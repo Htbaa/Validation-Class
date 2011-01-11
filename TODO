@@ -1,0 +1,7 @@
+Validation-Class Todo
+
+v 0.0000
+- translate params to groups
+v 0.0000
+- centralize directives
+- mixin_field function overwrites label directive

@@ -1,0 +1,86 @@
+NAME
+    Validation::Class - Centralized Input Validation For Any Application
+
+DESCRIPTION
+    Validation::Class is a different approach to data validation, it
+    attempts to simplify and centralize data validation rules to ensure DRY
+    (don't repeat yourself) code. The primary intent of this module is to
+    provide a simplistic validation work-flow and promote code (validation)
+    reuse. The following is an example of that...
+
+        use MyApp::Validation;
+    
+        my $input = MyApp::Validation->new($params);
+        unless ($input->validate('login', 'password')){
+            return $input->errors;
+        }
+
+WEB FRAMEWORKS
+    In the context that within our MyApp web application structure we have a validation
+    class named MyApp::Validation which is defined as follows:
+    
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    field 'login' => {
+	required => 1,
+	filter   => 'strip'
+    };
+    
+    field 'password' => {
+	required => 1,
+	filter   => 'strip'
+    };
+    
+    1;
+    
+  CATALYST - validation within a controller
+    package MyApp::Index;
+    use base qw/Catalyst::Controller/;
+    sub index : Global {
+        my ( $self, $c, @args ) = @_;
+	my $input = MyApp::Validation->new($c->req->params);
+        unless ($input->validate('login', 'password')){
+            $c->res->body("FAIL - " . join ", ", @{ $input->errors });
+        }
+        $c->res->body('PASS');
+    }
+    
+
+  MOJOLICIOUS - validation within a controller
+    package MyApp::Index;
+    use base 'Mojolicious::Controller';
+    use MyApp::Validation;
+
+    sub index {
+        my $self = shift;
+	my $input = MyApp::Validation->new($self->req->params);
+        unless ($input->validate('login', 'password')){
+            $self->render(text => "FAIL - " . join ", ", @{ $input->errors });
+        }
+        $self->render(text => 'PASS');
+    }
+
+  DANCER - validation within a controller
+    package MyApp::Index;
+    use Dancer;
+    use MyApp::Validation;
+
+    post '/login' => sub {
+	my $params = {params};
+	my $input = MyApp::Validation->new($params);
+        unless ($input->validate('login', 'password')){
+            return "FAIL - " . join ", ", @{ $input->errors };
+        }
+        return "PASS";
+    };
+
+AUTHOR
+    Al Newkirk <awncorp@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by awncorp.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+    
