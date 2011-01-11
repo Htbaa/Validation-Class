@@ -51,81 +51,142 @@ intent of this module is to provide a simplistic validation work-flow and promot
         return $input->errors;
     }
 
-=head1 BASIC USAGE
+=head2 Standard Validation Class
 
-    package MyApp::Validation
+    package MyApp::Validation;
     use Validation::Class;
-
-    # define a mixin, a sortof template that can be included with other rules
-    # by using the mixin directive
-    
-    mixin 'default' => {
-        required    => 1,
-        min_length  => 4,
-        max_length  => 255
-    };
-    
-    # define a data validation rule for parameter `login` using the default
-    # mixin where the `login` must be between 4-255 characters long and have
-    # at least one letter and number
     
     field 'login' => {
-        label => 'user login',
-        mixin => 'default',
-        validation => sub {
-            my ($self, $this, $params) = @_;
-            my ($name, $value) = ($this->{label}, $params->{login});
-            $self->error($this, "$name must contain at least one letter and number")
-                unless ($value =~ /[a-zA-Z]/ || $value =~ /[0-9]/);
-        }
+        required   => 1,
+        min_length => 1,
+        max_length => 255
     };
-    
-    # define a data validation rule for parameter `password` using the
-    # previously defined field `login` as the mixin (template)
     
     field 'password' => {
-        mixin_field => 'login',
-        label => 'user password'
+        required   => 1,
+        min_length => 1,
+        max_length => 255
     };
-
-=head1 CLASSLESS USAGE
     
+    1;
+    
+The field keyword creates validation blocks specific to the field which makes
+validation easy from your script or controller. e.g.
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new($params);
+    unless ($input->validate('login', 'password')){
+        return $input->errors;
+    }
+    
+Feeling lazy, have your validation class automatically find the appropriate fields
+to validate against (params must match field names).
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new($params);
+    unless ($input->validate){
+        return $input->errors;
+    }
+    
+=head2 Validation Class with Mixins and Grouping
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    mixin 'cds => {
+        required   => 1,
+    };
+    
+    field 'cds:id' => {
+        mixin => 'cds'
+    };
+    
+    mixin 'artists' => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255
+    };
+    
+    field 'artists:id' => {
+        mixin => 'artists'
+    };
+    
+    field 'artists:email' => {
+        mixin => 'artists'
+    }
+    
+    field 'artists:login' => {
+        mixin => 'artists'
+    };
+    
+    field 'artists:password' => {
+        mixin => 'artists'
+    };
+    
+    1;
+
+The mixin keyword creates a validation template that can be applied to any field.
+Fields defined using a delimiter (see above) such as (:, #, -) are referred to as
+grouped fields which have no programmatic significance other than clearly depicting how
+fields relate to one another. The following is an example of additional more advanced
+ways to validate. e.g.
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new($params);
+    unless ($input->validate('artists:login', 'artists:password')){
+        return $input->errors;
+    }
+
+What happens when your input parameters don't match your validation field names?
+In that case we want to call the validate function with field mappings as follows:
+
+    use MyApp::Validation;
+    
+    my $fields = {
+        login => 'artists:login', password => 'artists:password'
+    };
+    my $input = MyApp::Validation->new($params);
+    unless ($input->validate($fields)){
+        return $input->errors;
+    }
+
+=head2 Validation without Class
+
 And now for my second and final act, using Validation::Class outside of a package.
+This is useful for your one-off scripts that won't have classes shipped with it.
 
     #!/usr/bin/perl
     use Validation::Class;
     
-    my $i = validation_schema(
-            mixins => {
-                default => {
-                    required    => 1,
-                    min_length  => 4,
-                    max_length  => 255
+    my $input = validation_schema(
+        mixins => {
+            default => {
+                required    => 1,
+                min_length  => 4,
+                max_length  => 255
+            }
+        },
+        fields => {
+            login => {
+                label => 'user login',
+                mixin => 'default',
+                validation => sub {
+                    # error out for no good reason
+                    $_[0]->error($_[1], "Err..raaaarr, ...");
                 }
             },
-            fields => {
-                login => {
-                    label => 'user login',
-                    mixin => 'default',
-                    validation => sub {
-                        my ($self, $this, $params) = @_;
-                        my ($name, $value) = ($this->{name}, $params->{login});
-                        $self->error($this, "field $name must contain at least one letter and number")
-                            if ($value !~ /[a-zA-Z]/ && $value !~ /[0-9]/);
-                    }
-                },
-                password => {
-                    mixin_field => 'login',
-                    label => 'user password'
-                }
-            },
-    );
+            password => {
+                mixin_field => 'login',
+                label => 'user password'
+            }
+        }
+    )->setup($params);
     
-    # Important, store the new instance created by the $i->setup function
-    $o = $i->setup($params);
-    
-    unless ($o->validate) {
-        return $o->errors
+    unless ($input->validate) {
+        return $input->errors;
     }
     
 =cut
@@ -221,27 +282,35 @@ sub setup {
     return $self;
 }
 
-
-
 =method field
 
 The field function defines the validation rules for the specified parameter it
-is named after. e.g. field 'some_data' => {...}, validates against the value of 
-the hash reference where the key is `some_data`.
+is named after.
 
     field 'some_param' => {
         mixin => 'default',
         validation => sub {
-            my ($v, $this, $params) = @_;
-            $v->error($this, "...")
-                if ...
+            my ($self, $this, $params) = @_;
+            $self->error($this, "im an error, when you see me .. run");
         }
     };
 
-    Fields are comprised of specific directives, those directives are as follows:
-    name: The name of the field (auto set)
-    value: The value of the parameter matching the name of the field (auto set)
-    mixin: The template to be used to copy directives from
+The field keword takes two arguments, the field name and a hashref of key/values
+pairs. The keys are referred to as directives, those directives are as follows:
+
+=over 4
+
+=item * name
+
+The name of the field (auto set)
+
+=item * value
+
+The value of the parameter matching the name of the field (auto set)
+
+=item * mixin
+
+The template to be used to copy directives from e.g.
     
     mixin 'template' => {
         required => 1
@@ -251,7 +320,9 @@ the hash reference where the key is `some_data`.
         mixin => 'template'
     }
     
-    mixin_field: The field to be used as a mixin(template) to copy directives from
+=item * mixin_field
+
+The field to be used as a mixin (template) to have directives copied from e.g.
     
     field 'a_field' => {
         required => 1,
@@ -263,27 +334,54 @@ the hash reference where the key is `some_data`.
         mixin_field => 'a_field'
     };
     
-    validation: A validation routine that returns true or false
+=item * validation
+
+A custom validation routine. Please note that the return value is not important.
+Please register an error if validation fails e.g.
     
     field '...' => {
         validation => sub {
-            my ($self, $field, $all_parameters) = @_;
-            return 1
+            my ($self, $this, $parameters) = @_;
+            $self->error($this, "I failed") if $parameters->{something};
         }
     };
     
-    errors: The collection of errors encountered during processing (auto set arrayref)
-    label: An alias for the field name, something more human-readable
-    error: A custom error message, displayed instead of the generic ones
-    required : Determines whether the field is required or not, takes 1/0 true of false
-    min_length: Determines the maximum length of characters allowed
-    max_length: Determines the minimum length of characters allowed
-    ref_type: Determines whether the field value is a valid perl reference variable
-    regex: Determines whether the field value passed the regular expression test
+=item * errors
+
+The collection of errors encountered during processing (auto set arrayref)
+
+=item * label
+
+An alias for the field name, something more human-readable, is also used in
+auto-generated error messages
+
+=item * error
+
+A custom error message, displayed instead of the generic ones
+
+=item * required
+
+Determines whether the field is required or not, takes 1 or 0
+
+=item * min_length
+
+Determines the minimum length of characters allowed
+
+=item * max_length
+
+Determines the maximum length of characters allowed
+
+=item * ref_type
+
+Determines whether the field value is a valid perl reference variable
+
+=item * regex
+
+Determines whether the field value passes the supplied regular expression e.g.
     
     field 'c_field' => {
         label => 'a field labeled c',
-        error => 'a field labeled c cannot ',
+        error => 'a field labeled c cannot be ...',
         required => 1,
         min_length => 2,
         max_length => 25,
@@ -291,8 +389,13 @@ the hash reference where the key is `some_data`.
         regex => '^\d+$'
     };
     
-    filter: An alias for the filters directive, see filter method for filter names
-    filters: Set filters to manipulate the data before validation
+=item * filter
+
+An alias for the filters directive
+
+=item * filters
+
+Set filters to manipulate the data before validation, e.g.
     
     field 'd_field' => {
         ...,
@@ -315,20 +418,38 @@ the hash reference where the key is `some_data`.
         ]
     };
     
+    # the following filters can be set using the filter(s) keywords:
+    
+    field 'g_field' => {
+        filters => [
+            'trim', 
+            'alpha',
+            'digit',
+            'strip',
+            'numeric ',
+            'lowercase',
+            'uppercase',
+            'titlecase',
+            'camelcase',
+            'lowercase',
+            'alphanumeric',
+            sub {
+                my $value = shift;
+            }
+        ]
+    };
+
+=back
+    
 =cut
 
 sub field {
-    #my $group = shift if @_ == 3;
     my %spec = @_;
     if (%spec) {
         my $name = (keys(%spec))[0];
         my $data = (values(%spec))[0];
         
-        #$name    = "$group:$name" if $group;
-        
-        #$FIELDS->{$name} = merge($data, $FIELDS->{$name});
         $FIELDS->{$name} = $data;
-        
         $FIELDS->{$name}->{errors} = [];
         $FIELDS->{$name}->{validation} =
             defined $data->{validation} ? $data->{validation} : sub {0};
@@ -339,13 +460,14 @@ sub field {
 
 =method mixin
 
-The mixin function defines validation rule templates to be later reused by
-more specifically defined fields.
+The mixin function defines validation rule templates to be later reused within
+fields.
 
     mixin 'default' => {
         required    => 1,
         min_length  => 4,
-        max_length  => 255
+        max_length  => 255,
+        ...
     };
     
 =cut
@@ -356,7 +478,6 @@ sub mixin {
         my $name = (keys(%spec))[0];
         my $data = (values(%spec))[0];
         
-        #$MIXINS->{$name} = merge($data, $MIXINS->{$name});
         $MIXINS->{$name} = $data;
     }
     return 'mixin', %spec;
@@ -364,15 +485,18 @@ sub mixin {
 
 =method error
 
-The error function is used to set and/or retrieve errors encountered or set
-during validation. The error function with no parameters returns the error
-message arrayref which can be used to output a single concatenated error message
-a with delimeter.
+The error(s) function is used to set and/or retrieve errors encountered during
+validation. The error function with no parameters returns the error message object
+which is an arrayref of error messages. 
 
-    $self->error() # returns an arrayref of errors
-    join '<br/>', @{$self->error()}; # html-break delimeted errors
-    $self->error('some_param'); # show parameter-specific error messages arrayref
-    $self->error($this, "$name must conform ..."); # set error, see `field` function
+    # return all errors encountered/set
+    return $self->error();
+    
+    # return all errors specific to the specified field
+    return $self->error('some_param');
+    
+    # set an error specific to the specified field
+    $self->error($field_obj, "i am your error message");
     
 =cut
 
@@ -415,23 +539,10 @@ sub error {
     return 0;
 }
 
-=method errors
-
-The errors function is a synonym for the error function.
-
-=cut
-
 sub errors {
     my ($self, @args) = @_;
     return $self->error(@args);
 }
-
-=method check_mixin
-
-The check_mixin function is used internally to validate the defined keys and
-values of mixins.
-
-=cut
 
 sub check_mixin {
     my ($self, $mixin, $spec) = @_;
@@ -460,13 +571,6 @@ sub check_mixin {
     
     return 1;
 }
-
-=method check_field
-
-The check_field function is used internally to validate the defined keys and
-values of fields.
-
-=cut
 
 sub check_field {
     my ($self, $field, $spec) = @_;
@@ -503,13 +607,6 @@ sub check_field {
     return 1;
 }
 
-=method use_mixin
-
-The use_mixin function sequentially applies defined mixin parameteres
-(as templates)to the specified field.
-
-=cut
-
 sub use_mixin {
     my ($self, $field, $mixin_s ) = @_;
     if (ref($mixin_s) eq "ARRAY") {
@@ -528,13 +625,6 @@ sub use_mixin {
     }
     return 1;
 }
-
-=method use_mixin_field
-
-The use_mixin_field function copies the properties (directives) of a specified
-field to the target field processing copied mixins along the way.
-
-=cut
 
 sub use_mixin_field {
     my ($self, $field, $target) = @_;
@@ -563,7 +653,17 @@ sub use_mixin_field {
 =method validate
 
 The validate function sequentially checks the passed-in field names against their
-defined validation rules and returns 0 or 1 based on the existence of errors.
+defined validation rules and returns 0 or 1 based on the existence of errors for
+each within each field.
+
+    # find fields based on input parameters and validate them
+    $input->validate;
+    
+    # validate specific fields (validates in the order specified)
+    $input->validate('login', 'password');
+    
+    # map parameters to fields then validate (no validation order)
+    $input->validate({ 'login' => 'users:login', 'password' => 'users:password' });
 
 =cut
 
@@ -682,13 +782,6 @@ sub validate {
     return @{$self->{errors}} ? 0 : 1; # returns true if no errors
 }
 
-=method basic_validate
-
-The basic_validate function processes the pre-defined contraints e.g.,
-required, min_length, max_length, etc.
-
-=cut
-
 sub basic_validate {
     my ($self, $field, $this) = @_;
     
@@ -767,14 +860,6 @@ sub basic_validate {
     }
     return 1;
 }
-
-=method basic_filter
-
-The basic_filter function processes the pre-defined filters e.g.,
-trim, strip, digit, alpha, numeric, alphanumeric, uppercase, lowercase,
-titlecase, or custom etc.
-
-=cut
 
 sub basic_filter {
     my ($self, $filter, $field) = @_;
@@ -864,26 +949,23 @@ sub basic_filter {
 
 The validation_schema method encapsulates fields and mixins and returns a
 Validation::Class instance for further validation. This method exist for situations
-where Validation::Class is use outside of a specific validation package.
+where Validation::Class is used outside of a specific validation package.
 
     my $i = validation_schema(
-            mixins => {
-                    'default' => {
-                            required => 1
-                    }
-            },
-            fields => {
-                    'test1' => {
-                            mixin => 'default'
-                    }
-            },
-    );
+        mixins => {
+            'default' => {
+                    required => 1
+            }
+        },
+        fields => {
+            'test1' => {
+                    mixin => 'default'
+            }
+        }
+    )->setup({ test1 => '...' });
     
-    # Important store the new instance
-    $o = $i->setup({ test1 => '...' });
-    
-    if ($o->validate('test1')) {
-        ...
+    unless ($i->validate('test1')) {
+        return $i->errors;
     }
 
 =cut

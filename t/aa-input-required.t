@@ -23,16 +23,17 @@ field '002'     => {
 };
 
 # case: 1
+my @errors = ();
 my $v = Test::Validation->new();
 ok(!$v->validate('001'), "case:1 validation successful");
-my @errors = @{$v->errors};
+@errors = @{$v->errors};
 ok(@errors, "case:1 input missing test");
 ok($v->error('001')->[0] eq "this is a problem", "case:1 error msg test");
 
 # case: 2
 $v = Test::Validation->new({'002' => '1'});
 ok($v->validate('002'), "case:2 validation successful");
-my @errors = @{$v->errors};
+@errors = @{$v->errors};
 ok(!@errors, "case:2 input missing test");
 
 #print "# Error Output:\n";
