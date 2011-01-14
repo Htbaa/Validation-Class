@@ -54,7 +54,7 @@ WEB FRAMEWORKS
 
     sub index {
         my $self = shift;
-	my $input = MyApp::Validation->new($self->req->params);
+	my $input = MyApp::Validation->new($self->req->params->to_hash);
         unless ($input->validate('login', 'password')){
             $self->render(text => "FAIL - " . join ", ", @{ $input->errors });
         }
