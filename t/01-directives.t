@@ -1,6 +1,6 @@
 #!perl -T
 package Test::Validation;
-use Test::More tests => 11;
+use Test::More tests => 13;
 
 BEGIN {
 	use_ok( 'Validation::Class' );
@@ -78,6 +78,25 @@ ok(!@{$tv->errors()}, "reference type test");
 $tv = Test::Validation->new({ test1 => 1 });
 $tv->validate('test1');
 ok(!@{$tv->errors()}, "error count test");
+
+# test error_fields with errors
+$tv = Test::Validation->new( {} );
+$tv->validate('test2');
+is_deeply(
+    $tv->error_fields(),
+    { test2 => ['another value is always required'] },
+    "error_fields test with errors"
+);
+
+# test error_fields without errors
+$tv = Test::Validation->new( { test2 => "foo"} );
+$tv->validate('test2');
+is_deeply(
+    $tv->error_fields(),
+    {},
+    "error_fields without error "
+);
+
 
 # warn(($tv->errors())[0]);
 

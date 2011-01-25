@@ -24,6 +24,7 @@ BEGIN {
         field
         mixin
         error
+        error_fields
         errors
         check_field
         check_mixin
@@ -481,6 +482,26 @@ sub mixin {
         $MIXINS->{$name} = $data;
     }
     return 'mixin', %spec;
+}
+
+=method error_fields
+
+The error_fields function is used to get a hash reference containing
+all fields with validation errors as keys and their corresponding error
+messages as values.
+
+=cut
+
+sub error_fields {
+    my ($self) = @_;
+    my $error_fields = {};
+    for my $field ( keys %{ $self->{fields} } ) {
+        my $errors = $self->{fields}->{$field}->{errors};
+        if ( @{$errors} ) {
+            $error_fields->{$field} = $errors;
+        }
+    }
+    return $error_fields;
 }
 
 =method error
