@@ -33,6 +33,7 @@ BEGIN {
         use_mixin_field
         basic_validate
         basic_filter
+        params
         Oogly
     );
     %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
@@ -964,6 +965,25 @@ sub basic_filter {
         }
     }
     
+}
+
+=method params
+
+The params function is used to get a hash reference containing
+all the passed-in input paramters. This is useful and neccessary when your rules
+have filters that perform transformations and you want to use the altered values.
+
+=cut
+
+sub params {
+    my ($self) = shift;
+    my $error_fields = {};
+    my $params = ref $_[0] ? $_[0] : { @_ };
+    if ($params) {
+        $self->{params} = { %{$self->{params}}, %{$params} };
+        return $self;
+    }
+    return $self->{params};
 }
 
 =method validation_schema
