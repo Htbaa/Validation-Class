@@ -40,7 +40,8 @@ validation work-flow and promote code (validation) reuse.
 
     package MyApp::Validation;
     
-    use Validation::Class;
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
     
     # a validation rule
     field 'login'  => {
@@ -70,7 +71,8 @@ validation work-flow and promote code (validation) reuse.
 
     package MyApp::Validation;
     
-    use Validation::Class;
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
     
     # a validation rule template
     mixin 'basic'  => {
@@ -111,7 +113,8 @@ reuse in code. The field keyword should correspond with the parameter name
 expected to be passed to your validation class.
 
     package MyApp::Validation;
-    use Validation::Class;
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
     
     field 'login' => {
         required   => 1,
@@ -284,7 +287,8 @@ The mixin keyword creates a validation rules template that can be applied to any
 field using the mixin directive.
 
     package MyApp::Validation;
-    use Validation::Class;
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
     
     mixin 'constrain' => {
         required   => 1,
@@ -318,7 +322,8 @@ sub mixin {
 The filter keyword creates custom filters to be used in your field definitions.
 
     package MyApp::Validation;
-    use Validation::Class;
+    use Validation::Class qw/field mixin filter/;
+    10use base 'Validation::Class';
     
     filter 'telephone' => sub {
         $_[0] =~ s/[^\(\)\-\+\s\d]//g;
@@ -564,6 +569,50 @@ has 'filters' => (
       }
 );
 
+=head2 ignore_unknown
+
+The ignore_unknown boolean determines whether your application will live or die
+upon encountering unregistered fields during validation.
+
+    MyApp::Validation->new(params => $params, ignore_unknown => 1);
+    
+    or
+    
+    $self->ignore_unknown(1);
+    ...
+
+=cut
+
+# ignore unknown input parameters
+has 'ignore_unknown' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0
+);
+
+=head2 report_unknown
+
+The report_unknown boolean determines whether your application will report
+unregistered fields as class-level errors upon encountering unregistered fields
+during validation.
+
+    MyApp::Validation->new(params => $params,
+    ignore_unknown => 1, report_unknown => 1);
+    
+    or
+    
+    $self->report_unknown(1);
+    ...
+
+=cut
+
+# report unknown input parameters
+has 'report_unknown' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0
+);
+
 =head2 params
 
 The params attribute gets/sets the parameters to be validated.
@@ -757,7 +806,9 @@ sub validate {
             # process all params
             foreach my $field ( keys %{ $self->params } ) {
                 if ( !defined $self->fields->{$field} ) {
-                    die "Data validation field $field does not exist";
+                    my $death_cert
+                        = "Data validation field $field does not exist";
+                    $self->_suicide_by_unknown_field($death_cert);
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;
@@ -782,7 +833,9 @@ sub validate {
         else {
             foreach my $field (@fields) {
                 if ( !defined $self->fields->{$field} ) {
-                    die "Data validation field $field does not exist";
+                    my $death_cert
+                        = "Data validation field $field does not exist";
+                    $self->_suicide_by_unknown_field($death_cert);
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;
@@ -809,7 +862,9 @@ sub validate {
         if (@fields) {
             foreach my $field (@fields) {
                 if ( !defined $self->fields->{$field} ) {
-                    die "Data validation field $field does not exist";
+                    my $death_cert
+                        = "Data validation field $field does not exist";
+                    $self->_suicide_by_unknown_field($death_cert);
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;
@@ -948,8 +1003,9 @@ sub basic_validate {
 sub basic_filter {
     my ( $self, $filter, $field ) = @_;
 
-    if ( defined $self->params->{$field} ) {
-        $self->filters->{$filter}->( $self->params->{$field} );
+    if ( defined $self->params->{$field} && $self->filters->{$filter} ) {
+        $self->filters->{$filter}->( $self->params->{$field} )
+            if $self->params->{$field};
     }
 
 }
@@ -1107,6 +1163,20 @@ follows.
 sub errors {
     my ($self, $errobj) = @_;
     Validation::Class::Errors->new(errors => $errobj || $self->{errors} || []);
+}
+
+sub _suicide_by_unknown_field {
+    my $self  = shift;
+    my $error = shift;
+    if ($self->ignore_unknown) {
+        if ($self->report_unknown) {
+            push @{ $self->{errors} }, $error
+                unless grep { $_ eq $error } @{ $self->{errors} };
+        }
+    }
+    else {
+        die $error ;
+    }
 }
 
     package
