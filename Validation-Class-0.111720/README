@@ -1,0 +1,477 @@
+NAME
+    Validation::Class - Centralized Input Validation For Any Application
+
+VERSION
+    version 0.111720
+
+SYNOPSIS
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new(params => $params);
+        
+    unless ($input->validate('field1', 'field2')){
+            return $input->errors->to_string;
+        }
+
+DESCRIPTION
+    Validation::Class is a different approach to data validation, it
+    attempts to simplify and centralize data validation rules to ensure DRY
+    (don't repeat yourself) code. The primary intent of this module is to
+    provide a simplistic validation work-flow and promote code (validation)
+    reuse.
+
+BUILDING A VALIDATION CLASS
+        package MyApp::Validation;
+        
+    use Validation::Class qw/field mixin filter/;
+        use base 'Validation::Class';
+        
+    # a validation rule
+        field 'login'  => {
+            label      => 'user login',
+            error      => 'login invalid',
+            validation => sub {
+                my ($self, $this, $fields) = @_;
+                return $this->{value} eq 'admin' ? 1 : 0;
+            }
+        };
+        
+    # a validation rule
+        field 'password'  => {
+            label         => 'user password',
+            error         => 'password invalid',
+            validation    => sub {
+                my ($self, $this, $fields) = @_;
+                return $this->{value} eq 'pass' ? 1 : 0;
+            }
+        };
+        
+    1;
+
+USING MIXINS AND GROUPING
+        package MyApp::Validation;
+        
+    use Validation::Class qw/field mixin filter/;
+        use base 'Validation::Class';
+        
+    # a validation rule template
+        mixin 'basic'  => {
+            required   => 1,
+            min_length => 1,
+            max_length => 255,
+            filters    => ['lowercase', 'alphanumeric']
+        };
+        
+    # a validation rule
+        field 'user:login'  => {
+            mixin      => 'basic',
+            label      => 'user login',
+            error      => 'login invalid',
+            validation => sub {
+                my ($self, $this, $fields) = @_;
+                return $this->{value} eq 'admin' ? 1 : 0;
+            }
+        };
+        
+    # a validation rule
+        field 'user:password'  => {
+            mixin         => 'basic',
+            label         => 'user login',
+            error         => 'login invalid',
+            validation    => sub {
+                my ($self, $this, $fields) = @_;
+                return $this->{value} eq 'pass' ? 1 : 0;
+            }
+        };
+        
+    1;
+
+  FIELD KEYWORD
+    The field keyword create a validation block and defines validation rules
+    for reuse in code. The field keyword should correspond with the
+    parameter name expected to be passed to your validation class.
+
+        package MyApp::Validation;
+        use Validation::Class qw/field mixin filter/;
+        use base 'Validation::Class';
+        
+    field 'login' => {
+            required   => 1,
+            min_length => 1,
+            max_length => 255,
+            ...
+        };
+
+    The field keword takes two arguments, the field name and a hashref of
+    key/values pairs. The keys are referred to as directives, those
+    directives are as follows:
+
+   name
+    The name of the field (auto set)
+
+   value
+    The value of the parameter matching the name of the field (auto set)
+
+   mixin
+    The template to be used to copy directives from e.g.
+
+        mixin 'template' => {
+            required => 1
+        };
+        
+    field 'a_field' => {
+            mixin => 'template'
+        }
+
+   mixin_field
+    The field to be used as a mixin (template) to have directives copied
+    from e.g.
+
+        field 'a_field' => {
+            required => 1,
+            min_length => 2,
+            max_length => 10
+        };
+        
+    field 'b_field' => {
+            mixin_field => 'a_field'
+        };
+
+   validation
+    A custom validation routine. Please note that the return value is not
+    important. Please register an error if validation fails e.g.
+
+        field '...' => {
+            validation => sub {
+                my ($self, $this, $parameters) = @_;
+                $self->error($this, "I failed") if $parameters->{something};
+            }
+        };
+
+   errors
+    The collection of errors encountered during processing (auto set
+    arrayref)
+
+   label
+    An alias for the field name, something more human-readable, is also used
+    in auto-generated error messages
+
+   error
+    A custom error message, displayed instead of the generic ones
+
+   required
+    Determines whether the field is required or not, takes 1 or 0
+
+   min_length
+    Determines the minimum length of characters allowed
+
+   max_length
+    Determines the maximum length of characters allowed
+
+   ref_type
+    Determines whether the field value is a valid perl reference variable
+
+   regex
+    Determines whether the field value passes the supplied regular
+    expression e.g.
+
+        field 'c_field' => {
+            label => 'a field labeled c',
+            error => 'a field labeled c cannot be ...',
+            required => 1,
+            min_length => 2,
+            max_length => 25,
+            ref_type => 'array',
+            regex => '^\d+$'
+        };
+
+   filter
+    An alias for the filters directive
+
+   filters
+    Set filters to manipulate the data before validation, e.g.
+
+        field 'd_field' => {
+            ...,
+            filters => [
+                'trim',
+                'strip'
+            ]
+        };
+        
+    field 'e_field' => {
+            filter => 'strip'
+        };
+        
+    field 'f_field' => {
+            filters => [
+                'trim',
+                sub {
+                    $_[0] =~ s/(abc)|(123)//;
+                }
+            ]
+        };
+        
+    # the following filters can be set using the filter(s) keywords:
+        
+    field 'g_field' => {
+            filters => [
+                'trim', 
+                'alpha',
+                'digit',
+                'strip',
+                'numeric ',
+                'lowercase',
+                'uppercase',
+                'titlecase',
+                'camelcase',
+                'lowercase',
+                'alphanumeric',
+                sub {
+                    my $value = shift;
+                }
+            ]
+        };
+
+  MIXIN KEYWORD
+    The mixin keyword creates a validation rules template that can be
+    applied to any field using the mixin directive.
+
+        package MyApp::Validation;
+        use Validation::Class qw/field mixin filter/;
+        use base 'Validation::Class';
+        
+    mixin 'constrain' => {
+            required   => 1,
+            min_length => 1,
+            max_length => 255,
+            ...
+        };
+        
+    field 'login' => {
+            mixin => 'constrain',
+            ...
+        };
+
+  FILTER KEYWORD
+    The filter keyword creates custom filters to be used in your field
+    definitions.
+
+        package MyApp::Validation;
+        use Validation::Class qw/field mixin filter/;
+        10use base 'Validation::Class';
+        
+    filter 'telephone' => sub {
+            $_[0] =~ s/[^\(\)\-\+\s\d]//g;
+        };
+        
+    field 'telephone' => {
+            filter => ['trim', 'telephone'],
+            ...
+        };
+
+EXECUTING A VALIDATION CLASS
+    The following is an example of how to use you constructed validation
+    class in other code, .e.g. Web App Controller, etc.
+
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new(params => $params);
+        unless ($input->validate('field1','field2')){
+            return $input->errors->to_string;
+        }
+
+    Feeling lazy, have your validation class automatically find the
+    appropriate fields to validate against (params must match field names).
+
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new(params => $params);
+        unless ($input->validate){
+            return $input->errors->to_string;
+        }
+
+    If you are using groups in your validation class you might validate your
+    data like so ...
+
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new(params => $params);
+        unless ($input->validate('user:login', 'user:password')){
+            return $input->errors->to_string;
+        }
+
+    Although this means that the incoming parameters need to specify its
+    parameter names using the same group naming convention. if this is not
+    to your liking, the validate() method can assist you in mapping your
+    incoming parameters to your defined validation fields as shown here:
+
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new(params => $params);
+        unless ($input->validate({ user => 'user:login', pass => 'user:password')){
+            return $input->errors->to_string;
+        }
+
+  new
+    The new method instantiates and returns an instance of your validation
+    class.
+
+        use MyApp::Validation;
+        
+    my $input = MyApp::Validation->new;
+        $input->params($params);
+        ...
+
+    or
+
+        my $input = MyApp::Validation->new(params => $params);
+        ...
+
+  fields
+    The fields attribute returns a hashref of defined fields, filtered and
+    merged with thier parameter counterparts.
+
+        my $fields = $self->fields();
+        ...
+
+  filters
+    The filters attribute returns a hashref of pre-defined filter
+    definitions.
+
+        my $filters = $self->filters();
+        
+    $filters->{trim}->(...);
+        $filters->{alpha}->(...);
+        $filters->{digit}->(...);
+        $filters->{whiteout}->(...);
+        $filters->{numeric}->(...);
+        $filters->{uppercase}->(...);
+        $filters->{titlecase}->(...);
+        $filters->{camelcase}->(...);
+        $filters->{lowercase}->(...);
+        $filters->{alphanumeric}->(...);
+        ...
+
+  ignore_unknown
+    The ignore_unknown boolean determines whether your application will live
+    or die upon encountering unregistered fields during validation.
+
+        MyApp::Validation->new(params => $params, ignore_unknown => 1);
+        
+    or
+        
+    $self->ignore_unknown(1);
+        ...
+
+  report_unknown
+    The report_unknown boolean determines whether your application will
+    report unregistered fields as class-level errors upon encountering
+    unregistered fields during validation.
+
+        MyApp::Validation->new(params => $params,
+        ignore_unknown => 1, report_unknown => 1);
+        
+    or
+        
+    $self->report_unknown(1);
+        ...
+
+  params
+    The params attribute gets/sets the parameters to be validated.
+
+        my $input = {
+            ...
+        };
+        
+    $self->params($input);
+        my $params = $self->params();
+        
+    ...
+
+  mixins
+    The mixins attribute returns a hashref of defined validation templates.
+
+        my $mixins = $self->mixins();
+        ...
+
+  validate
+    The validate method returns a hashref of defined validation templates.
+
+        my $mixins = $self->mixins();
+        ...
+
+ERROR HANDLING
+    The most important part of any input validation framework is its
+    ease-of-use and its error handling. Validation::Class gives you the
+    ability to bypass, override and/or clear errors at-will without a
+    hassle. The following methods assist you in doing just that.
+
+  error_fields
+    The error_fields method returns a hashref of fields whose value is an
+    arrayref of error messages.
+
+        unless ($self->validate) {
+            my $fields = $self->error_fields();
+        }
+
+  reset_errors
+    The reset_errors method clears all errors, both at the class and
+    individual field levels. This method is called automatically everytime
+    the validate() method is triggered.
+
+        $self->reset_errors();
+
+  error
+    The error function is used to set and/or retrieve errors encountered
+    during validation. The error function with no parameters returns the
+    error message object which is an arrayref of error messages stored at
+    class-level.
+
+        # return all errors encountered/set as an arrayref
+        return $self->error();
+        
+    # return all errors specific to the specified field (at the field-level)
+        # as an arrayref
+        return $self->error('some_param');
+        
+    # set an error specific to the specified field (at the field-level)
+        # using the field object (hashref not field name)
+        $self->error($field_object, "i am your error message");
+
+        unless ($self->validate) {
+            my $fields = $self->error();
+        }
+
+  errors
+    The errors function returns a special class (Validation::Class::Errors)
+    used to add convenience methods to the error objects. This class can be
+    utilized as follows.
+
+        # by default uses errors specified at the class-level
+        return $self->errors;
+        
+    # count() method returns the number of errors encoutered
+        return $self->errors->count();
+        
+    # to_string($delimiter) method strigifies the error arrayref object using
+        # the specified delimiter or ', ' by default
+        return $self->errors->to_string();
+        return $self->errors->to_string("<br/>\n");
+        
+    # use errors at the field-level in the errors class
+        return $self->errors($self->fields->{some_field})->count();
+
+        unless ($self->validate) {
+            return $self->errors->to_string;
+        }
+
+AUTHOR
+    Al Newkirk <awncorp@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by awncorp.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
