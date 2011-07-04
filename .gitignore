@@ -1,4 +1,6 @@
 *.kpf
 *.tar.gz
+.build
+.build/*
 Validation-Class-*
 Validation-Class-*/*

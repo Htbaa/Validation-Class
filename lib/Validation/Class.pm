@@ -580,33 +580,39 @@ has 'filters' => (
             trim => sub {
                 $_[0] =~ s/^\s+//g;
                 $_[0] =~ s/\s+$//g;
+                $_[0];
             },
             alpha => sub {
                 $_[0] =~ s/[^A-Za-z]//g;
+                $_[0];
             },
             digit => sub {
                 $_[0] =~ s/\D//g;
+                $_[0];
             },
             whiteout => sub {
                 $_[0] =~ s/\s+/ /g;
+                $_[0];
             },
             numeric => sub {
                 $_[0] =~ s/[^0-9]//g;
+                $_[0];
             },
             uppercase => sub {
                 return uc $_[0];
             },
             titlecase => sub {
-                map ( ucfirst, split( /\s/, $_[0] ) );
+                join( "", map ( ucfirst, split( /\s/, $_[0] ) ) );
             },
             camelcase => sub {
-                map ( ucfirst, split( /\s/, lc $_[0] ) );
+                join( "", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
             },
             lowercase => sub {
                 return lc $_[0];
             },
             alphanumeric => sub {
                 $_[0] =~ s/[^A-Za-z0-9]//g;
+                $_[0];
               }
         };
       }
@@ -1084,7 +1090,7 @@ sub basic_filter {
     my ( $self, $filter, $field ) = @_;
 
     if ( defined $self->params->{$field} && $self->filters->{$filter} ) {
-        $self->filters->{$filter}->( $self->params->{$field} )
+        $self->params->{$field} = $self->filters->{$filter}->( $self->params->{$field} )
             if $self->params->{$field};
     }
 
