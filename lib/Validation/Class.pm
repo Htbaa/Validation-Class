@@ -337,16 +337,13 @@ The filter keyword creates custom filters to be used in your field definitions.
 =cut
 
 sub filter {
-    my %spec = @_;
+    my ($name, $data) = @_;
 
-    if (%spec) {
-        my $name = ( keys(%spec) )[0];
-        my $data = ( values(%spec) )[0];
-
+    if ($name && $data) {
         $FILTERS->{$name} = $data;
     }
 
-    return 'filter', %spec;
+    return 'filter', @_;
 }
 
 =head1 EXECUTING A VALIDATION CLASS

@@ -1,1 +1,4 @@
 *.kpf
+*.tar.gz
+Validation-Class-*
+Validation-Class-*/*
