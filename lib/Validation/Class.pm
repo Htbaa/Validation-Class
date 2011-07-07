@@ -601,11 +601,11 @@ has 'filters' => (
             uppercase => sub {
                 return uc $_[0];
             },
-            titlecase => sub {
-                join( "", map ( ucfirst, split( /\s/, $_[0] ) ) );
-            },
             camelcase => sub {
-                join( "", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
+                join( " ", map ( ucfirst, split( /\s/, $_[0] ) ) );
+            },
+            titlecase => sub {
+                join( " ", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
             },
             lowercase => sub {
                 return lc $_[0];
