@@ -1437,6 +1437,46 @@ sub use_filter {
 
 }
 
+=head1 PARAMETER HANDLING
+
+The following are convenience functions for handling your input data after
+processing and data validation.
+
+=cut
+
+=head2 get_params
+
+The get_params method returns the values (in list form) of the parameters
+specified.
+
+    if ($self->validate) {
+        my $name = $self->get_params('name');
+        my ($name, $email, $login, $password) =
+            $self->get_params(qw/name email login password/);
+        
+        # you should note that if the params dont exist they will return undef
+        # ... meaning you should check that it exists before checking its value
+        # e.g.
+        
+        if (defined $name) {
+            if ($name eq '') {
+                print 'name parameter was passed but was empty';
+            }
+        }
+        else {
+            print 'name parameter was never submitted';
+        }
+    }
+
+=cut
+
+sub get_params {
+    my ($self, @params) = @_;
+    return map {
+        $self->params->{$_}
+    }   @params;
+}
+
 =head1 ERROR HANDLING
 
 The most important part of any input validation framework is its ease-of-use and
