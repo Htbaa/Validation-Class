@@ -8,7 +8,7 @@ use 5.008001;
 use Moose;
 use Moose::Exporter;
 use Array::Unique;
-use Hash::Merge;
+# use Hash::Merge;
 
     Moose::Exporter->setup_import_methods(
         as_is  => [ 'field', 'filter', 'mixin' ],
@@ -17,7 +17,45 @@ use Hash::Merge;
 
 our $FIELDS  = {};
 our $MIXINS  = {};
-our $FILTERS = {};
+our $FILTERS = { # default filters
+    trim => sub {
+        $_[0] =~ s/^\s+//g;
+        $_[0] =~ s/\s+$//g;
+        $_[0];
+    },
+    alpha => sub {
+        $_[0] =~ s/[^A-Za-z]//g;
+        $_[0];
+    },
+    digit => sub {
+        $_[0] =~ s/\D//g;
+        $_[0];
+    },
+    whiteout => sub {
+        $_[0] =~ s/\s+/ /g;
+        $_[0];
+    },
+    numeric => sub {
+        $_[0] =~ s/[^0-9]//g;
+        $_[0];
+    },
+    uppercase => sub {
+        uc $_[0];
+    },
+    titlecase => sub {
+        join( "", map ( ucfirst, split( /\s/, $_[0] ) ) );
+    },
+    camelcase => sub {
+        join( "", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
+    },
+    lowercase => sub {
+        lc $_[0];
+    },
+    alphanumeric => sub {
+        $_[0] =~ s/[^A-Za-z0-9]//g;
+        $_[0];
+    }
+};
 
 =head1 SYNOPSIS
 
@@ -25,7 +63,7 @@ our $FILTERS = {};
     
     my $input = MyApp::Validation->new(params => $params);
     
-    unless ($input->validate('field1', 'field2')){
+    unless ($input->validate){
         return $input->errors->to_string;
     }
 
@@ -66,6 +104,373 @@ validation work-flow and promote code (validation) reuse.
     1;
 
 =cut
+
+=head1 USING DIRECTIVES
+
+    package MyApp::Validation;
+    
+    use Validation::Class qw/field mixin/;
+    use base 'Validation::Class';
+    
+    # a validation template
+    mixin '...'  => {
+        ...
+    };
+    
+    # a validation rule
+    field '...'  => {
+        mixin => '...',
+        ...
+    };
+    
+    1;
+    
+When building a validation class, the first encountered and arguably two most
+important keyword functions are field() and mixin() which are used to declare
+their respective properties. A mixin() declares a validation template where
+its properties are intended to be copied within field() declarations which
+declares validation rules and properties.
+
+Both the field() and mixin() declarations/functions require two parameters, the
+first being a name, used to identify the declaration, and the second being a
+hashref of key/value pairs. The key(s) within a declaration are commonly referred
+to as directives.
+
+The following is a list of default directives which can be used in field/mixin
+declarations:
+
+=cut
+
+our $DIRECTIVES = {};
+
+=head2 label
+
+    # the label directive
+    field 'foobar'  => {
+        label => 'Foo Bar',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{label} = {
+    mixin => 0,
+    field => 1,
+    multi => 0
+};
+
+=head2 alias
+
+    # the alias directive
+    field 'foobar'  => {
+        alias => 'foo_bar',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{alias} = {
+    mixin => 0,
+    field => 1,
+    multi => 1
+};
+
+=head2 mixin
+
+    mixin 'abcxyz' => {
+        ...
+    };
+
+    # the mixin directive
+    field 'foobar'  => {
+        mixin => 'abcxyz',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{mixin} = {
+    mixin => 0,
+    field => 1,
+    multi => 1
+};
+
+=head2 mixin_field
+
+    # the mixin_field directive
+    field 'foobar'  => {
+        mixin_field => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{mixin_field} = {
+    mixin => 0,
+    field => 1,
+    multi => 1
+};
+
+=head2 validation
+
+    # the validation directive
+    field 'foobar'  => {
+        validation => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{validation} = {
+    mixin => 0,
+    field => 1,
+    multi => 0
+};
+
+=head2 error/errors
+
+    # the error(s) directive
+    field 'foobar'  => {
+        errors => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{errors} = {
+    mixin => 0,
+    field => 1,
+    multi => 0
+};
+
+$DIRECTIVES->{error} = $DIRECTIVES->{errors};
+
+=head2 value
+
+    # the value directive
+    field 'foobar'  => {
+        value => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{value} = {
+    mixin => 1,
+    field => 1,
+    multi => 1
+};
+
+=head2 name
+
+    # the name directive
+    field 'foobar'  => {
+        name => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{name} = {
+    mixin => 0,
+    field => 0,
+    multi => 0
+};
+
+=head2 filter/filters
+
+    # the filter(s) directive
+    field 'foobar'  => {
+        filter => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{filter} = {
+    mixin => 1,
+    field => 1,
+    multi => 1
+};
+
+$DIRECTIVES->{filters} = $DIRECTIVES->{filter};
+
+=head2 required
+
+    # the required directive
+    field 'foobar'  => {
+        required => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{required} = {
+    mixin => 1,
+    field => 1,
+    multi => 0
+};
+
+=head1 USING VALIDATOR DIRECTIVES
+
+    package MyApp::Validation;
+    
+    use Validation::Class qw/field mixin/;
+    use base 'Validation::Class';
+    
+    # a validation rule with validator directives
+    field '...'  => {
+        min_length => '...',
+        max_length => '...',
+        pattern    => '+# (###) ###-####',
+        ...
+    };
+    
+    1;
+    
+Validator directives are special directives with associated validation code that
+is used to validate common use-cases such as "checking the length of a parameter",
+etc.
+
+The following is a list of the default validators which can be used in field/mixin
+declarations:
+
+=cut
+
+=head2 min_length
+
+    # the min_length directive
+    field 'foobar'  => {
+        min_length => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{min_length} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ( $directive, $value, $field, $class ) = @_;
+        if ($value) {
+            unless ( length($value) > $directive ) {
+                my $handle = $field->{label} || $field->{name};
+                my $characters = int( $directive ) > 1 ?
+                    " characters" : " character";
+                my $error = "$handle must contain $directive or more $characters";
+                $class->error( $field, $error );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
+=head2 max_length
+
+    # the max_length directive
+    field 'foobar'  => {
+        max_length => '...',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{max_length} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ( $directive, $value, $field, $class ) = @_;
+        if ($value) {
+            unless ( length($value) < $directive ) {
+                my $handle = $field->{label} || $field->{name};
+                my $characters = int( $directive ) > 1 ?
+                    " characters" : " character";
+                my $error = "$handle must contain $directive or less $characters";
+                $class->error( $field, $error );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
+=head2 between
+
+    # the between directive
+    field 'foobar'  => {
+        between => '1-5',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{between} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ($directive, $value, $field, $class) = @_;
+        my ($min, $max) = split /\-/, $directive;
+        if ($value) {
+            unless ($value > $min && $value < $max) {
+                my $handle = $field->{label} || $field->{name};
+                $class->error($field, "$handle must be between $directive");
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
+=head2 pattern
+
+    # the pattern directive
+    field 'telephone'  => {
+        pattern => '### ###-####',
+        ...
+    };
+    
+    field 'country_code'  => {
+        pattern => 'XX',
+        filter  => 'uppercase'
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{pattern} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ( $directive, $value, $field, $class ) = @_;
+        if ($value) {
+            # build the regex
+            my $regex = $directive;
+            $regex =~ s/([^#X ])/\\$1/g;
+            $regex =~ s/#/\\d/g;
+            $regex =~ s/X/[a-zA-Z]/g;
+            $regex = qr/$regex/;
+            unless ( $value =~ $regex ) {
+                my $handle = $field->{label} || $field->{name};
+                my $error = "$handle does not match the pattern $directive";
+                $class->error( $field, $error );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
+# mixin/field types store
+has 'directives' => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { $DIRECTIVES }
+);
 
 =head1 USING MIXINS AND GROUPING
 
@@ -197,13 +602,9 @@ Determines the minimum length of characters allowed
 
 Determines the maximum length of characters allowed
 
-=head3 regex
-
-Determines whether the field value passes the supplied regular expression e.g.
-
 =head3 alias
 
-Defines alternative parameter name for the field to be matched against
+Defines alternative parameter names for the field to be matched against
     
     field 'c_field' => {
         label => 'a field labeled c',
@@ -211,8 +612,7 @@ Defines alternative parameter name for the field to be matched against
         required => 1,
         min_length => 2,
         max_length => 25,
-        alais => 'cf',
-        regex => '^\d+$'
+        alais => 'cf'
     };
     
 =head3 filter
@@ -287,7 +687,7 @@ The mixin keyword creates a validation rules template that can be applied to any
 field using the mixin directive.
 
     package MyApp::Validation;
-    use Validation::Class qw/field mixin filter/;
+    use Validation::Class qw/field mixin/;
     use base 'Validation::Class';
     
     mixin 'constrain' => {
@@ -322,11 +722,11 @@ sub mixin {
 The filter keyword creates custom filters to be used in your field definitions.
 
     package MyApp::Validation;
-    use Validation::Class qw/field mixin filter/;
-    10use base 'Validation::Class';
+    use Validation::Class qw/field filter/;
+    use base 'Validation::Class';
     
     filter 'telephone' => sub {
-        $_[0] =~ s/[^\(\)\-\+\s\d]//g;
+        ...
     };
     
     field 'telephone' => {
@@ -345,6 +745,50 @@ sub filter {
 
     return 'filter', @_;
 }
+
+=head2 DIRECTIVE KEYWORD
+
+The directive keyword creates custom validator directives to be used in your field
+definitions. The routine is passed two parameters, the value of directive and the
+value of the field the validator is being processed against. The validator should
+return true or false.
+
+    package MyApp::Validation;
+    use Validation::Class qw/directive field/;
+    use base 'Validation::Class';
+    
+    directive 'between' => sub {
+        my ($directive, $value, $field, $class) = @_;
+        my ($min, $max) = split /\-/, $directive;
+        unless ($value > $min && $value < $max) {
+            my $handle = $field->{label} || $field->{name};
+            $class->error($field, "$handle must be between $directive");
+            return 0;
+        }
+        return 1;
+    };
+    
+    field 'hours' => {
+        between => '00-24',
+        ...
+    };
+
+=cut
+
+sub directive {
+    my ($name, $data) = @_;
+
+    if ($name && $data) {
+        $DIRECTIVES->{$name} = {
+            mixin     => 1,
+            field     => 1,
+            validator => $data
+        };
+    }
+
+    return 'directive', @_;
+}
+
 
 =head1 EXECUTING A VALIDATION CLASS
 
@@ -410,7 +854,7 @@ projects.
 
     use MyApp::Validation;
     
-    my  $input = MyApp::Validation->new(automap => 1, params => { foo => 1 });
+    my  $input = MyApp::Validation->new(params => { foo => 1 });
     unless ($input->validate(){
         return $input->errors->to_string;
     }
@@ -495,7 +939,7 @@ sub BUILD {
 
             foreach my $filter ( @{ $self->fields->{$_}->{filters} } ) {
                 if ( defined $self->params->{$_} ) {
-                    $self->basic_filter( $filter, $_ );
+                    $self->use_filter( $filter, $_ );
                 }
             }
 
@@ -511,8 +955,10 @@ sub BUILD {
     }
     
     # alias checking, ... for duplicate aliases, etc
+    my $fieldtree = {};
     my $aliastree = {};
     foreach my $field (keys %{$self->fields}) {
+        $fieldtree->{$field} = $field;
         my $f = $self->fields->{$field};
         if (defined $f->{alias}) {
             my $aliases = "ARRAY" eq ref $f->{alias} ?
@@ -522,6 +968,10 @@ sub BUILD {
                 if ($aliastree->{$alias}) {
                     die "The field $field contains the alias $alias which is ".
                         "also defined in the field $aliastree->{$alias}";
+                }
+                elsif ($fieldtree->{$alias}) {
+                    die "The field $field contains the alias $alias which is ".
+                        "the name of an existing field";
                 }
                 else {
                     $aliastree->{$alias} = $field;
@@ -575,47 +1025,7 @@ The filters attribute returns a hashref of pre-defined filter definitions.
 has 'filters' => (
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub {
-        {
-            trim => sub {
-                $_[0] =~ s/^\s+//g;
-                $_[0] =~ s/\s+$//g;
-                $_[0];
-            },
-            alpha => sub {
-                $_[0] =~ s/[^A-Za-z]//g;
-                $_[0];
-            },
-            digit => sub {
-                $_[0] =~ s/\D//g;
-                $_[0];
-            },
-            whiteout => sub {
-                $_[0] =~ s/\s+/ /g;
-                $_[0];
-            },
-            numeric => sub {
-                $_[0] =~ s/[^0-9]//g;
-                $_[0];
-            },
-            uppercase => sub {
-                return uc $_[0];
-            },
-            titlecase => sub {
-                join( "", map ( ucfirst, split( /\s/, $_[0] ) ) );
-            },
-            camelcase => sub {
-                join( "", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
-            },
-            lowercase => sub {
-                return lc $_[0];
-            },
-            alphanumeric => sub {
-                $_[0] =~ s/[^A-Za-z0-9]//g;
-                $_[0];
-              }
-        };
-      }
+    default => sub { $FILTERS }
 );
 
 =head2 ignore_unknown
@@ -662,23 +1072,6 @@ has 'report_unknown' => (
     default => 0
 );
 
-=head2 automap
-
-The automap boolean determines whether the validate() function will automatically
-map passed-in parameters against agaist aliases defined in the field definitions.
-
-    MyApp::Validation->new(params => $params, automap => 1);
-    ...
-
-=cut
-
-# automap input parameters
-has 'automap' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 0
-);
-
 =head2 params
 
 The params attribute gets/sets the parameters to be validated.
@@ -717,42 +1110,26 @@ has 'mixins' => (
     default => sub { $MIXINS }
 );
 
-# mixin/field types store
+# mixin/field directives store
 has 'types' => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub {
-        {
-            field => {
-                alias       => sub { 1 },
-                mixin       => sub { 1 },
-                mixin_field => sub { 1 },
-                validation  => sub { 1 },
-                errors      => sub { 1 },
-                label       => sub { 1 },
-                error       => sub { 1 },
-                value       => sub { 1 },
-                name        => sub { 1 },
-                filter      => sub { 1 },
-                filters     => sub { 1 },
-                required    => sub { 1 },
-                min_length  => sub { 1 },
-                max_length  => sub { 1 },
-                data_type   => sub { 1 },
-                regex       => sub { 1 }
-            },
-            mixin => {
-                required   => sub { 1 },
-                min_length => sub { 1 },
-                max_length => sub { 1 },
-                data_type  => sub { 1 },
-                regex      => sub { 1 },
-                filter     => sub { 1 },
-                filters    => sub { 1 },
-                validation => sub { 1 }
-            }
+        
+        my  $types = {
+            mixin => {},
+            field => {}
         };
-      }
+        
+        foreach my $directive (keys %{ $DIRECTIVES }) {
+            $types->{mixin}->{$directive} = $DIRECTIVES->{$directive}
+                if $DIRECTIVES->{$directive}->{mixin};
+            $types->{field}->{$directive} = $DIRECTIVES->{$directive}
+                if $DIRECTIVES->{$directive}->{field};
+        }
+        
+        return $types;
+    }
 );
 
 sub check_mixin {
@@ -761,11 +1138,11 @@ sub check_mixin {
     my $directives = $self->types->{mixin};
 
     foreach ( keys %{$spec} ) {
-        if ( !defined $directives->{$_} ) {
+        if ( ! defined $directives->{$_} ) {
             die
               "The $_ directive supplied by the $mixin mixin is not supported";
         }
-        if ( !$directives->{$_} ) {
+        if ( ! $directives->{$_} ) {
             die "The $_ directive supplied by the $mixin mixin is invalid";
         }
     }
@@ -779,12 +1156,9 @@ sub check_field {
     my $directives = $self->types->{field};
 
     foreach ( keys %{$spec} ) {
-        if ( !defined $directives->{$_} ) {
+        if ( ! defined $directives->{$_} ) {
             die
               "The $_ directive supplied by the $field field is not supported";
-        }
-        if ( !$directives->{$_}->() ) {
-            die "The $_ directive supplied by the $field field is invalid";
         }
     }
 
@@ -800,7 +1174,7 @@ sub use_mixin {
         foreach my $mixin ( @{$mixin_s} ) {
             if ( defined $self->{mixins}->{$mixin} ) {
                 $self->fields->{$field} =
-                  Hash::Merge::merge( $self->fields->{$field},
+                  $self->_merge_field_with_mixin( $self->fields->{$field},
                     $self->{mixins}->{$mixin} );
             }
         }
@@ -821,7 +1195,7 @@ sub use_mixin_field {
       if defined $self->fields->{$target}->{label};
 
     $self->fields->{$target} =
-      Hash::Merge::merge( $self->fields->{$field}, $self->fields->{$target} );
+      $self->_merge_field_with_field( $self->fields->{$target}, $self->fields->{$field} );
 
     $self->fields->{$target}->{name}  = $name  if defined $name;
     $self->fields->{$target}->{label} = $label if defined $label;
@@ -851,9 +1225,10 @@ sub validate {
     # validation calls
     $self->reset_errors();
     
-    # translation (mainly for param => group:field operation)
+    # save unaltered state-of-parameters
     my %original_parameters = %{$self->params};
 
+    # create alias map manually if requested
     if ( "HASH" eq ref $fields[0] ) {
         my $map = $fields[0];
         @fields = ();
@@ -865,22 +1240,20 @@ sub validate {
         }
     }
     
-    # (automap) from aliases if applicable
-    if ($self->automap) {
-        @fields = ();
-        foreach my $field (keys %{$self->fields}) {
-            my $f = $self->fields->{$field};
-            if (defined $f->{alias}) {
-                my $aliases = "ARRAY" eq ref $f->{alias} ?
-                    $f->{alias} : [$f->{alias}];
-                
-                foreach my $alias (@{$aliases}) {
-                    if (defined $self->params->{$alias}) {
-                        my $param_value = $self->params->{$alias};
-                        delete $self->params->{$alias};
-                        $self->params->{ $field } = $param_value;
-                        push @fields, $field;
-                    }
+    # create map from aliases if applicable
+    @fields = () unless scalar @fields;
+    foreach my $field (keys %{$self->fields}) {
+        my $f = $self->fields->{$field};
+        if (defined $f->{alias}) {
+            my $aliases = "ARRAY" eq ref $f->{alias} ?
+                $f->{alias} : [$f->{alias}];
+            
+            foreach my $alias (@{$aliases}) {
+                if (defined $self->params->{$alias}) {
+                    my $param_value = $self->params->{$alias};
+                    delete $self->params->{$alias};
+                    $self->params->{ $field } = $param_value;
+                    push @fields, $field;
                 }
             }
         }
@@ -902,7 +1275,7 @@ sub validate {
                 my @passed = ( $self, $this, $self->params );
 
                 # execute simple validation
-                $self->basic_validate( $field, $this );
+                $self->use_validator( $field, $this );
 
                 # custom validation
                 if ( defined $self->fields->{$field}->{validation} ) {
@@ -929,7 +1302,7 @@ sub validate {
                 my @passed = ( $self, $this, $self->params );
 
                 # execute simple validation
-                $self->basic_validate( $field, $this );
+                $self->use_validator( $field, $this );
 
                 # custom validation
                 if ( defined $self->fields->{$field}->{validation} ) {
@@ -958,7 +1331,7 @@ sub validate {
                 my @passed = ( $self, $this, $self->params );
 
                 # execute simple validation
-                $self->basic_validate( $field, $this );
+                $self->use_validator( $field, $this );
 
                 # custom validation
                 if ( $self->fields->{$field}->{value}
@@ -987,7 +1360,7 @@ sub validate {
                 $this->{value} = $self->params->{$field};
 
                 # execute simple validation
-                $self->basic_validate( $field, $this );
+                $self->use_validator( $field, $this );
 
                 # custom validation shouldn't fire without params and data
                 # my @passed = ($self, $this, {});
@@ -1003,7 +1376,7 @@ sub validate {
                 $this->{value} = $self->params->{$field};
 
                 # execute simple validation
-                $self->basic_validate( $field, $this );
+                $self->use_validator( $field, $this );
 
                 # custom validation shouldn't fire without params and data
                 # my @passed = ($self, $this, {});
@@ -1017,7 +1390,7 @@ sub validate {
     return @{ $self->{errors} } ? 0 : 1;    # returns true if no errors
 }
 
-sub basic_validate {
+sub use_validator {
     my ( $self, $field, $this ) = @_;
 
     # does field have a label, if not use field name
@@ -1034,49 +1407,17 @@ sub basic_validate {
 
     if ( $this->{required} || $value ) {
 
-        if ( defined $this->{min_length} ) {
-            if ( $this->{min_length} ) {
-                if ( length($value) < $this->{min_length} ) {
-                    my $error =
-                      defined $this->{error} ? $this->{error}
-                      : "$name must contain at least " 
-                      . $this->{min_length}
-                      . (
-                        int( $this->{min_length} ) > 1 ? " characters"
-                        : " character"
-                      );
-                    $self->error( $this, $error );
-                }
-            }
-        }
-
-        # check max character length
-        if ( defined $this->{max_length} ) {
-            if ( $this->{max_length} ) {
-                if ( length($value) > $this->{max_length} ) {
-                    my $error =
-                      defined $this->{error} ? $this->{error}
-                      : "$name cannot be greater than " 
-                      . $this->{max_length}
-                      . (
-                        int( $this->{max_length} ) > 1 ? " characters"
-                        : " character"
-                      );
-                    $self->error( $this, $error );
-                }
-            }
-        }
-
-        # check against regex
-        if ( defined $this->{regex} ) {
-            if ( $this->{regex} ) {
-                unless ( $value =~ $this->{regex} ) {
-                    my $error =
-                      defined $this->{error}
-                      ? $this->{error}
-                      : "$name failed regular expression testing "
-                      . "using $value";
-                    $self->error( $this, $error );
+        # find and process all the validators
+        foreach my $key (keys %{$this}) {
+            if ($self->directives->{$key}) {
+                if ($self->directives->{$key}->{validator}) {
+                    if ("CODE" eq ref $self->directives->{$key}->{validator}) {
+                        
+                        # validate
+                        my $result = $self->directives->{$key}
+                        ->{validator}->($this->{$key}, $value, $this, $self);
+                        
+                    }
                 }
             }
         }
@@ -1086,7 +1427,7 @@ sub basic_validate {
     return 1;
 }
 
-sub basic_filter {
+sub use_filter {
     my ( $self, $filter, $field ) = @_;
 
     if ( defined $self->params->{$field} && $self->filters->{$filter} ) {
@@ -1263,6 +1604,30 @@ sub _suicide_by_unknown_field {
     else {
         die $error ;
     }
+}
+
+sub _merge_field_with_mixin {
+    my ($self, $field, $mixin) = @_;
+    while (my($key,$value) = each(%{$mixin})) {
+        if (defined $self->types->{field}->{$key}) {
+            $field->{$key} = $value;
+        }
+    }
+    return $field;
+}
+
+sub _merge_field_with_field {
+    my ($self, $field, $mixin_field) = @_;
+    while (my($key,$value) = each(%{$mixin_field})) {
+        
+        # skip unless the directive is mixin compatible
+        next unless $self->types->{mixin}->{$key}->{mixin};
+        
+        if (defined $self->types->{field}->{$key}) {
+            $field->{$key} = $value;
+        }
+    }
+    return $field;
 }
 
     package

@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More tests => 21;
 
 # load module
 use Validation::Class;
@@ -11,9 +11,7 @@ mixin 'basic'  => {
     filters    => ['lowercase', 'alphanumeric']
 };
 
-mixin 'validation'  => {
-    validation => sub {1}
-};
+mixin 'validation'  => {};
 
 field 'login'  => {
     mixin      => 'basic',
@@ -33,10 +31,6 @@ field 'password'  => {
 	my ($self, $this, $fields) = @_;
 	return $this->{value} eq 'pass' ? 1 : 0;
     }
-};
-
-field 'nothing'   => {
-    mixin         => 'validation'
 };
 
 field 'something' => {
@@ -62,11 +56,6 @@ ok defined $v->fields->{password}->{required} &&
    defined $v->fields->{password}->{max_length},
    'password field received mixin';
 
-# verify nothing field received the validation mixin with a validation routine
-ok defined $v->fields->{nothing}->{validation} &&
-   ref $v->fields->{nothing}->{validation} eq 'CODE',
-   'mixin with validation routine passed properly';
-
 # check attributes
 ok $v->params,  'params attr ok';
 ok $v->fields,  'fields attr ok';
@@ -77,8 +66,7 @@ ok $v->types,   'types attr ok';
 # process field with multiple mixins
 ok defined $v->fields->{something}->{required} &&
    defined $v->fields->{something}->{min_length} &&
-   defined $v->fields->{something}->{max_length} &&
-   defined $v->fields->{something}->{validation},
+   defined $v->fields->{something}->{max_length},
    'something field generated from multiple mixins';
 
 # define grouped fields
