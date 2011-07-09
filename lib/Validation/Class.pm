@@ -17,6 +17,7 @@ use Array::Unique;
 
 our $FIELDS  = {};
 our $MIXINS  = {};
+our $DIRECTIVES = {};
 our $FILTERS = { # default filters
     trim => sub {
         $_[0] =~ s/^\s+//g;
@@ -74,8 +75,6 @@ simplify and centralize data validation rules to ensure DRY (don't repeat
 yourself) code. The primary intent of this module is to provide a simplistic
 validation work-flow and promote code (validation) reuse.
 
-=head1 BUILDING A VALIDATION CLASS
-
     package MyApp::Validation;
     
     use Validation::Class qw/field mixin filter/;
@@ -105,7 +104,190 @@ validation work-flow and promote code (validation) reuse.
 
 =cut
 
-=head1 USING DIRECTIVES
+=head1 BUILDING A VALIDATION CLASS
+
+    package MyApp::Validation;
+    
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
+    
+    # a validation rule template
+    mixin 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+    
+    # a validation rule
+    field 'user:login'  => {
+        mixin      => 'basic',
+        label      => 'user login',
+        error      => 'login invalid',
+        validation => sub {
+            my ($self, $this, $fields) = @_;
+            return $this->{value} eq 'admin' ? 1 : 0;
+        }
+    };
+    
+    # a validation rule
+    field 'user:password'  => {
+        mixin         => 'basic',
+        label         => 'user login',
+        error         => 'login invalid',
+        validation    => sub {
+            my ($self, $this, $fields) = @_;
+            return $this->{value} eq 'pass' ? 1 : 0;
+        }
+    };
+    
+    1;
+
+=head2 THE MIXIN KEYWORD
+
+The mixin keyword creates a validation rules template that can be applied to any
+field using the mixin directive.
+
+    package MyApp::Validation;
+    use Validation::Class qw/field mixin/;
+    use base 'Validation::Class';
+    
+    mixin 'constrain' => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        ...
+    };
+    
+    field 'login' => {
+        mixin => 'constrain',
+        ...
+    };
+
+=cut
+
+sub mixin {
+    my %spec = @_;
+
+    if (%spec) {
+        my $name = ( keys(%spec) )[0];
+        my $data = ( values(%spec) )[0];
+
+        $MIXINS->{$name} = $data;
+    }
+
+    return 'mixin', %spec;
+}
+
+=head2 THE FILTER KEYWORD
+
+The filter keyword creates custom filters to be used in your field definitions.
+
+    package MyApp::Validation;
+    use Validation::Class qw/field filter/;
+    use base 'Validation::Class';
+    
+    filter 'telephone' => sub {
+        ...
+    };
+    
+    field 'telephone' => {
+        filter => ['trim', 'telephone'],
+        ...
+    };
+
+=cut
+
+sub filter {
+    my ($name, $data) = @_;
+
+    if ($name && $data) {
+        $FILTERS->{$name} = $data;
+    }
+
+    return 'filter', @_;
+}
+
+=head2 THE DIRECTIVE KEYWORD
+
+The directive keyword creates custom validator directives to be used in your field
+definitions. The routine is passed two parameters, the value of directive and the
+value of the field the validator is being processed against. The validator should
+return true or false.
+
+    package MyApp::Validation;
+    use Validation::Class qw/directive field/;
+    use base 'Validation::Class';
+    
+    directive 'between' => sub {
+        my ($directive, $value, $field, $class) = @_;
+        my ($min, $max) = split /\-/, $directive;
+        unless ($value > $min && $value < $max) {
+            my $handle = $field->{label} || $field->{name};
+            $class->error($field, "$handle must be between $directive");
+            return 0;
+        }
+        return 1;
+    };
+    
+    field 'hours' => {
+        between => '00-24',
+        ...
+    };
+
+=cut
+
+sub directive {
+    my ($name, $data) = @_;
+
+    if ($name && $data) {
+        $DIRECTIVES->{$name} = {
+            mixin     => 1,
+            field     => 1,
+            validator => $data
+        };
+    }
+
+    return 'directive', @_;
+}
+
+=head2 THE FIELD KEYWORD
+
+The field keyword create a validation block and defines validation rules for
+reuse in code. The field keyword should correspond with the parameter name
+expected to be passed to your validation class.
+
+    package MyApp::Validation;
+    use Validation::Class qw/field mixin filter/;
+    use base 'Validation::Class';
+    
+    field 'login' => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        ...
+    };
+    
+The field keword takes two arguments, the field name and a hashref of key/values
+pairs. The keys are referred to as directives, those directives are as follows:
+
+=cut
+
+sub field {
+    my %spec = @_;
+
+    if (%spec) {
+        my $name = ( keys(%spec) )[0];
+        my $data = ( values(%spec) )[0];
+
+        $FIELDS->{$name} = $data;
+        $FIELDS->{$name}->{errors} = [];
+    }
+
+    return 'field', %spec;
+}
+
+=head1 FIELD/MIXIN DEFAULT DIRECTIVES
 
     package MyApp::Validation;
     
@@ -140,8 +322,6 @@ The following is a list of default directives which can be used in field/mixin
 declarations:
 
 =cut
-
-our $DIRECTIVES = {};
 
 =head2 label
 
@@ -311,7 +491,7 @@ $DIRECTIVES->{required} = {
     multi => 0
 };
 
-=head1 USING VALIDATOR DIRECTIVES
+=head1 FIELD/MIXIN DEFAULT VALIDATOR DIRECTIVES
 
     package MyApp::Validation;
     
@@ -471,324 +651,6 @@ has 'directives' => (
     isa     => 'HashRef',
     default => sub { $DIRECTIVES }
 );
-
-=head1 USING MIXINS AND GROUPING
-
-    package MyApp::Validation;
-    
-    use Validation::Class qw/field mixin filter/;
-    use base 'Validation::Class';
-    
-    # a validation rule template
-    mixin 'basic'  => {
-        required   => 1,
-        min_length => 1,
-        max_length => 255,
-        filters    => ['lowercase', 'alphanumeric']
-    };
-    
-    # a validation rule
-    field 'user:login'  => {
-        mixin      => 'basic',
-        label      => 'user login',
-        error      => 'login invalid',
-        validation => sub {
-            my ($self, $this, $fields) = @_;
-            return $this->{value} eq 'admin' ? 1 : 0;
-        }
-    };
-    
-    # a validation rule
-    field 'user:password'  => {
-        mixin         => 'basic',
-        label         => 'user login',
-        error         => 'login invalid',
-        validation    => sub {
-            my ($self, $this, $fields) = @_;
-            return $this->{value} eq 'pass' ? 1 : 0;
-        }
-    };
-    
-    1;
-
-=head2 FIELD KEYWORD
-
-The field keyword create a validation block and defines validation rules for
-reuse in code. The field keyword should correspond with the parameter name
-expected to be passed to your validation class.
-
-    package MyApp::Validation;
-    use Validation::Class qw/field mixin filter/;
-    use base 'Validation::Class';
-    
-    field 'login' => {
-        required   => 1,
-        min_length => 1,
-        max_length => 255,
-        ...
-    };
-    
-The field keword takes two arguments, the field name and a hashref of key/values
-pairs. The keys are referred to as directives, those directives are as follows:
-
-=head3 name
-
-The name of the field (auto set)
-
-=head3 value
-
-The value of the parameter matching the name of the field (auto set)
-
-=head3 mixin
-
-The template to be used to copy directives from e.g.
-    
-    mixin 'template' => {
-        required => 1
-    };
-    
-    field 'a_field' => {
-        mixin => 'template'
-    }
-    
-=head3 mixin_field
-
-The field to be used as a mixin (template) to have directives copied from e.g.
-    
-    field 'a_field' => {
-        required => 1,
-        min_length => 2,
-        max_length => 10
-    };
-    
-    field 'b_field' => {
-        mixin_field => 'a_field'
-    };
-    
-=head3 validation
-
-A custom validation routine. Please note that the return value is not important.
-Please register an error if validation fails e.g.
-    
-    field '...' => {
-        validation => sub {
-            my ($self, $this, $parameters) = @_;
-            $self->error($this, "I failed") if $parameters->{something};
-        }
-    };
-    
-=head3 errors
-
-The collection of errors encountered during processing (auto set arrayref)
-
-=head3 label
-
-An alias for the field name, something more human-readable, is also used in
-auto-generated error messages
-
-=head3 error
-
-A custom error message, displayed instead of the generic ones
-
-=head3 required
-
-Determines whether the field is required or not, takes 1 or 0
-
-=head3 min_length
-
-Determines the minimum length of characters allowed
-
-=head3 max_length
-
-Determines the maximum length of characters allowed
-
-=head3 alias
-
-Defines alternative parameter names for the field to be matched against
-    
-    field 'c_field' => {
-        label => 'a field labeled c',
-        error => 'a field labeled c cannot be ...',
-        required => 1,
-        min_length => 2,
-        max_length => 25,
-        alais => 'cf'
-    };
-    
-=head3 filter
-
-An alias for the filters directive
-
-=head3 filters
-
-Set filters to manipulate the data before validation, e.g.
-    
-    field 'd_field' => {
-        ...,
-        filters => [
-            'trim',
-            'strip'
-        ]
-    };
-    
-    field 'e_field' => {
-        filter => 'strip'
-    };
-    
-    field 'f_field' => {
-        filters => [
-            'trim',
-            sub {
-                $_[0] =~ s/(abc)|(123)//;
-            }
-        ]
-    };
-    
-    # the following filters can be set using the filter(s) keywords:
-    
-    field 'g_field' => {
-        filters => [
-            'trim', 
-            'alpha',
-            'digit',
-            'strip',
-            'numeric ',
-            'lowercase',
-            'uppercase',
-            'titlecase',
-            'camelcase',
-            'lowercase',
-            'alphanumeric',
-            sub {
-                my $value = shift;
-            }
-        ]
-    };
-
-=cut
-
-sub field {
-    my %spec = @_;
-
-    if (%spec) {
-        my $name = ( keys(%spec) )[0];
-        my $data = ( values(%spec) )[0];
-
-        $FIELDS->{$name} = $data;
-        $FIELDS->{$name}->{errors} = [];
-    }
-
-    return 'field', %spec;
-}
-
-=head2 MIXIN KEYWORD
-
-The mixin keyword creates a validation rules template that can be applied to any
-field using the mixin directive.
-
-    package MyApp::Validation;
-    use Validation::Class qw/field mixin/;
-    use base 'Validation::Class';
-    
-    mixin 'constrain' => {
-        required   => 1,
-        min_length => 1,
-        max_length => 255,
-        ...
-    };
-    
-    field 'login' => {
-        mixin => 'constrain',
-        ...
-    };
-
-=cut
-
-sub mixin {
-    my %spec = @_;
-
-    if (%spec) {
-        my $name = ( keys(%spec) )[0];
-        my $data = ( values(%spec) )[0];
-
-        $MIXINS->{$name} = $data;
-    }
-
-    return 'mixin', %spec;
-}
-
-=head2 FILTER KEYWORD
-
-The filter keyword creates custom filters to be used in your field definitions.
-
-    package MyApp::Validation;
-    use Validation::Class qw/field filter/;
-    use base 'Validation::Class';
-    
-    filter 'telephone' => sub {
-        ...
-    };
-    
-    field 'telephone' => {
-        filter => ['trim', 'telephone'],
-        ...
-    };
-
-=cut
-
-sub filter {
-    my ($name, $data) = @_;
-
-    if ($name && $data) {
-        $FILTERS->{$name} = $data;
-    }
-
-    return 'filter', @_;
-}
-
-=head2 DIRECTIVE KEYWORD
-
-The directive keyword creates custom validator directives to be used in your field
-definitions. The routine is passed two parameters, the value of directive and the
-value of the field the validator is being processed against. The validator should
-return true or false.
-
-    package MyApp::Validation;
-    use Validation::Class qw/directive field/;
-    use base 'Validation::Class';
-    
-    directive 'between' => sub {
-        my ($directive, $value, $field, $class) = @_;
-        my ($min, $max) = split /\-/, $directive;
-        unless ($value > $min && $value < $max) {
-            my $handle = $field->{label} || $field->{name};
-            $class->error($field, "$handle must be between $directive");
-            return 0;
-        }
-        return 1;
-    };
-    
-    field 'hours' => {
-        between => '00-24',
-        ...
-    };
-
-=cut
-
-sub directive {
-    my ($name, $data) = @_;
-
-    if ($name && $data) {
-        $DIRECTIVES->{$name} = {
-            mixin     => 1,
-            field     => 1,
-            validator => $data
-        };
-    }
-
-    return 'directive', @_;
-}
-
 
 =head1 EXECUTING A VALIDATION CLASS
 
@@ -989,6 +851,7 @@ sub BUILD {
 The fields attribute returns a hashref of defined fields, filtered and merged with
 thier parameter counterparts.
 
+    my $self = MyApp::Validation->new(fields => $fields);
     my $fields = $self->fields();
     ...
 
@@ -1006,17 +869,6 @@ has 'fields' => (
 The filters attribute returns a hashref of pre-defined filter definitions.
 
     my $filters = $self->filters();
-    
-    $filters->{trim}->(...);
-    $filters->{alpha}->(...);
-    $filters->{digit}->(...);
-    $filters->{whiteout}->(...);
-    $filters->{numeric}->(...);
-    $filters->{uppercase}->(...);
-    $filters->{titlecase}->(...);
-    $filters->{camelcase}->(...);
-    $filters->{lowercase}->(...);
-    $filters->{alphanumeric}->(...);
     ...
 
 =cut
@@ -1033,10 +885,7 @@ has 'filters' => (
 The ignore_unknown boolean determines whether your application will live or die
 upon encountering unregistered fields during validation.
 
-    MyApp::Validation->new(params => $params, ignore_unknown => 1);
-    
-    or
-    
+    my $self = MyApp::Validation->new(params => $params, ignore_unknown => 1);
     $self->ignore_unknown(1);
     ...
 
@@ -1055,11 +904,8 @@ The report_unknown boolean determines whether your application will report
 unregistered fields as class-level errors upon encountering unregistered fields
 during validation.
 
-    MyApp::Validation->new(params => $params,
+    my $self = MyApp::Validation->new(params => $params,
     ignore_unknown => 1, report_unknown => 1);
-    
-    or
-    
     $self->report_unknown(1);
     ...
 
@@ -1079,6 +925,8 @@ The params attribute gets/sets the parameters to be validated.
     my $input = {
         ...
     };
+    
+    my $self = MyApp::Validation->new(params => $input);
     
     $self->params($input);
     my $params = $self->params();
@@ -1211,10 +1059,36 @@ sub use_mixin_field {
 
 =head2 validate
 
-The validate method returns a hashref of defined validation templates.
+The validate method returns true/false depending on whether all specified fields
+passed validation checks. 
 
-    my $mixins = $self->mixins();
-    ...
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    # validate specific fields
+    unless ($input->validate('field1','field2')){
+        return $input->errors->to_string;
+    }
+    
+    # validate all fields, regardless of parameter existence
+    unless ($input->validate()){
+        return $input->errors->to_string;
+    }
+    
+    # validate all existing parameters
+    unless ($input->validate(keys %{$input->params})){
+        return $input->errors->to_string;
+    }
+    
+    # validate specific parameters (by name) after mapping them to other fields
+    my $map = {
+        param1 => 'field_abc',
+        param2 => 'field_def'
+    };
+    unless ($input->validate($map)){
+        return $input->errors->to_string;
+    }
 
 =cut
 
