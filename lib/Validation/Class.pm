@@ -630,7 +630,7 @@ $DIRECTIVES->{min_length} = {
     validator => sub {
         my ( $directive, $value, $field, $class ) = @_;
         if ($value) {
-            unless ( length($value) > $directive ) {
+            unless ( length($value) >= $directive ) {
                 my $handle = $field->{label} || $field->{name};
                 my $characters = int( $directive ) > 1 ?
                     " characters" : " character";
@@ -660,7 +660,7 @@ $DIRECTIVES->{max_length} = {
     validator => sub {
         my ( $directive, $value, $field, $class ) = @_;
         if ($value) {
-            unless ( length($value) < $directive ) {
+            unless ( length($value) <= $directive ) {
                 my $handle = $field->{label} || $field->{name};
                 my $characters = int( $directive ) > 1 ?
                     " characters" : " character";
