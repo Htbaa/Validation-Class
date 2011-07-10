@@ -15,48 +15,10 @@ use Array::Unique;
         also   => 'Moose',
     );
 
-our $FIELDS  = {};
-our $MIXINS  = {};
+our $FIELDS     = {};
+our $MIXINS     = {};
 our $DIRECTIVES = {};
-our $FILTERS = { # default filters
-    trim => sub {
-        $_[0] =~ s/^\s+//g;
-        $_[0] =~ s/\s+$//g;
-        $_[0];
-    },
-    alpha => sub {
-        $_[0] =~ s/[^A-Za-z]//g;
-        $_[0];
-    },
-    digit => sub {
-        $_[0] =~ s/\D//g;
-        $_[0];
-    },
-    whiteout => sub {
-        $_[0] =~ s/\s+/ /g;
-        $_[0];
-    },
-    numeric => sub {
-        $_[0] =~ s/[^0-9]//g;
-        $_[0];
-    },
-    uppercase => sub {
-        uc $_[0];
-    },
-    titlecase => sub {
-        join( "", map ( ucfirst, split( /\s/, $_[0] ) ) );
-    },
-    camelcase => sub {
-        join( "", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
-    },
-    lowercase => sub {
-        lc $_[0];
-    },
-    alphanumeric => sub {
-        $_[0] =~ s/[^A-Za-z0-9]//g;
-        $_[0];
-    }
-};
+our $FILTERS    = {};
 
 =head1 SYNOPSIS
 
@@ -464,6 +426,9 @@ $DIRECTIVES->{name} = {
         filter => '...',
         ...
     };
+    
+The following is a list of default filters that may be used with the filter
+directive:
 
 =cut
 
@@ -474,6 +439,137 @@ $DIRECTIVES->{filter} = {
 };
 
 $DIRECTIVES->{filters} = $DIRECTIVES->{filter};
+
+=head3 trim
+
+    field 'foobar'  => {
+        filter => 'trim',
+    };
+    
+=cut
+
+$FILTERS->{trim} = sub {
+    $_[0] =~ s/^\s+//g;
+    $_[0] =~ s/\s+$//g;
+    $_[0];
+};
+
+=head3 alpha
+
+    field 'foobar'  => {
+        filter => 'alpha',
+    };
+    
+=cut
+
+$FILTERS->{alpha} = sub {
+    $_[0] =~ s/[^A-Za-z]//g;
+    $_[0];
+};
+
+=head3 currency
+
+    field 'foobar'  => {
+        filter => 'currency',
+    };
+    
+=cut
+
+$FILTERS->{currency} = sub {
+    $_[0] =~ s/[^0-9\.\,]//g;
+    $_[0];
+};
+
+=head3 whitespace
+
+    field 'foobar'  => {
+        filter => 'whitespace',
+    };
+    
+=cut
+
+$FILTERS->{whitespace} = sub {
+    $_[0] =~ s/\s+/ /g;
+    $_[0] =~ s/^\s+//;
+    $_[0] =~ s/\s+$//;
+    $_[0];
+};
+
+=head3 numeric
+
+    field 'foobar'  => {
+        filter => 'numeric',
+    };
+    
+=cut
+
+$FILTERS->{numeric} = sub {
+    $_[0] =~ s/\D//g;
+    $_[0];
+};
+
+=head3 uppercase
+
+    field 'foobar'  => {
+        filter => 'uppercase',
+    };
+    
+=cut
+
+$FILTERS->{uppercase} = sub {
+    uc $_[0];
+};
+
+=head3 titlecase
+
+    field 'foobar'  => {
+        filter => 'titlecase',
+    };
+    
+=cut
+
+$FILTERS->{titlecase} = sub {
+    join( " ", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
+};
+
+=head3 capitalize
+
+    field 'foobar'  => {
+        filter => 'capitalize',
+    };
+    
+=cut
+
+$FILTERS->{capitalize} = sub {
+    $_[0] = ucfirst $_[0];
+    $_[0] =~ s/\.\s+([a-z])/\. \U$1/g;
+    $_[0];
+};
+
+=head3 lowercase
+
+    field 'foobar'  => {
+        filter => 'lowercase',
+    };
+    
+=cut
+
+$FILTERS->{lowercase} = sub {
+    lc $_[0];
+};
+
+=head3 alphanumeric
+
+    field 'foobar'  => {
+        filter => 'alphanumeric',
+    };
+    
+=cut
+
+$FILTERS->{alphanumeric} = sub {
+    $_[0] =~ s/[^A-Za-z0-9]//g;
+    $_[0];
+};
 
 =head2 required
 
