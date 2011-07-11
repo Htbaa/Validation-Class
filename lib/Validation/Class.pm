@@ -783,6 +783,39 @@ $DIRECTIVES->{pattern} = {
     }
 };
 
+=head2 matches
+
+    # the matches directive
+    field 'password'  => {
+        matches => 'password_confirmation',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{matches} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ( $directive, $value, $field, $class ) = @_;
+        if ($value) {
+            # build the regex
+            my $password = $value;
+            my $password_confirmation = $class->params->{$directive} || '';
+            unless ( $password =~ /^$password_confirmation$/ ) {
+                my $handle  = $field->{label} || $field->{name};
+                my $handle2 = $class->fields->{$directive}->{label}
+                    || $class->fields->{$directive}->{name};
+                my $error = "$handle does not match $handle2";
+                $class->error( $field, $error );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
 # mixin/field types store
 has 'directives' => (
     is      => 'rw',
