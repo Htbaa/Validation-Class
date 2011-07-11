@@ -709,6 +709,40 @@ $DIRECTIVES->{between} = {
     }
 };
 
+=head2 length
+
+    # the length directive
+    field 'foobar'  => {
+        length => 20,
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{length} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ($directive, $value, $field, $class) = @_;
+        
+        $value = length($value);
+        
+        if ($value) {
+            unless ($value == $directive) {
+                my $handle = $field->{label} || $field->{name};
+                my $characters = $directive > 1 ? "characters" : "character";
+                $class->error(
+                    $field,
+                    "$handle must contain exactly $directive $characters"
+                );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
 =head2 pattern
 
     # the pattern directive
