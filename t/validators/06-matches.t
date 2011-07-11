@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 # load module
 BEGIN { use_ok( 'Validation::Class' ) }
@@ -27,6 +27,12 @@ ok  'password does not match password2' eq $r->errors->to_string(),
     
     $r->fields->{password}->{label}  = 'pass (a)';
     $r->fields->{password2}->{label} = 'pass (b)';
+    
+ok  ! $r->validate(), 'foobar doesnt validate';
+ok  'pass (a) does not match pass (b)' eq $r->errors->to_string(),
+    'displays proper error message';
+    
+    $r->params->{password2} = '';
     
 ok  ! $r->validate(), 'foobar doesnt validate';
 ok  'pass (a) does not match pass (b)' eq $r->errors->to_string(),
