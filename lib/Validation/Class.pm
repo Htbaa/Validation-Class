@@ -816,6 +816,36 @@ $DIRECTIVES->{matches} = {
     }
 };
 
+=head2 options
+
+    # the options directive
+    field 'status'  => {
+        options => 'Active, Inactive',
+        ...
+    };
+
+=cut
+
+$DIRECTIVES->{options} = {
+    mixin     => 1,
+    field     => 1,
+    multi     => 0,
+    validator => sub {
+        my ( $directive, $value, $field, $class ) = @_;
+        if ($value) {
+            # build the regex
+            my (@options) = split /\,\s?/, $directive;
+            unless ( grep { $value =~ /^$_$/ } @options ) {
+                my $handle  = $field->{label} || $field->{name};
+                my $error = "$handle must be " . join " or ", @options;
+                $class->error( $field, $error );
+                return 0;
+            }
+        }
+        return 1;
+    }
+};
+
 # mixin/field types store
 has 'directives' => (
     is      => 'rw',
