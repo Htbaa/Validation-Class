@@ -11,7 +11,7 @@ use Array::Unique;
 # use Hash::Merge;
 
     Moose::Exporter->setup_import_methods(
-        as_is  => [ 'field', 'filter', 'mixin' ],
+        as_is  => [ 'field', 'mixin', 'filter', 'directive' ],
         also   => 'Moose',
     );
 
@@ -39,7 +39,7 @@ validation work-flow and promote code (validation) reuse.
 
     package MyApp::Validation;
     
-    use Validation::Class qw/field mixin filter/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     # a validation rule
@@ -70,7 +70,7 @@ validation work-flow and promote code (validation) reuse.
 
     package MyApp::Validation;
     
-    use Validation::Class qw/field mixin filter/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     # a validation rule template
@@ -111,7 +111,7 @@ The mixin keyword creates a validation rules template that can be applied to any
 field using the mixin directive.
 
     package MyApp::Validation;
-    use Validation::Class qw/field mixin/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     mixin 'constrain' => {
@@ -146,7 +146,7 @@ sub mixin {
 The filter keyword creates custom filters to be used in your field definitions.
 
     package MyApp::Validation;
-    use Validation::Class qw/field filter/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     filter 'telephone' => sub {
@@ -178,7 +178,7 @@ value of the field the validator is being processed against. The validator shoul
 return true or false.
 
     package MyApp::Validation;
-    use Validation::Class qw/directive field/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     directive 'between' => sub {
@@ -220,7 +220,7 @@ reuse in code. The field keyword should correspond with the parameter name
 expected to be passed to your validation class.
 
     package MyApp::Validation;
-    use Validation::Class qw/field mixin filter/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     field 'login' => {
@@ -253,7 +253,7 @@ sub field {
 
     package MyApp::Validation;
     
-    use Validation::Class qw/field mixin/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     # a validation template
@@ -591,7 +591,7 @@ $DIRECTIVES->{required} = {
 
     package MyApp::Validation;
     
-    use Validation::Class qw/field mixin/;
+    use Validation::Class;
     use base 'Validation::Class';
     
     # a validation rule with validator directives
