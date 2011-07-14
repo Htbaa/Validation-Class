@@ -953,73 +953,72 @@ sub BUILD {
     }
 
     # validate mixin directives
-    foreach ( keys %{ $self->mixins } ) {
-        $self->check_mixin( $_, $self->mixins->{$_} );
+    foreach my $mixin ( keys %{ $self->mixins } ) {
+        $self->check_mixin( $mixin, $self->mixins->{$mixin} );
     }
 
     # validate field directives and create filters arrayref if needed
-    foreach ( keys %{ $self->fields } ) {
-        $self->check_field( $_, $self->fields->{$_} ) unless $_ eq 'errors';
-        unless ( $_ eq 'errors' ) {
-            if ( !defined $self->fields->{$_}->{filters} ) {
-                $self->fields->{$_}->{filters} = [];
-            }
+    foreach my $field ( keys %{ $self->fields } ) {
+        $self->check_field( $field, $self->fields->{$field} );
+        
+        if ( ! defined $self->fields->{$field}->{filters} ) {
+            $self->fields->{$field}->{filters} = [];
         }
+        
     }
 
     # check for and process a mixin directive
-    foreach ( keys %{ $self->fields } ) {
-        unless ( $_ eq 'errors' ) {
+    foreach my $field ( keys %{ $self->fields } ) {
+        
 
-            $self->use_mixin( $_, $self->fields->{$_}->{mixin} )
-              if $self->fields->{$_}->{mixin};
-        }
+        $self->use_mixin( $field, $self->fields->{$field}->{mixin} )
+            if $self->fields->{$field}->{mixin};
+        
     }
 
     # check for and process a mixin_field directive
-    foreach ( keys %{ $self->fields } ) {
-        unless ( $_ eq 'errors' ) {
+    foreach my $field ( keys %{ $self->fields } ) {
+        
 
-            $self->use_mixin_field( $self->fields->{$_}->{mixin_field}, $_ )
-              if $self->fields->{$_}->{mixin_field}
-                  && $self->fields->{ $self->fields->{$_}->{mixin_field} };
-        }
+        $self->use_mixin_field( $self->fields->{$field}->{mixin_field}, $field )
+          if $self->fields->{$field}->{mixin_field}
+              && $self->fields->{ $self->fields->{$field}->{mixin_field} };
+        
     }
 
     # check for and process input filters and default values
-    foreach ( keys %{ $self->fields } ) {
-        unless ( $_ eq 'errors' ) {
+    foreach my $field ( keys %{ $self->fields } ) {
+        
+        tie my @filters, 'Array::Unique';
+        @filters = @{ $self->fields->{$field}->{filters} };
 
-            tie my @filters, 'Array::Unique';
-            @filters = @{ $self->fields->{$_}->{filters} };
+        if ( defined $self->fields->{$field}->{filter} ) {
+            
+            push @filters,
+                "ARRAY" eq ref $self->fields->{$field}->{filter} ?
+                    @{$self->fields->{$field}->{filter}} :
+                    $self->fields->{$field}->{filter} ;
+            
+            delete $self->fields->{$field}->{filter};
+        }
 
-            if ( defined $self->fields->{$_}->{filter} ) {
-                
-                push @filters,
-                    "ARRAY" eq ref $self->fields->{$_}->{filter} ?
-                        @{$self->fields->{$_}->{filter}} :
-                        $self->fields->{$_}->{filter} ;
-                
-                delete $self->fields->{$_}->{filter};
-            }
+        $self->fields->{$field}->{filters} = [@filters];
 
-            $self->fields->{$_}->{filters} = [@filters];
-
-            foreach my $filter ( @{ $self->fields->{$_}->{filters} } ) {
-                if ( defined $self->params->{$_} ) {
-                    $self->use_filter( $filter, $_ );
-                }
-            }
-
-            # default values
-            if ( defined $self->params->{$_}
-                && length( $self->params->{$_} ) == 0 )
-            {
-                if ( $self->fields->{$_}->{value} ) {
-                    $self->params->{$_} = $self->fields->{$_}->{value};
-                }
+        foreach my $filter ( @{ $self->fields->{$field}->{filters} } ) {
+            if ( defined $self->params->{$field} ) {
+                $self->use_filter( $filter, $field );
             }
         }
+
+        # default values
+        if ( defined $self->params->{$field}
+            && length( $self->params->{$field} ) == 0 )
+        {
+            if ( $self->fields->{$field}->{value} ) {
+                $self->params->{$field} = $self->fields->{$field}->{value};
+            }
+        }
+        
     }
     
     # alias checking, ... for duplicate aliases, etc
