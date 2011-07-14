@@ -415,7 +415,7 @@ $DIRECTIVES->{value} = {
 
 $DIRECTIVES->{name} = {
     mixin => 0,
-    field => 0,
+    field => 1,
     multi => 0
 };
 
