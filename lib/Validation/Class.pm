@@ -1338,15 +1338,16 @@ sub validate {
         }
     }
 
-    if ( $self->params ) {
+    if ( scalar(keys(%{$self->params})) ) {
         if ( !@fields ) {
 
             # process all params
             foreach my $field ( keys %{ $self->params } ) {
                 if ( !defined $self->fields->{$field} ) {
-                    my $death_cert
-                        = "Data validation field $field does not exist";
+                    my $death_cert =
+                        "Data validation field $field does not exist";
                     $self->_suicide_by_unknown_field($death_cert);
+                    next;
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;
@@ -1374,6 +1375,7 @@ sub validate {
                     my $death_cert
                         = "Data validation field $field does not exist";
                     $self->_suicide_by_unknown_field($death_cert);
+                    next;
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;
@@ -1400,9 +1402,10 @@ sub validate {
         if (@fields) {
             foreach my $field (@fields) {
                 if ( !defined $self->fields->{$field} ) {
-                    my $death_cert
-                        = "Data validation field $field does not exist";
+                    my $death_cert =
+                        "Data validation field $field does not exist";
                     $self->_suicide_by_unknown_field($death_cert);
+                    next;
                 }
                 my $this = $self->fields->{$field};
                 $this->{name}  = $field;

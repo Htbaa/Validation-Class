@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 2;
 
 use strict;
 use warnings;
@@ -27,7 +27,5 @@ my $v = Validation::Class->new(
 
 # params set at new function
 ok $v->validate(keys %{$params}), 'validation ok';
-ok $v->validate(keys %{$params}), 'validation ok';
-ok $v->validate(keys %{$params}), 'validation ok';
-ok $v->validate(keys %{$params}), 'validation ok';
-ok $v->validate(keys %{$params}), 'validation ok';
+# ok $v->fields->{_dc}, 'found anomaly, param converted to field';
+ok ! $v->fields->{_dc}, 'anomaly fixed, unknown param no longer converted to field';
