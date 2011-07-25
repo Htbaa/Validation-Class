@@ -8,7 +8,6 @@ use 5.008001;
 use Moose;
 use Moose::Exporter;
 use Array::Unique;
-# use Hash::Merge;
 
     Moose::Exporter->setup_import_methods(
         as_is  => [ 'field', 'mixin', 'filter', 'directive' ],
@@ -944,7 +943,10 @@ or
 # tie it all together after instantiation
 sub BUILD {
     my $self = shift;
-
+    
+    # reset fields if applicable
+    $self->reset_fields();
+    
     # add custom filters
     foreach my $filter (keys %{$FILTERS}) {
         unless (defined $self->filters->{$filter}) {
@@ -1066,7 +1068,7 @@ thier parameter counterparts.
 has 'fields' => (
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub { $FIELDS }
+    default => sub { $FIELDS },
 );
 
 =head2 filters
@@ -1300,8 +1302,9 @@ passed validation checks.
 sub validate {
     my ( $self, @fields ) = @_;
     
-    # first things first, reset the errors attribute in preparation for multiple
-    # validation calls
+    # first things first, reset the errors and value returning the validation
+    # class to its pristine state
+    $self->reset_fields();
     $self->reset_errors();
     
     # save unaltered state-of-parameters
@@ -1517,6 +1520,26 @@ sub use_filter {
             if $self->params->{$field};
     }
 
+}
+
+=head2 reset_fields
+
+The reset_fields effectively resets any altered field objects at the class level.
+This method is called automatically everytime the new() method is triggered.
+
+    $self->reset_fields();
+
+=cut
+
+sub reset_fields {
+    my $self = shift;
+       $self->reset_errors();
+    
+    for my $field ( keys %{ $self->fields } ) {
+        delete $self->fields->{$field}->{value};
+    }
+    
+    return $self;
 }
 
 =head1 PARAMETER HANDLING
@@ -1788,6 +1811,22 @@ sub _merge_field_with_field {
         }
     }
     return $field;
+}
+
+sub _build_validationclass_instance {
+    my $pname = __PACKAGE__;
+    my $instc = join "", map{ ('A'..'Z',0..9)[rand(36)] } (1..10);
+    my $package = <<EOF;
+    package $pname::$instc;
+    use base 'Validation::Class';
+    
+    our $FIELDS     = $FIELDS;
+    our $MIXINS     = $MIXINS;
+    our $DIRECTIVES = $DIRECTIVES;
+    our $FILTERS    = $FILTERS;
+    
+    1;
+EOF
 }
 
     package

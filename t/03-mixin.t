@@ -48,16 +48,16 @@ $x = $c = {
 
     $r = Validation::Class->new(%{$x});
 
-# for now, the filters directive gets added automatically
-my  $filter = 1;
+# for now, the filters and errors directives gets added automatically
+my  $others = 2;
 
-ok  4 + $filter == scalar(keys(%{$r->fields->{test1}})),
+ok  4 + $others == scalar(keys(%{$r->fields->{test1}})),
     'test1 directives count accurate';
-ok  2 + $filter == scalar(keys(%{$r->fields->{test2}})),
+ok  2 + $others == scalar(keys(%{$r->fields->{test2}})),
     'test2 directives count accurate';
-ok  4 + $filter == scalar(keys(%{$r->fields->{test3}})),
+ok  4 + $others == scalar(keys(%{$r->fields->{test3}})),
     'test3 directives count accurate';
-ok  4 + $filter == scalar(keys(%{$r->fields->{test3}})),
+ok  4 + $others == scalar(keys(%{$r->fields->{test3}})),
     'test4 directives count accurate';
 
 $x->{fields}->{test2}->{filter} = [qw/trim strip/];
