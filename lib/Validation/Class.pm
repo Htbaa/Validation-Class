@@ -1475,6 +1475,63 @@ sub validate {
     return @{ $self->{errors} } ? 0 : 1;    # returns true if no errors
 }
 
+=head2 validate_groups
+
+If your fields and parameters are grouped using the group:field convention, The
+validate_groups method returns true/false depending on whether all specified
+*group(s) fields passed validation checks. 
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    # validate all fields within a specific group
+    unless ($input->validate_groups('person')){
+        ...
+    }
+    
+    # validate specific fields within a specific group
+    unless ($input->validate_groups('person', [qw/login password/])){
+        ...
+    }
+    
+    # validate specific fields within a specific groups
+    my @groups = (
+        person => [qw/login password/],
+        person_settings => [qw/email title/]
+    );
+    
+    unless ($input->validate_groups(@groups)){
+        ...
+    }
+
+=cut
+
+sub validate_groups {
+    my ($self, @groups) = @_;
+    my %groups = scalar @groups % 2 ? ($groups[0], undef) : @groups;
+    my @fields = ();
+    
+    while (my($key, $value) = each(%groups)) {
+        if ("ARRAY" eq ref $value) {
+            push @fields, "$key:$_" for @{$value};
+        }
+        else {
+            if ($key) {
+                my @values = ();
+                for (keys %{$self->params}) {
+                    push @values, $_ =~ m/$key\:(\w+)/;
+                }
+                if (@values) {
+                    push @fields, "$key:$_" for @values;
+                }
+            }
+        }
+    }
+    
+    return @fields ? $self->validate(@fields) : 0;
+}
+
 sub use_validator {
     my ( $self, $field, $this ) = @_;
 
@@ -1548,6 +1605,40 @@ The following are convenience functions for handling your input data after
 processing and data validation.
 
 =cut
+
+=head2 get_group_params
+
+If your fields and parameters are grouped using the group:field convention, The
+get_group_params method returns a hashref of specified parameters.
+
+    my $params = {
+        'user:login' => 'member',
+        'user:password' => 'abc123456'
+    };
+    
+    if ($self->validate_group('user')) {
+        my $user = $self->get_group_params('user');
+        print $user->{login};
+    }
+
+=cut
+
+sub get_group_params {
+    my ($self, $group, @params) = @_;
+    return +{} unless $group;
+    
+    unless (@params) {
+        for (keys %{$self->params}) {
+            push @params, $_ =~ m/$group\:(\w+)/;
+        }
+    }
+    
+    return +{
+        map {
+            $_ => $self->params->{"$group:$_"}
+        }   @params
+    };
+}
 
 =head2 get_params
 
