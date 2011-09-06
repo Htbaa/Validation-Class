@@ -1599,6 +1599,7 @@ sub reset_fields {
     return $self;
 }
 
+
 =head1 PARAMETER HANDLING
 
 The following are convenience functions for handling your input data after
@@ -1923,25 +1924,31 @@ EOF
     package
         Validation::Class::Errors;
     
-    # Error Class for Validation::Class
-    
-    use Moose;
-    
-    has 'errors' => (
-        is      => 'rw',
-        isa     => 'ArrayRef',
-        default => sub { [] }
-    );
-    
-    sub count {
-        return scalar(@{shift->errors});
-    }
-    
-    sub to_string {
-        return join(($_[1]||', '), @{$_[0]->errors});
-    }
+        # Error Class for Validation::Class
+        
+        use Moose;
+        
+        has 'errors' => (
+            is      => 'rw',
+            isa     => 'ArrayRef',
+            default => sub { [] }
+        );
+        
+        sub count {
+            return scalar(@{shift->errors});
+        }
+        
+        sub to_string {
+            return join(($_[1]||', '), @{$_[0]->errors});
+        }
     
     # End of Validation::Class::Errors
 
+# Random Un-documented Shortcuts
+sub errors_to_string { shift->errors->to_string(@_) }
+sub validate_group { shift->validate_groups(@_) }
+sub group_validate { shift->validate_groups(@_) }
+sub group { shift->get_group_params(@_) }
+sub param { shift->get_params(@_) }
 
 1;    # End of Validation::Class
