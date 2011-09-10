@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="28399c9e-cb88-4604-a9af-d6aaa7dce590" kpf_version="5" name="Validation-Class.komodoproject">
+<preference-set idref="0791b889-bca9-496e-afee-fa597c878acc">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="07a54781-45f4-4dd8-9158-7e15dc2397c7">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="220d058c-df32-4677-a207-59ceb218c7f6">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="28399c9e-cb88-4604-a9af-d6aaa7dce590">
+  <boolean id="import_live">1</boolean>
+</preference-set>
+<preference-set idref="28399c9e-cb88-4604-a9af-d6aaa7dce590/lib/Validation/Class.pm">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">lib/Validation/Class.pm</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="28399c9e-cb88-4604-a9af-d6aaa7dce590/t/00-load.t">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-I C:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/00-load.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="28399c9e-cb88-4604-a9af-d6aaa7dce590/t/03-mixin.t">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-Ic:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/03-mixin.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="28399c9e-cb88-4604-a9af-d6aaa7dce590/t/97-persistent-values.t">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-Ic:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/97-persistent-values.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="31ec1eb3-ceb5-424c-bbca-1e21cb4bdc5d">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="6ab325ec-ff26-4a96-9664-8274ee5b4bb1">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="7641127f-5551-42ff-a145-c8e0adaf4176">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="87f66d4f-67bc-4af3-8bcb-933787fcaf46">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="8fdf1ecf-fedf-4a1b-b9e6-9760f21e0dc4">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="9549ad46-3139-467c-b5fc-6cabda28e805">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="9d048e4b-82d6-4b3f-99d6-e7c78cb615b6">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="a0983ab9-9178-4bad-a2ab-25c0db70303c">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="a142a506-ff33-4508-bf16-1f9b33b3c19d">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="a98e0935-578b-46fa-b8a5-4402f356c820">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="cf6e63d7-fb49-42f8-b9cd-9cc32ac2d7dd">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="cfb93500-2f78-4641-aaa1-58b2795b509f">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="dcd3453e-9891-4a6f-8bb1-ea65f7b55120">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="f82449f3-7c94-45cc-bb73-88627604ab72">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-I C:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="fe5b76d9-1bdc-480b-9e06-2534d372b0e4">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <long id="debugger.io-port">9011</long>
+  <string id="documentRoot"></string>
+  <string id="executable-params">-IC:\Repos\public\alnewkirk\Validation-Class\lib</string>
+  <string relative="path" id="filename">t/11-group-validation.t</string>
+  <string id="getparams"></string>
+  <string id="language">Perl</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+  <string id="warnings">enabled</string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+</project>
