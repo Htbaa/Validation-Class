@@ -19,6 +19,8 @@ our $MIXINS     = {};
 our $DIRECTIVES = {};
 our $FILTERS    = {};
 
+# VERSION
+
 =head1 SYNOPSIS
 
     use MyApp::Validation;
@@ -1090,7 +1092,7 @@ has 'filters' => (
 =head2 ignore_unknown
 
 The ignore_unknown boolean determines whether your application will live or die
-upon encountering unregistered fields during validation.
+upon encountering unregistered field directives during validation.
 
     my $self = MyApp::Validation->new(params => $params, ignore_unknown => 1);
     $self->ignore_unknown(1);
@@ -1108,8 +1110,8 @@ has 'ignore_unknown' => (
 =head2 report_unknown
 
 The report_unknown boolean determines whether your application will report
-unregistered fields as class-level errors upon encountering unregistered fields
-during validation.
+unregistered fields as class-level errors upon encountering unregistered field
+directives during validation.
 
     my $self = MyApp::Validation->new(params => $params,
     ignore_unknown => 1, report_unknown => 1);
@@ -1194,11 +1196,14 @@ sub check_mixin {
 
     foreach ( keys %{$spec} ) {
         if ( ! defined $directives->{$_} ) {
-            die
+            my $death_cert =
               "The $_ directive supplied by the $mixin mixin is not supported";
+            $self->_suicide_by_unknown_field($death_cert);
         }
         if ( ! $directives->{$_} ) {
-            die "The $_ directive supplied by the $mixin mixin is invalid";
+            my $death_cert =
+              "The $_ directive supplied by the $mixin mixin is empty";
+            $self->_suicide_by_unknown_field($death_cert);
         }
     }
 
@@ -1212,8 +1217,9 @@ sub check_field {
 
     foreach ( keys %{$spec} ) {
         if ( ! defined $directives->{$_} ) {
-            die
+            my $death_cert =
               "The $_ directive supplied by the $field field is not supported";
+            $self->_suicide_by_unknown_field($death_cert);
         }
     }
 
