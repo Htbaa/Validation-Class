@@ -48,8 +48,8 @@ $x = $c = {
 
     $r = Validation::Class->new(%{$x});
 
-# for now, the filters and errors directives gets added automatically
-my  $others = 2;
+# for now, the name, filters and errors directives gets added automatically
+my  $others = 3;
 
 ok  4 + $others == scalar(keys(%{$r->fields->{test1}})),
     'test1 directives count accurate';

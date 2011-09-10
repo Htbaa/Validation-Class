@@ -1050,6 +1050,10 @@ sub BUILD {
     }
     undef $aliastree;
 
+    # always done last!!! auto-generate the field name
+    # happens again at validation, FYI
+    $self->fields->{$_}->{name} = $_ for ( keys %{ $self->fields } );
+
     return $self;
 };
 
