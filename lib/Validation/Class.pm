@@ -1954,11 +1954,4 @@ EOF
     
     # End of Validation::Class::Errors
 
-# Random Un-documented Shortcuts
-sub errors_to_string { shift->errors->to_string(@_) }
-sub validate_group { shift->validate_groups(@_) }
-sub group_validate { shift->validate_groups(@_) }
-sub group { shift->get_group_params(@_) }
-sub param { shift->get_params(@_) }
-
 1;    # End of Validation::Class
