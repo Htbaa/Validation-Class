@@ -8,6 +8,7 @@ use 5.008001;
 use Moose;
 use Moose::Exporter;
 use Array::Unique;
+use Hash::Flatten;
 
     Moose::Exporter->setup_import_methods(
         as_is  => [ 'field', 'mixin', 'filter', 'directive' ],
@@ -67,6 +68,19 @@ validation work-flow and promote code (validation) reuse.
 
 =cut
 
+=head1 DESCRIPTION
+
+Important Note! Validation::Class just got alot more flexible which came at the
+cost of losing the grouped parameters functionality. AGAIN, grouped parameters
+are no longer supported using the old way of doing things. Validation::Class now
+supports hash serialization/deserialization which means that you can now set
+the parameters using a hashref of nested hashrefs and validate against them, or
+set the parameters using a hashref of (serialized)key/(non-ref)value pairs and
+validate against that. This function is provided in Validation::Class via
+L<Hash::Flatten>.
+
+=cut
+
 =head1 BUILDING A VALIDATION CLASS
 
     package MyApp::Validation;
@@ -83,7 +97,7 @@ validation work-flow and promote code (validation) reuse.
     };
     
     # a validation rule
-    field 'user:login'  => {
+    field 'user.login'  => {
         mixin      => 'basic',
         label      => 'user login',
         error      => 'login invalid',
@@ -94,7 +108,7 @@ validation work-flow and promote code (validation) reuse.
     };
     
     # a validation rule
-    field 'user:password'  => {
+    field 'user.password'  => {
         mixin         => 'basic',
         label         => 'user login',
         error         => 'login invalid',
@@ -876,37 +890,15 @@ to validate against (params must match field names).
         return $input->errors->to_string;
     }
     
-If you are using groups in your validation class you might validate your data
-like so ...
-
-    use MyApp::Validation;
-    
-    my $input = MyApp::Validation->new(params => $params);
-    unless ($input->validate('user:login', 'user:password')){
-        return $input->errors->to_string;
-    }
-    
-Although this means that the incoming parameters need to specify its parameter
-names using the same group naming convention. If this is not to your liking,
-the validate() method can assist you in mapping your incoming parameters to your
-grouped validation fields as shown here:
-
-    use MyApp::Validation;
-    
-    my $input = MyApp::Validation->new(params => $params);
-    unless ($input->validate({ user => 'user:login', pass => 'user:password')){
-        return $input->errors->to_string;
-    }
-    
-You can also map automatically by using field aliases whereby a field definition
-will have an alias attribute containing an arrayref of alternate parameters that
-can be matched against passed-in parameters as an alternative to the parameter
-mapping technique. The whole mapping technique can get cumbersome in larger
+You can define an alias to automatically map a parameter to a validation field
+whereby a field definition will have an alias attribute containing an arrayref
+of alternate parameters that can be matched against passed-in parameters.
+The whole mapping technique can get cumbersome in larger
 projects.
 
     package MyApp::Validation;
     
-    field 'foo:bar' => {
+    field 'foo.bar' => {
         ...,
         alias => [
             'foo',
@@ -945,6 +937,11 @@ or
 # tie it all together after instantiation
 sub BUILD {
     my $self = shift;
+    
+    # automatically serialize params if nested hash detected
+    if (grep { ref($_) } values %{$self->params}) {
+        $self->set_params_hash($self->params);
+    }
     
     # reset fields if applicable
     $self->reset_fields();
@@ -1130,6 +1127,50 @@ has 'report_unknown' => (
     isa     => 'Bool',
     default => 0
 );
+
+=head2 hash_inflator
+
+The hash_inflator value determines how the hash serializer (inflation/deflation)
+behaves. The value must be a hashref of L<Hash::Flatten/OPTIONS> options. Pure
+for the sake of consistency, you can use lowercase keys (with underscores) which
+will be converted to camelcased keys before passed to the serializer.
+
+    my $self = MyApp::Validation->new(
+        hash_inflator => {
+            hash_delimiter => '/',
+            array_delimiter => '//'
+        }
+    );
+    ...
+
+=cut
+
+# nested hashref serializer
+has 'hash_inflator' => (
+    is      => 'rw',
+    isa     => 'HashRef'
+);
+
+around 'hash_inflator' => sub {
+    my $orig    = shift;
+    my $self    = shift;
+    my $options = shift || {
+        hash_delimiter  => '.',
+        array_delimiter => ':',
+        escape_sequence => '',
+    };
+    
+    foreach my $option (keys %{$options}) {
+        if ($option =~ /\_/) {
+            my $cc_option = $option;
+            $cc_option =~ s/([a-zA-Z])\_([a-zA-Z])/$1\u$2/gi;
+            $options->{ucfirst $cc_option} = $options->{$option};
+            delete $options->{$option};
+        }
+    }
+
+    return $self->$orig($options);
+};
 
 =head2 params
 
@@ -1485,63 +1526,6 @@ sub validate {
     return @{ $self->{errors} } ? 0 : 1;    # returns true if no errors
 }
 
-=head2 validate_groups
-
-If your fields and parameters are grouped using the group:field convention, The
-validate_groups method returns true/false depending on whether all specified
-*group(s) fields passed validation checks. 
-
-    use MyApp::Validation;
-    
-    my $input = MyApp::Validation->new(params => $params);
-    
-    # validate all fields within a specific group
-    unless ($input->validate_groups('person')){
-        ...
-    }
-    
-    # validate specific fields within a specific group
-    unless ($input->validate_groups('person', [qw/login password/])){
-        ...
-    }
-    
-    # validate specific fields within a specific groups
-    my @groups = (
-        person => [qw/login password/],
-        person_settings => [qw/email title/]
-    );
-    
-    unless ($input->validate_groups(@groups)){
-        ...
-    }
-
-=cut
-
-sub validate_groups {
-    my ($self, @groups) = @_;
-    my %groups = scalar @groups % 2 ? ($groups[0], undef) : @groups;
-    my @fields = ();
-    
-    while (my($key, $value) = each(%groups)) {
-        if ("ARRAY" eq ref $value) {
-            push @fields, "$key:$_" for @{$value};
-        }
-        else {
-            if ($key) {
-                my @values = ();
-                for (keys %{$self->params}) {
-                    push @values, $_ =~ m/$key\:(\w+)/;
-                }
-                if (@values) {
-                    push @fields, "$key:$_" for @values;
-                }
-            }
-        }
-    }
-    
-    return @fields ? $self->validate(@fields) : 0;
-}
-
 sub use_validator {
     my ( $self, $field, $this ) = @_;
 
@@ -1617,48 +1601,14 @@ processing and data validation.
 
 =cut
 
-=head2 get_group_params
-
-If your fields and parameters are grouped using the group:field convention, The
-get_group_params method returns a hashref of specified parameters.
-
-    my $params = {
-        'user:login' => 'member',
-        'user:password' => 'abc123456'
-    };
-    
-    if ($self->validate_group('user')) {
-        my $user = $self->get_group_params('user');
-        print $user->{login};
-    }
-
-=cut
-
-sub get_group_params {
-    my ($self, $group, @params) = @_;
-    return +{} unless $group;
-    
-    unless (@params) {
-        for (keys %{$self->params}) {
-            push @params, $_ =~ m/$group\:(\w+)/;
-        }
-    }
-    
-    return +{
-        map {
-            $_ => $self->params->{"$group:$_"}
-        }   @params
-    };
-}
-
 =head2 get_params
 
 The get_params method returns the values (in list form) of the parameters
 specified.
 
     if ($self->validate) {
-        my $name = $self->get_params('name');
-        my ($name, $email, $login, $password) =
+        my $name_a = $self->get_params('name');
+        my ($name_b, $email, $login, $password) =
             $self->get_params(qw/name email login password/);
         
         # you should note that if the params dont exist they will return undef
@@ -1679,9 +1629,62 @@ specified.
 
 sub get_params {
     my ($self, @params) = @_;
+    
     return map {
         $self->params->{$_}
     }   @params;
+}
+
+=head2 get_params_hash
+
+If your fields and parameters are designed with complex hash structures, The
+get_params_hash method returns the deserialized hashref of specified parameters
+based on the the default or custom configuration of the hash serializer
+L<Hash::Flatten>.
+
+    my $params = {
+        'user.login' => 'member',
+        'user.password' => 'abc123456'
+    };
+    
+    if ($self->validate(keys %$params)) {
+        my $params = $self->get_params_hash;
+        print $params->{user}->{login};
+    }
+
+=cut
+
+sub get_params_hash {
+    my ($self) = @_;
+    my $serializer = Hash::Flatten->new($self->hash_inflator);
+    my $params = $serializer->unflatten($self->params);
+    
+    return $params;
+}
+
+=head2 set_params_hash
+
+Depending on how parameters are being input into your application, if your
+input parameters are already complex hash structures, The set_params_hash method
+will set and return the serialized version of your hashref based on the the
+default or custom configuration of the hash serializer L<Hash::Flatten>.
+
+    my $params = {
+        user => {
+            login => 'member',
+            password => 'abc123456'
+        }
+    };
+    
+    my $serialized_params = $self->set_params_hash($params);
+
+=cut
+
+sub set_params_hash {
+    my ($self, $params) = @_;
+    my $serializer = Hash::Flatten->new($self->hash_inflator);
+    
+    return $self->params($serializer->flatten($params));
 }
 
 =head1 ERROR HANDLING
