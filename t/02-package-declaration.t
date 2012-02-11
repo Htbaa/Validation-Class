@@ -1,6 +1,7 @@
 use Test::More tests => 4;
 
 package MyApp::Test;
+
 use Validation::Class;
 
 field 'field01' => {

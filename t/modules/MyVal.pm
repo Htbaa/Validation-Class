@@ -2,7 +2,9 @@ package MyVal;
 
 use Validation::Class;
 
-__PACKAGE__->load_classes;
+load {
+    classes => 1
+};
 
 profile new_ticket => sub {
 

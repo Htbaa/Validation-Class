@@ -1,4 +1,4 @@
-# ABSTRACT: Centralized Data Validation Framework
+# ABSTRACT: Low-Fat Full-Flavored Data Validation Construction Kit
 
 use strict;
 use warnings;
@@ -6,66 +6,260 @@ use warnings;
 package Validation::Class;
 
 use 5.008001;
+use strict;
+use warnings;
 
 # VERSION
 
-use Moose ('has');
-use Moose::Exporter;
-use MooseX::Traits;
-use Validation::Class::Sugar ();
+use Module::Find;
+use Hash::Merge 'merge';
+use Exporter ();
 
-my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
-    also             => [
-        'Moose',
-        'Validation::Class::Sugar'
-    ],
-    base_class_roles => [        
-        'Validation::Class::Errors',
-        'Validation::Class::Validator',
-    ],
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(
+    dir
+    directive
+    fld
+    field
+    flt
+    filter
+    
+    load
+    load_classes
+    load_plugins
+    
+    mxn
+    mixin
+    
+    new
+    
+    pro
+    profile
 );
 
-sub init_meta {
-    my ($dummy, %opts) = @_;
+sub dir { goto &directive }
+sub directive {
     
-    Moose->init_meta(%opts);
+    my ($name, $data) = @_;
     
-    Moose::Util::MetaRole::apply_base_class_roles(
-        for   => $opts{for_class},
-        roles => [
-            'MooseX::Traits',
-            'Validation::Class::Errors',
-            'Validation::Class::Validator',
-        ]
-    );
+    my $self = caller(0);
     
-    return Class::MOP::class_of($opts{for_class});
+    return 0 unless ($name && $data);
+    
+    no strict 'refs';
+        
+    $self->{config}->{DIRECTIVES}->{$name} = {
+        mixin     => 1,
+        field     => 1,
+        validator => $data
+    };
+    
+    use strict 'refs';
+    
+    return $name, $data;
+    
 }
 
-sub import {
-    return unless $import;  
-    goto &$import;
+sub fld { goto &field }
+sub field {
+    
+    my ($name, $data) = @_;
+    
+    my $self = caller(0);
+    
+    return 0 unless ($name && $data);
+    
+    no strict 'refs';
+    
+    $self->{config}->{FIELDS}->{$name} = $data;
+    $self->{config}->{FIELDS}->{$name}->{errors} = [];
+    
+    use strict 'refs';
+    
+    return $name, $data;
+    
 }
 
-sub unimport {
-    return unless $unimport;
-    goto &$unimport;
+sub flt { goto &filter }
+sub filter {
+    
+    my ($name, $data) = @_;
+    
+    my $self = caller(0);
+    
+    return 0 unless ($name && $data);
+    
+    no strict 'refs';
+    
+    $self->{config}->{FILTERS}->{$name} = $data;
+    
+    use strict 'refs';
+    
+    return $name, $data;
+    
 }
 
-# REGISTER TRAITS - Escape the PAUSE
+sub load {
+    
+    my ($data) = @_;
+    
+    my $self = caller(0); # hackaroni toni
+    
+    $self->load_classes() if $data->{classes};
+    
+    $self->load_plugins(@{$data->{plugins}}) if $data->{plugins};
+    
+}
 
-    {
-        # Profile Trait
-        package # Don't register with PAUSE (pause.perl.org)
-            Moose::Meta::Attribute::Custom::Trait::Profile
-        ;   sub register_implementation {
-                my $pkg = 'Validation_Class_Meta_Attribute_Profile';
-                   $pkg =~ s/_/::/g;
-                   $pkg
-            }
+sub load_classes {
+    
+    my ($self) = @_;
+    
+    no strict 'refs';
+    
+    # load class children and create relationship map (hash)
+    foreach my $child (usesub $self) {
+    
+        my $nickname  = $child;
+           $nickname  =~ s/^$self//;
+           $nickname  =~ s/^:://;
+           $nickname  =~ s/([a-z])([A-Z])/$1\_$2/g;
+           
+        my $quickname = $child;
+           $quickname =~ s/^$self//;
+           $quickname =~ s/^:://;
+           
+        $self->{relatives}->{lc $nickname} = $child;
+        $self->{relatives}->{$quickname}   = $child;
+    
     }
+    
+    use strict 'refs';
+    
+    return 0;
+    
+}
 
-# BEGIN MEGA-POD
+sub load_plugins {
+    
+    my ($self, @plugins) = @_;
+    
+    no strict 'refs';
+    
+    foreach my $plugin (@plugins) {
+    
+        if ($plugin !~ /^\+/) {
+    
+            $plugin = "Validation::Class::Plugin::$plugin";
+    
+        }
+        
+        $plugin =~ s/^\+//;
+        
+        # require plugin
+        my $file = $plugin;
+           $file =~ s/::/\//g;
+           $file .= ".pm";
+        
+        eval "require $plugin"
+            unless $INC{$file}; # unless already loaded
+    
+    }
+    
+    $self->{config}->{PLUGINS}->{$_} = 1 for @plugins;
+    
+    use strict 'refs';
+    
+    return 0;
+    
+}
+
+sub mxn { goto &mixin }
+sub mixin {
+
+    my ($name, $data) = @_;
+    my $self = caller(0);
+    
+    return 0 unless ($name && $data);
+    
+    no strict 'refs';
+    
+    $self->{config}->{MIXINS}->{$name} = $data;
+    
+    use strict 'refs';
+    
+    return $name, $data;
+
+}
+
+sub new {
+
+    my $invocant = shift;
+    
+    require (my $engine = 'Validation/Class/Engine.pm'); # base class
+    
+    $engine =~ s/\//::/g;
+    $engine =~ s/\.pm$//;
+    
+    no strict 'refs';
+    
+    my @routines =
+        grep { defined &{"$engine\::$_"} }
+            keys %{"$engine\::"};
+    
+    foreach my $routine (@routines) {
+        
+        eval { *{"$invocant\::$routine"} = \&{"$engine\::$routine"} };
+        
+    }
+    
+    $invocant->{config} = merge $engine->template, $invocant->{config};
+    
+    my $self = bless { %{ $invocant } }, ref $invocant || $invocant;
+    
+    # BEGIN
+    
+    my %params = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
+    
+    while (my($attr, $value) = each (%params)) {
+        
+        $self->$attr($value);
+        
+    }
+    
+    foreach my $plugin (keys %{$self->plugins}) {
+        
+        $plugin->new($self) if $plugin->can('new');
+    
+    }
+    
+    $self->normalize;
+    $self->apply_filters('pre') if $self->filtering;
+    
+    # END
+    
+    return $self;
+
+}
+
+sub pro { goto &profile }
+sub profile {
+
+    my ($name, $data) = @_;
+    my $self = caller(0);
+
+    return 0 unless ($name && "CODE" eq ref $data);
+    
+    no strict 'refs';
+
+    $self->{config}->{PROFILES}->{$name} = $data;
+    
+    use strict 'refs';
+    
+    return $name, $data;
+
+}
+
 
 =head1 SYNOPSIS
 
@@ -1459,7 +1653,7 @@ L<Validation::Class::Plugins>.
             'SuperX',
             '+MyApp::Validation::Plugin::SuperY'
         ]
-    };
+    }; # same as above
     
     1;
 

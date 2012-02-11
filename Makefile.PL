@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Centralized Data Validation Framework",
+  "ABSTRACT" => "Low-Fat Full-Flavored Data Validation Construction Kit",
   "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
@@ -24,12 +24,9 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Hash::Flatten" => 0,
     "Hash::Merge" => 0,
-    "Module::Find" => 0,
-    "Moose" => 0,
-    "MooseX::Traits" => 0,
-    "Scalar::Util" => 0
+    "Module::Find" => 0
   },
-  "VERSION" => "4.01003514",
+  "VERSION" => "5.0.0_01",
   "test" => {
     "TESTS" => "t/*.t t/filters/*.t t/validators/*.t"
   }

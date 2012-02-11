@@ -1,4 +1,4 @@
-# ABSTRACT: Drop-in Data Validation Class
+# ABSTRACT: Simple Inline Validation Class
 
 package Validation::Class::Simple;
 
@@ -6,35 +6,34 @@ use Validation::Class;
 
 # VERSION
 
-sub BUILD {} 
-
 =head2 SYNOPSIS
 
     use Validation::Class::Simple;
     
-    my $profile = {
-            'login'  => {
-                label      => 'User Login',
-                error      => 'Login invalid.',
-                required   => 1,
-                validation => sub {
-                    my ($self, $this_field, $all_params) = @_;
-                    return $this_field->{value} eq 'admin' ? 1 : 0;
-                }
-            },
-            'password'  => {
-                label         => 'User Password',
-                error         => 'Password invalid.',
-                required      => 1,
-                validation    => sub {
-                    my ($self, $this_field, $all_params) = @_;
-                    return $this_field->{value} eq 'pass' ? 1 : 0;
-                }
-            }    
-        };
+    my $fields = {
+        'login'  => {
+            label      => 'User Login',
+            error      => 'Login invalid.',
+            required   => 1,
+            validation => sub {
+                my ($self, $this_field, $all_params) = @_;
+                return $this_field->{value} eq 'admin' ? 1 : 0;
+            }
+        },
+        'password'  => {
+            label         => 'User Password',
+            error         => 'Password invalid.',
+            required      => 1,
+            validation    => sub {
+                my ($self, $this_field, $all_params) = @_;
+                return $this_field->{value} eq 'pass' ? 1 : 0;
+            }
+        }    
+    };
     
-      my $input =
-      Validation::Class::Simple->new( fields => $profile, params => $params );
+    my $input = Validation::Class::Simple->new(    
+        fields => $fields, params => $params
+    );
     
     unless ( $input->validate ) {
         return $input->errors_to_string;

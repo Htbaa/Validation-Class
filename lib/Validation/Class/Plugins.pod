@@ -7,12 +7,6 @@ Validation::Class::Plugins - Basic Instructions for Writing Plugins
 This documentation serves as a brief overview on writing plugins for
 Validation::Class. Here are the key points:
 
-L<Validation::Class> is written with L<Moose> and a plugin must be designed
-as a L<Moose::Role>. As a role the plugins attributes and methods are imported
-into the calling class and because of this it is important to name your
-attributes and methods cautiously as to not overwrite another plugins
-functionality.
-
 When creating B<official> Validation::Class plugins you should use the namespace
 Validation::Class::Plugin::YourPluginName. This will allow users of your plugin
 to simply pass YourPluginName to the load_plugins() method. Otherwise you will
@@ -22,9 +16,13 @@ The following is an example of including a plugin.
     package MyApp::Validation;
     
     use Validation::Class;
-        load_plugins __PACKAGE__,
+    
+    load {
+        plugins => [
             'YourPluginName',
-            '+MyApp::Validation::YourPluginName';
+            '+MyApp::Validation::YourPluginName'
+        ]
+    };
     
     # a validation rule
     field 'login'  => {
@@ -56,15 +54,14 @@ plugin for formatting telephone numbers:
 
     package Validation::Class::Plugin::TelephoneFormatting;
     
-    use Moose::Role;
-    
     # hook into the instantiation process
     # of the calling class at runtime
     sub new {
-        my ($class, $self) = @_;
+    
+        my ($plugin, $caller) = @_;
         
         # US Telephones
-        $class->filters->{telephone_usa} = sub {
+        $caller->filters->{telephone_usa} = sub {
             my $phone = shift;
                $phone =~ s/\D//g;
             
@@ -81,7 +78,9 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     
     use Validation::Class;
     
-    __PACKAGE__->load_plugins('TelephoneFormatting');
+    load {
+        plugins => ['TelephoneFormatting']
+    };
     
     # a validation rule
     field 'phone'  => {

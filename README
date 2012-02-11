@@ -1,8 +1,9 @@
 NAME
-    Validation::Class - Centralized Data Validation Framework
+    Validation::Class - Low-Fat Full-Flavored Data Validation Construction
+    Kit
 
 VERSION
-    version 4.01003514
+    version 5.0.0_01
 
 SYNOPSIS
         use MyApp::Validation;
@@ -1199,7 +1200,7 @@ VALIDATION CLASS METHODS
                 'SuperX',
                 '+MyApp::Validation::Plugin::SuperY'
             ]
-        };
+        }; # same as above
     
         1;
 
