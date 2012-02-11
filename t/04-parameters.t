@@ -1,6 +1,7 @@
 use Test::More tests => 3;
 
 # load module
+package MyVal;
 use Validation::Class;
 
 my $passer = sub { 1 };
@@ -51,7 +52,9 @@ field 'email', {
     validation => $passer
 };
 
-my $v = Validation::Class->new( params => {
+package main;
+
+my $v = MyVal->new( params => {
     id2 => '',
     login => 'admin',
     password => 'pass'
@@ -60,4 +63,4 @@ my $v = Validation::Class->new( params => {
 ok $v, 'validation-class initialized';
 
 ok ! $v->validate(qw/id2 login password/), 'validation works and found id error';
-ok $v->errors->to_string eq 'id error', 'id error found with correct value';
+ok $v->errors_to_string eq 'id error', 'id error found with correct value';

@@ -1,16 +1,15 @@
 use Test::More tests => 2;
 
-use strict;
-use warnings;
-
+package MyVal;
 use Validation::Class;
-use base 'Validation::Class';
+
+package main;
 
 my $params = {
      _dc => '0123456789'
 };
 
-my $v = Validation::Class->new(
+my $v = MyVal->new(
     fields => {
 	status => {
 	    required   => 1,

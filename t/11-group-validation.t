@@ -1,9 +1,11 @@
-use Test::More tests => 43;
+use Test::More tests => 42;
 
-# load module
-BEGIN { use_ok( 'Validation::Class' ) }
+package MyVal;
+use Validation::Class;
 
-my $v = Validation::Class->new(
+package main;
+
+my $v = MyVal->new(
     fields => {
         'user.login' => {
             error => 'login error'
@@ -29,27 +31,27 @@ ok defined $v->params->{'user.login'}, 'login param exists';
 $v->fields->{'user.login'}->{min_length} = 10;
 ok ! $v->validate('user.login'), 'error found as expected';
 ok ! $v->validate, 'alternate use of validation found error also';
-ok $v->errors->count == 1, 'error count is correct';
-ok $v->errors->to_string eq 'login error', 'error message specified captured';
+ok $v->error_count == 1, 'error count is correct';
+ok $v->errors_to_string eq 'login error', 'error message specified captured';
 
 $v->fields->{'user.login'}->{min_length} = 5;
 ok $v->validate('user.login'), 'user.login rule validates';
 ok $v->validate, 'alternate use of validation validates';
-ok $v->errors->count == 0, 'error count is zero';
-ok $v->errors->to_string eq '', 'no error messages found';
+ok $v->error_count == 0, 'error count is zero';
+ok $v->errors_to_string eq '', 'no error messages found';
 
 # check max_length directive
 $v->fields->{'user.login'}->{max_length} = 5;
 ok ! $v->validate('user.login'), 'error found as expected';
 ok ! $v->validate, 'alternate use of validation found error also';
-ok $v->errors->count == 1, 'error count is correct';
-ok $v->errors->to_string eq 'login error', 'error message specified captured';
+ok $v->error_count == 1, 'error count is correct';
+ok $v->errors_to_string eq 'login error', 'error message specified captured';
 
 $v->fields->{'user.login'}->{max_length} = 9;
 ok $v->validate('user.login'), 'user.login rule validates';
 ok $v->validate, 'alternate use of validation validates';
-ok $v->errors->count == 0, 'error count is zero';
-ok $v->errors->to_string eq '', 'no error messages found';
+ok $v->error_count == 0, 'error count is zero';
+ok $v->errors_to_string eq '', 'no error messages found';
 
 # grouped fields perform like normal fields, now testing validation and
 # extraction routines
@@ -61,7 +63,7 @@ ok defined $obj->{user}->{password} && $obj->{user}->{password}, 'get_params_has
 # crude method of testing the automatic hash serialization conversion on build
 # against the exact same tests as above
 
-$v = Validation::Class->new(
+$v = MyVal->new(
     fields => {
         'user.login' => {
             error => 'login error'
@@ -89,30 +91,27 @@ ok defined $v->params->{'user.login'}, 'login param exists';
 $v->fields->{'user.login'}->{min_length} = 10;
 ok ! $v->validate('user.login'), 'error found as expected';
 ok ! $v->validate, 'alternate use of validation found error also';
-ok $v->errors->count == 1, 'error count is correct';
-ok $v->errors->to_string eq 'login error', 'error message specified captured';
+ok $v->error_count == 1, 'error count is correct';
+ok $v->errors_to_string eq 'login error', 'error message specified captured';
 
 $v->fields->{'user.login'}->{min_length} = 5;
 ok $v->validate('user.login'), 'user.login rule validates';
 ok $v->validate, 'alternate use of validation validates';
-ok $v->errors->count == 0, 'error count is zero';
-ok $v->errors->to_string eq '', 'no error messages found';
+ok $v->error_count == 0, 'error count is zero';
+ok $v->errors_to_string eq '', 'no error messages found';
 
 # check max_length directive
 $v->fields->{'user.login'}->{max_length} = 5;
 ok ! $v->validate('user.login'), 'error found as expected';
 ok ! $v->validate, 'alternate use of validation found error also';
-ok $v->errors->count == 1, 'error count is correct';
-ok $v->errors->to_string eq 'login error', 'error message specified captured';
+ok $v->error_count == 1, 'error count is correct';
+ok $v->errors_to_string eq 'login error', 'error message specified captured';
 
 $v->fields->{'user.login'}->{max_length} = 9;
 ok $v->validate('user.login'), 'user.login rule validates';
 ok $v->validate, 'alternate use of validation validates';
-ok $v->errors->count == 0, 'error count is zero';
-ok $v->errors->to_string eq '', 'no error messages found';
-
-# grouped fields perform like normal fields, now testing validation and
-# extraction routines
+ok $v->error_count == 0, 'error count is zero';
+ok $v->errors_to_string eq '', 'no error messages found';
 
 $obj = $v->get_params_hash();
 ok defined $obj->{user}->{login} && $obj->{user}->{login}, 'get_params_hash has user hash with login key';

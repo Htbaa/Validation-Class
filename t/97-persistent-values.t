@@ -1,8 +1,6 @@
 use Test::More tests => 6;
 
-use strict;
-use warnings;
-
+package MyVal;
 use Validation::Class;
 
 field this => {
@@ -45,7 +43,9 @@ my $second_params = {
     that => ''
 };
 
-my $v1 = Validation::Class->new(
+package main;
+
+my $v1 = MyVal->new(
     #fields => my_fields,
     params => $first_params,
     ignore_unknown => 1
@@ -56,7 +56,7 @@ ok $v1, '1st validation object ok';
 $v1->validate(qw/this that/);
 ok $v1->fields->{this}->{value} eq '0123456789', '1st validation object -this- field value correct';
 
-my $v2 = Validation::Class->new(
+my $v2 = MyVal->new(
     #fields => my_fields,
     params => $second_params,
     ignore_unknown => 1

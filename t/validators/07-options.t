@@ -1,9 +1,11 @@
-use Test::More tests => 6;
+use Test::More tests => 5;
 
-# load module
-BEGIN { use_ok( 'Validation::Class' ) }
+package MyVal;
+use Validation::Class;
 
-my $r = Validation::Class->new(
+package main;
+
+my $r = MyVal->new(
     fields => {
         status => {
             options => 'Active, Inactive'
@@ -18,7 +20,7 @@ ok  $r->validate(), 'status is valid';
     $r->params->{status} = 'active';
     
 ok  ! $r->validate(), 'status case doesnt match';
-ok  'status must be Active or Inactive' eq $r->errors->to_string(),
+ok  'status must be Active or Inactive' eq $r->errors_to_string(),
     'displays proper error message';
     
     $r->params->{status} = 'inactive';
@@ -29,4 +31,4 @@ ok  ! $r->validate(), 'status case doesnt match alt';
     
 ok  $r->validate(), 'alternate status value validates';
     
-#warn $r->errors->to_string();
+#warn $r->errors_to_string();

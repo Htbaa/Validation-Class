@@ -1,12 +1,12 @@
-use Test::More tests => 2;
+use Test::More tests => 1;
 
 # load module
-BEGIN { use_ok( 'Validation::Class' ) }
+package MyVal; use Validation::Class;  package main;
 
-my $v = Validation::Class->new(
+my $v = MyVal->new(
     fields => {
         foobar => {
-            filter => 'alpha'
+            filters => 'alpha'
         }
     },
     params => {

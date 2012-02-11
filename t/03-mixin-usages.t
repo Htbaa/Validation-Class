@@ -1,62 +1,75 @@
-use Test::More tests => 3;
+use Test::More tests => 9;
 
-# load module
+package MyVal;
+
 use Validation::Class;
 
-my $passer = sub { 1 };
-
-my $mixins = {
-    'mix1',
-    {
-	required   => 1
-    }
+mixin ID => {
+    required   => 1,
+    min_length => 1,
+    max_length => 11
 };
 
-my $fields = {
-
-    'test1',
-    {
-	label      => 'user login',
-	error      => 'login invalid',
-	validation => $passer,
-	mixin      => 'mix1',
-	alias      => [ 'name', 'user' ],
-    },
-
-    'test2',
-    {
-	label       => 'user password',
-	mixin_field => 'abcdef'
-    },
-
-    'test3',
-    {
-	label      => 'user name',
-	error      => 'invalid name',
-	validation => sub { 888 },
-	mixin      => 'mix1'
-    },
-
-    'test4',
-    {
-	mixin       => 'mix1',
-	mixin_field => 'test1',
-	mixin_field => 'test3'
-    },
-
+mixin TEXT => {
+    required   => 1,
+    min_length => 1,
+    max_length => 255,
+    filters    => [qw/trim strip/]
 };
 
-my $v = Validation::Class->new(
-    mixins => $mixins,
-    fields => $fields,
-    params => { user => 'p3rlc0dr' }
-);
+mixin UTEXT => {
+    required   => 1,
+    min_length => 1,
+    max_length => 255,
+    filters    => 'uppercase'
+};
 
-# class init
-ok $v, 'validation-class initialized';
+field id => {
+    mixin => 'ID',
+    label => 'Object ID',
+    error => 'Object ID error'
+};
 
-# mixins and fields registered without keywords
-ok scalar( keys %{ $v->fields } ), 'fields registration ok';
-ok scalar( keys %{ $v->mixins } ), 'mixins registration ok';
+field name => {
+    mixin => 'TEXT',
+    label => 'Object Name',
+    error => 'Object Name error',
+    filters => ['uppercase']
+};
 
-my $foo;
+field handle => {
+    mixin => 'UTEXT',
+    label => 'Object Handle',
+    error => 'Object Handle error',
+    filters => [qw/trim strip/]
+};
+
+field email => {
+    mixin => 'TEXT',
+    label => 'Object Email',
+    error => 'Object Email error',
+    max_length => 500
+};
+
+field email_confirm => {
+    mixin_field => 'email',
+    label => 'Object Email Confirm',
+    error => 'Object Email confirmation error',
+    min_length => 5
+};
+
+package main;
+
+my $v = MyVal->new( params => { name => ' p3rlc0dr    ' } );
+ok $v, 'initialization successful';
+ok $v->fields->{email}->{max_length} == 500, 'email max_length mixin overridden';
+
+ok $v->fields->{email_confirm}->{required}, 'email_confirm required ok';
+ok $v->fields->{email_confirm}->{min_length} == 5, 'email_confirm min_length ok';
+ok $v->fields->{email_confirm}->{max_length} == 500, 'email_confirm max_length ok';
+ok $v->fields->{email_confirm}->{label} eq 'Object Email Confirm', 'email_confirm label ok';
+ok $v->fields->{email_confirm}->{error} eq 'Object Email confirmation error', 'email_confirm error ok';
+ok $v->params->{name} =~ /P3RLC0DR/, 'trim, strip and uppercase filters all applied';
+
+my $w = MyVal->new( params => { name => ' p3rlc0dr    ' } );
+ok $w->params->{name} =~ /P3RLC0DR/, 'trim, strip and uppercase filters all applied';
