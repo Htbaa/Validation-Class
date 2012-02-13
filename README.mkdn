@@ -4,7 +4,7 @@ Validation::Class - Low-Fat Full-Flavored Data Validation Construction Kit
 
 # VERSION
 
-version 5.0.0_02
+version 5.0.1
 
 # SYNOPSIS
 
