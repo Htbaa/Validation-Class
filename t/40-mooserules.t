@@ -1,4 +1,11 @@
-use Test::More tests => 9;
+use Test::More;
+
+if ($ENV{TEST_MOOSE}) {
+    plan tests => 9;
+}
+else {
+    plan skip_all => "No Moose";
+}
 
 # begin
 package Identify;

@@ -1,6 +1,11 @@
-use strict;
-use warnings;
-use Test::More 0.88;
+use Test::More;
+
+if ($ENV{TEST_MOOSE}) {
+    plan tests => 3;
+}
+else {
+    plan skip_all => "No Moose";
+}
 
 package Foo;
 use Moose;
@@ -52,5 +57,3 @@ ok !$rules->validate, 'Should not validate, values bad';
 $i = Bar->new( foo => 'foo', bar => 'bar' );
 $rules = $i->rules;
 ok $rules->validate, 'Should validate';
-
-done_testing;
