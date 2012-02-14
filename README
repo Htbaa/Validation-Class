@@ -3,7 +3,7 @@ NAME
     Kit
 
 VERSION
-    version 5.0.1
+    version 5.0.2
 
 SYNOPSIS
         use MyApp::Validation;
