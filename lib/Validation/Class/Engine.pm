@@ -202,9 +202,11 @@ sub class {
     
     my ( $self, $class, %args ) = @_;
     
-    confess 'Relative class does not exist, please ensure you are calling the class '.
-        'method from the parent class, i.e. the class where you called the '.
-        'load_classes method' unless defined $self->relatives->{$class};
+    #confess 'Relative class does not exist, please ensure you are calling the class '.
+    #    'method from the parent class, i.e. the class where you called the '.
+    #    'load_classes method' unless defined $self->relatives->{$class};
+    
+    return unless defined $self->relatives->{$class};
     
     my %defaults = (    
         'params'         => $self->params,
