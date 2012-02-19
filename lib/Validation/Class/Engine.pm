@@ -624,6 +624,27 @@ sub set_errors {
 
 }
 
+sub set_method {
+    
+    my ($self, $name, $code) = @_;
+    
+    my $class = ref $self || $self;
+    
+    my $shortname  = $name;
+       $shortname  =~ s/::/\_/;
+       $shortname  =~ s/([a-z])([A-Z])/$1\_$2/g;
+       
+    # place code on the calling class
+    
+    confess "Error attempting to create method $shortname, already exists"
+        if defined &{"${class}::$shortname"};
+    
+    no strict 'refs';
+    
+    *{"${class}::$shortname"} = $code;
+    
+}
+
 sub set_params_hash {
 
     my ($self, $params) = @_;

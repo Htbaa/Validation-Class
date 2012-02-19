@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 BEGIN {
     use FindBin;
@@ -27,6 +27,8 @@ package main;
 my $v = MyVal->new( params => { foo => 1 } );
 
 ok $v, 'initialization successful';
+
+ok 'abc' eq $v->squash, 'glade plugin applied squash method to base';
 
 eval { $v->stash->{smell}->() && $v->stash->{squirt}->() };
 ok ! $@, 'glade plugin applied to base';

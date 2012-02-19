@@ -54,8 +54,6 @@ sub directive {
         validator => $data
     };
     
-    use strict 'refs';
-    
     return $name, $data;
     
 }
@@ -74,8 +72,6 @@ sub field {
     $self->{config}->{FIELDS}->{$name} = $data;
     $self->{config}->{FIELDS}->{$name}->{errors} = [];
     
-    use strict 'refs';
-    
     return $name, $data;
     
 }
@@ -93,8 +89,6 @@ sub filter {
     
     $self->{config}->{FILTERS}->{$name} = $data;
     
-    use strict 'refs';
-    
     return $name, $data;
     
 }
@@ -105,9 +99,35 @@ sub load {
     
     my $self = caller(0); # hackaroni toni
     
+    no strict 'refs';
+    
     $self->load_classes() if $data->{classes};
     
     $self->load_plugins(@{$data->{plugins}}) if $data->{plugins};
+    
+    # attached base classes (configs)
+    if ($data->{base}) {
+        
+        if (@{$data->{base}}) {
+            
+            foreach my $class (@{$data->{base}}) {
+                
+                # require plugin
+                my $file = $class;
+                   $file =~ s/::/\//g;
+                   $file .= ".pm";
+                
+                eval "require $class"
+                    unless $INC{$file}; # unless already loaded
+                    
+                # merge configs
+                $self->{config} = merge $class->{config}, $self->{config};
+                
+            }
+            
+        }
+        
+    }
     
 }
 
@@ -133,8 +153,6 @@ sub load_classes {
         $self->{relatives}->{$quickname}   = $child;
     
     }
-    
-    use strict 'refs';
     
     return 0;
     
@@ -168,8 +186,6 @@ sub load_plugins {
     
     $self->{config}->{PLUGINS}->{$_} = 1 for @plugins;
     
-    use strict 'refs';
-    
     return 0;
     
 }
@@ -185,8 +201,6 @@ sub mixin {
     no strict 'refs';
     
     $self->{config}->{MIXINS}->{$name} = $data;
-    
-    use strict 'refs';
     
     return $name, $data;
 
@@ -253,8 +267,6 @@ sub profile {
     no strict 'refs';
 
     $self->{config}->{PROFILES}->{$name} = $data;
-    
-    use strict 'refs';
     
     return $name, $data;
 
@@ -1412,6 +1424,14 @@ prefixed with the name of the class being fetched, and adjust the matching rule
     my $kid3 = $rules->class('child'); # loads MyVal::Child;
     my $kid4 = $rules->class('step_child'); # loads MyVal::StepChild;
     
+    # INTELLIGENTLY DETECTING AND MAP PARAMS TO CHILD CLASS
+    my $params = {
+        'my.name'    => 'Guy Friday',
+        'child.name' => 'Guy Friday Jr.'
+    };
+    
+    $rules->class('child'); # child field *name* mapped to param *child.name*
+    
     # WITHOUT COPYING PARAMS FROM MyVal
     my $kid5 = $rules->class('child', params => {}); # .. etc
     
@@ -1595,10 +1615,23 @@ for configuring the current class.
     package MyVal;
     use Validation::Class;
     
+    # load all child classes (relatives)
     load {
-        classes => 1, # same as above
+        classes => 1 
+    };
+    
+    # load CPAN or Custom plugins
+    load {
         plugins => [
-            ...
+            'CPANPlugin',
+            '+MyVal::Plugin'
+        ]
+    };
+    
+    # merge configuration information from another class(es)
+    load {
+        base => [
+            'BaseClass'
         ]
     };
     
@@ -1608,7 +1641,7 @@ for configuring the current class.
 
 =head2 load_classes
 
-The load_classes method uses L<Module::Find> to load child classes for
+The load_classes method (B<depreciated>) uses L<Module::Find> to load child classes for
 convenient access through the class() method. Existing parameters and
 configuration options are passed to the child class's constructor. All
 attributes can be easily overwritten using the attribute's accessors on the
@@ -1631,7 +1664,7 @@ child class.
 
 =head2 load_plugins
 
-The load_plugins method is used to load plugins that support Validation::Class. 
+The load_plugins method (B<depreciated>) is used to load plugins that support Validation::Class. 
 A Validation::Class plugin is little more than a Role (Moose::Role) that extends
 the Validation::Class core. As usual, an official Validation::Class plugin can
 be referred to using shorthand while custom plugins are called by prefixing a
@@ -1759,6 +1792,19 @@ The set_errors method pushes its arguments (error messages) onto the class-level
 error stack of the current class.
 
     my $count = $self->set_errors('Oops', 'OMG', 'WTF');
+
+=cut
+
+=head2 set_method
+
+The set_method method conveniently creates a method on the calling class, this
+method is primarily intended to be used during instantiation of a plugin during
+instantiation of the validation class.
+
+Additionally, method names are flattened, e.g. ThisPackage will be converted to
+this_package for convenience and consistency.
+
+    my $sub = $self->set_method(__PACKAGE__ => sub { ... });
 
 =cut
 
