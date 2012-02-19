@@ -1,5 +1,8 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+5.15 (2012-02-20)
+    * cleaned up various error handling approaches, editorialized some POD also
+
 5.10 (2012-02-17)
     * flip-flopped again with regards to the version number style
     * class() returns undefined instead of dying with AWEFUL(tm) error per mst

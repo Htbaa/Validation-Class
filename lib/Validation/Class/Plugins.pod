@@ -19,7 +19,7 @@ The following is an example of including a plugin.
     
     load {
         plugins => [
-            'YourPluginName',
+            'PluginName',
             '+MyApp::Validation::YourPluginName'
         ]
     };

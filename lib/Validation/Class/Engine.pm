@@ -338,19 +338,22 @@ sub error {
                 grep { $_ eq $error } @{$self->errors};
         }
         else {
+            
             confess "Can't set error without proper field and error "
               . "message data, field must be a hashref with name "
               . "and value keys";
+            
         }
+    
     }
     
     # retrieve an error message on a particular field
     if ( @args == 1 ) {
 
-        #if ($self->fields->{ $args[0] }) {
+        #if ($self->fields->{$args[0]}) {
         
             # return param-specific errors
-        #    return $self->fields->{ $args[0] }->{errors};
+            #return $self->fields->{$args[0]}->{errors};
         
         #}
         #else {
@@ -377,42 +380,49 @@ sub error_count {
 
 sub error_fields {
     
-    my ($self) = @_;
+    my ($self, @fields) = @_;
     
     my $error_fields = {};
-
-    while (my($name, $field) = each(%{$self->fields})) {
+    
+    @fields = keys %{$self->fields} unless @fields;
+    
+    foreach my $name (@fields) {
+        
+        my $field = $self->fields->{$name};
         
         if (@{$field->{errors}}) {
+            
             $error_fields->{$name} = $field->{errors};
+        
         }
+        
     }
     
     return $error_fields;
 
 }
 
-# return arrayref of class errors as a string
+# return class errors as a string
 sub errors_to_string {
     
     my ($self, $delimiter, $transformer) = @_;
     
     $delimiter ||= ', '; # default delimiter is a comma
     
-    return join $delimiter, map {
-        
-        # maybe? tranforms each error
-        "CODE" eq ref $transformer ? $transformer->($_) : $_
-    }   @{$self->errors};
+    return join $delimiter, @{$self->errors} unless "CODE" eq ref $transformer;
+    
+    return join $delimiter, map { $transformer->($_) } @{$self->errors};
 
 }
 
 sub get_errors {
 
-    my ($self) = @_;
+    my ($self, @fields) = @_;
     
     # get class-level errors as a list
-    return (@{$self->{errors}});
+    return @fields ?
+        (map { @{$self->fields->{$_}->{errors}} } @fields) :
+        (@{$self->{errors}});
 
 }
 
@@ -421,7 +431,9 @@ sub get_params {
     my ($self, @params) = @_;
     
     # get param values as a list
-    return map { $self->params->{$_} } @params;
+    return @params ?
+        (map { $self->params->{$_} } @params) :
+        (values %{ $self->params });
     
 }
 
