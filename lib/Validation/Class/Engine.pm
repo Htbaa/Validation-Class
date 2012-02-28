@@ -88,36 +88,33 @@ has 'filtering' => 'pre';
 has 'filters' => sub { shift->{config}->{FILTERS} || {} };
 
 # Hash::Flatten args
-has 'hash_inflator' => sub {{
+has 'hash_inflator' => sub {
     
-    EscapeSequence => '',
-    HashDelimiter  => '.',
-    ArrayDelimiter => ':'
+    my $options = @_ > 1 ? pop @_ : {
+        hash_delimiter  => '.',
+        array_delimiter => ':',
+        escape_sequence => '',
+    };
+    
+    foreach my $option (keys %{$options}) {
+        
+        if ($option =~ /\_/) {
+        
+            my $cc_option = $option;
+            
+            $cc_option =~ s/([a-zA-Z])\_([a-zA-Z])/$1\u$2/gi;
+            
+            $options->{ucfirst $cc_option} = $options->{$option};
+            
+            delete $options->{$option};
+        
+        }
+        
+    }
 
-}};
-
-#around 'hash_inflator' => sub {
-#    my $orig    = shift;
-#    my $self    = shift;
-#    my $options = shift || {
-#        hash_delimiter  => '.',
-#        array_delimiter => ':',
-#        escape_sequence => '',
-#    };
-#    
-#    foreach my $option (keys %{$options}) {
-#        if ($option =~ /\_/) {
-#            my $cc_option = $option;
-#            
-#            $cc_option =~ s/([a-zA-Z])\_([a-zA-Z])/$1\u$2/gi;
-#            $options->{ucfirst $cc_option} = $options->{$option};
-#            
-#            delete $options->{$option};
-#        }
-#    }
-#
-#    return $self->$orig($options);
-#};
+    return $options;
+    
+};
 
 # switch: ignore unknown parameters
 has 'ignore_unknown' => '0';

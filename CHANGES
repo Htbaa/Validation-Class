@@ -1,5 +1,8 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+5.22 (2012-02-28)
+    * positioning load_plugins and load_classes methods for depreciation
+
 5.16 (2012-02-20)
     * added the set_method method, tests, updated some POD
     * update load method to inherit configuration data from other classes
