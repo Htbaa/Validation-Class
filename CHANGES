@@ -1,5 +1,18 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+0.00 (0000-00-00)
+    - allow default to execute a coderef
+    - allow array-like directives like "options" to take an arrayref or coderef
+
+5.50 (2012-03-08)
+    * automatic creation of class attributes based on param values
+    * added method and mth keywords in preparation for the new OO system in v6
+    * added ignore_failure flag (set true) to prevent methods from croaking on error
+    * added report_failure flag (set false) registering an error on method failure
+
+5.22 (2012-02-28)
+    * positioning load_plugins and load_classes methods for depreciation
+
 5.22 (2012-02-28)
     * positioning load_plugins and load_classes methods for depreciation
 
@@ -166,7 +179,3 @@ This file documents the revision history for the Perl library Validation::Class.
 1.9.50000 (2011-10-23)
     * Completely rewritten with Moose
     * Fixed mixin and mixin_field merging policy
-
-x.x.x
-    * Eliminate Moose dependency
-    * Document properly setting errors and stash usage

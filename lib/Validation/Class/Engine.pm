@@ -116,8 +116,14 @@ has 'hash_inflator' => sub {
     
 };
 
+# switch: ignore method requirement failures
+has 'ignore_failure' => '1';
+
 # switch: ignore unknown parameters
 has 'ignore_unknown' => '0';
+
+# hash of generated methods
+has 'methods' => sub { shift->{config}->{METHODS} || {} };
 
 # hash of mixins
 has 'mixins' => sub { shift->{config}->{MIXINS} || {} };
@@ -136,6 +142,9 @@ has 'queued' => sub { [] };
 
 # class relatives (child-classes) store
 has 'relatives' => sub {{  }};
+
+# switch: report method requirement failures
+has 'report_failure' => '0';
 
 # switch: report unknown input parameters
 has 'report_unknown' => '0';
@@ -628,13 +637,15 @@ sub set_method {
     my $class = ref $self || $self;
     
     my $shortname  = $name;
-       $shortname  =~ s/::/\_/;
+       $shortname  =~ s/::/\_/g;
+       $shortname  =~ s/[^a-zA-Z0-9\_]/\_/g;
        $shortname  =~ s/([a-z])([A-Z])/$1\_$2/g;
+       $shortname  = lc $shortname;
        
-    # place code on the calling class
+    confess "Error creating method $shortname, method already exists"
+        if $class->can($shortname);
     
-    confess "Error attempting to create method $shortname, already exists"
-        if defined &{"${class}::$shortname"};
+    # place code on the calling class
     
     no strict 'refs';
     

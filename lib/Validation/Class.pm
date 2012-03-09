@@ -1,4 +1,4 @@
-# ABSTRACT: Low-Fat Full-Flavored Data Validation Construction Kit
+# ABSTRACT: Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use warnings;
 # VERSION
 
 use Module::Find;
+use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
 
@@ -28,6 +29,8 @@ our @EXPORT = qw(
     load_classes
     load_plugins
     
+    mth
+    method
     mxn
     mixin
     
@@ -154,6 +157,8 @@ sub load {
     # attached base classes (configs)
     if ($data->{base}) {
         
+        $data->{base} = [$data->{base}] unless "ARRAY" eq ref $data->{base};
+        
         if (@{$data->{base}}) {
             
             foreach my $class (@{$data->{base}}) {
@@ -193,6 +198,22 @@ sub load_plugins {
     
 }
 
+sub mth { goto &method }
+sub method {
+
+    my ($name, $data) = @_;
+    my $self = caller(0);
+    
+    return 0 unless ($name && $data);
+    
+    no strict 'refs';
+    
+    $self->{config}->{METHODS}->{$name} = $data;
+    
+    return $name, $data;
+
+}
+
 sub mxn { goto &mixin }
 sub mixin {
 
@@ -220,9 +241,9 @@ sub new {
     
     no strict 'refs';
     
-    my @routines =
-        grep { defined &{"$engine\::$_"} }
-            keys %{"$engine\::"};
+    my @routines = grep { defined &{"$engine\::$_"} } keys %{"$engine\::"};
+    
+    # apply engine as a role
     
     foreach my $routine (@routines) {
         
@@ -230,11 +251,91 @@ sub new {
         
     }
     
+    # create config
+    
     $invocant->{config} = merge $engine->template, $invocant->{config};
+    
+    # start instantiation
     
     my $self = bless { %{ $invocant } }, ref $invocant || $invocant;
     
-    # BEGIN
+    # create class attributes (parameter accessors)
+    
+    while (my ($key, $value) = each(%{ $self->fields })) {
+        
+        confess "Error creating accessor $key, attribute collision"
+            if exists $self->{$key};
+            
+        confess "Error creating accessor $key, base-class method collision"
+            if $self->can($key) and defined &{"$engine\::$key"};
+            
+        confess "Error creating accessor $key, reserve word collision"
+            if $self->can($key) and grep { $key eq $_ } @EXPORT;
+        
+        # create accessor
+        
+        $self->set_method($key => sub {
+            
+            my ($self, $data) = @_;
+            
+            $self->params->{$key} = $data if defined $data;
+            
+            exists $self->params->{$key} ? $self->params->{$key} : undef;
+            
+        }) unless $self->can($key); # I already can
+        
+    }
+    
+    # create class methods (from signatures)
+    
+    while (my ($key, $value) = each(%{ $self->methods })) {
+        
+        confess "Error creating method $key, attribute collision"
+            if exists $self->{$key};
+            
+        confess "Error creating method $key, base-class method collision"
+            if $self->can($key) and defined &{"$engine\::$key"};
+            
+        confess "Error creating method $key, reserve word collision"
+            if $self->can($key) and grep { $key eq $_ } @EXPORT;
+        
+        # create method
+        
+        next unless $value->{input} && $value->{using};
+        
+        $self->set_method($key => sub {
+            
+            my $self = shift;
+            my @args = @_;
+            
+            my $validator =
+                "ARRAY" eq ref $value->{input} ?
+                    sub { $self->validate(@{$value->{input}}) } :
+                    sub { $self->validate_profile($value->{input}, @_) } ;
+            
+            if ($validator->(@args)) {
+                
+                return $value->{using}->($self, @args) ;
+                
+            }
+            
+            else {
+                
+                my $error = "method $key failed to validate";
+                
+                unshift @{$self->{errors}}, $error if $self->report_failure;
+                
+                confess $self->errors_to_string unless $self->ignore_failure;
+                
+            }
+            
+            return 0;
+            
+        }) unless $self->can($key); # I already can
+        
+    }
+    
+    # process parameters
     
     my %params = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
     
@@ -244,16 +345,20 @@ sub new {
         
     }
     
+    # process plugins
+    
     foreach my $plugin (keys %{$self->plugins}) {
         
         $plugin->new($self) if $plugin->can('new');
     
     }
     
+    # initialize object
+    
     $self->normalize;
     $self->apply_filters('pre') if $self->filtering;
     
-    # END
+    # end instantiation
     
     return $self;
 
@@ -347,13 +452,27 @@ A validation class is defined as follows:
     
     # a validation profile
     pro 'registration'  => sub {
-        my ($self, @args) = shift;
+        my ($self, @args) = @_;
         return $self->validate(qw(
             +name
             +email
             -login
             +password
         ))
+    };
+    
+    # an auto-validating method
+    mth 'register'  => {
+        
+        input => [qw/+login +password/],
+        using => sub {
+            
+            my ($self, @args) = shift;
+            
+            # ... do something
+            
+        }
+        
     };
     
     1;
@@ -428,10 +547,37 @@ various scenarios:
     
     1;
 
+=head2 THE METHOD KEYWORD
+
+The method keyword (or mth) creates an auto-validating method. See the
+ignore_failure and report_failure switch to control how method failures are
+handled.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    method 'do_something' => {
+        input => ['field_a', 'field_b'], # or scalar validation profile name
+        using => sub {
+            my ($self, @args) = @_;
+            # ...
+        }
+    };
+    
+    package main;
+    
+    my $input = MyApp::Validation->new;
+    
+    unless ($input->do_something) {
+        print $
+    }
+
+=cut
+
 =head2 THE MIXIN KEYWORD
 
-The mixin keyword (or mxn) creates a validation rules template that can be applied to any
-field using the mixin directive.
+The mixin keyword (or mxn) creates a validation rules template that can be
+applied to any field using the mixin directive.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -453,7 +599,8 @@ field using the mixin directive.
 
 =head2 THE FILTER KEYWORD
 
-The filter keyword (or flt) creates custom filters to be used in your field definitions.
+The filter keyword (or flt) creates custom filters to be used in your field
+definitions.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -474,10 +621,10 @@ The filter keyword (or flt) creates custom filters to be used in your field defi
 
 =head2 THE DIRECTIVE KEYWORD
 
-The directive keyword (or dir) creates custom validator directives to be used in your field
-definitions. The routine is passed two parameters, the value of directive and the
-value of the field the validator is being processed against. The validator should
-return true or false.
+The directive keyword (or dir) creates custom validator directives to be used in
+your field definitions. The routine is passed two parameters, the value of
+directive and the value of the field the validator is being processed against.
+The validator should return true or false.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -503,9 +650,9 @@ return true or false.
 
 =head2 THE FIELD KEYWORD
 
-The field keyword (or fld) creates a validation block and defines validation rules for
-reuse in code. The field keyword should correspond with the parameter name
-expected to be passed to your validation class.
+The field keyword (or fld) creates a validation block and defines validation
+rules for reuse in code. The field keyword should correspond with the parameter
+name expected to be passed to your validation class.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -654,6 +801,45 @@ classes. The following is an example of this:
     my $profile = $rules->class('profile');
     
     ...
+    
+    1;
+
+=cut
+
+=head1 DATA MODELING MADE EASY
+
+Validation::Class has become so much more than a simple data validation framework
+and is in-fact a viable alternative for data modeling. Much like the modern day
+OO systems available, Validation::Class aims to provide the convenience layer
+for easily defining self-validating data models.
+
+When fields are defined, accessors are automatically generated to make getting
+and setting their values much easier. When methods are defined using the method
+keyword, the routine becomes a auto-validating routine following the preset data
+validation rules and gaining consistency.
+
+    package MyVal::User;
+    
+    use Validation::Class;
+    
+    fld name     => { ... };
+    fld email    => { ... };
+    fld login    => { ... };
+    fld password => { ... };
+    
+    mth create   => { ... };
+    
+    package main;
+    
+    my $user = MyVal::User->new(name => '...', email => '...');
+    
+    if ($user->create) {
+        print "Just created an account for $user->name";
+    }
+    
+    else {
+        die $user->errors_to_string;
+    }
     
     1;
 
@@ -1263,6 +1449,20 @@ The new method instantiates and returns an instance of your validation class.
 
 =head1 VALIDATION CLASS ATTRIBUTES
 
+=head2 ignore_failure
+
+The ignore_failure boolean determines whether your application will live or die
+upon failing to validate a self-validating method defined using the method
+keyword. This is on (1) by default, method validation failures will set errors
+and can be determined by checking the error stack using one of the error message
+methods. If turned off, the application will die and confess on failure.
+
+    my $self = MyApp::Validation->new(params => $params, ignore_failure => 0);
+    $self->ignore_failure(1);
+    ...
+
+=cut
+
 =head2 ignore_unknown
 
 The ignore_unknown boolean determines whether your application will live or die
@@ -1348,6 +1548,20 @@ The params attribute gets/sets the parameters to be validated.
     $self->params($input);
     my $params = $self->params();
     
+    ...
+
+=cut
+
+=head2 report_failure
+
+The report_failure boolean determines whether your application will report
+self-validating method failures as class-level errors. This is off (0) by default,
+if turned on, an error messages will be generated and set at the class-level
+specifying the method which failed in addition to the existing messages.
+
+    my $self = MyApp::Validation->new(params => $params,
+    ignore_failure => 1, report_failure => 1);
+    $self->report_unknown(0);
     ...
 
 =cut
