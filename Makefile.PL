@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Low-Fat Full-Flavored Data Validation Construction Kit",
+  "ABSTRACT" => "Low-Fat Full-Flavored Data Modeling and Validation Framework",
   "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Hash::Merge" => 0,
     "Module::Find" => 0
   },
-  "VERSION" => "5.22",
+  "VERSION" => "5.50",
   "test" => {
     "TESTS" => "t/*.t t/filters/*.t t/validators/*.t"
   }

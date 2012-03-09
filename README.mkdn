@@ -1,10 +1,10 @@
 # NAME
 
-Validation::Class - Low-Fat Full-Flavored Data Validation Construction Kit
+Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 # VERSION
 
-version 5.22
+version 5.50
 
 # SYNOPSIS
 
@@ -85,13 +85,33 @@ A validation class is defined as follows:
 
     # a validation profile
     pro 'registration'  => sub {
-        my ($self, @args) = shift;
+        my ($self, @args) = @_;
         return $self->validate(qw(
             +name
             +email
             -login
             +password
         ))
+    };
+    
+
+    # an auto-validating method
+    mth 'register'  => {
+        
+
+        input => [qw/+login +password/],
+        using => sub {
+            
+
+            my ($self, @args) = shift;
+            
+
+            # ... do something
+            
+
+        }
+        
+
     };
     
 
@@ -177,10 +197,39 @@ various scenarios:
 
     1;
 
+## THE METHOD KEYWORD
+
+The method keyword (or mth) creates an auto-validating method. See the
+ignore_failure and report_failure switch to control how method failures are
+handled.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+
+    method 'do_something' => {
+        input => ['field_a', 'field_b'], # or scalar validation profile name
+        using => sub {
+            my ($self, @args) = @_;
+            # ...
+        }
+    };
+    
+
+    package main;
+    
+
+    my $input = MyApp::Validation->new;
+    
+
+    unless ($input->do_something) {
+        print $
+    }
+
 ## THE MIXIN KEYWORD
 
-The mixin keyword (or mxn) creates a validation rules template that can be applied to any
-field using the mixin directive.
+The mixin keyword (or mxn) creates a validation rules template that can be
+applied to any field using the mixin directive.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -202,7 +251,8 @@ field using the mixin directive.
 
 ## THE FILTER KEYWORD
 
-The filter keyword (or flt) creates custom filters to be used in your field definitions.
+The filter keyword (or flt) creates custom filters to be used in your field
+definitions.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -223,10 +273,10 @@ The filter keyword (or flt) creates custom filters to be used in your field defi
 
 ## THE DIRECTIVE KEYWORD
 
-The directive keyword (or dir) creates custom validator directives to be used in your field
-definitions. The routine is passed two parameters, the value of directive and the
-value of the field the validator is being processed against. The validator should
-return true or false.
+The directive keyword (or dir) creates custom validator directives to be used in
+your field definitions. The routine is passed two parameters, the value of
+directive and the value of the field the validator is being processed against.
+The validator should return true or false.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -252,9 +302,9 @@ return true or false.
 
 ## THE FIELD KEYWORD
 
-The field keyword (or fld) creates a validation block and defines validation rules for
-reuse in code. The field keyword should correspond with the parameter name
-expected to be passed to your validation class.
+The field keyword (or fld) creates a validation block and defines validation
+rules for reuse in code. The field keyword should correspond with the parameter
+name expected to be passed to your validation class.
 
     package MyApp::Validation;
     use Validation::Class;
@@ -422,6 +472,51 @@ classes. The following is an example of this:
     
 
     ...
+    
+
+    1;
+
+# DATA MODELING MADE EASY
+
+Validation::Class has become so much more than a simple data validation framework
+and is in-fact a viable alternative for data modeling. Much like the modern day
+OO systems available, Validation::Class aims to provide the convenience layer
+for easily defining self-validating data models.
+
+When fields are defined, accessors are automatically generated to make getting
+and setting their values much easier. When methods are defined using the method
+keyword, the routine becomes a auto-validating routine following the preset data
+validation rules and gaining consistency.
+
+    package MyVal::User;
+    
+
+    use Validation::Class;
+    
+
+    fld name     => { ... };
+    fld email    => { ... };
+    fld login    => { ... };
+    fld password => { ... };
+    
+
+    mth create   => { ... };
+    
+
+    package main;
+    
+
+    my $user = MyVal::User->new(name => '...', email => '...');
+    
+
+    if ($user->create) {
+        print "Just created an account for $user->name";
+    }
+    
+
+    else {
+        die $user->errors_to_string;
+    }
     
 
     1;
@@ -966,6 +1061,18 @@ The new method instantiates and returns an instance of your validation class.
 
 # VALIDATION CLASS ATTRIBUTES
 
+## ignore_failure
+
+The ignore_failure boolean determines whether your application will live or die
+upon failing to validate a self-validating method defined using the method
+keyword. This is on (1) by default, method validation failures will set errors
+and can be determined by checking the error stack using one of the error message
+methods. If turned off, the application will die and confess on failure.
+
+    my $self = MyApp::Validation->new(params => $params, ignore_failure => 0);
+    $self->ignore_failure(1);
+    ...
+
 ## ignore_unknown
 
 The ignore_unknown boolean determines whether your application will live or die
@@ -1042,6 +1149,18 @@ The params attribute gets/sets the parameters to be validated.
     my $params = $self->params();
     
 
+    ...
+
+## report_failure
+
+The report_failure boolean determines whether your application will report
+self-validating method failures as class-level errors. This is off (0) by default,
+if turned on, an error messages will be generated and set at the class-level
+specifying the method which failed in addition to the existing messages.
+
+    my $self = MyApp::Validation->new(params => $params,
+    ignore_failure => 1, report_failure => 1);
+    $self->report_unknown(0);
     ...
 
 ## report_unknown
