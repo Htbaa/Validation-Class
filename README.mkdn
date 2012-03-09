@@ -4,7 +4,7 @@ Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 # VERSION
 
-version 5.50
+version 5.51
 
 # SYNOPSIS
 
@@ -197,35 +197,6 @@ various scenarios:
 
     1;
 
-## THE METHOD KEYWORD
-
-The method keyword (or mth) creates an auto-validating method. See the
-ignore_failure and report_failure switch to control how method failures are
-handled.
-
-    package MyApp::Validation;
-    use Validation::Class;
-    
-
-    method 'do_something' => {
-        input => ['field_a', 'field_b'], # or scalar validation profile name
-        using => sub {
-            my ($self, @args) = @_;
-            # ...
-        }
-    };
-    
-
-    package main;
-    
-
-    my $input = MyApp::Validation->new;
-    
-
-    unless ($input->do_something) {
-        print $
-    }
-
 ## THE MIXIN KEYWORD
 
 The mixin keyword (or mxn) creates a validation rules template that can be
@@ -360,8 +331,57 @@ as arguments.
         die $val->errors_to_string;
     }
 
-The field keyword takes two arguments, the field name and a hashref of key/values
+The profile keyword takes two arguments, the field name and a hashref of key/values
 pairs.
+
+## THE METHOD KEYWORD
+
+The method keyword (or mth) creates an auto-validating method. See the
+ignore_failure and report_failure switch to control how method failures are
+handled.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+
+    method 'do_something' => {
+        input => ['field_a', 'field_b'], # or scalar validation profile name
+        using => sub {
+            my ($self, @args) = @_;
+            # ...
+        }
+    };
+    
+
+    package main;
+    
+
+    my $input = MyApp::Validation->new;
+    
+
+    unless ($input->do_something) {
+        print $
+    }
+
+## THE BUILD KEYWORD
+
+The build keyword (or bld) registers a coderef to be run at instantiation must
+in the same way the common BUILD routine is used in modern-day OO systems.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+
+    build sub {
+        
+
+        my $self = shift;
+        
+
+        # ... do something
+        
+
+    };
 
 # FILTERING INCOMING DATA
 

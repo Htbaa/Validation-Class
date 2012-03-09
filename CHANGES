@@ -3,6 +3,10 @@ This file documents the revision history for the Perl library Validation::Class.
 0.00 (0000-00-00)
     - allow default to execute a coderef
     - allow array-like directives like "options" to take an arrayref or coderef
+    - add before, after and around method modifiers
+
+5.51 (2012-03-08)
+    * add build/bld keywords to register methods to be executed on instantiation
 
 5.50 (2012-03-08)
     * automatic creation of class attributes based on param values

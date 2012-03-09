@@ -18,6 +18,9 @@ use Exporter ();
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
+    bld
+    build
+    
     dir
     directive
     fld
@@ -39,6 +42,23 @@ our @EXPORT = qw(
     pro
     profile
 );
+
+sub bld { goto &build }
+sub build {
+    
+    my ($code) = @_;
+    
+    my $self = caller(0);
+    
+    return 0 unless ("CODE" eq ref $code);
+    
+    no strict 'refs';
+        
+    push @{$self->{config}->{BUILDERS}}, $code;
+    
+    return $code;
+    
+}
 
 sub dir { goto &directive }
 sub directive {
@@ -353,6 +373,16 @@ sub new {
     
     }
     
+    # process builders
+    
+    my $builders = $self->{config}->{BUILDERS};
+    
+    if ("ARRAY" eq ref $builders) {
+        
+        $_->($self) for @{$builders};
+        
+    }
+    
     # initialize object
     
     $self->normalize;
@@ -547,33 +577,6 @@ various scenarios:
     
     1;
 
-=head2 THE METHOD KEYWORD
-
-The method keyword (or mth) creates an auto-validating method. See the
-ignore_failure and report_failure switch to control how method failures are
-handled.
-
-    package MyApp::Validation;
-    use Validation::Class;
-    
-    method 'do_something' => {
-        input => ['field_a', 'field_b'], # or scalar validation profile name
-        using => sub {
-            my ($self, @args) = @_;
-            # ...
-        }
-    };
-    
-    package main;
-    
-    my $input = MyApp::Validation->new;
-    
-    unless ($input->do_something) {
-        print $
-    }
-
-=cut
-
 =head2 THE MIXIN KEYWORD
 
 The mixin keyword (or mxn) creates a validation rules template that can be
@@ -702,8 +705,53 @@ as arguments.
         die $val->errors_to_string;
     }
     
-The field keyword takes two arguments, the field name and a hashref of key/values
+The profile keyword takes two arguments, the field name and a hashref of key/values
 pairs.
+
+=cut
+
+=head2 THE METHOD KEYWORD
+
+The method keyword (or mth) creates an auto-validating method. See the
+ignore_failure and report_failure switch to control how method failures are
+handled.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    method 'do_something' => {
+        input => ['field_a', 'field_b'], # or scalar validation profile name
+        using => sub {
+            my ($self, @args) = @_;
+            # ...
+        }
+    };
+    
+    package main;
+    
+    my $input = MyApp::Validation->new;
+    
+    unless ($input->do_something) {
+        print $
+    }
+
+=cut
+
+=head2 THE BUILD KEYWORD
+
+The build keyword (or bld) registers a coderef to be run at instantiation must
+in the same way the common BUILD routine is used in modern-day OO systems.
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    build sub {
+        
+        my $self = shift;
+        
+        # ... do something
+        
+    };
 
 =cut
 
