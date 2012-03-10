@@ -1,0 +1,427 @@
+=head1 NAME
+
+Validation::Class::Cookbook - Basic Instructions for Awesomeness
+
+=head1 OVERVIEW
+
+This documentation will serves as a brief overview of various usage scenarios
+for Validation::Class.
+
+=head1 BUILDING CLASSES
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    # a validation rule template
+    mixin 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+    
+    # a validation rule
+    field 'login'  => {
+        mixin      => 'basic',
+        label      => 'user login',
+        error      => 'login invalid',
+        validation => sub {
+            my ($self, $this, $fields) = @_;
+            return $this->{value} eq 'admin' ? 1 : 0;
+        }
+    };
+    
+    # a validation rule
+    field 'password'  => {
+        mixin         => 'basic',
+        label         => 'user login',
+        error         => 'login invalid',
+        validation    => sub {
+            my ($self, $this, $fields) = @_;
+            return $this->{value} eq 'pass' ? 1 : 0;
+        }
+    };
+    
+    1;
+
+Your validation class can be thought of as your data model/input firewall. The
+benefits this approach provides might require you to change your perspective
+on parameter handling and workflow. Typically when designing an application we
+tend to name parameters arbitrarily and validate the same data in various stages
+during program's execution at various places in the application stack. This
+approach is inefficient and prone to bugs and security problems.
+
+To get the most out of Validation::Class you should consider each parameter
+hitting your application (individually) as a transmission fitting a very specific
+criteria, yes, like a field in a data model.
+
+Your validation rules will act as filters which will reject or accept and
+format the transmission for use within your application, yes, almost exactly
+like a firewall.
+
+A validation class is defined as follows:
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    # a mixin template
+    mxn 'basic'  => {
+        required   => 1
+    };
+    
+    # a validation rule
+    fld 'login'  => {
+        label      => 'User Login',
+        error      => 'Login invalid.',
+        mixin      => 'basic',
+        validation => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'admin' ? 1 : 0;
+        }
+    };
+    
+    # a validation rule
+    fld 'password'  => {
+        label         => 'User Password',
+        error         => 'Password invalid.',
+        mixin         => 'basic',
+        validation    => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'pass' ? 1 : 0;
+        }
+    };
+    
+    # a validation profile
+    pro 'registration'  => sub {
+        my ($self, @args) = @_;
+        return $self->validate(qw(
+            +name
+            +email
+            -login
+            +password
+        ))
+    };
+    
+    # an auto-validating method
+    mth 'register'  => {
+        
+        input => [qw/+login +password/],
+        using => sub {
+            
+            my ($self, @args) = shift;
+            
+            # ... do something
+            
+        }
+        
+    };
+    
+    1;
+    
+The fields defined will be used to validate the specified input parameters.
+You specify the input parameters at/after instantiation, parameters should take
+the form of a hashref of key/value pairs passed to the params attribute, or
+attribute/value pairs. Multi-level (nested) hashrefs are allowed
+and are inflated/deflated in accordance with the rules of L<Hash::Flatten>.
+The following is an example on using your validate class to validate input in
+various scenarios:
+
+    # web app
+    package MyApp;
+    
+    use MyApp::User;
+    use Misc::WebAppFramework;
+    
+    get '/auth' => sub {
+        
+        # get user input parameters
+        my $params = shift;
+    
+        # initialize validation class and set input parameters
+        my $user = MyApp::User->new(params => $params);
+        
+        unless ($user->validate('login', 'password')) {
+            
+            # print errors to browser unless validation is successful
+            return $user->errors_to_string;
+            
+        }
+        
+        return 'you have authenticated';
+    };
+
+Lazy validation? Have your validation class automatically find the appropriate
+fields to validate against (params must match field names).
+
+    use MyApp::User;
+    
+    my $user = MyApp::User->new(params => $params);
+    
+    unless ($user->validate){
+    
+        return $input->errors_to_string;
+    
+    }
+    
+This approach can be utilized but is not recommended as the input dictates which
+fields to validate allowing margin for unexpected results. You can define an
+alias to automatically map a parameter to a validation field whereby a field
+definition will have an alias attribute containing an arrayref of alternate
+parameters that can be matched against passed-in parameters.
+
+    package MyApp::User;
+    
+    field 'fu' => {
+        ...,
+        alias => [
+            'foo',
+            'bar',
+            'baz',
+            'bax'
+        ]
+    };
+
+    package main;
+
+    use MyApp::User;
+    
+    my  $user = MyApp::User->new(params => { foo => 1 });
+    
+    unless ($user->validate('fu'){
+    
+        return $user->errors_to_string;
+    
+    }
+    
+    # OK because foo is an alias on the fu field
+
+=head2 Filtering Incoming Data
+
+Validation::Class supports pre/post filtering but is configured to pre-filter
+incoming data. This means that based upon the filtering options supplied within
+the individual fields, filtering will happen before validation (technically at
+instantiation and again just before validation). As expected, this is configurable
+via the filtering attribute.
+
+A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
+which boosts application security and is best used with passive filtering 
+(e.g. converting character case - filtering which only alters the input in
+predictable ways), versus aggressive filtering (e.g. formatting a telephone
+number) which completely and permanently changes the incoming data ... so much
+so that if the validation still fails ... errors that are reported may not
+match the data that was submitted.
+
+If you're sure you'd rather employ aggressive filtering, I suggest setting
+the filtering attribute to 'post' for post-filtering or setting it to null
+and applying the filters manually by calling the apply_filters() method.
+
+=head2 Auto Serialization/Deserialization
+
+Validation::Class supports automatic serialization and deserialization of
+parameters with complex data structures which means that you can set a parameter
+as an arrayref or hashref of nested data structures and validate against them, 
+likewise you can set a parameters using parameter names which are serialized
+string representations of the keys within the complex structure you wish to set
+and validate against. The serialization rules are as documented in L<Hash::Flatten>.
+
+The following is an example of that:
+
+    my $params = {
+        user => {
+            login => 'admin',
+            password => 'pass'
+        }
+    };
+    
+    my $input = MyApp->new(params => $params);
+    
+    # or
+    
+    my $params = {
+        'user.login' => 'admin',
+        'user.password' => 'pass'
+    };
+    
+    my $input = MyApp->new(params => $params);
+    
+    # field definition using field('user.login', ...)
+    # and field('user.password', ...) will match against the parameters above
+    
+    # after filtering, validation, etc ... return your params as a hashref if
+    # needed
+    
+    my $params = $input->get_params_hash;
+
+=head2 Separation of Concerns
+
+For larger applications where a single validation class might become cluttered
+and inefficient, Validation::Class comes equipped to help you separate your
+validation rules into separate classes.
+
+The idea is that you'll end up with a main validation class (most likely empty)
+that will simply serve as your point of entry into your relative (child)
+classes. The following is an example of this:
+
+    package MyVal::User;
+    
+    use Validation::Class;
+    
+    field name => { ... };
+    field email => { ... };
+    field login => { ... };
+    field password => { ... };
+    
+    package MyVal::Profile;
+    
+    use Validation::Class;
+    
+    field age => { ... };
+    field sex => { ... };
+    field birthday => { ... };
+    
+    package MyVal;
+    
+    use Validation::Class;
+    
+    load { classes => 1 };
+    
+    package main;
+    
+    my $input = MyVal->new(params => $params);
+    
+    my $user = $input->class('user');
+    
+    my $profile = $input->class('profile');
+    
+    ...
+    
+    1;
+
+=head2 Filtering Incoming Data
+
+Validation::Class supports pre/post filtering but is configured to pre-filter
+incoming data. This means that based upon the filtering options supplied within
+the individual fields, filtering will happen before validation (technically at
+instantiation and again just before validation). As expected, this is configurable
+via the filtering attribute.
+
+A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
+which boosts application security and is best used with passive filtering 
+(e.g. converting character case - filtering which only alters the input in
+predictable ways), versus aggressive filtering (e.g. formatting a telephone
+number) which completely and permanently changes the incoming data ... so much
+so that if the validation still fails ... errors that are reported may not
+match the data that was submitted.
+
+If you're sure you'd rather employ aggressive filtering, I suggest setting
+the filtering attribute to 'post' for post-filtering or setting it to null
+and applying the filters manually by calling the apply_filters() method.
+
+
+=head1 BUILDING PLUGINS
+
+When creating B<official> Validation::Class plugins you should use the namespace
+Validation::Class::Plugin::YourPluginName. This will allow users of your plugin
+to simply pass YourPluginName to the load_plugins() method. Otherwise you will
+need to pass the fully-qualified plugin package name prefixed with a "+" symbol.
+The following is an example of including a plugin.
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    load {
+        plugins => [
+            'PluginName', # Validation::Class::Plugin::PluginName
+            '+MyApp::User::YourPluginName'
+        ]
+    };
+    
+    # a validation rule
+    field 'login'  => {
+        label      => 'User Login',
+        error      => 'Login invalid.',
+        required   => 1,
+        validation => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'admin' ? 1 : 0;
+        }
+    };
+    
+    # a validation rule
+    field 'password'  => {
+        label         => 'User Password',
+        error         => 'Password invalid.',
+        required      => 1,
+        validation    => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'pass' ? 1 : 0;
+        }
+    };
+    
+    1;
+    
+Your plugin is loaded at runtime and can manipulate the L<Validation::Class>
+object by declaring a B<new> method. The following is an example of a fictitious
+plugin for formatting telephone numbers:
+
+    package Validation::Class::Plugin::TelephoneFormatting;
+    
+    # hook into the instantiation process
+    # of the calling class at runtime
+    sub new {
+    
+        my ($plugin, $caller) = @_;
+        
+        # US Telephones
+        $caller->filters->{telephone_usa} = sub {
+            my $phone = shift;
+               $phone =~ s/\D//g;
+            
+            my ($area, $prefix, $xchng) = $phone =~ m/1?(\d{3})(\d{3})(\d{4});
+               
+            return "+1 ($area) $prefix-$xchng";
+        };
+        
+    }
+
+Once we create, test and deploy our plugin, we can use it in our code as follows:
+    
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    load {
+        plugins => ['TelephoneFormatting']
+    };
+    
+    # a validation rule
+    field 'phone'  => {
+        label      => 'Telephone Number',
+        error      => 'Phone number invalid.',
+        required   => 1,
+        filters    => 'telephone_usa',
+        filtering  => 'post',
+        pattern    => '+1 (###) ###-####'
+    };
+    
+    package main ;
+    
+    my $input = MyApp::User->new(...);
+    
+    # ...
+    
+=head1 AUTHOR
+
+Al Newkirk <awncorp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by awncorp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+    
+=cut
