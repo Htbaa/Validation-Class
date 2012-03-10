@@ -6,11 +6,14 @@ This file documents the revision history for the Perl library Validation::Class.
     - add before, after and around method modifiers
     - write more tests for attributes and the method keyword
 
-6.00 (2012-03-08)
-    - Complete POD rewrite
+6.00 (0000-00-00)
     - Complete test suite rewrite
     - Discontinue Validation::Class::Moose
-    - Rename Plugins.pod to Cookbook.pod
+    
+5.60 (2012-03-10)
+    * Complete POD rewrite
+    * Rename Plugins.pod to Cookbook.pod
+    * Methods have output validation
 
 5.51 (2012-03-08)
     * add build/bld keywords to register methods to be executed on instantiation

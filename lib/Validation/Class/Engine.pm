@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+# ABSTRACT: Data Validation Engine for Validation::Class
 
 package Validation::Class::Engine;
 
@@ -13,6 +12,611 @@ use Carp 'confess';
 use Array::Unique;
 use Hash::Flatten;
 use Hash::Merge 'merge';
+
+=head1 SYNOPSIS
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    # a mixin template
+    mxn 'basic'  => {
+        required   => 1
+    };
+    
+    # a validation rule
+    fld 'login'  => {
+        label      => 'User Login',
+        error      => 'Login invalid.',
+        mixin      => 'basic',
+        validation => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'admin' ? 1 : 0;
+        }
+    };
+    
+    # a validation rule
+    fld 'password'  => {
+        label         => 'User Password',
+        error         => 'Password invalid.',
+        mixin         => 'basic',
+        validation    => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return $this_field->{value} eq 'pass' ? 1 : 0;
+        }
+    };
+    
+    # a validation profile
+    pro 'registration'  => sub {
+        my ($self, @args) = @_;
+        return $self->validate(qw(
+            +name
+            +email
+            -login
+            +password
+        ))
+    };
+    
+    # an auto-validating method
+    mth 'register'  => {
+        
+        input => [qw/+login +password/],
+        using => sub {
+            
+            my ($self, @args) = shift;
+            
+            # ... do something
+            
+        }
+        
+    };
+    
+    1;
+
+=head1 DESCRIPTION
+
+Validation::Class::Engine provides data validation functionality and acts as a
+role applied to Validation::Class.
+
+=head1 DEFAULT DIRECTIVES
+
+    package MyApp::Validation;
+    use Validation::Class;
+    
+    # a validation template
+    mixin '...'  => {
+        # mixin directives here
+        ...
+    };
+    
+    # a validation rule
+    field '...'  => {
+        # field directives here
+        ...
+    };
+    
+    1;
+    
+When building a validation class, the first encountered and arguably two most
+important keyword functions are field() and mixin(), which are used to declare
+their respective properties. A mixin() declares a validation template where
+its properties are intended to be copied within field() declarations which
+declares validation rules, filters and other properties.
+
+Both the field() and mixin() declarations/functions require two parameters, the
+first being a name, used to identify the declaration and to be matched against
+incoming input parameters and the second being a hashref of key/value pairs.
+The key(s) within a declaration are commonly referred to as directives.
+
+The following is a list of default directives which can be used in field/mixin
+declarations:
+
+=cut
+
+=head2 alias
+
+The alias directive is useful when many different parameters with different
+names can be validated using a single rule. E.g. The paging parameters in a
+webapp may take on different names but require the same validation.
+
+    # the alias directive
+    field 'pager'  => {
+        alias => ['page_user_list', 'page_other_list']
+        ...
+    };
+
+=cut
+
+=head2 default
+
+The default directive is used as a default value for a field to be used
+when a matching parameter is not present.
+
+    # the default directive
+    field 'quantity'  => {
+        default => 1,
+        ...
+    };
+
+=cut
+
+=head2 error/errors
+
+The error/errors directive is used to replace the system generated error
+messages when a particular field doesn't validate. If a field fails multiple
+directives, multiple errors will be generated for the same field. This may not
+be desirable, the error directive overrides this behavior and only the specified
+error is registered and displayed.
+
+    # the error(s) directive
+    field 'foobar'  => {
+        errors => 'Foobar failed processing, Wtf?',
+        ...
+    };
+
+=cut
+
+=head2 filtering
+
+The filtering directive is used to control when field filters are applied. The
+default recognized values are pre/post. A value of 'pre' instructs the validation
+class to apply the field's filters at instantiation and before validation whereas
+a value of 'post' instructs the validation class to apply the field's filters
+after validation. Alternatively, a value of undef or '' will bypass filtering
+altogether.
+
+    # the filtering directive
+    field 'foobar'  => {
+        filtering => 'post',
+        ...
+    };
+
+=cut
+
+=head2 label
+
+The label directive is used as a user-friendly reference when the field name
+is a serialized hash key or just plain ugly.
+
+    # the label directive
+    field 'hashref.foo.bar'  => {
+        label => 'Foo Bar',
+        ...
+    };
+
+=cut
+
+=head2 mixin
+
+The mixin directive is used to create a template of directives to be applied to
+other fields.
+
+    mixin 'ID' => {
+        required => 1,
+        min_length => 1,
+        max_length => 11
+    };
+
+    # the mixin directive
+    field 'user.id'  => {
+        mixin => 'ID',
+        ...
+    };
+
+=cut
+
+=head2 mixin_field
+
+The mixin directive is used to copy all directives from an existing field
+except for the name, label, and validation directives.
+
+    # the mixin_field directive
+    field 'foobar'  => {
+        label => 'Foo Bar',
+        required => 1
+    };
+    
+    field 'barbaz'  => {
+        mixin_field => 'foobar',
+        label => 'Bar Baz',
+        ...
+    };
+
+=cut
+
+=head2 name
+
+The name directive is used *internally* and cannot be changed.
+
+    # the name directive
+    field 'thename'  => {
+        ...
+    };
+
+=cut
+
+=head2 required
+
+The required directive is an important directive but can be misunderstood.
+The required directive is used to ensure the submitted parameter exists and
+has a value. If the parameter is never submitted, the directive is effectively
+skipped. This directive can be thought of as the "must-have-a-value-if-exists"
+directive.
+
+    # the required directive
+    field 'foobar'  => {
+        required => 1,
+        ...
+    };
+    
+    # fail
+    my $rules = MyApp::Validation->new(params => {  });
+    $rules->validate('foobar');
+    
+    # fail
+    my $rules = MyApp::Validation->new(params => { foobar => '' });
+    $rules->validate('foobar');
+    
+    # pass
+    my $rules = MyApp::Validation->new(params => {  foobar => 'Nice' });
+    $rules->validate('foobar');
+    
+See the toggle functionality within the validate() method. This method allows
+you to temporarily alter whether a field is required or not.
+
+=cut
+
+=head2 validation
+
+The validation directive is a coderef used add additional custom validation to
+the field. The coderef must return true (to pass) or false (to fail). Custom
+error messages can be set from within the coderef so make sure they are set
+based on appropriate logic as the registration of error message are not
+contingent on the success or failure of the routine. 
+
+    # the validation directive
+    field 'login'  => {
+        validation => sub {
+            my ($self, $this_field, $all_params) = @_;
+            return 0 unless $this_field->{value};
+            return $this_field->{value} eq 'admin' ? 1 : 0;
+        },
+        ...
+    };
+
+=cut
+
+=head2 value
+
+The value directive is used internally to store the field's matching parameter's
+value. This value can be set in the definition but SHOULD NOT be used as a
+default value unless you're sure no parameter will overwrite it during run-time.
+If you need to set a default value, see the default directive.
+
+    # the value directive
+    field 'quantity'  => {
+        value => 1,
+        ...
+    };
+
+=cut
+
+=head1 DEFAULT FILTER DIRECTIVES
+
+=head2 filters
+
+The filters directive is used to correct, alter and/or format the
+values of the matching input parameter. Note: Filtering is applied before
+validation. The filter directive can have multiple filters (even a coderef)
+in the form of an arrayref of values.
+
+    # the filter(s) directive
+    field 'text'  => {
+        filters => [qw/trim strip/ => sub {
+            $_[0] =~ s/\D//g;
+        }],
+        ...
+    };
+    
+The following is a list of default filters that may be used with the filter
+directive:
+
+=cut
+
+=head3 alpha
+
+The alpha filter removes all non-Alphabetic characters from the field's value.
+
+    field 'foobar'  => {
+        filter => 'alpha',
+    };
+    
+=cut
+
+=head3 alphanumeric
+
+The alpha filter removes all non-Alphabetic and non-Numeric characters from the
+field's value.
+
+    field 'foobar'  => {
+        filter => 'alphanumeric',
+    };
+    
+=cut
+
+=head3 capitalize
+
+The capitalize filter attempts to capitalize the first word in each sentence,
+where sentences are separated by a period and space, within the field's value.
+
+    field 'foobar'  => {
+        filter => 'capitalize',
+    };
+    
+=cut
+
+=head3 decimal
+
+The decimal filter removes all non-decimal-based characters from the field's
+value. Allows only: decimal, comma, and numbers.
+
+    field 'foobar'  => {
+        filter => 'decimal',
+    };
+    
+=cut
+
+=head3 numeric
+
+The numeric filter removes all non-numeric characters from the field's
+value.
+
+    field 'foobar'  => {
+        filter => 'numeric',
+    };
+    
+=cut
+
+=head3 strip
+
+As with the trim filter the strip filter removes leading and trailing
+whitespaces from the field's value and additionally removes multiple whitespaces
+from between the values characters.
+
+    field 'foobar'  => {
+        filter => 'strip',
+    };
+    
+=cut
+
+=head3 titlecase
+
+The titlecase filter converts the field's value to titlecase by capitalizing the
+first letter of each word.
+
+    field 'foobar'  => {
+        filter => 'titlecase',
+    };
+    
+=cut
+
+=head3 trim
+
+The trim filter removes leading and trailing whitespace from the field's value.
+
+    field 'foobar'  => {
+        filter => 'trim',
+    };
+    
+=cut
+
+=head3 uppercase
+
+The uppercase filter converts the field's value to uppercase.
+
+    field 'foobar'  => {
+        filter => 'uppercase',
+    };
+    
+=cut
+
+=head1 DEFAULT VALIDATOR DIRECTIVES
+
+    package MyApp::Validation;
+    
+    use Validation::Class;
+    
+    # a validation rule with validator directives
+    field 'telephone_number'  => {
+        length => 14,
+        pattern => '(###) ###-####',
+        ...
+    };
+    
+    1;
+    
+Validator directives are special directives with associated validation code that
+is used to validate common use cases such as "checking the length of a parameter",
+etc.
+
+The following is a list of the default validators which can be used in field/mixin
+declarations:
+
+=cut
+
+=head2 between
+
+    # the between directive
+    field 'foobar'  => {
+        between => '1-5',
+        ...
+    };
+
+=cut
+
+=head2 depends_on
+
+    # the depends_on directive
+    field 'change_password'  => {
+        depends_on => ['password', 'password_confirm'],
+        ...
+    };
+
+=cut
+
+=head2 length
+
+    # the length directive
+    field 'foobar'  => {
+        length => 20,
+        ...
+    };
+
+=cut
+
+=head2 matches
+
+    # the matches directive
+    field 'this_field'  => {
+        matches => 'another_field',
+        ...
+    };
+
+=cut
+
+=head2 max_alpha
+
+    # the max_alpha directive
+    field 'password'  => {
+        max_alpha => 30,
+        ...
+    };
+
+=cut
+
+=head2 max_digits
+
+    # the max_digits directive
+    field 'password'  => {
+        max_digits => 5,
+        ...
+    };
+
+=cut
+
+=head2 max_length
+
+    # the max_length directive
+    field 'foobar'  => {
+        max_length => '...',
+        ...
+    };
+
+=cut
+
+=head2 max_sum
+
+    # the max_sum directive
+    field 'vacation_days'  => {
+        max_sum => 5,
+        ...
+    };
+
+=cut
+
+=head2 max_symbols
+
+    # the max_symbols directive
+    field 'password'  => {
+        max_symbols => 1,
+        ...
+    };
+
+=cut
+
+=head2 min_alpha
+
+    # the min_alpha directive
+    field 'password'  => {
+        min_alpha => 2,
+        ...
+    };
+
+=cut
+
+=head2 min_digits
+
+    # the min_digits directive
+    field 'password'  => {
+        min_digits => 1,
+        ...
+    };
+
+=cut
+
+=head2 min_length
+
+    # the min_length directive
+    field 'foobar'  => {
+        min_length => '...',
+        ...
+    };
+
+=cut
+
+=head2 min_sum
+
+    # the min_sum directive
+    field 'vacation_days'  => {
+        min_sum => 0,
+        ...
+    };
+
+=cut
+
+=head2 min_symbols
+
+    # the min_symbols directive
+    field 'password'  => {
+        min_symbols => 0,
+        ...
+    };
+
+=cut
+
+=head2 options
+
+    # the options directive
+    field 'status'  => {
+        options => 'Active, Inactive',
+        ...
+    };
+
+=cut
+
+=head2 pattern
+
+    # the pattern directive
+    field 'telephone'  => {
+        # simple pattern
+        pattern => '### ###-####',
+        ...
+    };
+    
+    field 'country_code'  => {
+        # simple pattern
+        pattern => 'XX',
+        filter  => 'uppercase'
+        ...
+    };
+    
+    field 'complex'  => {
+        # regex pattern
+        pattern => qr/[0-9]+\,\s\.\.\./,
+        ...
+    };
+
+=cut
 
 # hackaroni toni, stolen from youknowwho ...
 sub has {
@@ -72,22 +676,83 @@ STMNT
     
 }
 
-# hash of directives
+=attribute directives
+
+The directives attribute returns a hashref of all defined directives.
+
+    my $directives = $self->directives();
+    ...
+
+=cut
+
 has 'directives' => sub { shift->{config}->{DIRECTIVES} || {} };
 
-# class errors store
+=attribute errors
+
+The errors attribute returns an arrayref of all errors set.
+
+    my $errors = $self->errors();
+    ...
+
+=cut
+
 has 'errors' => sub {[  ]};
 
-# hash of fields
+=attribute fields
+
+The fields attribute returns a hashref of defined fields, filtered and merged
+with their parameter counterparts.
+
+    my $fields = $self->fields();
+    ...
+
+=cut
+
 has 'fields' => sub { shift->{config}->{FIELDS} || {} };
 
-# switch: default filtering occurrence
+=attribute filtering
+
+The filtering attribute (by default set to 'pre') controls when incoming data
+is filtered. Setting this attribute to 'post' will defer filtering until after
+validation occurs which allows any errors messages to report errors based on the
+unaltered data. Alternatively, setting the filtering attribute to '' or undef
+will bypass all filtering unless explicitly defined at the field-level.
+
+    my $filtering = $self->filtering('post');
+    
+    $self->validate();
+    ...
+
+=cut
+
 has 'filtering' => 'pre';
 
-# hash of filters
+=attribute filters
+
+The filters attribute returns a hashref of pre-defined filter definitions.
+
+    my $filters = $self->filters();
+    ...
+
+=cut
+
 has 'filters' => sub { shift->{config}->{FILTERS} || {} };
 
-# Hash::Flatten args
+=attribute hash_inflator
+
+The hash_inflator attribute determines how the hash serializer (inflation/deflation)
+behaves. The value must be a hashref of L<Hash::Flatten/OPTIONS> options. Purely
+for the sake of consistency, you can use lowercase keys (with underscores) which
+will be converted to camel-cased keys before passed to the serializer.
+
+    my $options = $self->hash_inflator({
+        hash_delimiter => '/',
+        array_delimiter => '//'
+    });
+    ...
+
+=cut
+
 has 'hash_inflator' => sub {
     
     my $options = @_ > 1 ? pop @_ : {
@@ -116,40 +781,148 @@ has 'hash_inflator' => sub {
     
 };
 
-# switch: ignore method requirement failures
+=attribute ignore_failure
+
+The ignore_failure boolean determines whether your application will live or die
+upon failing to validate a self-validating method defined using the method
+keyword. This is on (1) by default, method validation failures will set errors
+and can be determined by checking the error stack using one of the error message
+methods. If turned off, the application will die and confess on failure.
+
+    my $ignoring = $self->ignore_failure(1);
+    ...
+
+=cut
+
 has 'ignore_failure' => '1';
 
-# switch: ignore unknown parameters
+=attribute ignore_unknown
+
+The ignore_unknown boolean determines whether your application will live or die
+upon encountering unregistered field directives during validation. This is off
+(0) by default, attempts to validate unknown fields WILL cause the program to die.
+
+    my $ignoring = $self->ignore_unknown(1);
+    ...
+
+=cut
+
 has 'ignore_unknown' => '0';
 
-# hash of generated methods
+=attribute methods
+
+The methods attribute returns a hashref of self-validating method definitions.
+
+    my $methods = $self->methods(); # definitions are hashrefs
+    ...
+
+=cut
+
 has 'methods' => sub { shift->{config}->{METHODS} || {} };
 
-# hash of mixins
+=attribute mixins
+
+The mixins attribute returns a hashref of defined validation templates.
+
+    my $mixins = $self->mixins();
+    ...
+
+=cut
+
 has 'mixins' => sub { shift->{config}->{MIXINS} || {} };
 
-# input parameters store
+=attribute params
+
+The params attribute gets/sets the parameters to be validated. The assigned value
+MUST be a hashref but can be flat or complex.
+
+    my $params = $self->params();
+    ...
+
+=cut
+
 has 'params' => sub {{  }};
 
-# hash of class plugins
+=attribute plugins
+
+The plugins attribute returns a hashref of loaded plugins.
+
+    my $plugins = $self->plugins();
+    ...
+
+=cut
+
 has plugins => sub { shift->{config}->{PLUGINS} || {} };
 
-# hash of input validation profiles
+=attribute profiles
+
+The profiles attribute returns a hashref of validation profiles.
+
+    my $profiles = $self->profiles();
+    ...
+
+=cut
+
 has 'profiles' => sub { shift->{config}->{PROFILES} || {} };
 
-# queued fields for (auto) validation
+=attribute queued
+
+The queued attribute returns an arrayref of field names for (auto) validation.
+It represents a list of field names stored to be used in validation later. If
+the queued attribute contains a list, you can omit arguments to the validate
+method. 
+
+    my $queued = $self->queued([qw/.../]);
+    ...
+
+=cut
+
 has 'queued' => sub { [] };
+
+=attribute relatives
+
+The relatives attribute returns a hashref of short-name/class-name pairs of
+loaded child classes.
+
+    my $relatives = $self->relatives();
+    ...
+
+=cut
 
 # class relatives (child-classes) store
 has 'relatives' => sub {{  }};
 
+=attribute report_failure
+
+The report_failure boolean determines whether your application will report
+self-validating method failures as class-level errors. This is off (0) by default,
+if turned on, an error messages will be generated and set at the class-level
+specifying the method which failed in addition to the existing messages.
+
+    my $reporting = $self->report_failure(0);
+    ...
+
+=cut
+
 # switch: report method requirement failures
 has 'report_failure' => '0';
+
+=attribute report_unknown
+
+The report_unknown boolean determines whether your application will report
+unregistered fields as class-level errors upon encountering unregistered field
+directives during validation. This is off (0) by default, attempts to validate
+unknown fields will NOT be registered as class-level variables.
+
+    my $reporting = $self->report_unknown(1);
+    ...
+
+=cut
 
 # switch: report unknown input parameters
 has 'report_unknown' => '0';
 
-# stash object for custom validation routines
+# stash object storage
 has 'stashed' => sub {{  }};
 
 # hash of directives by type
@@ -170,6 +943,20 @@ has 'types' => sub {
     return $types;
     
 };
+
+=method apply_filters
+
+The apply_filters method (usually called automatically based on the filtering
+attribute) can be used to run the currently defined parameters through the
+filters defined in the fields.
+
+    my $input = Class->new(filtering => '', params => $params);
+    
+    if ($input->validate) {
+        $input->apply_filters; # basically post filtering
+    }
+
+=cut
 
 sub apply_filters {
     
@@ -203,6 +990,52 @@ sub apply_filters {
     return $self;
 
 }
+
+=method class
+
+The class method returns a new initialize child validation class under the
+namespace of the calling class that issued the load_classes() method call.
+Existing parameters and configuration options are passed to the child class's
+constructor. All attributes can be easily overwritten using the attribute's
+accessors on the child class. Also, you may prevent/override arguments from
+being copy to the new child class object by supplying the them as arguments to
+this method.
+
+The class method is also quite handy in that it will detect parameters that are
+prefixed with the name of the class being fetched, and adjust the matching rule
+(if any) to allow validation to occur.
+
+    package Class;
+    use Validation::Class;
+    
+    load {
+        classes => 1 # load child classes e.g. Class::*
+    };
+    
+    package main;
+    
+    my $input = Class->new(params => $params);
+    
+    my $kid1 = $input->class('Child'); # loads Class::Child;
+    my $kid2 = $input->class('StepChild'); # loads Class::StepChild;
+    
+    my $kid3 = $input->class('child'); # loads Class::Child;
+    my $kid4 = $input->class('step_child'); # loads Class::StepChild;
+    
+    # INTELLIGENTLY DETECTING AND MAP PARAMS TO CHILD CLASS
+    my $params = {
+        'my.name'    => 'Guy Friday',
+        'child.name' => 'Guy Friday Jr.'
+    };
+    
+    $input->class('child'); # child field *name* mapped to param *child.name*
+    
+    # WITHOUT COPYING PARAMS FROM Class
+    my $kid5 = $input->class('child', params => {}); # .. etc
+    
+    1;
+
+=cut
 
 sub class {
     
@@ -290,6 +1123,28 @@ sub check_mixin {
 
 }
 
+=method clear_queue
+
+The clear_queue method resets the queue container, see the queue method for more
+information on queuing fields to be validated. The clear_queue method has yet
+another useful behavior in that it can assign the values of the queued
+parameters to the list it is passed, where the values are assigned in the same
+order queued.
+
+    my $input = Class->new(params => $params);
+    
+    $input->queue(qw(name +email +login +password));
+    
+    unless ($input->validate) {
+        return $input->errors_to_string;
+    }
+    
+    $input->clear_queue(my($name, $email));
+    
+    1;
+
+=cut
+
 sub clear_queue {
     
     my $self = shift;
@@ -307,6 +1162,37 @@ sub clear_queue {
 
 }
 
+=method clone
+
+The clone method is used to create new fields (rules) from existing fields
+on-the-fly. This is useful when you have a variable number of parameters being
+validated that can share existing validation rules. E.g., a web-form on a user's
+profile page may have dynamically created input boxes for the person's phone
+numbers allowing the user to add additional parameters to the web-form as
+needed, in that case as opposed to having multiple validation rules hardcoded
+for each parameter, you could hardcode one single rule and clone the rule at
+run-time.
+
+    package Class;
+    use Validation::Class;
+    
+    field phone => { required => 1 };
+    
+    package main;
+    
+    my $input = Class->new(params => $params);
+    
+    # clone phone rule at run-time to validate dynamically created parameters
+    $input->clone('phone', 'phone2', { label => 'Other Phone', required => 0 });
+    $input->clone('phone', 'phone3', { label => 'Third Phone', required => 0 });
+    $input->clone('phone', 'phone4', { label => 'Forth Phone', required => 0 });
+    
+    $input->validate(qw/phone phone2 phone3 phone4/);
+    
+    1;
+
+=cut
+
 sub clone {
     
     my ($self, $field_name, $new_field_name, $directives) = @_;
@@ -318,6 +1204,26 @@ sub clone {
     return $self;
     
 }
+
+=method error
+
+The error method is used to set and/or retrieve errors encountered during
+validation. The error method with no parameters returns the error message object
+which is an arrayref of error messages stored at class-level. 
+
+    # set errors at the class-level
+    return $self->error('this isnt cool', 'unknown somethingorother');
+    
+    # set an error at the field-level, using the field ref (not field name)
+    $self->error($field_object, "i am your error message");
+
+    # return all errors encountered/set as an arrayref
+    my $all_errors = $self->error();
+    
+    # return all error for a specific field, ... see the get_errors() method
+    my @errors = $self->get_errors('field_name');
+
+=cut
 
 sub error {
     
@@ -377,12 +1283,37 @@ sub error {
     
 }
 
-# return the number of errors
+=method error_count
+
+The error_count method returns the total number of error encountered from the 
+last validation call.
+
+    return $self->error_count();
+    
+    unless ($self->validate) {
+        print "Found ". $self->error_count ." Errors";
+    }
+
+=cut
+
 sub error_count {
     
     return scalar(@{shift->errors});
     
 }
+
+=method error_fields
+
+The error_fields method returns a hashref of fields whose value is an arrayref
+of error messages.
+
+    unless ($self->validate) {
+        my $bad_fields = $self->error_fields();
+    }
+    
+    my $bad_fields = $self->error_fields('login', 'password');
+
+=cut
 
 sub error_fields {
     
@@ -408,7 +1339,20 @@ sub error_fields {
 
 }
 
-# return class errors as a string
+=method errors_to_string
+
+The errors_to_string method stringifies the error arrayref object using the
+specified delimiter or ', ' by default. 
+
+    return $self->errors_to_string("<br/>\n");
+    return $self->errors_to_string("<br/>\n", sub{ uc shift });
+    
+    unless ($self->validate) {
+        return $self->errors_to_string;
+    }
+
+=cut
+
 sub errors_to_string {
     
     my ($self, $delimiter, $transformer) = @_;
@@ -421,6 +1365,16 @@ sub errors_to_string {
 
 }
 
+=method get_errors
+
+The get_errors method returns the list of class-level error set on the current
+class or a list of errors from the specified fields.
+
+    my @errors = $self->get_errors();
+    my @lp_errors = $self->get_errors('login', 'password');
+
+=cut
+
 sub get_errors {
 
     my ($self, @fields) = @_;
@@ -432,6 +1386,32 @@ sub get_errors {
 
 }
 
+=method get_params
+
+The get_params method returns the values (in list form) of the parameters
+specified.
+
+    if ($self->validate) {
+        my $name_a = $self->get_params('name');
+        my ($name_b, $email, $login, $password) =
+            $self->get_params(qw/name email login password/);
+        
+        # you should note that if the params dont exist they will return undef
+        # ... meaning you should check that it exists before checking its value
+        # e.g.
+        
+        if (defined $name) {
+            if ($name eq '') {
+                print 'name parameter was passed but was empty';
+            }
+        }
+        else {
+            print 'name parameter was never submitted';
+        }
+    }
+
+=cut
+
 sub get_params {
 
     my ($self, @params) = @_;
@@ -442,6 +1422,25 @@ sub get_params {
         (values %{ $self->params });
     
 }
+
+=method get_params_hash
+
+If your fields and parameters are designed with complex hash structures, the
+get_params_hash method returns the deserialized hashref of specified parameters
+based on the the default or custom configuration of the hash serializer
+L<Hash::Flatten>.
+
+    my $params = {
+        'user.login' => 'member',
+        'user.password' => 'abc123456'
+    };
+    
+    if ($self->validate(keys %$params)) {
+        my $params = $self->get_params_hash;
+        print $params->{user}->{login};
+    }
+
+=cut
 
 sub get_params_hash {
     
@@ -457,7 +1456,16 @@ sub get_params_hash {
     
 }
 
-# make the environment peaceful and sirene
+=method normalize
+
+The normalize method executes a set of routines that reset the parameter
+environment filtering any parameters present. This method is executed
+automatically at instantiation and validation. 
+
+    $self->normalize();
+
+=cut
+
 sub normalize {
     
     my $self = shift;
@@ -557,6 +1565,16 @@ sub normalize {
 
 }
 
+=method param
+
+The param method gets/sets a single parameter by name.
+
+    my $pass = $self->param('password');
+    
+    $self->param('password', '******');
+
+=cut
+
 sub param {
     
     my  ($self, $name, $value) = @_;
@@ -569,6 +1587,51 @@ sub param {
 
 }
 
+=method queue
+
+The queue method is a convenience method used specifically to append the
+stashed attribute allowing you to *queue* field to be validated. This method
+also allows you to set fields that must always be validated. 
+
+    # conditional validation flow WITHOUT the queue method
+    # imagine a user profile update action
+    
+    my $input = MyApp::Validation->new(params => $params);
+    my @fields = qw/name login/;
+    
+    push @fields, 'email_confirm' if $input->param('chg_email');
+    push @fields, 'password_confirm' if $input->param('chg_pass');
+    
+    ... if $input->validate(@fields);
+    
+    # conditional validation WITH the queue method
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    $input->queue(qw/name login/);
+    $input->queue(qw/email_confirm/) if $input->param('chg_email');
+    $input->queue(qw/password_confirm/) if $input->param('chg_pass');
+    
+    ... if $input->validate();
+    
+    # set fields that must ALWAYS be validated
+    # imagine a simple REST server
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    $input->queue(qw/login password/);
+    
+    if ($request eq '/resource/:id') {
+        
+        if ($input->validate('id')) {
+            
+            # validated login, password and id
+            ...
+        }
+    }
+
+=cut
+
 sub queue {
     
     my $self = shift;
@@ -578,6 +1641,15 @@ sub queue {
     return $self;
 
 }
+
+=method reset
+
+The reset method clears all errors, fields and stashed field names, both at the
+class and individual field levels.
+
+    $self->reset();
+
+=cut
 
 sub reset {
 
@@ -590,6 +1662,16 @@ sub reset {
     return $self;
 
 }
+
+=method reset_errors
+
+The reset_errors method clears all errors, both at the class and individual
+field levels. This method is called automatically every time the validate()
+method is triggered.
+
+    $self->reset_errors();
+
+=cut
 
 sub reset_errors {
 
@@ -604,6 +1686,16 @@ sub reset_errors {
     return $self;
 
 }
+
+=method reset_fields
+
+The reset_fields method clears all errors and field values, both at the class
+and individual field levels. This method is executed automatically at
+instantiation.
+
+    $self->reset_fields();
+
+=cut
 
 sub reset_fields {
 
@@ -624,6 +1716,15 @@ sub reset_fields {
 
 }
 
+=method set_errors
+
+The set_errors method pushes its arguments (error messages) onto the class-level
+error stack of the current class.
+
+    my $count = $self->set_errors('Oops', 'OMG', 'WTF');
+
+=cut
+
 sub set_errors {
 
     my ($self, @errors) = @_;
@@ -632,6 +1733,19 @@ sub set_errors {
     return push @{$self->{errors}}, @errors if @errors;
 
 }
+
+=method set_method
+
+The set_method method conveniently creates a method on the calling class, this
+method is primarily intended to be used during instantiation of a plugin during
+instantiation of the validation class.
+
+Additionally, method names are flattened, e.g. ThisPackage will be converted to
+this_package for convenience and consistency.
+
+    my $sub = $self->set_method(__PACKAGE__ => sub { ... });
+
+=cut
 
 sub set_method {
     
@@ -656,6 +1770,24 @@ sub set_method {
     
 }
 
+=method set_params_hash
+
+Depending on how parameters are being input into your application, if your
+input parameters are already complex hash structures, The set_params_hash method
+will set and return the serialized version of your hashref based on the the
+default or custom configuration of the hash serializer L<Hash::Flatten>.
+
+    my $params = {
+        user => {
+            login => 'member',
+            password => 'abc123456'
+        }
+    };
+    
+    my $serialized_params = $self->set_params_hash($params);
+
+=cut
+
 sub set_params_hash {
 
     my ($self, $params) = @_;
@@ -667,6 +1799,34 @@ sub set_params_hash {
     return $self->params($serializer->flatten($params));
 
 }
+
+=method stash
+
+The stash method provides a container for context/instance specific information.
+The stash is particularly useful when custom validation routines require insight
+into context/instance specific operations.
+
+    package MyApp::Validation;
+    
+    use Validation::Class;
+    
+    fld 'email' => {
+        validation => sub {
+            my $db = shift->stash->{database};
+            my $this = shift;
+            
+            return $db->find('email' => $this->{value}) ? 0 : 1 ; # email exists
+        }
+    };
+    
+    package main;
+    
+    $self->stash( { database => $dbix_object } );
+    $self->stash( ftp => $net_ftp, database => $dbix_object );
+    
+    ...
+
+=cut
 
 sub stash {
 
@@ -1636,6 +2796,71 @@ sub use_validator {
 
 }
 
+=method validate
+
+The validate method returns true/false depending on whether all specified fields
+passed validation checks. 
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    # validate specific fields
+    unless ($input->validate('field1','field2')){
+        return $input->errors_to_string;
+    }
+    
+    # validate fields based on a regex pattern
+    unless ($input->validate(qr/^field(\d+)?/)){
+        return $input->errors_to_string;
+    }
+    
+    # validate existing parameters, if no parameters exist,
+    # validate all fields ... which will return true unless field(s) exist
+    # with a required directive
+    unless ($input->validate()){
+        return $input->errors_to_string;
+    }
+    
+    # validate all fields period, obviously
+    unless ($input->validate(keys %{$input->fields})){
+        return $input->errors_to_string;
+    }
+    
+    # validate specific parameters (by name) after mapping them to other fields
+    my $parameter_map = {
+        user => 'hey_im_not_named_login',
+        pass => 'password_is_that_really_you'
+    };
+    unless ($input->validate($parameter_map)){
+        return $input->errors_to_string;
+    }
+    
+Another cool trick the validate() method can perform is the ability to temporarily
+alter whether a field is required or not during run-time. This functionality is
+often referred to as the *toggle* function.
+
+This method is important when you define a field (or two or three) as required
+or non and want to change that per validation. This is done by calling the
+validate() method with a list of fields to be validated and prefixing the
+target fields with a plus or minus as follows:
+
+    use MyApp::Validation;
+    
+    my $input = MyApp::Validation->new(params => $params);
+    
+    # validate specific fields, force name, email and phone to be required
+    # regardless of the field definitions directives ... and force the age, sex
+    # and birthday to be optional
+    
+    my @spec = qw(+name +email +phone -age -sex -birthday);
+    
+    unless ($input->validate(@spec)){
+        return $input->errors_to_string;
+    }
+
+=cut
+
 sub validate {
 
     my ( $self, @fields ) = @_;
@@ -1983,6 +3208,22 @@ sub validate {
     return $valid;    # returns true if no errors
 
 }
+
+=method validate_profile
+
+The validate_profile method executes a stored validation profile, it requires a
+profile name and can be passed additional parameters which get forwarded into the
+profile routine in the order received.
+
+    unless ($self->validate_profile('password_change')) {
+        die $self->errors_to_string;
+    }
+    
+    unless ($self->validate_profile('email_change', $dbi_handle)) {
+        die $self->errors_to_string;
+    }
+
+=cut
 
 sub validate_profile {
 

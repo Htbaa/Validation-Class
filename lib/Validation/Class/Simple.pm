@@ -31,22 +31,25 @@ use Validation::Class;
         }    
     };
     
+    # my $params  = { ... }
+    
     my $input = Validation::Class::Simple->new(    
         fields => $fields, params => $params
     );
     
-    unless ( $input->validate ) {
+    unless ($input->validate) {
+    
         return $input->errors_to_string;
+    
     }
 
 =cut
 
 =head1 DESCRIPTION
 
-Validation::Class::Simple is a drop-in validation class derived from the
-L<Validation::Class> framework. This package is intended to be used in
-situations where a full-fledged validation class is not warranted,
-e.g. (scripts, etc).
+Validation::Class::Simple is simply a throw-away namespace, good for defining
+a validation class on-the-fly (in scripts, etc) in situations where a full-fledged
+validation class is not warranted, e.g. (scripts, etc).
 
 Simply define your data validation profile and execute, much in the same way
 you would use most other data validation libraries available.
