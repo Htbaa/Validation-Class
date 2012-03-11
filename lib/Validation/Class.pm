@@ -252,7 +252,7 @@ packages to be used in all your classes.
     package MyApp::Directives;
     
     use Validation::Class;
-    ues Data::Validate::Email;
+    use Data::Validate::Email;
     
     directive 'is_email' => sub {
     

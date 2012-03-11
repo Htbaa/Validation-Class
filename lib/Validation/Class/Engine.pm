@@ -78,7 +78,7 @@ use Hash::Merge 'merge';
 Validation::Class::Engine provides data validation functionality and acts as a
 role applied to Validation::Class.
 
-=head1 DEFAULT DIRECTIVES
+=head1 DIRECTIVES
 
     package MyApp::Validation;
     use Validation::Class;
@@ -301,8 +301,6 @@ If you need to set a default value, see the default directive.
 
 =cut
 
-=head1 DEFAULT FILTER DIRECTIVES
-
 =head2 filters
 
 The filters directive is used to correct, alter and/or format the
@@ -420,7 +418,7 @@ The uppercase filter converts the field's value to uppercase.
     
 =cut
 
-=head1 DEFAULT VALIDATOR DIRECTIVES
+=head2 validators
 
     package MyApp::Validation;
     

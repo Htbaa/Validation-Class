@@ -4,7 +4,7 @@ Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 # VERSION
 
-version 5.60
+version 5.61
 
 # SYNOPSIS
 
@@ -161,7 +161,7 @@ packages to be used in all your classes.
     
 
     use Validation::Class;
-    ues Data::Validate::Email;
+    use Data::Validate::Email;
     
 
     directive 'is_email' => sub {

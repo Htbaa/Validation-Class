@@ -7,6 +7,150 @@ Validation::Class::Cookbook - Basic Instructions for Awesomeness
 This documentation will serves as a brief overview of various usage scenarios
 for Validation::Class.
 
+=head2 Data Modeling Fun
+
+Recently I been experimenting with using Validation::Class (v5.50+) to provide a
+self-validating data model in various projects. The DRY approach the library
+enforces ensures data integrity through consistency.
+
+I personally prefer to check incoming data once and ensure it meets a specific
+criteria then move on throughout various layers in the application stack with
+a level-of-certainty that the input is as it should be, ... sort've a
+set-it-and-forget-it point-of-view.
+
+Prior to recent changes, the general idea was to have application developers
+create a validation class in addition to an existing data/object model (which is
+twice the work), this was the reasoning behind having the framework ship with a
+half-baked Moose adapter.
+
+The two main changes in Validation::Class are, automatic generation of attributes
+based on field names, and the method keyword which creates self-validating routines
+(sorta like method signatures). Simple as it may seem, these two changes allow
+developers to easily create data models and objects with validating attributes
+and methods with built-in validation and error handling while remaining fast and
+extensible due to its lean dependency chain.
+
+=head2 Die On Your Own Terms
+
+Validation::Class won't die on instantiation (or anywhere else for that matter)
+unless you tell it to. The ignore_failure flag when set to false will confess to
+method validate failures. The ignore_unknown flag when set to false will confess
+to an attempt to validate a parameter with no matching field definition.
+
+Although the sentiment may not be shared by all, error handling is on of those
+things I'd just like to be there without worry too much about how its setup.
+Validation and error handling are built-in mechanisms you are encouraged to
+leverage.
+
+=head2 The Example
+
+The following is a reasonably realistic albeit lame example of Validation::Class
+usage scenarios:
+
+... in MyApp.pm (the glue)
+
+    package MyApp;
+    
+    use Validation::Class;
+    
+    load {
+        classes => 1;
+    };
+    
+    1;
+    
+... in MyApp/Person.pm (the role/base-class)
+
+    package MyApp::Person;
+    
+    use Validation::Class;
+    
+    mxn 'basic' => {
+        require => 1,
+        filters => ['trim', 'strip']
+    };
+    
+    fld 'first_name' => {
+        mixin => 'basic'
+    };
+    
+    fld 'last_name' => {
+        mixin => 'basic'
+    };
+    
+... in MyApp/User.pm (an app user)
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    load {
+        base => 'MyApp::Person'
+    };
+    
+    fld 'login' => {
+        mixin => 'basic'
+    };
+    
+    fld 'password' => {
+        mixin => 'basic'
+    };
+    
+    mth 'register' => {
+        input => ['first_name', 'last_name', 'login', 'password'],
+        using => sub {
+        
+            my ($self) = @_;
+            
+            # do something registrationy
+        
+        }
+    }
+    
+... in myapp.pl (the script)
+
+    use MyApp;
+    
+    # find some parameters, e.g.
+    
+    #my $params = {
+    #    'user.first_name' => '...',
+    #    'user.last_name'  => '...',
+    #    'user.login'      => '...',
+    #    'user.password'   => '...'
+    #};
+    #
+    #or
+    #
+    #my $params = {
+    #    
+    #    user => {
+    #        first_name => '...',
+    #        last_name  => '...',
+    #        login      => '...',
+    #        password   => '...'
+    #    }
+    #    
+    #};
+    
+    my $app = MyApp->new(params => $params);
+    
+    my $user = $app->class('user');
+    
+    unless ($user->register) {
+        print $user->errors_to_string
+    }
+    
+    # OR
+    
+    my $user = MyApp::User->new(first_name => '...', last_name => '...');
+    
+    $user->register;
+    
+    unless ($user->error_count) {
+        ...
+    }
+
 =head1 BUILDING CLASSES
 
     package MyApp::User;
