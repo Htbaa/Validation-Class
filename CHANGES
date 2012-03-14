@@ -5,10 +5,18 @@ This file documents the revision history for the Perl library Validation::Class.
     - allow array-like directives like "options" to take an arrayref or coderef
     - add before, after and around method modifiers
     - write more tests for attributes and the method keyword
-
+    - complete test suite rewrite
+    - discontinue Validation::Class::Moose
+    - perform export manually and turn on strict and warnings
+    - set/load -> base to be renamed config
+    
 6.00 (0000-00-00)
-    - Complete test suite rewrite
-    - Discontinue Validation::Class::Moose
+    - ...
+
+5.63 (2012-03-13)
+    * set/load -> base copies routines from the specified class if not exist
+    * attributes get registered in the config hash
+    * Slight POD changes
     
 5.62 (2012-03-12)
     * added "set" keyword as an alias to "load"

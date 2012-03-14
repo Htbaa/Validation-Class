@@ -1092,7 +1092,7 @@ sub check_field {
     foreach ( keys %{$spec} ) {
         
         # if the field has a directive not listed in the directives table
-        # errror !!!
+        # error !!!
         if ( ! defined $directives->{$_} ) {
             my $death_cert = "The $_ directive supplied by the $field ".
                              "field is not supported";

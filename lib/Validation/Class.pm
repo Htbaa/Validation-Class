@@ -235,7 +235,7 @@ STMNT
         no strict 'refs';
         no warnings 'redefine';
         
-        *{$self."::$attr"} = eval $stmnt;
+        *{$self."::$attr"} = $self->{config}->{ATTRIBUTES}->{$attr} = eval $stmnt;
 
         confess($self . " attribute compiler error: \n$stmnt\n$@\n") if $@;
 
@@ -303,7 +303,7 @@ packages to be used in all your classes.
         unless ($validator->is_email($value)) {
         
             my $handle = $field->{label} || $field->{name};
-            $class->error($field, "$handle must be a valid email address");
+            $self->error($field, "$handle must be a valid email address");
             
             return 0;
         
@@ -672,9 +672,25 @@ sub load {
                 
                 eval "require $class"
                     unless $INC{$file}; # unless already loaded
+                
+                my @routines = grep { defined &{"$class\::$_"} }
+                    keys %{"$class\::"};
+                
+                if (@routines) {
                     
-                # merge configs
-                $self->{config} = merge $class->{config}, $self->{config};
+                    # copy methods
+                    foreach my $routine (@routines) {
+                        
+                        eval { *{"$self\::$routine"} = \&{"$class\::$routine"} }
+                            unless $self->can($routine);
+                        
+                    }
+                    
+                    # merge configs
+                    $class->{config} ||= {};
+                    $self->{config} = merge $class->{config}, $self->{config};
+                    
+                }
                 
             }
             

@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 5.62
+    version 5.63
 
 SYNOPSIS
         package MyVal::User;
@@ -175,7 +175,7 @@ KEYWORDS
             unless ($validator->is_email($value)) {
         
                 my $handle = $field->{label} || $field->{name};
-                $class->error($field, "$handle must be a valid email address");
+                $self->error($field, "$handle must be a valid email address");
             
                 return 0;
         
