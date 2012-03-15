@@ -20,6 +20,8 @@ use Validation::Class::Engine; # used-as-role, see new()
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
+    attribute
+
     bld
     build
     

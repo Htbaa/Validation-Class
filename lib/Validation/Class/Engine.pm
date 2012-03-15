@@ -1099,6 +1099,7 @@ sub check_field {
 
             $self->xxx_suicide_by_unknown_field($death_cert);
         }
+        
     }
 
     return 1;
