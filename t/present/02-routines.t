@@ -104,9 +104,9 @@ ok do {
         use_validator
         validate
         validate_profile
-        xxx_suicide_by_unknown_field
-        xxx_merge_field_with_mixin
-        xxx_merge_field_with_field
+        _error_unknown_field
+        _merge_mixin
+        _merge_field
     );
     
     foreach (@methods) {

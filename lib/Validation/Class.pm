@@ -683,11 +683,28 @@ sub load {
     }
     
     # attach roles
-    if ($data->{role} || $data->{roles}) {
+    if ($data->{base} || $data->{role} || $data->{roles}) {
         
-        $data->{roles} = [$data->{roles}] unless "ARRAY" eq ref $data->{roles};
+        if ($data->{roles}) {
+            
+            $data->{roles} = [$data->{roles}]
+                unless "ARRAY" eq ref $data->{roles};
+            
+        }
         
-        push @{$data->{roles}}, delete $data->{role};
+        else {
+            
+            $data->{roles} = [];
+            
+        }
+        
+        push @{$data->{roles}},
+            ("ARRAY" eq ref $data->{role} ? @{$data->{role}} : $data->{role})
+                if defined $data->{role};
+        
+        push @{$data->{roles}},
+            ("ARRAY" eq ref $data->{base} ? @{$data->{base}} : $data->{base})
+                if defined $data->{base};
         
         if (@{$data->{roles}}) {
             
