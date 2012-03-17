@@ -57,7 +57,7 @@ use Validation::Class::Simple;
 
 =head1 DESCRIPTION
 
-Validation::Class::Moose (SOON TO BE DEPRECIATED) is a L<Moose> role that
+Validation::Class::Moose (may be depreciated soon) is a L<Moose> role that
 infuses the power and flexibility of L<Validation::Class> into your Moose classes.
 Validation::Class::Moose, by design, is not designed for attribute type checking,
 the Moose type constraint system exists for that purpose and works well, ...

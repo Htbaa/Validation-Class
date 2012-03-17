@@ -60,7 +60,7 @@ use Hash::Merge 'merge';
     # an auto-validating method
     mth 'register'  => {
         
-        input => [qw/+login +password/],
+        input => 'registration',
         using => sub {
             
             my ($self, @args) = shift;
@@ -1046,21 +1046,22 @@ sub class {
     
     my ( $self, $class, %args ) = @_;
     
-    #confess 'Relative class does not exist, please ensure you are calling the class '.
-    #    'method from the parent class, i.e. the class where you called the '.
-    #    'load_classes method' unless defined $self->relatives->{$class};
+    return undef unless defined $self->relatives->{$class};
     
-    return unless defined $self->relatives->{$class};
-    
-    my %defaults = (    
-        'params'         => $self->params,
-        'stashed'        => $self->stashed,
-        'ignore_unknown' => $self->ignore_unknown,
-        'report_unknown' => $self->report_unknown,
-        'hash_inflator'  => $self->hash_inflator
+    my @attrs = qw(
+        hash_inflator
+        ignore_failure
+        ignore_unknown
+        params
+        report_failure
+        report_unknown
+        stashed
     );
     
+    my %defaults = ( map { $_ => $self->$_ } @attrs );
+    
     my $child = $self->relatives->{$class}->new(merge(\%args, \%defaults));
+    
     my $delimiter = $self->hash_inflator->{'HashDelimiter'};
     
     $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
@@ -1097,7 +1098,7 @@ sub check_field {
             my $death_cert = "The $_ directive supplied by the $field ".
                              "field is not supported";
 
-            $self->xxx_suicide_by_unknown_field($death_cert);
+            $self->_error_unknown_field($death_cert);
         }
         
     }
@@ -1116,12 +1117,12 @@ sub check_mixin {
         if ( ! defined $directives->{$_} ) {
             my $death_cert =
               "The $_ directive supplied by the $mixin mixin is not supported";
-            $self->xxx_suicide_by_unknown_field($death_cert);
+            $self->_error_unknown_field($death_cert);
         }
         if ( ! $directives->{$_} ) {
             my $death_cert =
               "The $_ directive supplied by the $mixin mixin is empty";
-            $self->xxx_suicide_by_unknown_field($death_cert);
+            $self->_error_unknown_field($death_cert);
         }
     }
 
@@ -2703,7 +2704,7 @@ sub use_mixin {
         
         if (defined $self->{mixins}->{$mixin}) {
             
-            $self->fields->{$field} = $self->xxx_merge_field_with_mixin(
+            $self->fields->{$field} = $self->_merge_mixin(
                 $self->fields->{$field},
                 $self->{mixins}->{$mixin}
             );
@@ -2729,7 +2730,7 @@ sub use_mixin_field {
     my $label = $self->fields->{$target}->{label}
       if defined $self->fields->{$target}->{label};
 
-    $self->fields->{$target} = $self->xxx_merge_field_with_field(
+    $self->fields->{$target} = $self->_merge_field(
         $self->fields->{$target},
         $self->fields->{$field}
     );
@@ -3007,7 +3008,7 @@ sub validate {
             while (my($name, $param) = each(%{$self->params})) {
                 
                 if ( !defined $self->fields->{$name} ) {
-                    $self->xxx_suicide_by_unknown_field(
+                    $self->_error_unknown_field(
                         "Data validation field $name does not exist"
                     );
                     next;
@@ -3066,7 +3067,7 @@ sub validate {
                 
                 if (!defined $self->fields->{$field_name}) {
                     
-                    $self->xxx_suicide_by_unknown_field(
+                    $self->_error_unknown_field(
                         "Data validation field $field_name does not exist"
                     );
                     next;
@@ -3130,7 +3131,7 @@ sub validate {
                 
                 if ( !defined $self->fields->{$field_name} ) {
                     
-                    $self->xxx_suicide_by_unknown_field(
+                    $self->_error_unknown_field(
                         "Data validation field $field_name does not exist"
                     );
                     next;
@@ -3254,7 +3255,7 @@ sub validate_profile {
 
 }
 
-sub xxx_suicide_by_unknown_field {
+sub _error_unknown_field {
 
     my ($self, $error) = @_;
     
@@ -3272,7 +3273,7 @@ sub xxx_suicide_by_unknown_field {
     
 }
 
-sub xxx_merge_field_with_mixin {
+sub _merge_mixin {
 
     my ($self, $field, $mixin) = @_;
     
@@ -3328,7 +3329,7 @@ sub xxx_merge_field_with_mixin {
 
 }
 
-sub xxx_merge_field_with_field {
+sub _merge_field {
 
     my ($self, $field, $mixin_field) = @_;
     

@@ -93,7 +93,9 @@ our @EXPORT = qw(
         min_symbols => 1
     };
     
-    has attitude => 1; # just an attr
+    # just an attr
+    
+    has attitude => 1; 
     
     # self-validating method
     
@@ -143,7 +145,7 @@ centralizes data validation rules to ensure consistency through DRY
     unless ($user->validate('login', 'pass')){
     
         # do something with ... $input->errors;
-        
+    
     }
 
 =head1 DESCRIPTION
@@ -152,7 +154,7 @@ Validation::Class is much more than a simple data validation framework, in-fact
 it is more of a data modeling framework and can be used as an alternative to
 minimalistic object systems such as L<Moo>, L<Mo>, etc.
 
-Validation::Class aims to provide the building blocks for easily defining
+Validation::Class aims to provide the building blocks for easily definable
 self-validating data models.
 
 When fields (attributes with validation rules) are defined, accessors are
@@ -172,7 +174,7 @@ The attribute keyword (or has) creates a class attribute.
     
     use Validate::Class;
     
-    has 'attitude' => sub {
+    attribute 'attitude' => sub {
         
         return $self->bothered ? 1 : 0 
         
@@ -455,8 +457,10 @@ sub filter {
 
 =keyword load
 
-The load keyword (or set), which can also be used as a method, provides options for
-further configuring the calling class. 
+The load keyword (or set), which can also be used as a method, provides options
+for extending the current class by attaching other L<Validation::Class> classes
+as roles. The process of applying roles to the current class mainly involve
+copying the role's methods and configuration.
 
     package MyApp;
     
@@ -538,6 +542,26 @@ more about plugins at L<Validation::Class::Cookbook>.
         plugins => [
             'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
             '+MyVal::Plugin'
+        ]
+    };
+    
+    1;
+    
+The C<load.roles> option is used to load and inherit functionality from child
+classes, these classes should be used and thought-of as roles. Any validation
+class can be used as a role with this option.
+
+    package MyVal::User;
+    
+    load {
+        role => 'MyVal::Person'
+    };
+    
+    # or
+    
+    load {
+        roles => [
+            'MyVal::Person'
         ]
     };
     
@@ -658,14 +682,16 @@ sub load {
         
     }
     
-    # attached base classes (configs)
-    if ($data->{base}) {
+    # attach roles
+    if ($data->{role} || $data->{roles}) {
         
-        $data->{base} = [$data->{base}] unless "ARRAY" eq ref $data->{base};
+        $data->{roles} = [$data->{roles}] unless "ARRAY" eq ref $data->{roles};
         
-        if (@{$data->{base}}) {
+        push @{$data->{roles}}, delete $data->{role};
+        
+        if (@{$data->{roles}}) {
             
-            foreach my $class (@{$data->{base}}) {
+            foreach my $class (@{$data->{roles}}) {
                 
                 # require plugin
                 my $file = $class;
@@ -736,7 +762,7 @@ to proceed.
     method 'register' => {
     
         input  => ['name', '+email', 'login', '+password'],
-        output => ['+id'], # optional output validation
+        output => ['+id'], # optional output validation, dies on failure
         using  => sub {
         
             my ($self, @args) = @_;
@@ -958,7 +984,7 @@ sub new {
                     sub { $self->validate(@{$input}) } :
                     
                     # validate profile
-                    sub { $self->validate_profile($input, @_) } ;
+                    sub { $self->validate_profile($input, @args) } ;
             
             }
             
@@ -966,7 +992,7 @@ sub new {
                 
                 if ("CODE" eq ref $using) {
                     
-                    my $error = "method $key failed to validate";
+                    my $error = "Method $key failed to validate";
                         
                     # run input validation
                     if ("CODE" eq ref $validator) {
@@ -997,7 +1023,7 @@ sub new {
                             sub { $self->validate(@{$output}) } :
                             
                             # validate profile
-                            sub { $self->validate_profile($output, @_) } ;
+                            sub { $self->validate_profile($output, @args) } ;
                         
                         confess $error. " output, ". $self->errors_to_string
                             unless $validator->(@args);
@@ -1010,7 +1036,7 @@ sub new {
                 
                 else {
                     
-                    confess "Error executing $key, no associates coderef";
+                    confess "Error executing $key, no associated coderef";
                     
                 }
                 
@@ -1123,6 +1149,29 @@ This class encapsulates the functionality used to manipulate the environment of
 the calling class. The engine-class is the role that provides all of the data
 validation functionality, please see L<Validation::Class::Engine> for more
 information on specific methods, and attributes.
+
+=cut
+
+=head2 before
+ 
+ before foo => sub { ... };
+ 
+See L<< Class::Method::Modifiers/before method(s) => sub { ... } >> for full
+documentation.
+ 
+=head2 around
+ 
+ around foo => sub { ... };
+ 
+See L<< Class::Method::Modifiers/around method(s) => sub { ... } >> for full
+documentation.
+ 
+=head2 after
+ 
+ after foo => sub { ... };
+ 
+See L<< Class::Method::Modifiers/after method(s) => sub { ... } >> for full
+documentation.
 
 =cut
 

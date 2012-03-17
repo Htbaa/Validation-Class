@@ -10,8 +10,10 @@ This file documents the revision history for the Perl library Validation::Class.
     - perform export manually and turn on strict and warnings
     - set/load -> base to be renamed config
     
-6.00 (0000-00-00)
-    - ...
+5.68 (2012-03-17)
+    * POD changes, more tests
+    * fixed self-validiting method arg handling in Class.pm
+    * renamed utility functions and update the class method in Engine.pm
 
 5.64 (2012-03-15)
     * fixed attribute method not being exported
