@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Hash::Merge" => 0,
     "Module::Find" => 0
   },
-  "VERSION" => "5.64",
+  "VERSION" => "5.68",
   "test" => {
     "TESTS" => "t/past/*.t t/past/filters/*.t t/past/validators/*.t t/present/*.t"
   }

@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 5.64
+    version 5.68
 
 SYNOPSIS
         package MyVal::User;
@@ -47,7 +47,9 @@ SYNOPSIS
             min_symbols => 1
         };
     
-        has attitude => 1; # just an attr
+        # just an attr
+    
+        has attitude => 1; 
     
         # self-validating method
     
@@ -96,7 +98,7 @@ SYNOPSIS
         unless ($user->validate('login', 'pass')){
     
             # do something with ... $input->errors;
-        
+    
         }
 
 DESCRIPTION
@@ -105,7 +107,7 @@ DESCRIPTION
     alternative to minimalistic object systems such as Moo, Mo, etc.
 
     Validation::Class aims to provide the building blocks for easily
-    defining self-validating data models.
+    definable self-validating data models.
 
     When fields (attributes with validation rules) are defined, accessors
     are automatically generated to make getting and setting their values
@@ -124,7 +126,7 @@ KEYWORDS
     
         use Validate::Class;
     
-        has 'attitude' => sub {
+        attribute 'attitude' => sub {
         
             return $self->bothered ? 1 : 0 
         
@@ -262,7 +264,10 @@ KEYWORDS
 
   load
     The load keyword (or set), which can also be used as a method, provides
-    options for further configuring the calling class.
+    options for extending the current class by attaching other
+    Validation::Class classes as roles. The process of applying roles to the
+    current class mainly involve copying the role's methods and
+    configuration.
 
         package MyApp;
     
@@ -350,6 +355,26 @@ KEYWORDS
     
         1;
 
+    The "load.roles" option is used to load and inherit functionality from
+    child classes, these classes should be used and thought-of as roles. Any
+    validation class can be used as a role with this option.
+
+        package MyVal::User;
+    
+        load {
+            role => 'MyVal::Person'
+        };
+    
+        # or
+    
+        load {
+            roles => [
+                'MyVal::Person'
+            ]
+        };
+    
+        1;
+
   method
     The method keyword (or mth) is used to create an auto-validating method.
     Similar to method signatures, an auto-validating method can leverage
@@ -363,7 +388,7 @@ KEYWORDS
         method 'register' => {
     
             input  => ['name', '+email', 'login', '+password'],
-            output => ['+id'], # optional output validation
+            output => ['+id'], # optional output validation, dies on failure
             using  => sub {
         
                 my ($self, @args) = @_;
@@ -496,6 +521,24 @@ ATTRIBUTES, METHODS, AND MORE
     provides all of the data validation functionality, please see
     Validation::Class::Engine for more information on specific methods, and
     attributes.
+
+  before
+     before foo => sub { ... };
+
+    See "before method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
+
+  around
+     around foo => sub { ... };
+
+    See "around method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
+
+  after
+     after foo => sub { ... };
+
+    See "after method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
 
 AUTHOR
     Al Newkirk <awncorp@cpan.org>

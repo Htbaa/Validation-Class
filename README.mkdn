@@ -4,7 +4,7 @@ Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 # VERSION
 
-version 5.64
+version 5.68
 
 # SYNOPSIS
 
@@ -59,7 +59,10 @@ version 5.64
     };
     
 
-    has attitude => 1; # just an attr
+    # just an attr
+    
+
+    has attitude => 1; 
     
 
     # self-validating method
@@ -127,7 +130,7 @@ centralizes data validation rules to ensure consistency through DRY
     
 
         # do something with ... $input->errors;
-        
+    
 
     }
 
@@ -137,7 +140,7 @@ Validation::Class is much more than a simple data validation framework, in-fact
 it is more of a data modeling framework and can be used as an alternative to
 minimalistic object systems such as [Moo](http://search.cpan.org/perldoc?Moo), [Mo](http://search.cpan.org/perldoc?Mo), etc.
 
-Validation::Class aims to provide the building blocks for easily defining
+Validation::Class aims to provide the building blocks for easily definable
 self-validating data models.
 
 When fields (attributes with validation rules) are defined, accessors are
@@ -159,7 +162,7 @@ The attribute keyword (or has) creates a class attribute.
     use Validate::Class;
     
 
-    has 'attitude' => sub {
+    attribute 'attitude' => sub {
         
 
         return $self->bothered ? 1 : 0 
@@ -331,8 +334,10 @@ The coderef should also return the transformed value.
 
 ## load
 
-The load keyword (or set), which can also be used as a method, provides options for
-further configuring the calling class. 
+The load keyword (or set), which can also be used as a method, provides options
+for extending the current class by attaching other [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) classes
+as roles. The process of applying roles to the current class mainly involve
+copying the role's methods and configuration.
 
     package MyApp;
     
@@ -438,6 +443,30 @@ more about plugins at [Validation::Class::Cookbook](http://search.cpan.org/perld
 
     1;
 
+The `load.roles` option is used to load and inherit functionality from child
+classes, these classes should be used and thought-of as roles. Any validation
+class can be used as a role with this option.
+
+    package MyVal::User;
+    
+
+    load {
+        role => 'MyVal::Person'
+    };
+    
+
+    # or
+    
+
+    load {
+        roles => [
+            'MyVal::Person'
+        ]
+    };
+    
+
+    1;
+
 ## method
 
 The method keyword (or mth) is used to create an auto-validating method. Similar
@@ -455,7 +484,7 @@ to proceed.
     
 
         input  => ['name', '+email', 'login', '+password'],
-        output => ['+id'], # optional output validation
+        output => ['+id'], # optional output validation, dies on failure
         using  => sub {
         
 
@@ -616,6 +645,27 @@ This class encapsulates the functionality used to manipulate the environment of
 the calling class. The engine-class is the role that provides all of the data
 validation functionality, please see [Validation::Class::Engine](http://search.cpan.org/perldoc?Validation::Class::Engine) for more
 information on specific methods, and attributes.
+
+## before
+
+    before foo => sub { ... };
+
+See ["before method(s) => sub { ... }" in Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers#before method(s) => sub { ... }) for full
+documentation.
+
+## around
+
+    around foo => sub { ... };
+
+See ["around method(s) => sub { ... }" in Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers#around method(s) => sub { ... }) for full
+documentation.
+
+## after
+
+    after foo => sub { ... };
+
+See ["after method(s) => sub { ... }" in Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers#after method(s) => sub { ... }) for full
+documentation.
 
 # AUTHOR
 
