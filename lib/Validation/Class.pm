@@ -394,8 +394,34 @@ sub field {
     
     no strict 'refs';
     
+    confess "Error creating accessor $name, attribute collision"
+        if exists $self->{config}->{FIELDS}->{$name};
+        
+    confess "Error creating accessor $name, reserve word collision"
+        if $self->can($name) and grep { $name eq $_ } @EXPORT;
+        
+    confess "Error creating accessor $name, method collision"
+        if $self->can($name);
+    
+    # create accessor
+    
     $self->{config}->{FIELDS}->{$name} = $data;
     $self->{config}->{FIELDS}->{$name}->{errors} = [];
+    
+    *{"${self}::$name"} = sub {
+        
+        my ($self, $data) = @_;
+        
+        $self->params->{$name} = $data
+            
+            if defined $data
+            && not defined $self->fields->{$name}->{readonly}
+        
+        ;
+        
+        return $self->default_value($name);
+        
+    };
     
     return $name, $data;
     
@@ -836,7 +862,101 @@ sub method {
     
     no strict 'refs';
     
+    confess "Error creating method $name, attribute collision"
+        if exists $self->{$name};
+        
+    confess "Error creating method $name, reserve word collision"
+        if $self->can($name) and grep { $name eq $_ } @EXPORT;
+    
+    confess "Error creating method $name, method collision"
+        if $self->can($name);
+    
+    # create method
+    
+    return unless $data->{input} && $data->{using};
+    
     $self->{config}->{METHODS}->{$name} = $data;
+    
+    *{"${self}::$name"} = sub {
+        
+        my $self  = shift;
+        my @args  = @_;
+        
+        my $validator;
+        
+        my $input  = $data->{'input'};
+        my $using  = $data->{'using'};
+        my $output = $data->{'output'};
+        
+        if ($input) {
+        
+            $validator = "ARRAY" eq ref $input ?
+                
+                # validate fields
+                sub { $self->validate(@{$input}) } :
+                
+                # validate profile
+                sub { $self->validate_profile($input, @args) } ;
+        
+        }
+        
+        if ($using) {
+            
+            if ("CODE" eq ref $using) {
+                
+                my $error = "Method $name failed to validate";
+                    
+                # run input validation
+                if ("CODE" eq ref $validator) {
+                    
+                    unless ($validator->(@args)) {
+                    
+                        unshift @{$self->{errors}}, $error
+                            if $self->report_failure;
+                        
+                        confess $error. " input, ". $self->errors_to_string
+                            if ! $self->ignore_failure;
+                        
+                        return undef;
+                        
+                    }
+                    
+                }
+                
+                # execute routine
+                my $return = $data->{using}->($self, @args);
+                
+                # run output validation
+                if ($output) {
+                    
+                    $validator = "ARRAY" eq ref $output ?
+                        
+                        # validate fields
+                        sub { $self->validate(@{$output}) } :
+                        
+                        # validate profile
+                        sub { $self->validate_profile($output, @args) } ;
+                    
+                    confess $error. " output, ". $self->errors_to_string
+                        unless $validator->(@args);
+                    
+                }
+                
+                return $return;
+                
+            }
+            
+            else {
+                
+                confess "Error executing $name, no associated coderef";
+                
+            }
+            
+        }
+        
+        return undef;
+        
+    };
     
     return $name, $data;
 
@@ -937,133 +1057,6 @@ sub new {
     # start instantiation
     
     my $self = bless { %{ $invocant } }, ref $invocant || $invocant;
-    
-    # create class attributes (parameter accessors)
-    
-    while (my ($key, $value) = each(%{ $self->fields })) {
-        
-        confess "Error creating accessor $key, attribute collision"
-            if exists $self->{$key};
-            
-        confess "Error creating accessor $key, base-class method collision"
-            if $self->can($key) and defined &{"$engine\::$key"};
-            
-        confess "Error creating accessor $key, reserve word collision"
-            if $self->can($key) and grep { $key eq $_ } @EXPORT;
-        
-        # create accessor
-        
-        $self->set_method($key => sub {
-            
-            my ($self, $data) = @_;
-            
-            $self->params->{$key} = $data if defined $data;
-            
-            return exists $self->params->{$key} ? $self->params->{$key} : undef;
-            
-        }) unless $self->can($key); # I already can
-        
-    }
-    
-    # create class methods (from signatures)
-    
-    while (my ($key, $value) = each(%{ $self->methods })) {
-        
-        confess "Error creating method $key, attribute collision"
-            if exists $self->{$key};
-            
-        confess "Error creating method $key, base-class method collision"
-            if $self->can($key) and defined &{"$engine\::$key"};
-            
-        confess "Error creating method $key, reserve word collision"
-            if $self->can($key) and grep { $key eq $_ } @EXPORT;
-        
-        # create method
-        
-        next unless $value->{input} && $value->{using};
-        
-        $self->set_method($key => sub {
-            
-            my $self  = shift;
-            my @args  = @_;
-            
-            my $validator;
-            
-            my $input  = $value->{'input'};
-            my $using  = $value->{'using'};
-            my $output = $value->{'output'};
-            
-            if ($input) {
-            
-                $validator = "ARRAY" eq ref $input ?
-                    
-                    # validate fields
-                    sub { $self->validate(@{$input}) } :
-                    
-                    # validate profile
-                    sub { $self->validate_profile($input, @args) } ;
-            
-            }
-            
-            if ($using) {
-                
-                if ("CODE" eq ref $using) {
-                    
-                    my $error = "Method $key failed to validate";
-                        
-                    # run input validation
-                    if ("CODE" eq ref $validator) {
-                        
-                        unless ($validator->(@args)) {
-                        
-                            unshift @{$self->{errors}}, $error
-                                if $self->report_failure;
-                            
-                            confess $error. " input, ". $self->errors_to_string
-                                if ! $self->ignore_failure;
-                            
-                            return undef;
-                            
-                        }
-                        
-                    }
-                    
-                    # execute routine
-                    my $return = $value->{using}->($self, @args);
-                    
-                    # run output validation
-                    if ($output) {
-                        
-                        $validator = "ARRAY" eq ref $output ?
-                            
-                            # validate fields
-                            sub { $self->validate(@{$output}) } :
-                            
-                            # validate profile
-                            sub { $self->validate_profile($output, @args) } ;
-                        
-                        confess $error. " output, ". $self->errors_to_string
-                            unless $validator->(@args);
-                        
-                    }
-                    
-                    return $return;
-                    
-                }
-                
-                else {
-                    
-                    confess "Error executing $key, no associated coderef";
-                    
-                }
-                
-            }
-            
-            return undef;
-            
-        }) unless $self->can($key); # I already can
-        
-    }
     
     # process parameters
     

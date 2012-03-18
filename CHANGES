@@ -3,13 +3,20 @@ This file documents the revision history for the Perl library Validation::Class.
 0.00 (0000-00-00)
     - allow default to execute a coderef
     - allow array-like directives like "options" to take an arrayref or coderef
-    - add before, after and around method modifiers
     - write more tests for attributes and the method keyword
     - complete test suite rewrite
     - discontinue Validation::Class::Moose
     - perform export manually and turn on strict and warnings
-    - set/load -> base to be renamed config
     
+5.75 (2012-03-18)
+    * add before, after and around method modifiers
+    * set/load -> base to be renamed config
+    * accessors created at compile-time instead of run-time
+    * POD changes
+    * added readonly directive
+    * added default_value method
+    * added get_classes method
+
 5.68 (2012-03-17)
     * POD changes, more tests
     * fixed self-validiting method arg handling in Class.pm

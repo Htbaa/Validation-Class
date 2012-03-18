@@ -80,10 +80,12 @@ ok do {
         check_mixin
         clear_queue
         clone
+        default_value
         error
         error_count
         error_fields
         errors_to_string
+        get_classes
         get_errors
         get_params
         get_params_hash
