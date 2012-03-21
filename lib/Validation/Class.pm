@@ -239,6 +239,8 @@ STMNT
         no strict 'refs';
         no warnings 'redefine';
         
+        $self->{config}->{ATTRIBUTES} ||= {};
+        
         *{$self."::$attr"} = $self->{config}->{ATTRIBUTES}->{$attr} = eval $stmnt;
 
         confess($self . " attribute compiler error: \n$stmnt\n$@\n") if $@;

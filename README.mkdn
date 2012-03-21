@@ -4,7 +4,7 @@ Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
 
 # VERSION
 
-version 5.80
+version 5.81
 
 # SYNOPSIS
 

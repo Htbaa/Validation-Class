@@ -9,6 +9,9 @@ This file documents the revision history for the Perl library Validation::Class.
     - perform export manually and turn on strict and warnings
 
 5.80 (2012-03-20)
+    * bug fix: Class.pm gotcha in attribute keyword, (used once typo error)
+
+5.80 (2012-03-20)
     * bug fix: config merging while using class as class and role in parrallel
     * added copy_errors method
     
