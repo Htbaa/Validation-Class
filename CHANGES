@@ -7,6 +7,10 @@ This file documents the revision history for the Perl library Validation::Class.
     - complete test suite rewrite
     - discontinue Validation::Class::Moose
     - perform export manually and turn on strict and warnings
+
+5.80 (2012-03-20)
+    * bug fix: config merging while using class as class and role in parrallel
+    * added copy_errors method
     
 5.75 (2012-03-18)
     * add before, after and around method modifiers

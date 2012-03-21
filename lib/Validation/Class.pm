@@ -279,7 +279,9 @@ sub build {
     return 0 unless ("CODE" eq ref $code);
     
     no strict 'refs';
-        
+    
+    $self->{config}->{BUILDERS} ||= [];
+    
     push @{$self->{config}->{BUILDERS}}, $code;
     
     return $code;
@@ -604,6 +606,8 @@ sub load {
     $self ||= caller(0); # hackaroni toni
     
     no strict 'refs';
+    
+    $self->{config}->{BUILDERS} ||= []; # prevents merge from referencing
 
     if ($data->{class}) {
         

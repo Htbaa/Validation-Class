@@ -1235,6 +1235,34 @@ sub clone {
     
 }
 
+=method copy_errors
+
+The copy_errors method is used to copy error messages from one class to another.
+Both classes must be Validation::Class based and/or at-least implement the
+get_errors and set_errors methods.
+
+    $input = Class->new;
+    $other = $input->class('other');
+    
+    unless ($other->validate) {
+        
+        $other->copy_errors($input);
+        
+    }
+
+=cut
+
+sub copy_errors {
+    
+    my ($self, $target) = @_;
+    
+    # copy errors from one class to another, both must be VC classes
+    $target->set_errors($self->get_errors) if $self->error_count;
+    
+    return $self;
+    
+}
+
 =method default_value
 
 The default_value method returns the absolute value (hardcoded, default or
@@ -1977,7 +2005,11 @@ sub template {
     
     {
         
-        DIRECTIVES => {
+        ATTRIBUTES  => {},
+        
+        BUILDERS    => {},
+        
+        DIRECTIVES  => {
             
             '&toggle' => {
                 
@@ -2763,6 +2795,8 @@ sub template {
             }
         
         },
+        
+        METHODS    => {},
         
         MIXINS     => {},
         
