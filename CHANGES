@@ -8,6 +8,10 @@ This file documents the revision history for the Perl library Validation::Class.
     - discontinue Validation::Class::Moose
     - perform export manually and turn on strict and warnings
 
+5.82 (2012-03-22)
+    * bug fix: minor but major typo in Engine.pm template method broken
+      build keyword functionality
+
 5.80 (2012-03-20)
     * bug fix: Class.pm gotcha in attribute keyword, (used once typo error)
 

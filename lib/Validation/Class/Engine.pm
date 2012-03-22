@@ -2007,7 +2007,7 @@ sub template {
         
         ATTRIBUTES  => {},
         
-        BUILDERS    => {},
+        BUILDERS    => [],
         
         DIRECTIVES  => {
             
