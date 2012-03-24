@@ -351,7 +351,9 @@ sub directive {
     return 0 unless ($name && $data);
     
     no strict 'refs';
-        
+    
+    $self->{config}->{DIRECTIVES} ||= {};
+    
     $self->{config}->{DIRECTIVES}->{$name} = {
         mixin     => 1,
         field     => 1,
@@ -397,6 +399,8 @@ sub field {
     return 0 unless ($name && $data);
     
     no strict 'refs';
+    
+    $self->{config}->{FIELDS} ||= {};
     
     confess "Error creating accessor $name, attribute collision"
         if exists $self->{config}->{FIELDS}->{$name};
@@ -478,6 +482,8 @@ sub filter {
     return 0 unless ($name && $data);
     
     no strict 'refs';
+    
+    $self->{config}->{FILTERS} ||= {};
     
     $self->{config}->{FILTERS}->{$name} = $data;
     
@@ -868,6 +874,8 @@ sub method {
     
     no strict 'refs';
     
+    $self->{config}->{METHODS} ||= {};
+    
     confess "Error creating method $name, attribute collision"
         if exists $self->{$name};
         
@@ -1005,6 +1013,8 @@ sub mixin {
     return 0 unless ($name && $data);
     
     no strict 'refs';
+    
+    $self->{config}->{MIXINS} ||= {};
     
     $self->{config}->{MIXINS}->{$name} = $data;
     
@@ -1153,6 +1163,8 @@ sub profile {
     
     no strict 'refs';
 
+    $self->{config}->{PROFILES} ||= {};
+    
     $self->{config}->{PROFILES}->{$name} = $data;
     
     return $name, $data;

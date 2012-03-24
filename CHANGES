@@ -8,6 +8,9 @@ This file documents the revision history for the Perl library Validation::Class.
     - discontinue Validation::Class::Moose
     - perform export manually and turn on strict and warnings
 
+5.83 (2012-03-24)
+    * creates keyword config defaults on access
+
 5.82 (2012-03-22)
     * bug fix: minor but major typo in Engine.pm template method broken
       build keyword functionality
