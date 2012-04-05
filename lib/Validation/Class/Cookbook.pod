@@ -21,7 +21,7 @@ set-it-and-forget-it point-of-view.
 Prior to recent changes, the general idea was to have application developers
 create a validation class in addition to an existing data/object model (which is
 twice the work), this was the reasoning behind having the framework ship with a
-half-baked Moose adapter.
+Moose adapter.
 
 The two main changes in Validation::Class are, automatic generation of attributes
 based on field names, and the method keyword which creates self-validating routines

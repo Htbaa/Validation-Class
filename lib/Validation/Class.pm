@@ -764,7 +764,7 @@ sub load {
                     # copy methods
                     foreach my $routine (@routines) {
                         
-                        eval { *{"$self\::$routine"} = \&{"$class\::$routine"} }
+                        eval { *{"$self\::$routine"} = *{"$class\::$routine"} }
                             unless $self->can($routine);
                         
                     }
@@ -868,6 +868,7 @@ sub mth { goto &method }
 sub method {
 
     my ($name, $data) = @_;
+
     my $self = caller(0);
     
     return 0 unless ($name && $data);
@@ -1008,6 +1009,7 @@ sub mxn { goto &mixin }
 sub mixin {
 
     my ($name, $data) = @_;
+
     my $self = caller(0);
     
     return 0 unless ($name && $data);
@@ -1062,7 +1064,7 @@ sub new {
     
     foreach my $routine (@routines) {
         
-        eval { *{"$invocant\::$routine"} = \&{"$engine\::$routine"} };
+        eval { *{"$invocant\::$routine"} = *{"$engine\::$routine"} };
         
     }
     
@@ -1157,6 +1159,7 @@ sub pro { goto &profile }
 sub profile {
 
     my ($name, $data) = @_;
+
     my $self = caller(0);
 
     return 0 unless ($name && "CODE" eq ref $data);
