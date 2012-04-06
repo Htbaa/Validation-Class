@@ -130,12 +130,20 @@ webapp may take on different names but require the same validation.
 =head2 default
 
 The default directive is used as a default value for a field to be used
-when a matching parameter is not present.
+when a matching parameter is not present. Optionally, the default directive
+can be a coderef allowing the default value to be set on request.
 
     # the default directive
     field 'quantity'  => {
         default => 1,
         ...
+    };
+    
+    # the default directive as a coderef
+    field 'quantity'  => {
+        default => sub {
+            return DB::Settings->default_quantity
+        }
     };
 
 =cut
@@ -400,6 +408,21 @@ The uppercase filter converts the field's value to uppercase.
 Validator directives are special directives with associated validation code that
 is used to validate common use cases such as "checking the length of a parameter",
 etc.
+
+Please note that a directive's value can be either a scalar or arrayref, most
+directives take a scalar value though some have the ability to take an arrayref
+or parse a delimited list. There is no official documentation as to which
+directives can accept lists of values although it will typically be evident.
+
+    E.g. (a directive with a list of values)
+    
+    {
+        directive => [qw(1 2 3)],
+        directive => ['1', '2', '3'],
+        directive => '1, 2, 3',
+        directive => '1-2-3',
+        directive => '1,2,3',
+    }
 
 The following is a list of the default validators which can be used in field/mixin
 declarations:
@@ -998,10 +1021,10 @@ sub apply_filters {
             $self->use_filter($_, $name) for @{$field->{filters}};
             
             # set default value - absolute last resort
-            if (defined $self->params->{$field}) {
-                if (!$self->params->{$field}) {
+            if (defined $self->params->{$name}) {
+                if (!$self->params->{$name}) {
                     if ($field->{default}) {
-                        $self->params->{$field} = $field->{default};
+                        $self->params->{$name} = $self->default_value($name);
                     }
                 }
             }
@@ -1290,7 +1313,9 @@ sub default_value {
         
         if (exists $self->fields->{$field_name}->{default}) {
             
-            $value = $self->fields->{$field_name}->{default};
+            $value = "CODE" eq ref $self->fields->{$field_name}->{default} ?
+                $self->fields->{$field_name}->{default}->($self) :
+                $self->fields->{$field_name}->{default};
             
         }
         
@@ -2033,37 +2058,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
                 
-                validator => sub {
-                    
-                    my ($directive, $value, $field, $class) = @_;
-                    my ($min, $max) = "ARRAY" eq ref $directive ?
-                        @{$directive} :
-                        split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $directive;
-                    
-                    $min = scalar($min);
-                    $max = scalar($max);
-                    $value = length($value);
-                    
-                    if ($value) {
-                    
-                        unless ($value >= $min && $value <= $max) {
-                    
-                            my $handle = $field->{label} || $field->{name};
-                            my $error  =
-                                "$handle must contain between ".
-                                "$directive characters";
-                            
-                            $class->error($field, $error);
-                            
-                            return 0;
-                    
-                        }
-                    
-                    }
-                    
-                    return 1;
-                
-                }
+                validator => \&template_validator_between
                 
             },
             
@@ -2081,49 +2076,7 @@ sub template {
                 field     => 1,
                 multi     => 1,
             
-                validator => sub {
-            
-                    my ($directive, $value, $field, $class) = @_;
-                    
-                    if ($value) {
-                        
-                        my $dependents = "ARRAY" eq ref $directive ?
-                        $directive : [$directive];
-                        
-                        if (@{$dependents}) {
-                            
-                            my @blanks = ();
-            
-                            foreach my $dep (@{$dependents}) {
-            
-                                push @blanks,
-                                    $class->fields->{$dep}->{label} ||
-                                    $class->fields->{$dep}->{name} 
-                                    if ! $class->params->{$dep};
-            
-                            }
-                                
-                            if (@blanks) {
-            
-                                my $handle = $field->{label} || $field->{name};
-            
-                                $class->error(
-                                    $field, "$handle requires " .
-                                    join(", ", @blanks) . " to have " .
-                                    (@blanks > 1 ? "values" : "a value")
-                                );
-            
-                                return 0;
-            
-                            }
-            
-                        }
-                        
-                    }
-                    
-                    return 1;
-            
-                }
+                validator => \&template_validator_depends_on
             
             },
             
@@ -2173,34 +2126,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
            
-                validator => sub {
-           
-                    my ($directive, $value, $field, $class) = @_;
-                    
-                    $value = length($value);
-                    
-                    if ($value) {
-           
-                        unless ($value == $directive) {
-           
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = $directive > 1 ?
-                            "characters" : "character";
-                            
-                            $class->error(
-                                $field, "$handle must contain exactly "
-                                ."$directive $characters"
-                            );
-           
-                            return 0;
-           
-                        }
-           
-                    }
-           
-                    return 1;
-           
-                }
+                validator => \&template_validator_length
            
             },
            
@@ -2210,30 +2136,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
            
-                validator => sub {
-           
-                    my ( $directive, $value, $field, $class ) = @_;
-           
-                    if ($value) {
-                        # build the regex
-                        my $this = $value;
-                        my $that = $class->params->{$directive} || '';
-                        unless ( $this eq $that ) {
-                            my $handle  = $field->{label} || $field->{name};
-                            my $handle2 = $class->fields->{$directive}->{label}
-                                || $class->fields->{$directive}->{name};
-                            my $error = "$handle does not match $handle2";
-                            $class->error( $field, $error );
-           
-                            return 0;
-           
-                        }
-           
-                    }
-           
-                    return 1;
-           
-                }
+                validator => \&template_validator_matches
            
             },
            
@@ -2243,33 +2146,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
                 
-                validator => sub {
-                
-                    my ( $directive, $value, $field, $class ) = @_;
-                
-                    if ($value) {
-                
-                        my @i = ($value =~ /[a-zA-Z]/g);
-                
-                        unless ( @i <= $directive ) {
-                
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "characters" : "character";
-                            my $error = "$handle must contain at-least "
-                            ."$directive alphabetic $characters";
-                            
-                            $class->error( $field, $error );
-                
-                            return 0;
-                
-                        }
-                
-                    }
-                
-                    return 1;
-                
-                }
+                validator => \&template_validator_max_alpha
             
             },
             
@@ -2279,32 +2156,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        my @i = ($value =~ /[0-9]/g);
-            
-                        unless ( @i <= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "digits" : "digit";
-                            my $error = "$handle must contain at-least "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_max_digits
             
             },
             
@@ -2314,31 +2166,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        unless ( length($value) <= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "characters" : "character";
-                            my $error = "$handle can't contain more than "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_max_length
             
             },
             
@@ -2348,28 +2176,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        unless ( $value <= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $error = "$handle can't be greater than "
-                            ."$directive";
-                            
-                            $class->error( $field, $error );
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_max_sum
             
             },
             
@@ -2379,33 +2186,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        my @i = ($value =~ /[^0-9a-zA-Z]/g);
-            
-                        unless ( @i <= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "symbols" : "symbol";
-                            my $error = "$handle can't contain more than "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_max_symbols
             
             },
             
@@ -2415,33 +2196,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        my @i = ($value =~ /[a-zA-Z]/g);
-            
-                        unless ( @i >= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "characters" : "character";
-                            my $error = "$handle must contain at-least "
-                            ."$directive alphabetic $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_min_alpha
             
             },
             
@@ -2451,33 +2206,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        my @i = ($value =~ /[0-9]/g);
-            
-                        unless ( @i >= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "digits" : "digit";
-                            my $error = "$handle must contain at-least "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_min_digits
             
             },
             
@@ -2487,31 +2216,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        unless ( length($value) >= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "characters" : "character";
-                            my $error = "$handle must contain at-least "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_min_length
             
             },
             
@@ -2521,29 +2226,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        unless ( $value >= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $error = "$handle can't be less than "
-                            ."$directive";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_min_sum
             
             },
             
@@ -2553,33 +2236,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        my @i = ($value =~ /[^0-9a-zA-Z]/g);
-            
-                        unless ( @i >= $directive ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $characters = int( $directive ) > 1 ?
-                                "symbols" : "symbol";
-                            my $error = "$handle must contain at-least "
-                            ."$directive $characters";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_min_symbols
             
             },
             
@@ -2613,31 +2270,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        # build the regex
-                        my (@options) =
-                            split /(?:\s{1,})?[,]{1,}(?:\s{1,})?/, $directive;
-            
-                        unless ( grep { $value =~ /^$_$/ } @options ) {
-            
-                            my $handle  = $field->{label} || $field->{name};
-                            my $error = "$handle must be " . join " or ", @options;
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_options
             
             },
             
@@ -2647,41 +2280,7 @@ sub template {
                 field     => 1,
                 multi     => 0,
             
-                validator => sub {
-            
-                    my ( $directive, $value, $field, $class ) = @_;
-            
-                    if ($value) {
-            
-                        # build the regex
-                        my $regex = $directive;
-            
-                        unless ("Regexp" eq ref $regex) {
-            
-                            $regex =~ s/([^#X ])/\\$1/g;
-                            $regex =~ s/#/\\d/g;
-                            $regex =~ s/X/[a-zA-Z]/g;
-                            $regex = qr/$regex/;
-            
-                        }
-            
-                        unless ( $value =~ $regex ) {
-            
-                            my $handle = $field->{label} || $field->{name};
-                            my $error = "$handle does not match the "
-                            ."pattern $directive";
-                            
-                            $class->error( $field, $error );
-            
-                            return 0;
-            
-                        }
-            
-                    }
-            
-                    return 1;
-            
-                }
+                validator => \&template_validator_pattern
             
             },
             
@@ -2806,6 +2405,464 @@ sub template {
     
     }
     
+}
+
+sub template_validator_between {
+    
+    my ($directive, $value, $field, $class) = @_;
+    
+    my ($min, $max) = "ARRAY" eq ref $directive ?
+        @{$directive} : split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $directive;
+    
+    $min = scalar($min);
+    $max = scalar($max);
+    
+    $value = length($value);
+    
+    if ($value) {
+    
+        unless ($value >= $min && $value <= $max) {
+    
+            my $handle = $field->{label} || $field->{name};
+            my $error  = "$handle must contain between $directive characters";
+            
+            $class->error($field, $error);
+            
+            return 0;
+    
+        }
+    
+    }
+    
+    return 1;
+    
+}
+
+sub template_validator_depends_on {
+
+    my ($directive, $value, $field, $class) = @_;
+    
+    if ($value) {
+        
+        my $dependents = "ARRAY" eq ref $directive ?
+        $directive : [$directive];
+        
+        if (@{$dependents}) {
+            
+            my @blanks = ();
+
+            foreach my $dep (@{$dependents}) {
+
+                push @blanks,
+                    $class->fields->{$dep}->{label} ||
+                    $class->fields->{$dep}->{name} 
+                    if ! $class->params->{$dep};
+
+            }
+                
+            if (@blanks) {
+
+                my $handle = $field->{label} || $field->{name};
+
+                $class->error(
+                    $field, "$handle requires " .
+                    join(", ", @blanks) . " to have " .
+                    (@blanks > 1 ? "values" : "a value")
+                );
+
+                return 0;
+
+            }
+
+        }
+        
+    }
+    
+    return 1;
+
+}
+
+sub template_validator_length {
+
+    my ($directive, $value, $field, $class) = @_;
+    
+    $value = length($value);
+    
+    if ($value) {
+
+        unless ($value == $directive) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = $directive > 1 ?
+            "characters" : "character";
+            
+            $class->error(
+                $field, "$handle must contain exactly "
+                ."$directive $characters"
+            );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_matches {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+        # build the regex
+        my $this = $value;
+        my $that = $class->params->{$directive} || '';
+        unless ( $this eq $that ) {
+            my $handle  = $field->{label} || $field->{name};
+            my $handle2 = $class->fields->{$directive}->{label}
+                || $class->fields->{$directive}->{name};
+            my $error = "$handle does not match $handle2";
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_max_alpha {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[a-zA-Z]/g);
+
+        unless ( @i <= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "characters" : "character";
+            my $error = "$handle must contain at-least "
+            ."$directive alphabetic $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_max_digits {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[0-9]/g);
+
+        unless ( @i <= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "digits" : "digit";
+            my $error = "$handle must contain at-least "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_max_length {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        unless ( length($value) <= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "characters" : "character";
+            my $error = "$handle can't contain more than "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_max_sum {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        unless ( $value <= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $error = "$handle can't be greater than "
+            ."$directive";
+            
+            $class->error( $field, $error );
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_max_symbols {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[^0-9a-zA-Z]/g);
+
+        unless ( @i <= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "symbols" : "symbol";
+            my $error = "$handle can't contain more than "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_min_alpha {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[a-zA-Z]/g);
+
+        unless ( @i >= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "characters" : "character";
+            my $error = "$handle must contain at-least "
+            ."$directive alphabetic $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_min_digits {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[0-9]/g);
+
+        unless ( @i >= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "digits" : "digit";
+            my $error = "$handle must contain at-least "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_min_length {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        unless ( length($value) >= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "characters" : "character";
+            my $error = "$handle must contain at-least "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_min_sum {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        unless ( $value >= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $error = "$handle can't be less than "
+            ."$directive";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_min_symbols {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        my @i = ($value =~ /[^0-9a-zA-Z]/g);
+
+        unless ( @i >= $directive ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $characters = int( $directive ) > 1 ?
+                "symbols" : "symbol";
+            my $error = "$handle must contain at-least "
+            ."$directive $characters";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_options {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        # build the regex
+        my (@options) = "ARRAY" eq ref $directive ?
+        @{$directive} :
+        split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $directive;
+
+        unless ( grep { $value =~ /^$_$/ } @options ) {
+
+            my $handle  = $field->{label} || $field->{name};
+            my $error = "$handle must be " . join " or ", @options;
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub template_validator_pattern {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        # build the regex
+        my $regex = $directive;
+
+        unless ("Regexp" eq ref $regex) {
+
+            $regex =~ s/([^#X ])/\\$1/g;
+            $regex =~ s/#/\\d/g;
+            $regex =~ s/X/[a-zA-Z]/g;
+            $regex = qr/$regex/;
+
+        }
+
+        unless ( $value =~ $regex ) {
+
+            my $handle = $field->{label} || $field->{name};
+            my $error = "$handle does not match the "
+            ."pattern $directive";
+            
+            $class->error( $field, $error );
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
 }
 
 sub use_filter {

@@ -1,9 +1,13 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 0.00 (0000-00-00)
-    - allow default to execute a coderef
-    - allow array-like directives like "options" to take an arrayref or coderef
     - rewrite tests (using cucumber or in that fashion)
+
+5.90 (2012-04-05)
+    * allow all array-like directives (e.g. "options") to take an arrayref
+    * decouple validator from validating-directives
+    * fixed unreported bug in the apply_filters method setting default value
+    * allow default to execute a coderef
 
 5.85 (2012-04-05)
     * added Validation::Class::Exporter
