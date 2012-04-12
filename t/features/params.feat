@@ -1,0 +1,30 @@
+# comments are ignored
+
+Feature: Parameter Handling
+    In order to test getting and setting parameters
+    As a package using Validation::Class
+    I want to create new object and check parameters
+
+    Scenario ParamValues_001: Validating Parameter Values
+        Given a new object from class MyApp::Test
+        When I pass the param method the key :name and value :value
+        Then the params attribute key :name will be :value
+        And validating the field :name with a value of :value will :result
+    
+    # ~  will be interpreted as undefined
+    
+    Example ParamValues_001:
+        | name      | value         | result  |
+        
+        | name      | Kathy         | pass    |
+        | name      | Joe           | fail    |
+        | name      | John          | fail    |
+        | name      | O             | fail    |
+        | name      | 1             | fail    |
+        | name      | Ricky         | pass    |
+        | name      |               | fail    |
+        | name      | ~             | fail    |
+        | name      | Lady          | fail    |
+        | name      | §§            | fail    |
+        | name      | ♠♣♥♦♠♣♥♦♠♣♥♦  | pass    |
+
