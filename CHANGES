@@ -4,6 +4,9 @@ This file documents the revision history for the Perl library Validation::Class.
     - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
 
+5.96 (2012-04-07)
+    * misc cleanup, version bump
+
 5.95 (2012-04-07)
     * trialing new style of testing using BDD (no-commitment)
     * fixed V::C::Exporter passing V::C keywords
