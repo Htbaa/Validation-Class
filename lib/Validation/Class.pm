@@ -425,14 +425,16 @@ sub field {
         
         my ($self, $data) = @_;
         
-        $self->params->{$name} = $data
+        my $parameters = $self->get_params_hash;
+        
+        $parameters->{$name} = $data
             
             if defined $data
             && not defined $self->fields->{$name}->{readonly}
         
         ;
         
-        return $self->default_value($name);
+        return $self->default_value($name, $parameters);
         
     };
     

@@ -4,6 +4,12 @@ This file documents the revision history for the Perl library Validation::Class.
     - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
 
+6.00 (2012-04-12)
+    * added POD for the lowercase filter
+    * relocated pre-filtering to include exploded fields
+    * field accessors always grab the collapsed value
+    * improved overall parameter handling with array parameter support
+
 5.98 (2012-04-12)
     * added get_fields to V::C::Engine
     * validate in V::C::Engine restores exploded params
