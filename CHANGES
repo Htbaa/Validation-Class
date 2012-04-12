@@ -4,6 +4,10 @@ This file documents the revision history for the Perl library Validation::Class.
     - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
 
+5.98 (2012-04-12)
+    * added get_fields to V::C::Engine
+    * validate in V::C::Engine restores exploded params
+
 5.96 (2012-04-07)
     * misc cleanup, version bump
 

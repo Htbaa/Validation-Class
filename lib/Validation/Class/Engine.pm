@@ -1527,10 +1527,27 @@ sub get_errors {
 
     my ($self, @fields) = @_;
     
-    # get class-level errors as a list
     return @fields ?
-        (map { @{$self->fields->{$_}->{errors}} } @fields) :
-        (@{$self->{errors}});
+    (map { @{$self->fields->{$_}->{errors}} } @fields) : (@{$self->{errors}});
+
+}
+
+=method get_fields
+
+The get_fields method returns the list of references to the specified fields.
+Returns undef if no arguments are passed. This method is likely to be used more
+internally than externally.
+
+    my ($login, $password) = ($self->get_fields('login', 'password'));
+
+=cut
+
+sub get_fields {
+
+    my ($self, @fields) = @_;
+    
+    # get fields as a list
+    return @fields ? (map { $self->fields->{$_} } @fields) : undef;
 
 }
 
@@ -3115,7 +3132,7 @@ sub validate {
     my %original_parameters = %{$self->params};
 
     # create alias map manually if requested
-    # sorta DEPRECIATED
+    # VERY DEPRECIATED BUT IT REMAINS
     if ( "HASH" eq ref $fields[0] ) {
         
         my $alias_map = $fields[0]; @fields = (); # blank
@@ -3400,7 +3417,9 @@ sub validate {
     my $valid = @{ $self->errors } ? 0 : 1;
     
     # restore sanity
-    $self->params({%original_parameters});
+    $self->params({%original_parameters}); # (todo: remove this)
+    
+    $self->params($self->get_params_hash); # should address explosions
     
     # run post-validation filtering
     $self->apply_filters('post') if $self->filtering && $valid;
