@@ -49,7 +49,7 @@ use warnings;
     
     package main;
     
-    my $eg = MyApp::Example->new; # let go!!!
+    my $eg = MyApp::Example->new; # lets go!!!
 
 =head1 DESCRIPTION
 
@@ -120,6 +120,9 @@ sub apply_spec {
         my $isa  = "$child\::ISA";
         
         push @$isa, 'Validation::Class';
+        
+        *{"$child\::$_"} = *{"Validation\::Class\::$_"}
+            for @Validation::Class::EXPORT;
         
         strict->import;
         warnings->import;

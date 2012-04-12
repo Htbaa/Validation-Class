@@ -339,6 +339,11 @@ passed four ordered parameters, the value of directive, the value of the
 field (parameter value), the field object (hashref), and the instantiated class
 object. The validator MUST return true or false.
 
+Additionally, if you only desire to extend the list of acceptable directives,
+you can create a no-op by simply returning true, e.g.:
+
+    directive 'new_addition' => sub {1};
+
 =cut
 
 sub dir { goto &directive }

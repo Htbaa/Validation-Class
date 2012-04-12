@@ -1,7 +1,13 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 0.00 (0000-00-00)
-    - rewrite tests (using cucumber or in that fashion)
+    - track class() usage and bubble-up errors
+    - rewrite tests (using a simpler abstraction)
+
+5.95 (2012-04-07)
+    * trialing new style of testing using BDD (no-commitment)
+    * fixed V::C::Exporter passing V::C keywords
+    * V::C POD update
 
 5.90 (2012-04-05)
     * allow all array-like directives (e.g. "options") to take an arrayref
