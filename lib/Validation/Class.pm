@@ -425,16 +425,26 @@ sub field {
         
         my ($self, $data) = @_;
         
+        # this method-of-operation can be computationally expensive due to the
+        # fact that each call serializes/de-serializes the params hash ...
+        # ... research a better approach
+        
+        my $fields     = $self->fields;
         my $parameters = $self->get_params_hash;
         
-        $parameters->{$name} = $data
+        my $result = undef;
+        
+        if (defined $data && not defined $fields->{$name}->{readonly}) {
             
-            if defined $data
-            && not defined $self->fields->{$name}->{readonly}
+            $parameters->{$name} = $data;
+            
+        }
         
-        ;
+        $result = $self->default_value($name, $parameters);
+            
+        $self->set_params_hash($parameters);
         
-        return $self->default_value($name, $parameters);
+        return $result;
         
     };
     

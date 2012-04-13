@@ -1,8 +1,12 @@
 This file documents the revision history for the Perl library Validation::Class.
 
-0.00 (0000-00-00)
+TODO (0000-00-00)
     - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
+    - REMOVE ARRAY::UNIQUE YOU TWIT
+
+6.05 (2012-04-13)
+    * fixed major bug for V::C field accessors when setting values
 
 6.00 (2012-04-12)
     * added POD for the lowercase filter
