@@ -2439,6 +2439,8 @@ sub template {
         PLUGINS    => {},
         
         PROFILES   => {},
+        
+        RELATIVES  => {},
     
     }
     

@@ -5,6 +5,15 @@ TODO (0000-00-00)
     - rewrite tests (using a simpler abstraction)
     - REMOVE ARRAY::UNIQUE YOU TWIT
 
+6.55 (2012-05-01)
+    * major implementation overhaul
+    * prevent namespace pollution by placing bulk functionality in prototype class
+    * added proto/prototype method to access prototype class
+    * removed load_classes and load_plugins
+    * changed options accepted by the load/set method
+    * no longer registering quickname for relatives
+    * 
+
 6.05 (2012-04-13)
     * fixed major bug for V::C field accessors when setting values
 
