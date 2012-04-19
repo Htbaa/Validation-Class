@@ -2,6 +2,12 @@ package MyApp::Test;
 
 use Validation::Class;
 
+set {
+    
+    classes => [__PACKAGE__]
+    
+};
+
 # rules mixin
 
 mxn basic       => {

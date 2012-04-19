@@ -55,9 +55,15 @@ ok defined $v->fields->{password}->{required}
 # check attributes
 ok $v->params,  'params attr ok';
 ok $v->fields,  'fields attr ok';
-ok $v->mixins,  'mixins attr ok';
-ok $v->filters, 'filters attr ok';
-ok $v->types,   'types attr ok';
+
+# ok $v->mixins,  'mixins attr ok'; - DEPRECIATED
+ok $v->proto->mixins,  'mixins attr ok';
+
+# ok $v->filters, 'filters attr ok'; - DEPRECIATED
+ok $v->proto->filters, 'filters attr ok';
+
+# ok $v->types,   'types attr ok'; - DEPRECIATED
+ok $v->proto->types,   'types attr ok';
 
 # process field with multiple mixins
 ok defined $v->fields->{something}->{required}

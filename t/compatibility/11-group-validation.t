@@ -56,7 +56,8 @@ ok $v->errors_to_string eq '', 'no error messages found';
 # grouped fields perform like normal fields, now testing validation and
 # extraction routines
 
-my $obj = $v->get_params_hash();
+# my $obj = $v->get_params_hash(); - DEPRECIATED
+my $obj = $v->proto->get_params_hash();
 ok defined $obj->{user}->{login} && $obj->{user}->{login}, 'get_params_hash has user hash with login key';
 ok defined $obj->{user}->{password} && $obj->{user}->{password}, 'get_params_hash has user hash with password key';
 
@@ -113,7 +114,8 @@ ok $v->validate, 'alternate use of validation validates';
 ok $v->error_count == 0, 'error count is zero';
 ok $v->errors_to_string eq '', 'no error messages found';
 
-$obj = $v->get_params_hash();
+# $obj = $v->get_params_hash(); - DEPRECIATED
+$obj = $v->proto->get_params_hash();
 ok defined $obj->{user}->{login} && $obj->{user}->{login}, 'get_params_hash has user hash with login key';
 ok defined $obj->{user}->{password} && $obj->{user}->{password}, 'get_params_hash has user hash with password key';
 

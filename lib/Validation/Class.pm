@@ -12,7 +12,7 @@ use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
 
-use Validation::Class::Engine; # used-as-role, see new()
+use Validation::Class::Prototype;
 
 {
     
@@ -26,21 +26,58 @@ use Validation::Class::Engine; # used-as-role, see new()
             
             no strict 'refs';
             
+            my $proto_class = 'Validation::Class::Prototype';
+            
             my $proto = {
                 package => $TARGET_CLASS,
-                config  => Validation::Class::Engine->template
+                config  => $proto_class->default_configuration
             };
             
             # injected into every derived class
+            
             *{"$TARGET_CLASS\::new"}       = sub { goto \&new };
             *{"$TARGET_CLASS\::proto"}     = sub { goto \&prototype };
             *{"$TARGET_CLASS\::prototype"} = sub { goto \&prototype };
             
-            # inject prototype class aliases
-            # e.g. validate
-            # e.g. validate_profile
+            # inject prototype class aliases unless exist
             
-            bless $proto, 'Validation::Class::Prototype';
+            my @aliases = $proto_class->default_method_aliases;
+            
+            foreach my $alias (@aliases) {
+                
+                # slight-of-hand
+                *{"$TARGET_CLASS\::$alias"} = sub {
+                    
+                    my $self = shift @_;
+                    
+                    my $proto = return_class_proto(ref $self); # isnt recursive
+                    
+                    $proto->$alias(@_);
+                    
+                }   unless $TARGET_CLASS->can($alias);
+                
+            }
+            
+            # inject wrapped prototype class aliases unless exist
+            
+            my @wrapped_aliases = $proto_class->default_method_aliases_wrapped;
+            
+            foreach my $alias (@wrapped_aliases) {
+                
+                # slight-of-hand
+                *{"$TARGET_CLASS\::$alias"} = sub {
+                    
+                    my $self = shift @_;
+                    
+                    my $proto = return_class_proto(ref $self); # isnt recursive
+                    
+                    $proto->$alias($self, @_);
+                    
+                }   unless $TARGET_CLASS->can($alias);
+                
+            }
+            
+            bless $proto, $proto_class;
             
         };
         
@@ -61,6 +98,20 @@ use Validation::Class::Engine; # used-as-role, see new()
         return $proto;
         
     }
+    
+}
+
+sub import {
+    
+    my $caller = caller(0) || caller(1);
+    
+    if ($caller) {
+        
+        return_class_proto $caller # create prototype instance when used
+        
+    }
+    
+    __PACKAGE__->export_to_level(1, @_);
     
 }
 
@@ -469,12 +520,13 @@ sub field {
             
             my ($self, $data) = @_;
             
-            # this method-of-operation can be computationally expensive due to the
-            # fact that each call serializes/de-serializes the params hash ...
+            # this method-of-operation can be computationally expensive due to
+            # the fact that each call serializes/de-serializes the params hash 
             # ... research a better approach
             
-            my $fields     = $self->fields;
-            my $parameters = $self->get_params_hash;
+            my $proto      = $self->proto;
+            my $fields     = $proto->fields;
+            my $parameters = $proto->get_params_hash;
             
             my $result = undef;
             
@@ -484,9 +536,9 @@ sub field {
                 
             }
             
-            $result = $self->default_value($name, $parameters);
+            $result = $proto->default_value($name, $parameters);
                 
-            $self->set_params_hash($parameters);
+            $proto->set_params_hash($parameters);
             
             return $result;
             
@@ -746,6 +798,8 @@ sub load {
                        $file =~ s/::/\//g;
                        $file .= ".pm";
                     
+                    no strict 'refs';
+                    
                     eval "require $role"
                         unless $INC{$file}; # unless already loaded
                     
@@ -767,11 +821,14 @@ sub load {
                             
                         }
                         
-                        $proto->{config} ||= {}; # good measure
+                        my $role_proto = return_class_proto $role;
+                        
+                        $proto->{config}       ||= {}; # good measure
+                        $role_proto->{config}  ||= {}; # good measure
                         
                         # merge configs
                         $proto->{config} =
-                            merge $proto->{config}, $role->{config};
+                            merge $proto->{config}, $role_proto->{config};
                         
                     }
                     
@@ -1029,81 +1086,46 @@ keyword for hooking into the instantiation process.
 
 sub new {
 
-    my ($class) = @_;
+    my $class = shift;
     
-    my $proto = return_class_proto $class;
+    my $proto  = return_class_proto $class;
+    
+    my $config = $proto->{config};
     
     my $self = bless {},  $class;
     
-    return $self;
+    # process parameters
     
-    #my $invocant = shift;
-    #
-    #my $engine = 'Validation/Class/Engine.pm'; # class role, manually
-    #
-    #$engine =~ s/\//::/g;
-    #$engine =~ s/\.pm$//;
-    #
-    #no strict 'refs';
-    #
-    #my @routines = grep {
-    #    
-    #    defined &{"$engine\::$_"} && $_ ne 'has'
-    #
-    #} keys %{"$engine\::"};
-    #
-    ## apply engine as a role
-    #
-    #foreach my $routine (@routines) {
-    #    
-    #    eval { *{"$invocant\::$routine"} = *{"$engine\::$routine"} };
-    #    
-    #}
-    #
-    ## create config
-    #
-    #$invocant->{config} = merge $engine->template, $invocant->{config};
-    #
-    ## start instantiation
-    #
-    #my $self = bless { %{ $invocant } }, ref $invocant || $invocant;
-    #
-    ## process parameters
-    #
-    #my %params = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
-    #
-    #while (my($attr, $value) = each (%params)) {
-    #    
-    #    $self->$attr($value);
-    #    
-    #}
-    #
-    ## process plugins
-    #
-    #foreach my $plugin (keys %{$self->plugins}) {
-    #    
-    #    $plugin->new($self) if $plugin->can('new');
-    #
-    #}
-    #
-    ## process builders
-    #
-    #my $builders = $self->{config}->{BUILDERS};
-    #
-    #if ("ARRAY" eq ref $builders) {
-    #    
-    #    $_->($self) for @{$builders};
-    #    
-    #}
-    #
-    ## initialize object
-    #
-    #$self->normalize;
-    #$self->apply_filters('pre') if $self->filtering;
-    #
-    ## end instantiation
-    #
-    #return $self;
+    my %PARAMS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
+    
+    while (my($attr, $value) = each (%PARAMS)) {
+        
+        $self->$attr($value);
+        
+    }
+    
+    # process plugins
+    
+    foreach my $plugin (keys %{$config->{PLUGINS}}) {
+        
+        $plugin->new($self) if $plugin->can('new');
+        
+    }
+    
+    # process builders
+    
+    foreach my $builder (@{$config->{BUILDERS}}) {
+        
+        $builder->($self);
+        
+    }
+    
+    # initialize prototype
+    
+    $proto->normalize;
+    $proto->apply_filters('pre') if $proto->filtering;
+    
+    return $self;
 
 }
 

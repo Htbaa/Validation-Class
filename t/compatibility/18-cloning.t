@@ -17,9 +17,10 @@ my $v = MyVal->new( params => {
 
 ok $v, 'initialization successful';
 
-   $v->clone('email', 'email3', { label => 'Third Email', required => 0 });
-   $v->clone('email', 'email2');
-   $v->clone('email', 'email1');
+   # $v->clone - DEPRECIATED
+   $v->proto->clone('email', 'email3', { label => 'Third Email', required => 0 });
+   $v->proto->clone('email', 'email2');
+   $v->proto->clone('email', 'email1');
 
 ok $v->fields->{email1}->{required}, 'email1 cloned of email, has req';
 ok 1 == $v->fields->{email1}->{min_length}, 'email1 cloned of email, has min';
