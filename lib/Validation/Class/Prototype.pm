@@ -9,7 +9,6 @@ use warnings;
 # VERSION
 
 use Carp 'confess';
-use Array::Unique; # DELETE THIS SHYTE IMMEDIATELY (SOONISH) ...
 use Hash::Flatten;
 use Hash::Merge 'merge';
 
@@ -1718,7 +1717,7 @@ sub default_configuration {
         
         DIRECTIVES  => {
             
-            '&toggle' => {
+            ':toggle' => {
                 
                 mixin => 0,
                 field => 1,
@@ -2734,7 +2733,7 @@ sub reset_fields {
         
         # set default, special directives, etc
         $self->fields->{$field}->{name} = $field;
-        $self->fields->{$field}->{'&toggle'} = undef;
+        $self->fields->{$field}->{':toggle'} = undef;
         delete $self->fields->{$field}->{value};
         
     }
@@ -2990,9 +2989,9 @@ sub use_validator {
     # check if required
     my $req = $field->{required} ? 1 : 0;
     
-    if (defined $field->{'&toggle'}) {
-        $req = 1 if $field->{'&toggle'} eq '+';
-        $req = 0 if $field->{'&toggle'} eq '-';
+    if (defined $field->{':toggle'}) {
+        $req = 1 if $field->{':toggle'} eq '+';
+        $req = 0 if $field->{':toggle'} eq '-';
     }
     
     if ( $req && ( !defined $value || $value eq '' ) ) {
@@ -3146,7 +3145,7 @@ sub validate {
             
             # set fields toggle directive
             $field =~ s/^[\-\+]{1}//;
-            $self->fields->{$field}->{'&toggle'} = $switch;
+            $self->fields->{$field}->{':toggle'} = $switch;
         }
         
     }
@@ -3541,24 +3540,40 @@ sub _merge_mixin {
                 # if field has existing array value, merge unique
                 if ("ARRAY" eq ref $field->{$key}) {
                     
-                    tie my @values, 'Array::Unique';
+                    my @values = "ARRAY" eq ref $value ? @{$value} : ($value);
                     
-                    push @{$field->{$key}},
-                    "ARRAY" eq ref $value ? @{$value} : $value;
+                    push @values, @{$field->{$key}};
                     
-                    $field->{$key} = [@{$field->{$key}}];
+                    @values = do {
+                        
+                        my %uniq = ();
+                        
+                        $uniq{$_} = $_ for @values;
+                        
+                        values %uniq
+                        
+                    };
+                    
+                    $field->{$key} = [@values];
                     
                 }
                 
                 # merge copy
                 else {
                     
-                    tie my @values, 'Array::Unique';
-                    
-                    @values = "ARRAY" eq ref $value ?
-                    @{$value} : ($value);
+                    my @values = "ARRAY" eq ref $value ? @{$value} : ($value);
                     
                     push @values, $field->{$key} if $field->{$key};
+                    
+                    @values = do {
+                        
+                        my %uniq = ();
+                        
+                        $uniq{$_} = $_ for @values;
+                        
+                        values %uniq
+                        
+                    };
                     
                     $field->{$key} = [@values];
                     
@@ -3598,21 +3613,31 @@ sub _merge_field {
             if ($self->types->{field}->{$key}->{multi}) {
                 
                 # if field has existing array value, merge unique
-                if ("ARRAY" eq ref $field->{key}) {
+                if ("ARRAY" eq ref $field->{$key}) {
                     
-                    tie my @values, 'Array::Unique';
+                    my @values = "ARRAY" eq ref $value ? @{$value} : ($value);
                     
-                    push @{$field->{$key}},
-                    "ARRAY" eq ref $value ? @{$value} : $value;
+                    push @values, @{$field->{$key}};
                     
-                    $field->{$key} = [@{$field->{$key}}];
+                    @values = do {
+                        
+                        my %uniq = ();
+                        
+                        $uniq{$_} = $_ for @values;
+                        
+                        values %uniq
+                        
+                        
+                    };
+                    
+                    $field->{$key} = [@values];
+                    
                 }
                 
                 # simple copy
                 else {
                     
-                    $field->{$key} =
-                    "ARRAY" eq ref $value ? [@{$value}] : $value;
+                    $field->{$key} = "ARRAY" eq ref $value ? $value : [$value];
                     
                 }
                 

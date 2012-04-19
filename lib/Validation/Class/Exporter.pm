@@ -18,7 +18,7 @@ use warnings;
     
     Validation::Class::Exporter->apply_spec(
         routines => ['thing'], # export routines as is
-        settings => [ base => __PACKAGE__ ] # passed to Validation::Class::load()
+        settings => [ ... ] # passed to the "load" method, see Validation::Class
     );
     
     has foo => 0;
@@ -49,7 +49,7 @@ use warnings;
     
     package main;
     
-    my $eg = MyApp::Example->new; # lets go!!!
+    my $eg = MyApp::Example->new; # we have lift-off!!!
 
 =head1 DESCRIPTION
 
@@ -100,6 +100,7 @@ sub apply_spec {
     
     no strict 'refs';
     no warnings 'once';
+    no warnings 'redefine';
     
     my $parent = caller(0);
     
@@ -117,9 +118,9 @@ sub apply_spec {
         
         *{"$child\::$_"} = *{"$parent\::$_"} for @routines;
         
-        my $isa  = "$child\::ISA";
+        my $ISA  = "$child\::ISA";
         
-        push @$isa, 'Validation::Class';
+        push @$ISA, 'Validation::Class';
         
         *{"$child\::$_"} = *{"Validation\::Class\::$_"}
             for @Validation::Class::EXPORT;

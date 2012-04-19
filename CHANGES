@@ -3,16 +3,18 @@ This file documents the revision history for the Perl library Validation::Class.
 TODO (0000-00-00)
     - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
-    - REMOVE ARRAY::UNIQUE YOU TWIT
+    - cleanup error handling (needs its own class)
+    - merge half-ass cookbook into POD
 
-6.55 (2012-05-01)
+6.20_01 (2012-04-20)
     * major implementation overhaul
-    * prevent namespace pollution by placing bulk functionality in prototype class
+    * prevent namespace pollution by employing a prototype class
     * added proto/prototype method to access prototype class
     * removed load_classes and load_plugins
     * changed options accepted by the load/set method
     * no longer registering quickname for relatives
-    * 
+    * depreciated load_plugins and load_classes methods
+    * removed Array::Unique finally
 
 6.05 (2012-04-13)
     * fixed major bug for V::C field accessors when setting values

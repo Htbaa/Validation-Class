@@ -20,7 +20,7 @@ use Validation::Class::Prototype;
     
     sub return_class_proto {
         
-        my $TARGET_CLASS = $_[0] ||= caller(2);
+        my $TARGET_CLASS = shift || caller(2);
         
         return $CLASSES{$TARGET_CLASS} ||= do {
             
@@ -119,10 +119,8 @@ our @ISA    = qw(Exporter);
 our @EXPORT = qw(
 
     attribute
-
     bld
     build
-    
     dir
     directive
     fld
@@ -130,19 +128,13 @@ our @EXPORT = qw(
     flt
     filter
     has
-    
     load
-    load_classes
-    load_plugins
-    
     mth
     method
     mxn
     mixin
-    
     pro
     profile
-    
     set
 
 );
@@ -698,7 +690,7 @@ sub load {
     
     return configure_class_proto sub {
         
-        my $proto = $self ||= $_[0];
+        my $proto = $self ? $self->proto : $_[0];
         
         my $name = $proto->{package};
         
