@@ -1,18 +1,20 @@
-# ABSTRACT: Data Validation Schema for Validation::Class
+# ABSTRACT: Data Validation Engine for Validation::Class Classes
 
 package Validation::Class::Prototype;
 
-use 5.008001;
 use strict;
 use warnings;
 
 # VERSION
 
+use base 'Validation::Class::Backwards'; # we're pro-life
+
 use Carp 'confess';
 use Hash::Flatten;
 use Hash::Merge 'merge';
 
-use Validation::Class::Base ('has');
+use Validation::Class::Error;
+use Validation::Class::Base 'has';
 
 =head1 SYNOPSIS
 
@@ -693,7 +695,7 @@ The errors attribute returns an arrayref of all errors set.
 
 =cut
 
-has 'errors' => sub {[  ]};
+has 'errors' => sub { Validation::Class::Error->new };
 
 =attribute fields
 
@@ -705,7 +707,7 @@ with their parameter counterparts.
 
 =cut
 
-has 'fields' => sub { shift->{config}->{FIELDS} || {} };
+has 'fields' => sub {{}};
 
 =attribute filtering
 
@@ -733,7 +735,7 @@ The filters attribute returns a hashref of pre-defined filter definitions.
 
 =cut
 
-has 'filters' => sub { shift->{config}->{FILTERS} || {} };
+has 'filters' => sub {{}};
 
 =attribute hash_inflator
 
@@ -815,7 +817,7 @@ The methods attribute returns a hashref of self-validating method definitions.
 
 =cut
 
-has 'methods' => sub { shift->{config}->{METHODS} || {} };
+has 'methods' => sub {{}};
 
 =attribute mixins
 
@@ -826,7 +828,7 @@ The mixins attribute returns a hashref of defined validation templates.
 
 =cut
 
-has 'mixins' => sub { shift->{config}->{MIXINS} || {} };
+has 'mixins' => sub {{}};
 
 =attribute params
 
@@ -838,7 +840,7 @@ MUST be a hashref but can be flat or complex.
 
 =cut
 
-has 'params' => sub {{  }};
+has 'params' => sub {{}};
 
 =attribute plugins
 
@@ -860,7 +862,7 @@ The profiles attribute returns a hashref of validation profiles.
 
 =cut
 
-has 'profiles' => sub { shift->{config}->{PROFILES} || {} };
+has 'profiles' => sub {{}};
 
 =attribute queued
 
@@ -874,7 +876,7 @@ method.
 
 =cut
 
-has 'queued' => sub { [] };
+has 'queued' => sub {[]};
 
 =attribute relatives
 
@@ -887,7 +889,7 @@ loaded child classes.
 =cut
 
 # class relatives (child-classes) store
-has 'relatives' => sub { shift->{config}->{RELATIVES} || {} };
+has 'relatives' => sub {{}};
 
 =attribute report_failure
 
@@ -902,7 +904,7 @@ specifying the method which failed in addition to the existing messages.
 =cut
 
 # switch: report method requirement failures
-has 'report_failure' => '0';
+has 'report_failure' => 0;
 
 =attribute report_unknown
 
@@ -917,10 +919,10 @@ unknown fields will NOT be registered as class-level variables.
 =cut
 
 # switch: report unknown input parameters
-has 'report_unknown' => '0';
+has 'report_unknown' => 0;
 
 # stash object storage
-has 'stashed' => sub {{  }};
+has 'stashed' => sub {{}};
 
 # hash of directives by type
 has 'types' => sub {
@@ -1213,11 +1215,400 @@ sub clone {
     
     my ($self, $field_name, $new_field_name, $directives) = @_;
     
+    $directives ||= {};
+    
+    $directives->{name} = $new_field_name unless $directives->{name};
+    
     # build a new field from an existing one during runtime
-    $self->fields->{$new_field_name} = $directives || {};
+    $self->fields->{$new_field_name} =
+        Validation::Class::Field->new($directives);
+    
     $self->use_mixin_field( $field_name, $new_field_name );
     
     return $self;
+    
+}
+
+sub configuration {
+    
+    return {
+        
+        ATTRIBUTES  => {},
+        
+        BUILDERS    => [],
+        
+        DIRECTIVES  => {
+            
+            ':toggle' => {
+                
+                mixin => 0,
+                field => 1,
+                multi => 0
+                
+            },
+            
+            alias => {
+                
+                mixin => 0,
+                field => 1,
+                multi => 1
+                
+            },
+            
+            between => {
+                
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+                
+                validator => \&configuration_validator_between
+                
+            },
+            
+            default => {
+                
+                mixin => 1,
+                field => 1,
+                multi => 1
+                
+            },
+            
+            depends_on => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 1,
+            
+                validator => \&configuration_validator_depends_on
+            
+            },
+            
+            error => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            errors => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            filters => {
+            
+                mixin => 1,
+                field => 1,
+                multi => 1
+            
+            },
+            
+            filtering => {
+            
+                mixin => 1,
+                field => 1,
+                multi => 1
+            
+            },
+            
+            label => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+           
+            },
+           
+            length => {
+           
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+           
+                validator => \&configuration_validator_length
+           
+            },
+           
+            matches => {
+           
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+           
+                validator => \&configuration_validator_matches
+           
+            },
+           
+            max_alpha => {
+                
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+                
+                validator => \&configuration_validator_max_alpha
+            
+            },
+            
+            max_digits => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_max_digits
+            
+            },
+            
+            max_length => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_max_length
+            
+            },
+            
+            max_sum => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_max_sum
+            
+            },
+            
+            max_symbols => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_max_symbols
+            
+            },
+            
+            min_alpha => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_min_alpha
+            
+            },
+            
+            min_digits => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_min_digits
+            
+            },
+            
+            min_length => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_min_length
+            
+            },
+            
+            min_sum => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_min_sum
+            
+            },
+            
+            min_symbols => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_min_symbols
+            
+            },
+            
+            mixin => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 1
+            
+            },
+            
+            mixin_field => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            name => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            options => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_options
+            
+            },
+            
+            pattern => {
+            
+                mixin     => 1,
+                field     => 1,
+                multi     => 0,
+            
+                validator => \&configuration_validator_pattern
+            
+            },
+            
+            readonly => {
+                
+                mixin => 0,
+                field => 1,
+                multi => 0
+                
+            },
+            
+            required => {
+            
+                mixin => 1,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            validation => {
+            
+                mixin => 0,
+                field => 1,
+                multi => 0
+            
+            },
+            
+            value => {
+            
+                mixin => 1,
+                field => 1,
+                multi => 1
+            
+            }
+        
+        },
+        
+        FIELDS     => {},
+        
+        FILTERS    => {
+        
+            alpha => sub {
+        
+                $_[0] =~ s/[^A-Za-z]//g;
+                $_[0];
+        
+            },
+        
+            alphanumeric => sub {
+        
+                $_[0] =~ s/[^A-Za-z0-9]//g;
+                $_[0];
+        
+            },
+        
+            capitalize => sub {
+        
+                $_[0] = ucfirst $_[0];
+                $_[0] =~ s/\.\s+([a-z])/\. \U$1/g;
+                $_[0];
+        
+            },
+        
+            decimal => sub {
+        
+                $_[0] =~ s/[^0-9\.\,]//g;
+                $_[0];
+        
+            },
+        
+            lowercase => sub {
+        
+                lc $_[0];
+        
+            },
+        
+            numeric => sub {
+        
+                $_[0] =~ s/\D//g;
+                $_[0];
+        
+            },
+        
+            strip => sub {
+        
+                $_[0] =~ s/\s+/ /g;
+                $_[0] =~ s/^\s+//;
+                $_[0] =~ s/\s+$//;
+                $_[0];
+        
+            },
+        
+            titlecase => sub {
+        
+                join( " ", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
+        
+            },
+        
+            trim => sub {
+        
+                $_[0] =~ s/^\s+//g;
+                $_[0] =~ s/\s+$//g;
+                $_[0];
+        
+            },
+        
+            uppercase => sub {
+        
+                uc $_[0];
+        
+            }
+        
+        },
+        
+        METHODS    => {},
+        
+        MIXINS     => {},
+        
+        PLUGINS    => {},
+        
+        PROFILES   => {},
+        
+        RELATIVES  => {},
+    
+    }
     
 }
 
@@ -1707,431 +2098,6 @@ sub copy_errors {
     
 }
 
-sub default_configuration {
-    
-    return {
-        
-        ATTRIBUTES  => {},
-        
-        BUILDERS    => [],
-        
-        DIRECTIVES  => {
-            
-            ':toggle' => {
-                
-                mixin => 0,
-                field => 1,
-                multi => 0
-                
-            },
-            
-            alias => {
-                
-                mixin => 0,
-                field => 1,
-                multi => 1
-                
-            },
-            
-            between => {
-                
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-                
-                validator => \&configuration_validator_between
-                
-            },
-            
-            default => {
-                
-                mixin => 1,
-                field => 1,
-                multi => 1
-                
-            },
-            
-            depends_on => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 1,
-            
-                validator => \&configuration_validator_depends_on
-            
-            },
-            
-            error => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            errors => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            filters => {
-            
-                mixin => 1,
-                field => 1,
-                multi => 1
-            
-            },
-            
-            filtering => {
-            
-                mixin => 1,
-                field => 1,
-                multi => 1
-            
-            },
-            
-            label => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-           
-            },
-           
-            length => {
-           
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-           
-                validator => \&configuration_validator_length
-           
-            },
-           
-            matches => {
-           
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-           
-                validator => \&configuration_validator_matches
-           
-            },
-           
-            max_alpha => {
-                
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-                
-                validator => \&configuration_validator_max_alpha
-            
-            },
-            
-            max_digits => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_max_digits
-            
-            },
-            
-            max_length => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_max_length
-            
-            },
-            
-            max_sum => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_max_sum
-            
-            },
-            
-            max_symbols => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_max_symbols
-            
-            },
-            
-            min_alpha => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_min_alpha
-            
-            },
-            
-            min_digits => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_min_digits
-            
-            },
-            
-            min_length => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_min_length
-            
-            },
-            
-            min_sum => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_min_sum
-            
-            },
-            
-            min_symbols => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_min_symbols
-            
-            },
-            
-            mixin => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 1
-            
-            },
-            
-            mixin_field => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            name => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            options => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_options
-            
-            },
-            
-            pattern => {
-            
-                mixin     => 1,
-                field     => 1,
-                multi     => 0,
-            
-                validator => \&configuration_validator_pattern
-            
-            },
-            
-            readonly => {
-                
-                mixin => 0,
-                field => 1,
-                multi => 0
-                
-            },
-            
-            required => {
-            
-                mixin => 1,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            validation => {
-            
-                mixin => 0,
-                field => 1,
-                multi => 0
-            
-            },
-            
-            value => {
-            
-                mixin => 1,
-                field => 1,
-                multi => 1
-            
-            }
-        
-        },
-        
-        FIELDS     => {},
-        
-        FILTERS    => {
-        
-            alpha => sub {
-        
-                $_[0] =~ s/[^A-Za-z]//g;
-                $_[0];
-        
-            },
-        
-            alphanumeric => sub {
-        
-                $_[0] =~ s/[^A-Za-z0-9]//g;
-                $_[0];
-        
-            },
-        
-            capitalize => sub {
-        
-                $_[0] = ucfirst $_[0];
-                $_[0] =~ s/\.\s+([a-z])/\. \U$1/g;
-                $_[0];
-        
-            },
-        
-            decimal => sub {
-        
-                $_[0] =~ s/[^0-9\.\,]//g;
-                $_[0];
-        
-            },
-        
-            lowercase => sub {
-        
-                lc $_[0];
-        
-            },
-        
-            numeric => sub {
-        
-                $_[0] =~ s/\D//g;
-                $_[0];
-        
-            },
-        
-            strip => sub {
-        
-                $_[0] =~ s/\s+/ /g;
-                $_[0] =~ s/^\s+//;
-                $_[0] =~ s/\s+$//;
-                $_[0];
-        
-            },
-        
-            titlecase => sub {
-        
-                join( " ", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
-        
-            },
-        
-            trim => sub {
-        
-                $_[0] =~ s/^\s+//g;
-                $_[0] =~ s/\s+$//g;
-                $_[0];
-        
-            },
-        
-            uppercase => sub {
-        
-                uc $_[0];
-        
-            }
-        
-        },
-        
-        METHODS    => {},
-        
-        MIXINS     => {},
-        
-        PLUGINS    => {},
-        
-        PROFILES   => {},
-        
-        RELATIVES  => {},
-    
-    }
-    
-}
-
-sub default_method_aliases {
-    
-    return qw{
-        
-        class
-        clear_queue
-        copy_errors
-        error
-        error_count
-        error_fields
-        errors
-        errors_to_string
-        get_errors
-        fields
-        filtering
-        ignore_failure
-        ignore_unknown
-        param
-        params
-        queue
-        report_failure
-        report_unknown
-        reset_errors
-        set_errors
-        stash
-        
-    }
-    
-}
-
-sub default_method_aliases_wrapped {
-    
-    return qw{
-        
-        set_method
-        validate
-        validate_profile
-        
-    }
-    
-}
-
 =method default_value
 
 The default_value method returns the absolute value (hardcoded, default or
@@ -2181,164 +2147,46 @@ sub default_value {
     
 }
 
-=method error
-
-The error method is used to set and/or retrieve errors encountered during
-validation. The error method with no parameters returns the error message object
-which is an arrayref of error messages stored at class-level. 
-
-    # set errors at the class-level
-    return $self->error('this isnt cool', 'unknown somethingorother');
+sub export_methods {
     
-    # set an error at the field-level, using the field ref (not field name)
-    $self->error($field_object, "i am your error message");
-
-    # return all errors encountered/set as an arrayref
-    my $all_errors = $self->error();
-    
-    # return all error for a specific field, ... see the get_errors() method
-    my @errors = $self->get_errors('field_name');
-
-=cut
-
-sub error {
-    
-    my ( $self, @args ) = @_;
-
-    # set an error message on a particular field
-    if ( @args == 2 ) {
-
-        # set error message
-        my ( $field, $error ) = @args;
+    return qw{
         
-        # field must be a reference (hashref) to a field object
-        if ( ref($field) eq "HASH" && ( !ref($error) && $error ) ) {
-
-            # temporary, may break stuff
-            $error = $field->{error} if defined $field->{error};
-
-            # add error to field-level errors
-            push @{$field->{errors}}, $error unless
-                grep { $_ eq $error } @{$field->{errors}};
-            
-            # add error to class-level errors    
-            push @{$self->errors}, $error unless
-                grep { $_ eq $error } @{$self->errors};
-        }
-        else {
-            
-            confess "Can't set error without proper field and error "
-              . "message data, field must be a hashref with name "
-              . "and value keys";
-            
-        }
-    
-    }
-    
-    # retrieve an error message on a particular field
-    if ( @args == 1 ) {
-
-        #if ($self->fields->{$args[0]}) {
-        
-            # return param-specific errors
-            #return $self->fields->{$args[0]}->{errors};
-        
-        #}
-        #else {
-            
-            # add error to class-level errors    
-            return push @{$self->errors}, $args[0] unless
-                grep { $_ eq $args[0] } @{$self->errors};
-            
-        #}
+        class
+        clear_queue
+        copy_errors
+        error
+        error_count
+        error_fields
+        errors
+        errors_to_string
+        get_errors
+        fields
+        filtering
+        ignore_failure
+        ignore_unknown
+        param
+        params
+        queue
+        report_failure
+        report_unknown
+        reset_errors
+        set_errors
+        stash
         
     }
-    
-    # return all class-level error messages
-    return $self->errors;
     
 }
 
-=method error_count
-
-The error_count method returns the total number of error encountered from the 
-last validation call.
-
-    return $self->error_count();
+sub export_methods_wrapped {
     
-    unless ($self->validate) {
-        print "Found ". $self->error_count ." Errors";
-    }
-
-=cut
-
-sub error_count {
-    
-    return scalar(@{shift->errors});
-    
-}
-
-=method error_fields
-
-The error_fields method returns a hashref of fields whose value is an arrayref
-of error messages.
-
-    unless ($self->validate) {
-        my $bad_fields = $self->error_fields();
-    }
-    
-    my $bad_fields = $self->error_fields('login', 'password');
-
-=cut
-
-sub error_fields {
-    
-    my ($self, @fields) = @_;
-    
-    my $error_fields = {};
-    
-    @fields = keys %{$self->fields} unless @fields;
-    
-    foreach my $name (@fields) {
+    return qw{
         
-        my $field = $self->fields->{$name};
-        
-        if (@{$field->{errors}}) {
-            
-            $error_fields->{$name} = $field->{errors};
-        
-        }
+        set_method
+        validate
+        validate_profile
         
     }
     
-    return $error_fields;
-
-}
-
-=method errors_to_string
-
-The errors_to_string method stringifies the error arrayref object using the
-specified delimiter or ', ' by default. 
-
-    return $self->errors_to_string("<br/>\n");
-    return $self->errors_to_string("<br/>\n", sub{ uc shift });
-    
-    unless ($self->validate) {
-        return $self->errors_to_string;
-    }
-
-=cut
-
-sub errors_to_string {
-    
-    my ($self, $delimiter, $transformer) = @_;
-    
-    $delimiter ||= ', '; # default delimiter is a comma
-    
-    return join $delimiter, @{$self->errors} unless "CODE" eq ref $transformer;
-    
-    return join $delimiter, map { $transformer->($_) } @{$self->errors};
-
 }
 
 =method get_classes
@@ -2383,8 +2231,36 @@ sub get_errors {
 
     my ($self, @fields) = @_;
     
-    return @fields ?
-    (map { @{$self->fields->{$_}->{errors}} } @fields) : (@{$self->{errors}});
+    if (@fields) {
+        
+        return map {
+            
+            ( $self->fields->{$_}->{errors}->all_errors )
+            
+        }   @fields
+        
+    }
+    
+    return ( $self->errors->all_errors );
+
+}
+
+=method get_field
+
+The get_field method returns a single reference to the specified field.
+Returns undef if no arguments are passed. 
+
+    my $login = $self->get_field('login');
+
+=cut
+
+sub get_field {
+
+    my ($self, $field) = @_;
+    
+    ($field) = $self->get_fields($field);
+    
+    return $field;
 
 }
 
@@ -2704,11 +2580,13 @@ method is triggered.
 sub reset_errors {
 
     my $self = shift;
-       
-       $self->errors([]);
+    
+    $self->errors->clear_errors;
     
     foreach my $field (values %{$self->fields}) {
-        $field->{errors} = [];
+        
+        $field->{errors}->clear_errors;
+        
     }
     
     return $self;
@@ -2758,7 +2636,7 @@ sub set_errors {
     my ($self, @errors) = @_;
     
     # set class-level errors from list
-    return push @{$self->{errors}}, @errors if @errors;
+    return $self->errors->add_errors(@errors) if @errors;
 
 }
 
@@ -3221,7 +3099,7 @@ sub validate {
                 my $label = ($field->{label} || $field->{name});
                 
                 $self->clone($name, "$name:$i", {
-                    label => $label . " #" . ($i+1)
+                    label  => $label . " #" . ($i+1)
                 }); 
                 
                 push @fields, "$name:$i" # black hackery

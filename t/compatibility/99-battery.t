@@ -132,7 +132,7 @@ my $params = {
     email        => 'awncorp2cpan.org'
 };
 
-$v = MyVal->new( params => $params );
+$v = MyVal->new( params => $params, fields => $v->fields );
 
 # params set at new function
 ok scalar( keys %{ $v->params } ), 'params have been set at instantiation';
@@ -159,6 +159,8 @@ $v->fields->{'password_cfm'} = {
 	return $this->{value} eq $params->{password} ? 1 : 0;
     }
 };
+
+$v = MyVal->new( params => $v->params, fields => $v->fields );
 
 ok $v->validate('password'), 'password field validates';
 ok $v->validate( 'password', 'password_cfm' ),

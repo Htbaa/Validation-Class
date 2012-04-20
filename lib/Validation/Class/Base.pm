@@ -6,7 +6,7 @@ use warnings;
 # VERSION
 
 use Exporter ();
-use Carp ('confess');
+use Carp 'confess';
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
@@ -67,6 +67,15 @@ sub has {
         *{"$class\::$attr"} = $code;
         
     }
+    
+}
+
+sub import {
+    
+    strict->import;
+    warnings->import;
+    
+    __PACKAGE__->export_to_level(1, @_);
     
 }
 

@@ -120,7 +120,8 @@ sub apply_spec {
         
         my $ISA  = "$child\::ISA";
         
-        push @$ISA, 'Validation::Class';
+        push @$ISA, 'Validation::Class'
+            unless grep { $_ eq 'Validation::Class' } @$ISA;
         
         *{"$child\::$_"} = *{"Validation\::Class\::$_"}
             for @Validation::Class::EXPORT;

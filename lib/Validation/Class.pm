@@ -1,4 +1,4 @@
-# ABSTRACT: Low-Fat Full-Flavored Data Modeling and Validation Framework
+# ABSTRACT: Robust Data Modeling and Validation Framework
 
 package Validation::Class;
 
@@ -12,6 +12,9 @@ use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
 
+use Validation::Class::Error;
+use Validation::Class::Field;
+use Validation::Class::Fields;
 use Validation::Class::Prototype;
 
 {
@@ -30,7 +33,7 @@ use Validation::Class::Prototype;
             
             my $proto = {
                 package => $TARGET_CLASS,
-                config  => $proto_class->default_configuration
+                config  => {}
             };
             
             # injected into every derived class
@@ -41,7 +44,7 @@ use Validation::Class::Prototype;
             
             # inject prototype class aliases unless exist
             
-            my @aliases = $proto_class->default_method_aliases;
+            my @aliases = $proto_class->export_methods;
             
             foreach my $alias (@aliases) {
                 
@@ -60,7 +63,7 @@ use Validation::Class::Prototype;
             
             # inject wrapped prototype class aliases unless exist
             
-            my @wrapped_aliases = $proto_class->default_method_aliases_wrapped;
+            my @wrapped_aliases = $proto_class->export_methods_wrapped;
             
             foreach my $alias (@wrapped_aliases) {
                 
@@ -77,7 +80,11 @@ use Validation::Class::Prototype;
                 
             }
             
-            bless $proto, $proto_class;
+            my $self = bless $proto, $proto_class;
+            
+            $self->{config} = merge $proto_class->configuration, $self->{config};
+            
+            $self; # return-once
             
         };
         
@@ -110,6 +117,9 @@ sub import {
         return_class_proto $caller # create prototype instance when used
         
     }
+    
+    strict->import;
+    warnings->import;
     
     __PACKAGE__->export_to_level(1, @_);
     
@@ -496,15 +506,17 @@ sub field {
         my ($proto) = @_;
     
         $proto->{config}->{FIELDS} ||= {};
-    
+        
         confess "Error creating accessor $name on $proto->{package}, ".
             "attribute collision" if exists $proto->{config}->{FIELDS}->{$name};
             
         confess "Error creating accessor $name on $proto->{package}, ".
             "method collision" if $proto->{package}->can($name);
         
-        $proto->{config}->{FIELDS}->{$name} = $data;
-        $proto->{config}->{FIELDS}->{$name}->{errors} = []; # req default
+        $data->{name} = $name;
+        
+        my $field = $proto->{config}->{FIELDS}->{$name}
+            = Validation::Class::Field->new($data);
         
         no strict 'refs';
         
@@ -960,7 +972,7 @@ sub method {
                         
                         unless ($validator->(@args)) {
                         
-                            unshift @{$self->{errors}}, $error
+                            unshift @{$self->errors}, $error
                                 if $self->report_failure;
                             
                             confess $error. " input, ". $self->errors_to_string
@@ -1086,6 +1098,12 @@ sub new {
     
     my $self = bless {},  $class;
     
+    # clone config
+    
+    my @clonables = qw(fields filters methods mixins profiles relatives) ;
+    
+    $proto->{$_} = merge $proto->{config}->{uc $_}, $proto->{$_} for @clonables;
+    
     # process parameters
     
     my %PARAMS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
@@ -1109,6 +1127,20 @@ sub new {
     foreach my $builder (@{$config->{BUILDERS}}) {
         
         $builder->($self);
+        
+    }
+    
+    # bless specific structures
+    
+    $proto->fields(Validation::Class::Fields->new($proto->fields));
+    
+    while (my($name, $config) = each(%{$proto->fields})) {
+        
+        $config->{name} = $name
+            unless defined $config->{name};
+        
+        $config = Validation::Class::Field->new($config)
+            unless "Validation::Class::Field" eq ref $config;
         
     }
     
@@ -1207,6 +1239,18 @@ sub prototype {
     my ($self) = @_;
     
     return_class_proto ref $self;
+    
+}
+
+# hack, if you know about it, you know about it
+# ... if you dont ... o.O
+sub setup {
+    
+    my $class = pop @_;
+    
+    return undef unless $class;
+    
+    return_class_proto $class; 
     
 }
 
