@@ -47,14 +47,22 @@ sub new {
 =method add
 
     $self = $self->add(foo => Foo->new);
+    
+    $self->add(foo => Foo->new, bar => Bar->new);
 
 =cut
 
 sub add {
     
-    my ($self, $key, $object) = @_;
+    my $self = shift;
     
-    $self->{$key} = $object;
+    my %arguments = @_ % 2 ? %{$_[0]} : @_;
+    
+    while (my($key, $object) = each %arguments) {
+    
+        $self->{$key} = $object;
+    
+    }
     
     return $self;
     
@@ -90,7 +98,7 @@ sub count {
 
 =method each
 
-    my $self = $self->each(sub{
+    $self = $self->each(sub{
         
         my ($name, $object) = @_;
         ...
@@ -133,6 +141,18 @@ sub find {
         for grep { $_ =~ $pattern } keys %{$self};
     
     return { %matches };
+    
+}
+
+=method hash
+
+    my $hash = $self->hash; 
+
+=cut
+
+sub hash {
+    
+    return {%{$_[0]}};
     
 }
 

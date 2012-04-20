@@ -12,9 +12,10 @@ use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
 
-use Validation::Class::Error;
+use Validation::Class::Errors;
 use Validation::Class::Field;
 use Validation::Class::Fields;
+use Validation::Class::Params;
 use Validation::Class::Prototype;
 
 {
@@ -44,7 +45,7 @@ use Validation::Class::Prototype;
             
             # inject prototype class aliases unless exist
             
-            my @aliases = $proto_class->export_methods;
+            my @aliases = $proto_class->proxy_methods;
             
             foreach my $alias (@aliases) {
                 
@@ -63,7 +64,7 @@ use Validation::Class::Prototype;
             
             # inject wrapped prototype class aliases unless exist
             
-            my @wrapped_aliases = $proto_class->export_methods_wrapped;
+            my @wrapped_aliases = $proto_class->proxy_methods_wrapped;
             
             foreach my $alias (@wrapped_aliases) {
                 
@@ -540,7 +541,7 @@ sub field {
                 
             }
             
-            $result = $proto->default_value($name, $parameters);
+            $result = $proto->field_default_value($name, $parameters);
                 
             $proto->set_params_hash($parameters);
             
@@ -1104,11 +1105,11 @@ sub new {
     
     $proto->{$_} = merge $proto->{config}->{uc $_}, $proto->{$_} for @clonables;
     
-    # process parameters
+    # process arguments
     
-    my %PARAMS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
+    my %ARGS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
     
-    while (my($attr, $value) = each (%PARAMS)) {
+    while (my($attr, $value) = each (%ARGS)) {
         
         $self->$attr($value);
         
@@ -1130,11 +1131,14 @@ sub new {
         
     }
     
-    # bless specific structures
+    # process special structures
     
+    $proto->params(Validation::Class::Params->new($proto->params));
     $proto->fields(Validation::Class::Fields->new($proto->fields));
     
-    while (my($name, $config) = each(%{$proto->fields})) {
+    $proto->fields->each(sub{
+        
+        my ($name, $config) = @_;
         
         $config->{name} = $name
             unless defined $config->{name};
@@ -1142,7 +1146,7 @@ sub new {
         $config = Validation::Class::Field->new($config)
             unless "Validation::Class::Field" eq ref $config;
         
-    }
+    });
     
     # initialize prototype
     

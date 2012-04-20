@@ -54,7 +54,7 @@ which is an arrayref of error messages stored at class-level.
 
 RECOMMENDED:
 
-    # see Validation::Class::Error
+    # see Validation::Class::Errors
     
     # set errors at the class-level
     return $self->errors->add_errors(...);

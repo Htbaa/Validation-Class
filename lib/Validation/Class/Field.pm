@@ -60,11 +60,11 @@ as listed under L<Validation::Class::Prototype/DIRECTIVES>.
 
 =attribute errors
 
-The errors attribute is a L<Validation::Class::Error> object.
+The errors attribute is a L<Validation::Class::Errors> object.
 
 =cut
 
-has 'errors' => sub { Validation::Class::Error->new };
+has 'errors' => sub { Validation::Class::Errors->new };
 
 =method new
 

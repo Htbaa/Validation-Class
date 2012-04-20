@@ -22,6 +22,4 @@ parameters and is derrived from the L<Validation::Class::Collection> class.
 
 =cut
 
-
-
 1;

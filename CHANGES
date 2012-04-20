@@ -1,7 +1,7 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
-    - track class() usage and bubble-up errors
+    - track class() usage and bubble-up errors via transactions
     - rewrite tests (using a simpler abstraction)
     - cleanup error handling (needs its own class)
     - merge half-ass cookbook into POD
