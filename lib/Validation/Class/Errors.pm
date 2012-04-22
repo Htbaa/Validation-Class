@@ -7,9 +7,6 @@ use warnings;
 
 # VERSION
 
-use Carp 'confess';
-use Validation::Class::Base 'has';
-
 =head1 SYNOPSIS
 
     package SomeClass;
@@ -55,27 +52,19 @@ sub new {
     
     my $self = bless [], $class;
     
-    $self->add_error($_) for @arguments;
+    $self->add($_) for @arguments;
     
     return $self;
     
 }
 
-=method add_error
+=method add
 
-    $self = $self->add_error("houston, we have a problem", "this isn't cool");
-
-=cut
-
-sub add_error { goto &add_errors }
-
-=method add_errors
-
-    $self = $self->add_errors("houston, we have a problem", "this isn't cool");
+    $self = $self->add("houston, we have a problem", "this isn't cool");
 
 =cut
 
-sub add_errors {
+sub add {
     
     my ($self, @error_messages) = @_;
     
@@ -89,53 +78,53 @@ sub add_errors {
     
 }
 
-=method all_errors
+=method all
 
-    my @list = $self->all_errors;
+    my @list = $self->all;
 
 =cut
 
-sub all_errors {
+sub all {
     
     return (@{$_[0]});
     
 }
 
-=method clear_errors
+=method clear
 
-    $self = $self->clear_errors; 
+    $self = $self->clear; 
 
 =cut
 
-sub clear_errors {
+sub clear {
     
     my ($self) = @_;
     
-    delete $self->[$_] for (0..($self->count_errors - 1)) ;
+    delete $self->[($_ - 1)] for (1..$self->count) ;
     
     return $self;
     
 }
 
-=method count_errors
+=method count
 
-    my $count = $self->count_errors; 
+    my $count = $self->count; 
 
 =cut
 
-sub count_errors {
+sub count {
     
     return scalar(@{$_[0]});
     
 }
 
-=method each_error
+=method each
 
-    my $list = $self->each_error(sub{ ucfirst lc shift });
+    my $list = $self->each(sub{ ucfirst lc shift });
 
 =cut
 
-sub each_error {
+sub each {
     
     my ($self, $transformer) = @_;
     
@@ -149,108 +138,66 @@ sub each_error {
     
 }
 
-=method error_list
+=method list
 
-    my $list = $self->error_list;
+    my $list = $self->list;
 
 =cut
 
-sub error_list {
+sub list {
     
     return [@{$_[0]}];
     
 }
 
-=method find_errors
+=method find
 
-    my @matches = $self->find_errors(qr/password/);
+    my @matches = $self->find(qr/password/);
 
 =cut
 
-sub find_errors {
+sub find {
     
     my ($self, $pattern) = @_;
     
     return undef unless "REGEXP" eq uc ref $pattern;
     
-    return ( grep { $_ =~ $pattern } $self->all_errors );
+    return ( grep { $_ =~ $pattern } $self->all );
     
 }
 
-=method first_error
+=method first
 
-    my $item = $self->first_error;
-    my $item = $self->first_error(qr/password/);
+    my $item = $self->first;
+    my $item = $self->first(qr/password/);
 
 =cut
 
-sub first_error {
+sub first {
     
     my ($self, $pattern) = @_;
     
-    return $self->error_list->[0] unless "REGEXP" eq uc ref $pattern;
+    return $self->list->[0] unless "REGEXP" eq uc ref $pattern;
     
-    return ( $self->find_errors($pattern) )[ 0 ];
-    
-}
-
-=method get_error
-
-    my $item = $self->get_error; # first error
-
-=cut
-
-sub get_error {
-    
-    my ($self) = @_;
-    
-    return $self->first_error;
+    return ( $self->find($pattern) )[ 0 ];
     
 }
 
-=method get_errors
+=method join
 
-    my @list = $self->get_errors; # all errors
+    my $string = $self->join; # returns "an error, another error"
+    
+    my $string = $self->join($delimiter); 
 
 =cut
 
-sub get_errors {
-    
-    my ($self) = @_;
-    
-    return $self->all_errors;
-    
-}
-
-=method has_errors
-
-    my $true = $self->has_errors; 
-
-=cut
-
-sub has_errors {
-    
-    my ($self) = @_;
-    
-    return $self->count_errors ? 1 : 0;
-    
-}
-
-=method join_errors
-
-    my $string = $self->join_errors; # returns "an error, another error"
-    
-    my $string = $self->join_errors($delimiter); 
-
-=cut
-
-sub join_errors {
+sub join {
     
     my ($self, $delimiter) = @_;
     
     $delimiter = ', ' unless defined $delimiter;
     
-    return join $delimiter, $self->all_errors;
+    return join $delimiter, $self->all;
     
 }
 
@@ -271,9 +218,9 @@ sub to_string {
     
     $delimiter = ', ' unless defined $delimiter; # default delimiter is a comma-space
     
-    $self->each_error($transformer) if $transformer;
+    $self->each($transformer) if $transformer;
     
-    return $self->join_errors($delimiter);
+    return $self->join($delimiter);
 
 }
 

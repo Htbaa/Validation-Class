@@ -44,7 +44,7 @@ while (my($dir, $cfg) = each %{$directives}) {
     
     $field->validate; # validate this only
     
-    $field->errors->count_errors; # field-level errors
+    $field->errors->count; # field-level errors
     
     1;
 

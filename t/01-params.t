@@ -5,6 +5,8 @@ BEGIN {
     
 }
 
+use utf8;
+use open qw/:std :utf8/;
 use Test::More;
 
 {
@@ -17,14 +19,13 @@ use Test::More;
     };
     
     package main;
-    use utf8;
     
     my $class = TestClass::CheckParameters->new;
     
     ok "TestClass::CheckParameters" eq ref $class,
     "TestClass::CheckParameters instantiated";
     
-    ok $_ eq $class->name($_),
+    ok $_ eq $class->name($_),  
     "TestClass::CheckParameters name accessor set to `$_` with expected return ".
     "value" for (
         'Kathy',
@@ -41,7 +42,7 @@ use Test::More;
         '♠♣♥♦♠♣♥♦♠♣♥♦'
     );
     
-    ok $class->params->{name} eq $class->name($_),
+    ok $class->params->{name} eq $class->name($_),  
     "TestClass::CheckParameters name parameter set to `$_` using ".
     "the name accessor" for (
         'Kathy',
@@ -58,7 +59,7 @@ use Test::More;
         '♠♣♥♦♠♣♥♦♠♣♥♦'
     );
     
-    ok $class->params->{name} eq $class->name($_),
+    ok $class->params->{name} eq $class->name($_), 
     "TestClass::CheckParameters name parameter set to `$_` using ".
     "the name accessor" for (
         'Kathy',

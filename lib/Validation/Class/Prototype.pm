@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-use base 'Validation::Class::Backwards'; # we're pro-life
+use base 'Validation::Class::Backwards'; # I'm pro-life
 
 use Carp 'confess';
 use Hash::Merge 'merge';
@@ -1145,7 +1145,7 @@ sub apply_validator {
         my $error = defined $field->{error} ?
             $field->{error} : "$name is required";
         
-        $field->{errors}->add_error($error);
+        $field->{errors}->add($error);
         
         return $self; # if required and fails, stop processing immediately
     
@@ -1862,7 +1862,7 @@ sub configuration_validator_between {
             my $handle = $field->{label} || $field->{name};
             my $error  = "$handle must contain between $directive characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
             
             return 0;
     
@@ -1903,7 +1903,7 @@ sub configuration_validator_depends_on {
                 my $error = "$handle requires " . join(", ", @blanks) .
                     " to have " . (@blanks > 1 ? "values" : "a value");
                 
-                $field->errors->add_error($field->{error} || $error);
+                $field->errors->add($field->{error} || $error);
 
                 return 0;
 
@@ -1934,7 +1934,7 @@ sub configuration_validator_length {
             my $error = "$handle must contain exactly " .
                 "$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -1964,7 +1964,7 @@ sub configuration_validator_matches {
             
             my $error = "$handle does not match $handle2";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
             
             return 0;
             
@@ -1993,7 +1993,7 @@ sub configuration_validator_max_alpha {
             my $error = "$handle must contain at-least "
                 . "$directive alphabetic $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
             
             return 0;
         
@@ -2022,7 +2022,7 @@ sub configuration_validator_max_digits {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
             
             return 0;
 
@@ -2049,7 +2049,7 @@ sub configuration_validator_max_length {
             my $error = "$handle can't contain more than "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2073,7 +2073,7 @@ sub configuration_validator_max_sum {
             my $error = "$handle can't be greater than "
                 ."$directive";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
             
             return 0;
 
@@ -2102,7 +2102,7 @@ sub configuration_validator_max_symbols {
             my $error = "$handle can't contain more than "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2131,7 +2131,7 @@ sub configuration_validator_min_alpha {
             my $error = "$handle must contain at-least "
                 ."$directive alphabetic $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2160,7 +2160,7 @@ sub configuration_validator_min_digits {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2187,7 +2187,7 @@ sub configuration_validator_min_length {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2211,7 +2211,7 @@ sub configuration_validator_min_sum {
             my $error = "$handle can't be less than "
             ."$directive";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2240,7 +2240,7 @@ sub configuration_validator_min_symbols {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2268,7 +2268,7 @@ sub configuration_validator_options {
             
             my $error = "$handle must be " . join " or ", @options;
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2326,9 +2326,9 @@ sub error_fields {
         
         my $field = $self->fields->{$name};
         
-        if ($field->{errors}->has_errors) {
+        if ($field->{errors}->count) {
             
-            $failed->{$name} = $field->{errors}->error_list;
+            $failed->{$name} = $field->{errors}->list;
         
         }
         
@@ -2360,11 +2360,11 @@ sub errors_to_string {
     
     my $errors = Validation::Class::Errors->new([]); # handle combined errors
     
-    $errors->add_errors($self->{errors}->all_errors);
+    $errors->add($self->{errors}->all);
     
     $self->fields->each(sub{
         
-        $errors->add_errors($_[1]->{errors}->all_errors);
+        $errors->add($_[1]->{errors}->all);
         
     });
     
@@ -2397,7 +2397,7 @@ sub configuration_validator_pattern {
             my $error = "$handle does not match the "
                 ."pattern $directive";
             
-            $field->errors->add_error($field->{error} || $error);
+            $field->errors->add($field->{error} || $error);
 
             return 0;
 
@@ -2479,11 +2479,11 @@ sub get_errors {
     
     if (!@criteria) {
         
-        $errors->add_errors($self->{errors}->all_errors);
+        $errors->add($self->{errors}->all);
         
         $self->fields->each(sub{
             
-            $errors->add_errors($_[1]->{errors}->all_errors);
+            $errors->add($_[1]->{errors}->all);
             
         });
         
@@ -2493,11 +2493,11 @@ sub get_errors {
         
         my $query = $criteria[0];
         
-        $errors->add_errors($self->{errors}->find_errors($query));
+        $errors->add($self->{errors}->find($query));
         
         $self->fields->each(sub{
             
-            $errors->add_errors($_[1]->{errors}->find_errors($query));
+            $errors->add($_[1]->{errors}->find($query));
             
         });
         
@@ -2507,13 +2507,13 @@ sub get_errors {
         
         for (@criteria) {
         
-            $errors->add_errors($self->fields->{$_}->{errors}->all_errors);
+            $errors->add($self->fields->{$_}->{errors}->all);
         
         }
         
     }
     
-    return ($errors->all_errors);
+    return ($errors->all);
 
 }
 
@@ -2990,7 +2990,7 @@ sub pitch_error {
         
         if ($self->report_unknown) {
         
-            $self->errors->add_error($error_message);
+            $self->errors->add($error_message);
         
         }
         
@@ -3103,11 +3103,11 @@ sub reset_errors {
 
     my $self = shift;
     
-    $self->errors->clear_errors;
+    $self->errors->clear;
     
     foreach my $field ($self->fields->values) {
         
-        $field->{errors}->clear_errors;
+        $field->{errors}->clear;
         
     }
     
@@ -3158,7 +3158,7 @@ sub set_errors {
 
     my ($self, @errors) = @_;
     
-    $self->errors->add_errors(@errors)  if @errors;
+    $self->errors->add(@errors)  if @errors;
     
     return @errors;
 
@@ -3589,7 +3589,7 @@ sub validate {
                             
                             if (defined $field->{error}) {
     
-                                $field->{errors}->add_error($field->{error});
+                                $field->{errors}->add($field->{error});
     
                             }
     
@@ -3601,7 +3601,7 @@ sub validate {
                                     "could not be validated"
                                 ;
                                 
-                                $field->{errors}->add_error($error_msg);
+                                $field->{errors}->add($error_msg);
                                 
                             }
                             
@@ -3656,7 +3656,7 @@ sub validate {
                             
                             if ( defined $field->{error} ) {
     
-                                $field->{errors}->add_error($field->{error});
+                                $field->{errors}->add($field->{error});
     
                             }
     
@@ -3668,7 +3668,7 @@ sub validate {
                                     "could not be validated"
                                 ;
                                 
-                                $field->{errors}->add_error($error_msg);
+                                $field->{errors}->add($error_msg);
                                 
                             }
                             
@@ -3728,7 +3728,7 @@ sub validate {
                             
                             if (defined $field->{error}) {
     
-                                $field->{errors}->add_error($field->{error});
+                                $field->{errors}->add($field->{error});
     
                             }
     
@@ -3740,7 +3740,7 @@ sub validate {
                                     "could not be validated"
                                 ;
                                 
-                                $field->{errors}->add_error($error_msg);
+                                $field->{errors}->add($error_msg);
                                 
                             }
                             
@@ -3767,7 +3767,7 @@ sub validate {
     
                 if ($self->report_unknown) {
     
-                    $self->errors->add_error($error);
+                    $self->errors->add($error);
     
                 }
     
