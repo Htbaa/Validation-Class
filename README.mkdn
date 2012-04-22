@@ -406,7 +406,7 @@ A Validation::Class plugin is little more than a class that implements a "new"
 method that extends the associated validation class object. As usual, an official
 Validation::Class plugin can be referred to using shorthand while custom plugins
 are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
-more about plugins at [Validation::Class::Cookbook](http://search.cpan.org/perldoc?Validation::Class::Cookbook). This option accepts a
+more about plugins at [Validation::Class::Intro](http://search.cpan.org/perldoc?Validation::Class::Intro). This option accepts a
 constant or an arrayref of constants.
 
     package MyVal;
