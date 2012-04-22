@@ -5,6 +5,7 @@ TODO (0000-00-00)
     - rewrite tests (using a simpler abstraction)
 
 7.00_01 (2012-04-20)
+    * complete rewrite
     * major implementation overhaul
     * prevent namespace pollution by employing a prototype class
     * added proto/prototype method to access prototype class
