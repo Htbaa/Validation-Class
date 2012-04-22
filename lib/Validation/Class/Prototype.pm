@@ -10,11 +10,13 @@ use warnings;
 use base 'Validation::Class::Backwards'; # we're pro-life
 
 use Carp 'confess';
-use Hash::Flatten;
 use Hash::Merge 'merge';
+use Hash::Flatten;
 
+use Validation::Class::Base 'has', 'hold';
+use Validation::Class::Params;
 use Validation::Class::Errors;
-use Validation::Class::Base 'has';
+use Validation::Class::Fields;
 
 =head1 SYNOPSIS
 
@@ -22,45 +24,64 @@ use Validation::Class::Base 'has';
     
     use Validation::Class;
     
+    # import other class config, etc
+    
+    set {
+        # ...
+    };
+    
     # a mixin template
+    
     mxn 'basic'  => {
         required   => 1
     };
     
     # a validation rule
+    
     fld 'login'  => {
         label      => 'User Login',
         error      => 'Login invalid.',
         mixin      => 'basic',
+        
         validation => sub {
+        
             my ($self, $this_field, $all_params) = @_;
+        
             return $this_field->{value} eq 'admin' ? 1 : 0;
+        
         }
+        
     };
     
     # a validation rule
+    
     fld 'password'  => {
         label         => 'User Password',
         error         => 'Password invalid.',
         mixin         => 'basic',
+        
         validation    => sub {
+        
             my ($self, $this_field, $all_params) = @_;
+        
             return $this_field->{value} eq 'pass' ? 1 : 0;
+        
         }
+        
     };
     
     # a validation profile
+    
     pro 'registration'  => sub {
+        
         my ($self, @args) = @_;
-        return $self->validate(qw(
-            +name
-            +email
-            -login
-            +password
-        ))
+        
+        return $self->validate(qw(+name +email -login +password))
+        
     };
     
     # an auto-validating method
+    
     mth 'register'  => {
         
         input => 'registration',
@@ -78,21 +99,25 @@ use Validation::Class::Base 'has';
 
 =head1 DESCRIPTION
 
-Validation::Class::Prototype provides the data validation schema for all
-Validation::Class based classes. This class inherits from L<Validation::Class::Base>. 
+Validation::Class::Prototype provides the data validation schema and routines
+for all Validation::Class based classes. This class inherits from
+L<Validation::Class::Base>. 
 
 =head1 DIRECTIVES
 
     package MyApp::Validation;
+    
     use Validation::Class;
     
     # a validation template
+    
     mixin '...'  => {
         # mixin directives here
         ...
     };
     
     # a validation rule
+    
     field '...'  => {
         # field directives here
         ...
@@ -688,30 +713,32 @@ The directives attribute returns a hashref of all defined directives.
 
 =cut
 
-has 'directives' => sub { shift->{config}->{DIRECTIVES} || {} };
+# is never changed so direct access is OK
+hold 'directives' => sub { shift->{config}->{DIRECTIVES} || {} }; 
 
 =attribute errors
 
-The errors attribute returns an arrayref of all errors set.
+The errors attribute provides error handling functionality and CANNOT be
+overridden. This attribute is a L<Validation::Class::Errors> object.
 
     my $errors = $self->errors();
     ...
 
 =cut
 
-has 'errors' => sub { Validation::Class::Errors->new };
+hold 'errors' => sub { Validation::Class::Errors->new };
 
 =attribute fields
 
-The fields attribute returns a hashref of defined fields, filtered and merged
-with their parameter counterparts.
+The fields attribute provides field handling functionality and CANNOT be
+overridden. This attribute is a L<Validation::Class::Fields> object.
 
     my $fields = $self->fields();
     ...
 
 =cut
 
-has 'fields' => sub {{}};
+hold 'fields' => sub { Validation::Class::Fields->new };
 
 =attribute filtering
 
@@ -739,7 +766,7 @@ The filters attribute returns a hashref of pre-defined filter definitions.
 
 =cut
 
-has 'filters' => sub {{}};
+hold 'filters' => sub {{}};
 
 =attribute hash_inflator
 
@@ -821,7 +848,7 @@ The methods attribute returns a hashref of self-validating method definitions.
 
 =cut
 
-has 'methods' => sub {{}};
+hold 'methods' => sub {{}};
 
 =attribute mixins
 
@@ -832,19 +859,19 @@ The mixins attribute returns a hashref of defined validation templates.
 
 =cut
 
-has 'mixins' => sub {{}};
+hold 'mixins' => sub {{}};
 
 =attribute params
 
-The params attribute gets/sets the parameters to be validated. The assigned value
-MUST be a hashref but can be flat or complex.
+The params attribute provides parameter handling functionality and CANNOT be
+overridden. This attribute is a L<Validation::Class::Params> object.
 
     my $params = $self->params();
     ...
 
 =cut
 
-has 'params' => sub {{}};
+hold 'params' => sub { Validation::Class::Params->new };
 
 =attribute plugins
 
@@ -866,7 +893,7 @@ The profiles attribute returns a hashref of validation profiles.
 
 =cut
 
-has 'profiles' => sub {{}};
+hold 'profiles' => sub {{}};
 
 =attribute queued
 
@@ -893,7 +920,7 @@ loaded child classes.
 =cut
 
 # class relatives (child-classes) store
-has 'relatives' => sub {{}};
+hold 'relatives' => sub {{}};
 
 =attribute report_failure
 
@@ -929,7 +956,7 @@ has 'report_unknown' => 0;
 has 'stashed' => sub {{}};
 
 # hash of directives by type
-has 'types' => sub {
+hold 'types' => sub {
     
     my $self  = shift;
     my $types = { mixin => {}, field => {} };
@@ -981,7 +1008,7 @@ filters defined in their matching fields.
 
     $self = $self->apply_filters;
     
-    # appy filters to fields labeled as "dont filter automaticalyt" (post)
+    # apply filters to fields labeled as "dont filter automatically" (post)
     $self = $self->apply_filters('post'); 
 
 =cut
@@ -1004,14 +1031,14 @@ sub apply_filters {
                 unless "ARRAY" eq ref $config->filters;
             
             # apply filters
-            $self->apply_filter($_, $name) for @{$field->filters};
+            $self->apply_filter($_, $name) for @{$config->filters};
             
             # set default value - absolute last resort
             if (defined $self->params->{$name}) {
                 
                 if (!$self->params->{$name}) {
                     
-                    if ($field->default()) {
+                    if (defined $config->{default}) {
                         
                         $self->params->{$name} =
                             $self->field_default_value($name);
@@ -1059,9 +1086,9 @@ sub apply_mixin {
 
 sub apply_mixin_field {
 
-    my ($self, $name, $target) = @_;
+    my ($self, $field, $target) = @_;
     
-    $self->check_field( $name, $self->fields->{$field} );
+    $self->check_field( $field, $self->fields->{$field} );
 
     # some overwriting restricted
     
@@ -1084,7 +1111,9 @@ sub apply_mixin_field {
     $self->fields->{$target}->{label} = $label if defined $label;
 
     foreach my $key ( keys %{$self->fields->{$field}}) {
+    
         $self->apply_mixin( $target, $key ) if $key eq 'mixin';
+    
     }
 
     return $self;
@@ -1116,7 +1145,7 @@ sub apply_validator {
         my $error = defined $field->{error} ?
             $field->{error} : "$name is required";
         
-        $self->error( $field, $error );
+        $field->{errors}->add_error($error);
         
         return $self; # if required and fails, stop processing immediately
     
@@ -1234,6 +1263,24 @@ sub class {
     
     my %settings = %{ merge(\%args, \%defaults) };
     
+    if (defined $settings{params}) {
+    
+        if ("HASH" eq ref $settings{params}) {
+            
+            $proto->{params} =
+                delete $settings{params};
+            
+        }
+        
+        if ("Validation::Class::Params" eq ref $settings{params}) {
+            
+            $proto->{params} =
+                Validation::Class::Params->new(delete $settings{params});
+            
+        }
+    
+    }
+    
     while (my($attr, $value) = each(%settings)) {
         
         $proto->$attr($value);
@@ -1276,7 +1323,7 @@ sub check_field {
                 The $_ directive supplied by the $name field is not supported
             };
 
-            $self->pitch_error($death_cert);
+            $self->pitch_error($error);
             
         }
         
@@ -1815,7 +1862,7 @@ sub configuration_validator_between {
             my $handle = $field->{label} || $field->{name};
             my $error  = "$handle must contain between $directive characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
             
             return 0;
     
@@ -1856,7 +1903,7 @@ sub configuration_validator_depends_on {
                 my $error = "$handle requires " . join(", ", @blanks) .
                     " to have " . (@blanks > 1 ? "values" : "a value");
                 
-                $field->errors->add_error($error);
+                $field->errors->add_error($field->{error} || $error);
 
                 return 0;
 
@@ -1887,7 +1934,7 @@ sub configuration_validator_length {
             my $error = "$handle must contain exactly " .
                 "$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -1917,7 +1964,7 @@ sub configuration_validator_matches {
             
             my $error = "$handle does not match $handle2";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
             
             return 0;
             
@@ -1946,7 +1993,7 @@ sub configuration_validator_max_alpha {
             my $error = "$handle must contain at-least "
                 . "$directive alphabetic $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
             
             return 0;
         
@@ -1975,7 +2022,7 @@ sub configuration_validator_max_digits {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
             
             return 0;
 
@@ -2002,7 +2049,7 @@ sub configuration_validator_max_length {
             my $error = "$handle can't contain more than "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2026,7 +2073,7 @@ sub configuration_validator_max_sum {
             my $error = "$handle can't be greater than "
                 ."$directive";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
             
             return 0;
 
@@ -2055,7 +2102,7 @@ sub configuration_validator_max_symbols {
             my $error = "$handle can't contain more than "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2084,7 +2131,7 @@ sub configuration_validator_min_alpha {
             my $error = "$handle must contain at-least "
                 ."$directive alphabetic $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2113,7 +2160,7 @@ sub configuration_validator_min_digits {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2140,7 +2187,7 @@ sub configuration_validator_min_length {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2164,7 +2211,7 @@ sub configuration_validator_min_sum {
             my $error = "$handle can't be less than "
             ."$directive";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2193,7 +2240,7 @@ sub configuration_validator_min_symbols {
             my $error = "$handle must contain at-least "
                 ."$directive $characters";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2221,7 +2268,7 @@ sub configuration_validator_options {
             
             my $error = "$handle must be " . join " or ", @options;
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2230,6 +2277,98 @@ sub configuration_validator_options {
     }
 
     return 1;
+
+}
+
+=method error_count
+
+The error_count method returns the total number of errors set at both the class
+and field level.
+
+    my $count = $self->error_count;
+
+=cut
+
+sub error_count {
+    
+    my ($self) = @_;
+    
+    my $count = scalar($self->get_errors) || 0;
+    
+    return $count;
+    
+}
+
+=method error_fields
+
+The error_fields method returns a hashref containing the names of fields which
+failed validation and an arrayref of error messages.
+
+    unless ($self->validate) {
+        
+        my $failed = $self->error_fields;
+        
+    }
+    
+    my $suspects = $self->error_fields('field2', 'field3');
+
+=cut
+
+sub error_fields {
+    
+    my ($self, @fields) = @_;
+    
+    my $failed = {};
+    
+    @fields = $self->fields->keys unless @fields;
+    
+    foreach my $name (@fields) {
+        
+        my $field = $self->fields->{$name};
+        
+        if ($field->{errors}->has_errors) {
+            
+            $failed->{$name} = $field->{errors}->error_list;
+        
+        }
+        
+    }
+    
+    return $failed;
+
+}
+
+=method errors_to_string
+
+The errors_to_string method stringifies the all error objects on both the class
+and fields using the specified delimiter (defaulting to comma-space (", ")).
+
+    return $self->errors_to_string("\n");
+    return $self->errors_to_string(undef, sub{ ucfirst lc shift });
+    
+    unless ($self->validate) {
+    
+        return $self->errors_to_string;
+    
+    }
+
+=cut
+
+sub errors_to_string {
+    
+    my ($self, $delimiter, $transformer) = @_;
+    
+    my $errors = Validation::Class::Errors->new([]); # handle combined errors
+    
+    $errors->add_errors($self->{errors}->all_errors);
+    
+    $self->fields->each(sub{
+        
+        $errors->add_errors($_[1]->{errors}->all_errors);
+        
+    });
+    
+    return $errors->to_string($delimiter, $transformer);
 
 }
 
@@ -2258,7 +2397,7 @@ sub configuration_validator_pattern {
             my $error = "$handle does not match the "
                 ."pattern $directive";
             
-            $field->errors->add_error($error);
+            $field->errors->add_error($field->{error} || $error);
 
             return 0;
 
@@ -2336,15 +2475,15 @@ sub get_errors {
 
     my ($self, @criteria) = @_;
     
-    my @errors = ();
+    my $errors = Validation::Class::Errors->new([]); # handle combined errors
     
     if (!@criteria) {
         
-        push @errors, $self->errors->all_errors;
+        $errors->add_errors($self->{errors}->all_errors);
         
         $self->fields->each(sub{
             
-            push @errors, $_[1]->errors->all_errors
+            $errors->add_errors($_[1]->{errors}->all_errors);
             
         });
         
@@ -2354,11 +2493,11 @@ sub get_errors {
         
         my $query = $criteria[0];
         
-        push @errors, $self->errors->find_errors($query);
+        $errors->add_errors($self->{errors}->find_errors($query));
         
         $self->fields->each(sub{
             
-            push @errors, $_[1]->errors->find_errors($query)
+            $errors->add_errors($_[1]->{errors}->find_errors($query));
             
         });
         
@@ -2366,11 +2505,15 @@ sub get_errors {
     
     else {
         
-        push @errors, $self->fields->{$_}->errors->all_errors for @criteria;
+        for (@criteria) {
+        
+            $errors->add_errors($self->fields->{$_}->{errors}->all_errors);
+        
+        }
         
     }
     
-    return @errors;
+    return ($errors->all_errors);
 
 }
 
@@ -3036,15 +3179,13 @@ this_function for convenience and consistency.
 
 sub set_method {
     
-    my ($self, $name, $code) = @_;
+    my ($self, $context, $name, $code) = @_;
     
-    #my ($self, $context, $name, $code) = @_;
-    #
-    #confess
-    #    "Context object ($self->{package} class instance) required ".
-    #    "to perform validation" unless $self->{package} eq ref $context;
+    confess
+        "Context object ($self->{package} class instance) required ".
+        "to perform validation" unless $self->{package} eq ref $context;
     
-    my $class = $self->{package};
+    my $class = ref $context;
     
     my $shortname  = $name;
        $shortname  =~ s/::/\_/g;
@@ -3091,7 +3232,8 @@ sub set_params_hash {
     
     my $serializer = Hash::Flatten->new($self->hash_inflator);
     
-    $self->params($serializer->flatten($params));
+    $self->{params} =
+        Validation::Class::Params->new($serializer->flatten($params));
     
     return $self->params->hash;
 
@@ -3255,12 +3397,9 @@ sub validate {
         "Context object ($self->{package} class instance) required ".
         "to perform validation" unless $self->{package} eq ref $context;
     
-    # first things first, reset the errors and values, etc,
-    # returning the validation class to its pristine state
+    # first-things-first, normalize our environment
     
     $self->normalize();
-    $self->reset_fields();
-    $self->reset_errors();
     
     # include fields queued by the queue method
     
@@ -3308,7 +3447,7 @@ sub validate {
     }
     
     # create alias map manually if requested
-    # very depreciated but it remains for back-compat !!!
+    # extremely-depreciated but it remains for back-compat and nostalgia !!!
     
     my $alias_map ;
     
@@ -3327,7 +3466,9 @@ sub validate {
     
     # create a map from aliases if applicable
     
-    while (my($name, $field) = each(%{$self->fields})) {
+    my $alias_mapping = sub {
+        
+        my($name, $field) = @_;
         
         if (defined $field->{alias}) {
             
@@ -3347,13 +3488,15 @@ sub validate {
             
         }
         
-    }
-
-    if ( values %{$self->params} ) {
-        
-        # check for parameters the are arrayrefs and handle them appropriately
+    };
     
-        my $params = $self->params;
+    $self->fields->each($alias_mapping);
+    
+    if ($self->params->count) {
+        
+        # check for parameters that are arrayrefs and handle them appropriately
+    
+        my $params = $self->params->hash;
         
         my ($ad, $hd) = @{$self->hash_inflator}{'ArrayDelimiter', 'HashDelimiter'};
         # ^^ pun here
@@ -3390,7 +3533,7 @@ sub validate {
             }
             
             # like it never existed ...
-    
+            
             @fields = grep { $_ ne $name } @fields if @fields; # ... 
             
         }
@@ -3400,7 +3543,9 @@ sub validate {
         $self->apply_filters('pre') if $self->filtering;
         
         # validate all parameters against all defined fields because no fields
-        # were explicitly requested to be validated
+        # were explicitly requested to be validated - i.e. not explicitly
+        # defining fields to be validated effectively allows the parameters
+        # submitted to dictate what gets validated (may not be ideal)
     
         if ( !@fields ) {
 
@@ -3434,27 +3579,29 @@ sub validate {
     
                 if (defined $field->{validation} && $field->{value}) {
                     
-                    my $errcnt = $self->error_count;
+                    my $count = $self->error_count;
                     
                     unless ($field->{validation}->(@args)) {
                         
                         # assuming the validation routine didnt issue an error
     
-                        if ($errcnt == $self->error_count) {
+                        if ($count == $self->error_count) {
                             
                             if (defined $field->{error}) {
     
-                                $self->error($field, $field->{error});
+                                $field->{errors}->add_error($field->{error});
     
                             }
     
                             else {
                                 
-                                my $error_msg =
-                                    (($field->{label} || $field->{name})
-                                    . " did not pass validation");
+                                my $error_msg = join " ",
                                 
-                                $self->error($field, $error_msg);
+                                    ($field->{label} || $field->{name}),
+                                    "could not be validated"
+                                ;
+                                
+                                $field->{errors}->add_error($error_msg);
                                 
                             }
                             
@@ -3499,27 +3646,29 @@ sub validate {
     
                 if (defined $field->{validation} && $field->{value}) {
                     
-                    my $errcnt = $self->error_count;
+                    my $count = $self->error_count;
                     
                     unless ($field->{validation}->(@args)) {
                         
                         # assuming the validation routine didnt issue an error
     
-                        if ($errcnt == $self->error_count) {
+                        if ($count == $self->error_count) {
                             
                             if ( defined $field->{error} ) {
     
-                                $self->error($field, $field->{error});
+                                $field->{errors}->add_error($field->{error});
     
                             }
     
                             else {
                                 
-                                my $error_msg =
-                                    (($field->{label} || $field->{name}) .
-                                    " did not pass validation");
-                                    
-                                $self->error($field, $error_msg);
+                                my $error_msg = join " ",
+                                
+                                    ($field->{label} || $field->{name}),
+                                    "could not be validated"
+                                ;
+                                
+                                $field->{errors}->add_error($error_msg);
                                 
                             }
                             
@@ -3539,7 +3688,7 @@ sub validate {
         
         # validate fields although no parameters were submitted
         # will likely pass validation unless fields exist with
-        # a `required` directive or other validation logic
+        # a *required* directive or other validation logic
         # expecting a value
     
         if (@fields) {
@@ -3570,26 +3719,28 @@ sub validate {
     
                 if (defined $field->{validation} && $field->{value}) {
                     
-                    my $errcnt = $self->error_count;
+                    my $count = $self->error_count;
                     
                     unless ($field->{validation}->(@args)) {
                         
                         # assuming the validation routine didnt issue an error
-                        if ($errcnt == $self->error_count) {
+                        if ($count == $self->error_count) {
                             
                             if (defined $field->{error}) {
     
-                                $self->error($field, $field->{error});
+                                $field->{errors}->add_error($field->{error});
     
                             }
     
                             else {
                                 
-                                my $error_msg =
-                                    (($field->{label} || $field->{name}) .
-                                     " did not pass validation");
+                                my $error_msg = join " ",
                                 
-                                $self->error($field, $error_msg);
+                                    ($field->{label} || $field->{name}),
+                                    "could not be validated"
+                                ;
+                                
+                                $field->{errors}->add_error($error_msg);
                                 
                             }
                             
@@ -3616,8 +3767,7 @@ sub validate {
     
                 if ($self->report_unknown) {
     
-                    $self->set_errors($error)
-                        unless grep { $_ eq $error } @{ $self->errors };
+                    $self->errors->add_error($error);
     
                 }
     
@@ -3633,7 +3783,7 @@ sub validate {
         
     }
     
-    my $valid = @{ $self->errors } ? 0 : 1;
+    my $valid = $self->error_count ? 0 : 1;
     
     # restore parameters from depreciated alias map functionality
     # very depreciated but it remains for back-compat !!!
@@ -3648,6 +3798,10 @@ sub validate {
         }
         
     }
+    
+    # do I need to reap cloned fields ???
+    
+    # ...
     
     # run post-validation filtering
     
@@ -3687,13 +3841,8 @@ sub validate_profile {
     
     return 0 unless $name;
     
-    # first things first, reset the errors and values, etc,
-    # returning the validation class to its pristine state
-    
     $self->normalize();
     $self->apply_filters('pre') if $self->filtering;
-    $self->reset_fields();
-    $self->reset_errors();
     
     if ("CODE" eq ref $self->profiles->{$name}) {
         

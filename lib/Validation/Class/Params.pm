@@ -18,7 +18,7 @@ use base 'Validation::Class::Collection';
 =head1 DESCRIPTION
 
 Validation::Class::Params is a container class for standard data input
-parameters and is derrived from the L<Validation::Class::Collection> class.
+parameters and is derived from the L<Validation::Class::Collection> class.
 
 =cut
 

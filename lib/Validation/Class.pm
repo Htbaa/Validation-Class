@@ -1,4 +1,4 @@
-# ABSTRACT: Robust Data Modeling and Validation Framework
+# ABSTRACT: Simple Object System, Data Validation and Modeling Framework
 
 package Validation::Class;
 
@@ -12,11 +12,11 @@ use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
 
-use Validation::Class::Errors;
 use Validation::Class::Field;
 use Validation::Class::Fields;
 use Validation::Class::Params;
 use Validation::Class::Prototype;
+use Validation::Class::Errors;
 
 {
     
@@ -197,7 +197,7 @@ our @EXPORT = qw(
     
     has attitude => 1; 
     
-    # self-validating method
+    # self-validating method (even better than method signatures)
     
     mth create  => {
     
@@ -226,9 +226,9 @@ our @EXPORT = qw(
     
     1;
 
-Validation::Class takes a different approach towards data validation, it
-centralizes data validation rules to ensure consistency through DRY
-(dont-repeat-yourself) code.
+Validation::Class takes a different approach towards data modeling and
+validation, it centralizes data validation rules to ensure consistency through
+DRY (dont-repeat-yourself) code.
 
     use MyApp;
     
@@ -249,7 +249,7 @@ centralizes data validation rules to ensure consistency through DRY
 
 =head1 DESCRIPTION
 
-Validation::Class is much more than a simple data validation framework, in-fact
+Validation::Class is much more than a robust data validation framework, in-fact
 it is more of a data modeling framework and can be used as an alternative to
 minimalistic object systems such as L<Moo>, L<Mo>, etc.
 
@@ -259,9 +259,9 @@ self-validating data models.
 When fields (attributes with validation rules) are defined, accessors are
 automatically generated to make getting and setting their values much easier.
 
-Methods can be defined using the method keyword which can make the routine
-self-validating, checking the defined input requirements against existing
-validation rules before executing the routine gaining consistency and security.
+Methods can be defined using the method keyword to create a self-validating
+method, checking the defined input requirements against existing validation rules
+before executing the routine, gaining consistency and security.
 
 =cut
 
@@ -410,7 +410,8 @@ packages to be used in all your classes.
         unless ($validator->is_email($value)) {
         
             my $handle = $field->{label} || $field->{name};
-            $self->error($field, "$handle must be a valid email address");
+            
+            $self->errors->add_error("$handle must be a valid email address");
             
             return 0;
         
@@ -516,8 +517,7 @@ sub field {
         
         $data->{name} = $name;
         
-        my $field = $proto->{config}->{FIELDS}->{$name}
-            = Validation::Class::Field->new($data);
+        $proto->{config}->{FIELDS}->{$name} = $data;
         
         no strict 'refs';
         
@@ -664,7 +664,7 @@ A Validation::Class plugin is little more than a class that implements a "new"
 method that extends the associated validation class object. As usual, an official
 Validation::Class plugin can be referred to using shorthand while custom plugins
 are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
-more about plugins at L<Validation::Class::Cookbook>. This option accepts a
+more about plugins at L<Validation::Class::Intro>. This option accepts a
 constant or an arrayref of constants.
 
     package MyVal;
@@ -1073,13 +1073,22 @@ sub mixin {
 
 =method new
 
-The new method should NOT be overridden. The new method performs a series of
-actions (magic) required for the class to function properly. See the build
-keyword for hooking into the instantiation process.
+The new method instantiates a new class object, it performs a series of actions
+(magic) required for the class function properly, and for that reason, this
+method should never be overridden. Use the build keyword to hooking into the
+instantiation process.
 
     package MyApp;
     
     use Validation::Class;
+    
+    # optionally
+    
+    build sub {
+        
+        my ($self) = @_; # is instantiated
+        
+    };
     
     package main;
     
@@ -1099,21 +1108,32 @@ sub new {
     
     my $self = bless {},  $class;
     
-    # clone config
+    # clone config values
     
     my @clonables = qw(fields filters methods mixins profiles relatives) ;
     
     $proto->{$_} = merge $proto->{config}->{uc $_}, $proto->{$_} for @clonables;
     
-    # process arguments
-    
     my %ARGS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
+    
+    # process collection assignments
+    
+    $proto->{fields} = delete $ARGS{fields} if defined $ARGS{fields};
+    $proto->{params} = delete $ARGS{params} if defined $ARGS{params};
+    
+    # process attribute assignments
     
     while (my($attr, $value) = each (%ARGS)) {
         
         $self->$attr($value);
         
     }
+    
+    # bless specific collections
+    
+    $proto->{fields} = Validation::Class::Fields->new(%{$proto->{fields}});
+    
+    $proto->{params} = Validation::Class::Params->new(%{$proto->{params}});
     
     # process plugins
     
@@ -1131,27 +1151,12 @@ sub new {
         
     }
     
-    # process special structures
-    
-    $proto->params(Validation::Class::Params->new($proto->params));
-    $proto->fields(Validation::Class::Fields->new($proto->fields));
-    
-    $proto->fields->each(sub{
-        
-        my ($name, $config) = @_;
-        
-        $config->{name} = $name
-            unless defined $config->{name};
-        
-        $config = Validation::Class::Field->new($config)
-            unless "Validation::Class::Field" eq ref $config;
-        
-    });
-    
     # initialize prototype
     
     $proto->normalize;
     $proto->apply_filters('pre') if $proto->filtering;
+    
+    # ready-set-go !!!
     
     return $self;
 
@@ -1218,7 +1223,7 @@ sub profile {
 
 =method prototype
 
-The prototype method (or proto) returns and caches an instance of the class
+The prototype method (or proto) returns an instance of the associated class
 prototype. The class prototype is responsible for manipulating and validating
 the data model (current class). It is not likely that you'll need to access
 this method directly.
@@ -1240,30 +1245,46 @@ this method directly.
 sub proto { goto &prototype }
 sub prototype {
     
-    my ($self) = @_;
+    my ($self) = pop @_;
     
-    return_class_proto ref $self;
-    
-}
-
-# hack, if you know about it, you know about it
-# ... if you dont ... o.O
-sub setup {
-    
-    my $class = pop @_;
-    
-    return undef unless $class;
-    
-    return_class_proto $class; 
+    return_class_proto ref $self || $self;
     
 }
 
-=head1 ATTRIBUTES, METHODS, AND MORE
+=head1 THE PROTOTYPE CLASS
 
-This class encapsulates the functionality used to manipulate the environment of
-the calling class. The engine-class is the role that provides all of the data
-validation functionality, please see L<Validation::Class::Engine> for more
-information on specific methods, and attributes.
+This module provides mechanisms (sugar functions to model your data) which allow
+you to define self-validating classes. Each class your create is associated with
+a *prototype* class which provides data validation functionality and keeps your
+class' namespace free from pollution, please see L<Validation::Class::Prototype>
+for more information on specific methods, and attributes.
+
+All derived classes will have a prototype-class attached to it which does all
+the heavy lifting (regarding validation and error handling). The prototype
+injects a few proxy methods into your class which are basically aliases to your
+prototype class, however it is possible to access the prototype directly using
+the proto/prototype methods.
+
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    package main;
+    
+    my $user  = MyApp::User->new;
+    my $proto = $user->prototype;
+    
+    $proto->error_count # same as calling $self->error_count
+
+
+=head1 THE OBJECT SYSTEM
+
+All derived classes will benefit from the light-weight, straight-forward and
+simple object system Validation::Class provides. The standard *new* method
+should be used to instantiate a new object and the *bld/build* keywords can be
+used to hook into the instantiation process. Validation::Class does NOT provide
+method modifiers but can be extended with L<Class::Method::Modifiers>.
 
 =cut
 

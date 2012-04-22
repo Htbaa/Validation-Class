@@ -1,15 +1,95 @@
-=head1 NAME
+# PODNAME: Validation::Class::Intro
+# ABSTRACT: Getting Started with Validation::Class
 
-Validation::Class::Cookbook - Basic Instructions for Awesomeness
+# VERSION
 
 =head1 OVERVIEW
 
 This documentation will serves as a brief overview of various usage scenarios
 for Validation::Class.
 
+=head1 EXAMPLE
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    
+    # import other class config, etc
+    
+    set {
+        # ...
+    };
+    
+    # a mixin template
+    
+    mxn 'basic'  => {
+        required   => 1
+    };
+    
+    # a validation rule
+    
+    fld 'login'  => {
+        label      => 'User Login',
+        error      => 'Login invalid.',
+        mixin      => 'basic',
+        
+        validation => sub {
+        
+            my ($self, $this_field, $all_params) = @_;
+        
+            return $this_field->{value} eq 'admin' ? 1 : 0;
+        
+        }
+        
+    };
+    
+    # a validation rule
+    
+    fld 'password'  => {
+        label         => 'User Password',
+        error         => 'Password invalid.',
+        mixin         => 'basic',
+        
+        validation    => sub {
+        
+            my ($self, $this_field, $all_params) = @_;
+        
+            return $this_field->{value} eq 'pass' ? 1 : 0;
+        
+        }
+        
+    };
+    
+    # a validation profile
+    
+    pro 'registration'  => sub {
+        
+        my ($self, @args) = @_;
+        
+        return $self->validate(qw(+name +email -login +password))
+        
+    };
+    
+    # an auto-validating method
+    
+    mth 'register'  => {
+        
+        input => 'registration',
+        using => sub {
+            
+            my ($self, @args) = shift;
+            
+            # ... do something
+            
+        }
+        
+    };
+    
+    1;
+
 =head2 Data Modeling Fun
 
-Recently I been experimenting with using Validation::Class (v5.50+) to provide a
+Recently I've been experimenting with using Validation::Class to provide a
 self-validating data model in various projects. The DRY approach the library
 enforces ensures data integrity through consistency.
 
@@ -21,28 +101,28 @@ set-it-and-forget-it point-of-view.
 Prior to recent changes, the general idea was to have application developers
 create a validation class in addition to an existing data/object model (which is
 twice the work), this was the reasoning behind having the framework ship with a
-Moose adapter.
+Moose adapter (no longer ... available, required, supported).
 
-The two main changes in Validation::Class are, automatic generation of attributes
-based on field names, and the method keyword which creates self-validating routines
-(sorta like method signatures). Simple as it may seem, these two changes allow
-developers to easily create data models and objects with validating attributes
-and methods with built-in validation and error handling while remaining fast and
-extensible due to its lean dependency chain.
+Two noteworthy features of Validation::Class are, automatic generation of
+attributes accessors based on field names, and the method keyword which creates
+self-validating routines (sorta like method signatures). Simple as it may seem,
+these two features allow developers to easily create data models and objects with
+validatable attributes and methods with built-in validation and error handling
+while remaining fast and extensible due to its lean dependency chain.
 
 =head2 Die On Your Own Terms
 
 Validation::Class won't die on instantiation (or anywhere else for that matter)
 unless you tell it to. The ignore_failure flag when set to false will confess to
-method validate failures. The ignore_unknown flag when set to false will confess
-to an attempt to validate a parameter with no matching field definition.
+method validation failures. The ignore_unknown flag when set to false will
+confess to an attempt to validate a parameter with no matching field definition.
 
-Although the sentiment may not be shared by all, error handling is on of those
-things I'd just like to be there without worry too much about how its setup.
+Although the sentiment may not be shared by all, error handling is one of those
+things I'd just like to be available without worry too much about how its setup.
 Validation and error handling are built-in mechanisms you are encouraged to
 leverage.
 
-=head2 The Example
+=head2 A Reasonably Realistic Example
 
 The following is a reasonably realistic albeit lame example of Validation::Class
 usage scenarios:
@@ -53,8 +133,8 @@ usage scenarios:
     
     use Validation::Class;
     
-    load {
-        classes => 1;
+    set {
+        classes => [__PACKAGE__]; # load all sub-classes, MyApp::*
     };
     
     1;
@@ -84,8 +164,8 @@ usage scenarios:
     
     use Validation::Class;
     
-    load {
-        base => 'MyApp::Person'
+    set {
+        base => ['MyApp::Person']
     };
     
     fld 'login' => {
@@ -113,42 +193,46 @@ usage scenarios:
     
     # find some parameters, e.g.
     
-    #my $params = {
-    #    'user.first_name' => '...',
-    #    'user.last_name'  => '...',
-    #    'user.login'      => '...',
-    #    'user.password'   => '...'
-    #};
-    #
-    #or
-    #
-    #my $params = {
-    #    
-    #    user => {
-    #        first_name => '...',
-    #        last_name  => '...',
-    #        login      => '...',
-    #        password   => '...'
-    #    }
-    #    
-    #};
+    my $params = {
+        'user.first_name' => '...',
+        'user.last_name'  => '...',
+        'user.login'      => '...',
+        'user.password'   => '...'
+    };
+    
+    # or
+    
+    my $params = {
+        
+        user => {
+            first_name => '...',
+            last_name  => '...',
+            login      => '...',
+            password   => '...'
+        }
+        
+    };
     
     my $app = MyApp->new(params => $params);
     
     my $user = $app->class('user');
     
     unless ($user->register) {
-        print $user->errors_to_string
+
+        print $user->errors_to_string # more error handling via V::C::Errors
+
     }
     
-    # OR
+    # or
     
     my $user = MyApp::User->new(first_name => '...', last_name => '...');
     
     $user->register;
     
     unless ($user->error_count) {
+    
         ...
+        
     }
 
 =head1 BUILDING CLASSES
@@ -158,6 +242,7 @@ usage scenarios:
     use Validation::Class;
     
     # a validation rule template
+
     mixin 'basic'  => {
         required   => 1,
         min_length => 1,
@@ -166,6 +251,7 @@ usage scenarios:
     };
     
     # a validation rule
+
     field 'login'  => {
         mixin      => 'basic',
         label      => 'user login',
@@ -177,6 +263,7 @@ usage scenarios:
     };
     
     # a validation rule
+
     field 'password'  => {
         mixin         => 'basic',
         label         => 'user login',
@@ -189,11 +276,11 @@ usage scenarios:
     
     1;
 
-Your validation class can be thought of as your data model/input firewall. The
+Your validation class can be thought of as your data-model/input-firewall. The
 benefits this approach provides might require you to change your perspective
 on parameter handling and workflow. Typically when designing an application we
-tend to name parameters arbitrarily and validate the same data in various stages
-during program's execution at various places in the application stack. This
+tend to name parameters arbitrarily and validate the same data at various stages
+during a program's execution in various places in the application stack. This
 approach is inefficient and prone to bugs and security problems.
 
 To get the most out of Validation::Class you should consider each parameter
@@ -211,44 +298,55 @@ A validation class is defined as follows:
     use Validation::Class;
     
     # a mixin template
+
     mxn 'basic'  => {
         required   => 1
     };
     
     # a validation rule
+
     fld 'login'  => {
         label      => 'User Login',
         error      => 'Login invalid.',
         mixin      => 'basic',
+
         validation => sub {
+
             my ($self, $this_field, $all_params) = @_;
             return $this_field->{value} eq 'admin' ? 1 : 0;
+
         }
+
     };
     
     # a validation rule
+
     fld 'password'  => {
         label         => 'User Password',
         error         => 'Password invalid.',
         mixin         => 'basic',
+
         validation    => sub {
+
             my ($self, $this_field, $all_params) = @_;
             return $this_field->{value} eq 'pass' ? 1 : 0;
+
         }
+
     };
     
     # a validation profile
+
     pro 'registration'  => sub {
+
         my ($self, @args) = @_;
-        return $self->validate(qw(
-            +name
-            +email
-            -login
-            +password
-        ))
+
+        return $self->validate(qw(+name +email -login +password))
+        
     };
     
     # an auto-validating method
+
     mth 'register'  => {
         
         input => [qw/+login +password/],
@@ -297,7 +395,9 @@ various scenarios:
     };
 
 Lazy validation? Have your validation class automatically find the appropriate
-fields to validate against (params must match field names).
+fields to validate against (params must match field names). This is possible but
+not necessarily recommended as the execution and validation is dictated by the
+parameters submitted (which you may or may not have control over).
 
     use MyApp::User;
     
@@ -309,11 +409,9 @@ fields to validate against (params must match field names).
     
     }
     
-This approach can be utilized but is not recommended as the input dictates which
-fields to validate allowing margin for unexpected results. You can define an
-alias to automatically map a parameter to a validation field whereby a field
-definition will have an alias attribute containing an arrayref of alternate
-parameters that can be matched against passed-in parameters.
+You can define an alias to automatically map a parameter to a validation field
+whereby a field definition will have an alias attribute containing an arrayref
+of alternate names that can be matched against passed-in parameter names.
 
     package MyApp::User;
     
@@ -429,7 +527,7 @@ classes. The following is an example of this:
     
     use Validation::Class;
     
-    load { classes => 1 };
+    set { classes => [__PACKAGE__] };
     
     package main;
     
@@ -443,40 +541,19 @@ classes. The following is an example of this:
     
     1;
 
-=head2 Filtering Incoming Data
-
-Validation::Class supports pre/post filtering but is configured to pre-filter
-incoming data. This means that based upon the filtering options supplied within
-the individual fields, filtering will happen before validation (technically at
-instantiation and again just before validation). As expected, this is configurable
-via the filtering attribute.
-
-A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
-which boosts application security and is best used with passive filtering 
-(e.g. converting character case - filtering which only alters the input in
-predictable ways), versus aggressive filtering (e.g. formatting a telephone
-number) which completely and permanently changes the incoming data ... so much
-so that if the validation still fails ... errors that are reported may not
-match the data that was submitted.
-
-If you're sure you'd rather employ aggressive filtering, I suggest setting
-the filtering attribute to 'post' for post-filtering or setting it to null
-and applying the filters manually by calling the apply_filters() method.
-
-
 =head1 BUILDING PLUGINS
 
 When creating B<official> Validation::Class plugins you should use the namespace
 Validation::Class::Plugin::YourPluginName. This will allow users of your plugin
-to simply pass YourPluginName to the load_plugins() method. Otherwise you will
-need to pass the fully-qualified plugin package name prefixed with a "+" symbol.
-The following is an example of including a plugin.
+to simply pass YourPluginName to C<load.plugins> option of the load() method.
+Otherwise you will need to pass the fully-qualified plugin package name prefixed
+with a "+" symbol. The following is an example of including a plugin.
 
     package MyApp::User;
     
     use Validation::Class;
     
-    load {
+    set {
         plugins => [
             'PluginName', # Validation::Class::Plugin::PluginName
             '+MyApp::User::YourPluginName'
@@ -484,6 +561,7 @@ The following is an example of including a plugin.
     };
     
     # a validation rule
+    
     field 'login'  => {
         label      => 'User Login',
         error      => 'Login invalid.',
@@ -495,6 +573,7 @@ The following is an example of including a plugin.
     };
     
     # a validation rule
+    
     field 'password'  => {
         label         => 'User Password',
         error         => 'Password invalid.',
@@ -507,26 +586,29 @@ The following is an example of including a plugin.
     
     1;
     
-Your plugin is loaded at runtime and can manipulate the L<Validation::Class>
-object by declaring a B<new> method. The following is an example of a fictitious
+Your plugin is loaded at runtime and can manipulate the calling class by
+declaring a B<new> method. The following is an example of a fictitious
 plugin for formatting telephone numbers:
 
     package Validation::Class::Plugin::TelephoneFormatting;
     
-    # hook into the instantiation process
-    # of the calling class at runtime
+    # hook into the instantiation process of the calling class at runtime
+    
     sub new {
     
         my ($plugin, $caller) = @_;
         
         # US Telephones
+        
         $caller->filters->{telephone_usa} = sub {
+        
             my $phone = shift;
                $phone =~ s/\D//g;
             
             my ($area, $prefix, $xchng) = $phone =~ m/1?(\d{3})(\d{3})(\d{4});
                
             return "+1 ($area) $prefix-$xchng";
+        
         };
         
     }
@@ -537,16 +619,17 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     
     use Validation::Class;
     
-    load {
+    set {
         plugins => ['TelephoneFormatting']
     };
     
     # a validation rule
+    
     field 'phone'  => {
         label      => 'Telephone Number',
         error      => 'Phone number invalid.',
         required   => 1,
-        filters    => 'telephone_usa',
+        filters    => ['telephone_usa'],
         filtering  => 'post',
         pattern    => '+1 (###) ###-####'
     };
@@ -556,16 +639,5 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     my $input = MyApp::User->new(...);
     
     # ...
-    
-=head1 AUTHOR
 
-Al Newkirk <awncorp@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by awncorp.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-    
 =cut

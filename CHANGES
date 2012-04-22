@@ -1,12 +1,10 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
-    - track class() usage and bubble-up errors via transactions
+    - introduce transactions - track class() usage and bubble-up errors
     - rewrite tests (using a simpler abstraction)
-    - cleanup error handling (needs its own class)
-    - merge half-ass cookbook into POD
 
-6.20 (2012-04-20)
+7.00_01 (2012-04-20)
     * major implementation overhaul
     * prevent namespace pollution by employing a prototype class
     * added proto/prototype method to access prototype class
@@ -15,3 +13,5 @@ TODO (0000-00-00)
     * no longer registering quickname for relatives
     * depreciated load_plugins and load_classes methods
     * removed Array::Unique finally
+    * cleanup error handling (needs its own class)
+    * merge half-ass cookbook into intro POD

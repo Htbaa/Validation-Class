@@ -1,4 +1,4 @@
-# ABSTRACT: Backwards-Compatibility Layer for Validation::Class::Engine
+# ABSTRACT: Backwards-Compatibility Layer for Validation::Class
 
 package Validation::Class::Backwards;
 
@@ -8,6 +8,15 @@ use warnings;
 # VERSION
 
 use Carp 'confess';
+
+$ENV{'VALIDATION_CLASS_BC_WARNING'} = <<'WARNING'; # usage warning
+The method you're attempting to use is (or will be) DEPRECIATED.
+WARNING
+
+sub warning {
+    warn $ENV{'VALIDATION_CLASS_BC_WARNING'}
+        if $ENV{'VALIDATION_CLASS_BC_WARNING'}
+}
 
 =head1 SYNOPSIS
 
@@ -27,11 +36,12 @@ use Carp 'confess';
 
 Validation::Class::Backwards is responsible for providing depreciated
 functionality to the L<Validation::Class::Prototype> layer whilst clearly
-remaining seperate via namespacing.
+remaining separate via namespacing.
 
 Note: The methods described here will eventually become obsolete and cease to
-exist. Please review the namespace occassionally and adjust your code
-accordingly.
+exist. Please review the namespace occasionally and adjust your code
+accordingly. Using methods defined here will generate warnings unless you
+unset the $ENV{'VALIDATION_CLASS_BC_WARNING'} environment variable.
 
 =cut
 
@@ -67,7 +77,7 @@ RECOMMENDED:
 
 =cut
 
-sub error {
+sub error { warning();
     
     my ( $self, @args ) = @_;
 
@@ -110,86 +120,6 @@ sub error {
     # return all class-level error messages
     return $self->errors->all_errors;
     
-}
-
-=method error_count
-
-The error_count method returns the total number of error encountered from the 
-last validation call.
-
-    return $self->error_count();
-    
-    unless ($self->validate) {
-        print "Found ". $self->error_count ." Errors";
-    }
-
-=cut
-
-sub error_count {
-    
-    my ($self) = @_;
-    
-    return $self->errors->count_errors;
-    
-}
-
-=method error_fields
-
-The error_fields method returns a hashref of fields whose value is an arrayref
-of error messages.
-
-    unless ($self->validate) {
-        my $bad_fields = $self->error_fields();
-    }
-    
-    my $bad_fields = $self->error_fields('login', 'password');
-
-=cut
-
-sub error_fields {
-    
-    my ($self, @fields) = @_;
-    
-    my $error_fields = {};
-    
-    @fields = keys %{$self->fields} unless @fields;
-    
-    foreach my $name (@fields) {
-        
-        my $field = $self->fields->{$name};
-        
-        if ($field->{errors}->has_errors) {
-            
-            $error_fields->{$name} = $field->{errors}->error_list;
-        
-        }
-        
-    }
-    
-    return $error_fields;
-
-}
-
-=method errors_to_string
-
-The errors_to_string method stringifies the error arrayref object using the
-specified delimiter or ', ' by default. 
-
-    return $self->errors_to_string("\n");
-    return $self->errors_to_string(undef, sub{ ucfirst lc shift });
-    
-    unless ($self->validate) {
-        return $self->errors_to_string;
-    }
-
-=cut
-
-sub errors_to_string {
-    
-    my ($self, $delimiter, $transformer) = @_;
-    
-    return $self->errors->to_string($delimiter, $transformer);
-
 }
 
 1;

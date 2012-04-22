@@ -34,11 +34,17 @@ This class is primarily used as a base class for collection management classes.
 
 sub new {
     
-    my ($class, $config) = @_;
+    my $class = shift;
     
-    $config ||= {};
+    my %arguments = @_ % 2 ? %{$_[0]} : @_;
     
-    my $self = bless $config, $class;
+    my $self = bless {}, $class;
+    
+    while (my($name, $value) = each(%arguments)) {
+        
+        $self->add($name => $value);
+        
+    }
     
     return $self;
     

@@ -49,7 +49,15 @@ derived classes on both the class and field levels respectively.
 
 sub new {
     
-    bless [], shift
+    my $class = shift;
+    
+    my @arguments = @_ ? @_ > 1 ? @_ : "ARRAY" eq ref $_[0] ? @{$_[0]} : () : ();
+    
+    my $self = bless [], $class;
+    
+    $self->add_error($_) for @arguments;
+    
+    return $self;
     
 }
 
@@ -70,6 +78,8 @@ sub add_error { goto &add_errors }
 sub add_errors {
     
     my ($self, @error_messages) = @_;
+    
+    return undef unless @error_messages;
     
     my %seen = map { $_ => 1 } @{$self};
     

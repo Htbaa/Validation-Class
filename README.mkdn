@@ -1,10 +1,10 @@
 # NAME
 
-Validation::Class - Low-Fat Full-Flavored Data Modeling and Validation Framework
+Validation::Class - Simple Object System, Data Validation and Modeling Framework
 
 # VERSION
 
-version 6.05
+version 7.00_01
 
 # SYNOPSIS
 
@@ -65,7 +65,7 @@ version 6.05
     has attitude => 1; 
     
 
-    # self-validating method
+    # self-validating method (even better than method signatures)
     
 
     mth create  => {
@@ -107,9 +107,9 @@ version 6.05
 
     1;
 
-Validation::Class takes a different approach towards data validation, it
-centralizes data validation rules to ensure consistency through DRY
-(dont-repeat-yourself) code.
+Validation::Class takes a different approach towards data modeling and
+validation, it centralizes data validation rules to ensure consistency through
+DRY (dont-repeat-yourself) code.
 
     use MyApp;
     
@@ -136,7 +136,7 @@ centralizes data validation rules to ensure consistency through DRY
 
 # DESCRIPTION
 
-Validation::Class is much more than a simple data validation framework, in-fact
+Validation::Class is much more than a robust data validation framework, in-fact
 it is more of a data modeling framework and can be used as an alternative to
 minimalistic object systems such as [Moo](http://search.cpan.org/perldoc?Moo), [Mo](http://search.cpan.org/perldoc?Mo), etc.
 
@@ -146,9 +146,9 @@ self-validating data models.
 When fields (attributes with validation rules) are defined, accessors are
 automatically generated to make getting and setting their values much easier.
 
-Methods can be defined using the method keyword which can make the routine
-self-validating, checking the defined input requirements against existing
-validation rules before executing the routine gaining consistency and security.
+Methods can be defined using the method keyword to create a self-validating
+method, checking the defined input requirements against existing validation rules
+before executing the routine, gaining consistency and security.
 
 # KEYWORDS
 
@@ -228,7 +228,9 @@ packages to be used in all your classes.
         
 
             my $handle = $field->{label} || $field->{name};
-            $self->error($field, "$handle must be a valid email address");
+            
+
+            $self->errors->add_error("$handle must be a valid email address");
             
 
             return 0;
@@ -341,8 +343,8 @@ The coderef should also return the transformed value.
 
 The load keyword (or set), which can also be used as a method, provides options
 for extending the current class by attaching other [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) classes
-as roles. The process of applying roles to the current class mainly involve
-copying the role's methods and configuration.
+as relatives, roles, plugins, etc. The process of applying roles to the current
+class mainly involve copying the role's methods and configuration.
 
     package MyApp;
     
@@ -350,7 +352,7 @@ copying the role's methods and configuration.
     use Validation::Class;
     
 
-    # load specific child class
+    # load stuff (extend MyApp)
     
 
     load {
@@ -360,43 +362,13 @@ copying the role's methods and configuration.
 
     1;
 
-The `load.class` option, can be a constant or arrayref, will require other
-classes specifically and add them to the relationship map for convenient access
-through the class() method. Existing parameters and configuration options are
-passed to the child class' constructor. All attributes can be easily overwritten
-using the attribute's accessors on the child class.
-
-    package MyApp;
-    
-
-    use Validation::Class;
-    
-
-    # load specific child class
-    
-
-    load {
-        class => 'MyApp::Relative'
-    };
-    
-
-    package main;
-    
-
-    my $app = MyApp->new;
-    
-
-    my $rel = $app->class('relative'); # instantiated MyApp::Relative object
-    my $rel = $app->class('MyApp::Relative'); # alternatively
-    
-
-    1;
-
-The `load.classes` option, can be a constant or arrayref, uses [Module::Find](http://search.cpan.org/perldoc?Module::Find)
+The `load.classes` option, can be a constant or arrayref and uses [Module::Find](http://search.cpan.org/perldoc?Module::Find)
 to load __all__ child classes (in-all-subdirectories) for convenient access
 through the class() method. Existing parameters and configuration options are
 passed to the child class' constructor. All attributes can be easily overwritten
-using the attribute's accessors on the child class.
+using the attribute's accessors on the child class. These child classes are
+often referred to as relatives. This option accepts a constant or an arrayref of
+constants.
 
     package MyApp;
     
@@ -404,11 +376,13 @@ using the attribute's accessors on the child class.
     use Validation::Class;
     
 
-    # load specific child class
+    # load all child classes
     
 
     load {
-        classes => 1
+        classes => [
+            __PACKAGE__
+        ]
     };
     
 
@@ -418,12 +392,11 @@ using the attribute's accessors on the child class.
     my $app = MyApp->new;
     
 
-    my $rel = $app->class('relative'); # instantiated MyApp::Relative object
-    my $rel = $app->class('MyApp::Relative'); # alternatively
+    my $rel = $app->class('relative'); # new MyApp::Relative object
     
 
     my $rel = $app->class('data_source'); # MyApp::DataSource
-    my $rel = $app->class('data_source-first'); # MyApp::DataSource::First
+    my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
     
 
     1;
@@ -433,7 +406,8 @@ A Validation::Class plugin is little more than a class that implements a "new"
 method that extends the associated validation class object. As usual, an official
 Validation::Class plugin can be referred to using shorthand while custom plugins
 are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
-more about plugins at [Validation::Class::Cookbook](http://search.cpan.org/perldoc?Validation::Class::Cookbook).
+more about plugins at [Validation::Class::Cookbook](http://search.cpan.org/perldoc?Validation::Class::Cookbook). This option accepts a
+constant or an arrayref of constants.
 
     package MyVal;
     
@@ -450,17 +424,10 @@ more about plugins at [Validation::Class::Cookbook](http://search.cpan.org/perld
 
 The `load.roles` option is used to load and inherit functionality from child
 classes, these classes should be used and thought-of as roles. Any validation
-class can be used as a role with this option.
+class can be used as a role with this option. This option accepts a constant or
+an arrayref of constants.
 
     package MyVal::User;
-    
-
-    load {
-        role => 'MyVal::Person'
-    };
-    
-
-    # or
     
 
     load {
@@ -625,10 +592,43 @@ be used to execute a sequence of actions for validation purposes.
 
 ## new
 
-The new method, exported into the calling namespace automatically, should NOT be
-tampered with. The new method performs a series of actions (magic) required for
-the class to function properly. See the build keyword for hooking into the
+The new method instantiates a new class object, it performs a series of actions
+(magic) required for the class function properly, and for that reason, this
+method should never be overridden. Use the build keyword to hooking into the
 instantiation process.
+
+    package MyApp;
+    
+
+    use Validation::Class;
+    
+
+    # optionally
+    
+
+    build sub {
+        
+
+        my ($self) = @_; # is instantiated
+        
+
+    };
+    
+
+    package main;
+    
+
+    my $app = MyApp->new;
+    
+
+    ...
+
+## prototype
+
+The prototype method (or proto) returns an instance of the associated class
+prototype. The class prototype is responsible for manipulating and validating
+the data model (current class). It is not likely that you'll need to access
+this method directly.
 
     package MyApp;
     
@@ -642,14 +642,47 @@ instantiation process.
     my $app = MyApp->new;
     
 
+    my $prototype = $app->prototype;
+    
+
     ...
 
-# ATTRIBUTES, METHODS, AND MORE
+# THE PROTOTYPE CLASS
 
-This class encapsulates the functionality used to manipulate the environment of
-the calling class. The engine-class is the role that provides all of the data
-validation functionality, please see [Validation::Class::Engine](http://search.cpan.org/perldoc?Validation::Class::Engine) for more
-information on specific methods, and attributes.
+This module provides mechanisms (sugar functions to model your data) which allow
+you to define self-validating classes. Each class your create is associated with
+a *prototype* class which provides data validation functionality and keeps your
+class' namespace free from pollution, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype)
+for more information on specific methods, and attributes.
+
+All derived classes will have a prototype-class attached to it which does all
+the heavy lifting (regarding validation and error handling). The prototype
+injects a few proxy methods into your class which are basically aliases to your
+prototype class, however it is possible to access the prototype directly using
+the proto/prototype methods.
+
+    package MyApp::User;
+    
+
+    use Validation::Class;
+    
+
+    package main;
+    
+
+    my $user  = MyApp::User->new;
+    my $proto = $user->prototype;
+    
+
+    $proto->error_count # same as calling $self->error_count
+
+# THE OBJECT SYSTEM
+
+All derived classes will benefit from the light-weight, straight-forward and
+simple object system Validation::Class provides. The standard *new* method
+should be used to instantiate a new object and the *bld/build* keywords can be
+used to hook into the instantiation process. Validation::Class does NOT provide
+method modifiers but can be extended with [Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers).
 
 ## before
 
@@ -674,11 +707,11 @@ documentation.
 
 # AUTHOR
 
-Al Newkirk <awncorp@cpan.org>
+Al Newkirk <anewkirk@ana.io>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by awncorp.
+This software is copyright (c) 2011 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

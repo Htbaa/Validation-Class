@@ -9,9 +9,6 @@ package MyVal;
 
 use Validation::Class;
 
-# __PACKAGE__->load_classes; - DEPRECIATED
-# __PACKAGE__->load_plugins('+MyVal::Plugin::Glade'); - DEPRECIATED
-
 set {
     
     classes => [__PACKAGE__],
@@ -26,8 +23,6 @@ use Validation::Class;
 package ValMy::Alt;
 
 use Validation::Class;
-
-# __PACKAGE__->load_plugins('+MyVal::Plugin::Glade'); - DEPRECIATED
 
 set {
     

@@ -9,8 +9,8 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Low-Fat Full-Flavored Data Modeling and Validation Framework",
-  "AUTHOR" => "Al Newkirk <awncorp\@cpan.org>",
+  "ABSTRACT" => "Simple Object System, Data Validation and Modeling Framework",
+  "AUTHOR" => "Al Newkirk <anewkirk\@ana.io>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -20,15 +20,15 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Validation::Class",
   "PREREQ_PM" => {
-    "Array::Unique" => 0,
     "Carp" => 0,
     "Hash::Flatten" => 0,
     "Hash::Merge" => 0,
-    "Module::Find" => 0
+    "Module::Find" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "6.05",
+  "VERSION" => "7.00_01",
   "test" => {
-    "TESTS" => "t/*.t t/past/*.t t/past/filters/*.t t/past/validators/*.t"
+    "TESTS" => "t/*.t t/archived/*.t t/archived/filters/*.t t/archived/validators/*.t"
   }
 );
 
