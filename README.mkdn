@@ -4,7 +4,7 @@ Validation::Class - Simple Object System, Data Validation and Modeling Framework
 
 # VERSION
 
-version 7.00_01
+version 7.01
 
 # SYNOPSIS
 

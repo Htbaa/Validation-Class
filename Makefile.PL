@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Module::Find" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.00_01",
+  "VERSION" => "7.01",
   "test" => {
     "TESTS" => "t/*.t t/archived/*.t t/archived/filters/*.t t/archived/validators/*.t"
   }

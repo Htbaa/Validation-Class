@@ -2,9 +2,9 @@ This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
     - introduce transactions - track class() usage and bubble-up errors
-    - rewrite tests (using a simpler abstraction)
 
-7.00_01 (2012-04-20)
+7.01 (2012-04-23)
+    * release new public version
     * complete rewrite
     * major implementation overhaul
     * prevent namespace pollution by employing a prototype class
@@ -16,3 +16,4 @@ TODO (0000-00-00)
     * removed Array::Unique finally
     * cleanup error handling (needs its own class)
     * merge half-ass cookbook into intro POD
+    * started rewriting existing tests (and new ones)
