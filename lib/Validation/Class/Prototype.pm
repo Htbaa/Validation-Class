@@ -2581,53 +2581,6 @@ sub get_params {
     
 }
 
-=method get_params_hash
-
-If your fields and parameters are designed with complex hash-like structures,
-the get_params_hash method returns the deserialized hashref of registered
-parameters based on the the default or custom configuration of the hash
-serializer L<Hash::Flatten>. Please note, this functionality is called
-automatically during normalization which occurs at instantiation and
-validation, so chances are good that you'll likely not need to call this method.
-
-    my $params = {
-        'user.login' => 'member',
-        'user.password' => 'abc123456'
-    };
-    
-    $params = $self->get_params_hash;
-        
-    print $params->{user}->{login};
-    
-    $self->params->add(
-        'user.login' => 'member',
-        'user.password' => 'abc123456'
-    );
-    
-    if ($self->validate) {
-    
-        print $params->{user}->{login};
-        
-    }
-
-=cut
-
-sub get_params_hash {
-    
-    my ($self, $params) = @_;
-    
-    $self->params->add($params) if $params;
-    
-    $params = $self->params->hash;
-    
-    my $serializer = Hash::Flatten->new($self->hash_inflator);
-    
-    $params = $serializer->unflatten($params);
-    
-    return $params;
-    
-}
-
 sub merge_fields {
 
     my ($self, $field, $mixin_field) = @_;
@@ -2799,7 +2752,7 @@ sub normalize {
     
     if (grep { ref($_) } values %{$self->params}) {
         
-        $self->set_params_hash($self->params);
+        $self->flatten_params($self->params);
         
     }
     
@@ -3204,10 +3157,10 @@ sub set_method {
     
 }
 
-=method set_params_hash
+=method flatten_params
 
 Depending on how parameters are being input into your application, if your
-input parameters are already complex hash structures, The set_params_hash method
+input parameters are already complex hash structures, The flatten_params method
 will set and return the serialized version of your hashref based on the the
 default or custom configuration of the hash serializer L<Hash::Flatten>.
 
@@ -3220,15 +3173,15 @@ default or custom configuration of the hash serializer L<Hash::Flatten>.
         
     };
     
-    my $serialized_params = $self->set_params_hash($params);
+    my $serialized_params = $self->flatten_params($params);
 
 =cut
 
-sub set_params_hash {
+sub flatten_params {
 
     my ($self, $params) = @_;
     
-    $params = $self->get_params_hash($params);
+    $params = $self->unflatten_params($params);
     
     my $serializer = Hash::Flatten->new($self->hash_inflator);
     
@@ -3321,6 +3274,53 @@ sub throw_error {
     $error_message =~ s/\s+/ /g;
     
     confess $error_message ;
+    
+}
+
+=method unflatten_params
+
+If your fields and parameters are designed with complex hash-like structures,
+the unflatten_params method returns the deserialized hashref of registered
+parameters based on the the default or custom configuration of the hash
+serializer L<Hash::Flatten>. Please note, this functionality is called
+automatically during normalization which occurs at instantiation and
+validation, so chances are good that you'll likely not need to call this method.
+
+    my $params = {
+        'user.login' => 'member',
+        'user.password' => 'abc123456'
+    };
+    
+    $params = $self->unflatten_params;
+        
+    print $params->{user}->{login};
+    
+    $self->params->add(
+        'user.login' => 'member',
+        'user.password' => 'abc123456'
+    );
+    
+    if ($self->validate) {
+    
+        print $params->{user}->{login};
+        
+    }
+
+=cut
+
+sub unflatten_params {
+    
+    my ($self, $params) = @_;
+    
+    $self->params->add($params) if $params;
+    
+    $params = $self->params->hash;
+    
+    my $serializer = Hash::Flatten->new($self->hash_inflator);
+    
+    $params = $serializer->unflatten($params);
+    
+    return $params;
     
 }
 

@@ -20,61 +20,41 @@ use Test::More;
     
     package main;
     
-    my $class = TestClass::CheckParameters->new;
+    my $class = "TestClass::CheckParameters";
+    my $self  = $class->new;
     
-    ok "TestClass::CheckParameters" eq ref $class,
-    "TestClass::CheckParameters instantiated";
+    ok $class eq ref $self, "$class instantiated";
     
-    ok $_ eq $class->name($_),  
-    "TestClass::CheckParameters name accessor set to `$_` with expected return ".
-    "value" for (
-        'Kathy',
-        'Joe',
-        'John',
-        'O',
-        '1',
-        1234,
-        'Ricky',
-        '~',
-        '',
-        'Lady',
-        '§§',
-        '♠♣♥♦♠♣♥♦♠♣♥♦'
+    my @vals = qw(
+        Kathy
+        Joe
+        John
+        O
+        1
+        234
+        Ricky
+        ~
+        '
+        Lady
+        §§
+        ♠♣♥♦♠♣♥♦♠♣♥♦
     );
     
-    ok $class->params->{name} eq $class->name($_),  
-    "TestClass::CheckParameters name parameter set to `$_` using ".
-    "the name accessor" for (
-        'Kathy',
-        'Joe',
-        'John',
-        'O',
-        '1',
-        1234,
-        'Ricky',
-        '~',
-        '',
-        'Lady',
-        '§§',
-        '♠♣♥♦♠♣♥♦♠♣♥♦'
-    );
+    for my $v (@vals) {
+        
+        ok $v eq $self->name($v),  
+            "$class name accessor set to `$v` with expected return value"
+        
+    }
     
-    ok $class->params->{name} eq $class->name($_), 
-    "TestClass::CheckParameters name parameter set to `$_` using ".
-    "the name accessor" for (
-        'Kathy',
-        'Joe',
-        'John',
-        'O',
-        '1',
-        1234,
-        'Ricky',
-        '~',
-        '',
-        'Lady',
-        '§§',
-        '♠♣♥♦♠♣♥♦♠♣♥♦'
-    );
+    for my $v (@vals) {
+        
+        ok $self->params->{name} eq $self->name($v),  
+            "$class name parameter set to `$v` using the name accessor"
+        
+    }
+    
+    ok $class->name;
     
 }
 

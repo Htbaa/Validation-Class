@@ -531,7 +531,7 @@ sub field {
             
             my $proto      = $self->proto;
             my $fields     = $proto->fields;
-            my $parameters = $proto->get_params_hash;
+            my $parameters = $proto->unflatten_params;
             
             my $result = undef;
             
@@ -543,7 +543,7 @@ sub field {
             
             $result = $proto->field_default_value($name, $parameters);
                 
-            $proto->set_params_hash($parameters);
+            $proto->flatten_params($parameters);
             
             return $result;
             
