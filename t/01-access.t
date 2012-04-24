@@ -6,7 +6,6 @@ BEGIN {
 }
 
 use utf8;
-use open qw/:std :utf8/;
 use Test::More;
 
 {

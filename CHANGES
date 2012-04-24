@@ -3,7 +3,10 @@ This file documents the revision history for the Perl library Validation::Class.
 TODO (0000-00-00)
     - introduce transactions - track class() usage and bubble-up errors
 
-7.03 (2012-04-23)
+7.04 (2012-04-24)
+    * using the 5.14 open pragma for one test cause failures on cpants
+
+7.03 (2012-04-24)
     * fixed minor object-based parameter handling issue
     * get_hash_params method renamed unflatten_params
     * set_hash_params method renamed flatten_params

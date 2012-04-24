@@ -494,9 +494,7 @@ key/values pairs known as directives.
 The field keyword also creates accessors which provide easy access to the
 field's corresponding parameter value(s). Accessors will be created using the
 field's name as a label having any special characters replaced with an
-underscore, however, please be aware that fields with names that resemble
-flattened arrays will be labeled without being suffixed with the index number
-and will instead require the index as its first parameter.
+underscore.
 
     field 'login' => {
         required   => 1,
@@ -521,9 +519,9 @@ and will instead require the index as its first parameter.
     
     $self->preference_send_reminders($value);
     
-    $self->preference_send_reminders_text($index => $value);
+    $self->preference_send_reminders_text_0($value);
 
-Protip: Fields are used to validate scalar and array data. Please don't use
+Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword
 instead.
 
@@ -544,7 +542,7 @@ sub field {
         
         confess "Error creating accessor $name on $proto->{package}, ".
             "attribute collision" if exists $proto->{config}->{FIELDS}->{$name};
-            
+        
         confess "Error creating accessor $name on $proto->{package}, ".
             "method collision" if $proto->{package}->can($name);
         
@@ -554,13 +552,11 @@ sub field {
         
         no strict 'refs';
         
-        #my @split_name = split /\W/, $name;
-        #
-        #my $is_array_field = $split_name[-1] =~ /^\d$/ ? 1 : 0;
-        #
-        #my $accessor = join("_", @split_name[0..($#split_name - 1)]) || $name;
+        my $accessor = $name;
         
-        *{"$proto->{package}\::$name"} = sub {
+        $accessor =~ s/[^a-zA-Z0-9_]/_/g;
+        
+        my $accessor_routine = sub {
             
             my ($self, $data) = @_;
             
@@ -572,7 +568,7 @@ sub field {
             
             if (defined $data && not defined $fields->{$name}->{readonly}) {
                 
-                $parameters->{$name} = $data;
+                $parameters->{$name} = $data ;
                 
                 # OMG - this is sooo gross !!!
                 # are you really telling me that this is the best you can do
@@ -597,6 +593,8 @@ sub field {
             return $result;
             
         };
+        
+        *{"$proto->{package}\::$accessor"} = $accessor_routine;
         
     };
     

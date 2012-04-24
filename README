@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.03
+    version 7.04
 
 SYNOPSIS
         package MyVal::User;
@@ -233,10 +233,7 @@ KEYWORDS
     The field keyword also creates accessors which provide easy access to
     the field's corresponding parameter value(s). Accessors will be created
     using the field's name as a label having any special characters replaced
-    with an underscore, however, please be aware that fields with names that
-    resemble flattened arrays will be labeled without being suffixed with
-    the index number and will instead require the index as its first
-    parameter.
+    with an underscore.
 
         field 'login' => {
             required   => 1,
@@ -261,11 +258,11 @@ KEYWORDS
     
         $self->preference_send_reminders($value);
     
-        $self->preference_send_reminders_text($index => $value);
+        $self->preference_send_reminders_text_0($value);
 
-    Protip: Fields are used to validate scalar and array data. Please don't
-    use fields to store and validate blessed objects. Please see the *has*
-    keyword instead.
+    Protip: Field directives are used to validate scalar and array data.
+    Don't use fields to store and validate blessed objects. Please see the
+    *has* keyword instead.
 
   filter
     The filter keyword (or flt) creates custom filters to be used in your

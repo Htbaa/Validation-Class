@@ -3516,8 +3516,9 @@ sub validate {
     
         my $params = $self->params->hash;
         
-        my ($ad, $hd) = @{$self->hash_inflator}{'ArrayDelimiter', 'HashDelimiter'};
-        # ^^ pun here
+        my ($ad, $hd) = @{$self->hash_inflator}
+            # ^^ pun here
+            {'ArrayDelimiter', 'HashDelimiter'};
         
         my %seen = ();
         
