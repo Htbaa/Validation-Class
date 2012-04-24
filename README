@@ -1,9 +1,9 @@
 NAME
-    Validation::Class - Simple Object System, Data Validation and Modeling
+    Validation::Class - Self-Validating Object System and Data Validation
     Framework
 
 VERSION
-    version 7.01
+    version 7.03
 
 SYNOPSIS
         package MyVal::User;
@@ -213,8 +213,8 @@ KEYWORDS
 
   field
     The field keyword (or fld) creates an attribute with validation rules
-    for reuse in code. The field keyword may also correspond with the
-    parameter name expected to be passed to your validation class.
+    for reuse in code. The field name should correspond with the parameter
+    name expected to be passed to your validation class.
 
         package MyApp::User;
     
@@ -230,9 +230,42 @@ KEYWORDS
     The field keyword takes two arguments, the field name and a hashref of
     key/values pairs known as directives.
 
-    Protip: Fields are used to validate constant and array data, not
-    hashrefs and objects. Don't try to use fields like attributes (use the
-    has keyword instead).
+    The field keyword also creates accessors which provide easy access to
+    the field's corresponding parameter value(s). Accessors will be created
+    using the field's name as a label having any special characters replaced
+    with an underscore, however, please be aware that fields with names that
+    resemble flattened arrays will be labeled without being suffixed with
+    the index number and will instead require the index as its first
+    parameter.
+
+        field 'login' => {
+            required   => 1,
+            min_length => 1,
+            max_length => 255,
+            ...
+        };
+    
+        field 'preference.send_reminders' => {
+            required   => 1,
+            max_length => 1,
+            ...
+        };
+    
+        field 'preference.send_reminders.text:0' => {
+            ...
+        };
+    
+        my $value = $self->login;
+    
+        $self->login($new_value); # arrayrefs and hashrefs will be flattened
+    
+        $self->preference_send_reminders($value);
+    
+        $self->preference_send_reminders_text($index => $value);
+
+    Protip: Fields are used to validate scalar and array data. Please don't
+    use fields to store and validate blessed objects. Please see the *has*
+    keyword instead.
 
   filter
     The filter keyword (or flt) creates custom filters to be used in your

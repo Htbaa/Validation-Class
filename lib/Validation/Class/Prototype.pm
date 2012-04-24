@@ -2459,6 +2459,41 @@ sub field_default_value {
     
 }
 
+=method flatten_params
+
+Depending on how parameters are being input into your application, if your
+input parameters are already complex hash structures, The flatten_params method
+will set and return the serialized version of your hashref based on the the
+default or custom configuration of the hash serializer L<Hash::Flatten>.
+
+    my $params = {
+        
+        user => {
+            login => 'member',
+            password => 'abc123456'
+        }
+        
+    };
+    
+    my $serialized_params = $self->flatten_params($params);
+
+=cut
+
+sub flatten_params {
+
+    my ($self, $params) = @_;
+    
+    $params = $self->unflatten_params($params);
+    
+    my $serializer = Hash::Flatten->new($self->hash_inflator);
+    
+    $self->{params} =
+        Validation::Class::Params->new($serializer->flatten($params));
+    
+    return $self->params->hash;
+
+}
+
 =method get_errors
 
 The get_errors method returns a list of combined class-and-field-level errors.
@@ -2914,7 +2949,7 @@ sub normalize {
 
 The param method gets/sets a single parameter by name.
 
-    $self->param('name');
+    my $value = $self->param('name');
     
     $self->param('name', '...');
 
@@ -3101,7 +3136,7 @@ sub reset_fields {
 =method set_errors
 
 The set_errors method pushes its arguments (error messages) onto the class-level
-error stack of the current class.
+error stack and returns a count of class-level errors.
 
     my $count = $self->set_errors(..., ...);
 
@@ -3111,9 +3146,9 @@ sub set_errors {
 
     my ($self, @errors) = @_;
     
-    $self->errors->add(@errors)  if @errors;
+    $self->errors->add(@errors) if @errors;
     
-    return @errors;
+    return $self->errors->count;
 
 }
 
@@ -3157,38 +3192,21 @@ sub set_method {
     
 }
 
-=method flatten_params
+=method set_params
 
-Depending on how parameters are being input into your application, if your
-input parameters are already complex hash structures, The flatten_params method
-will set and return the serialized version of your hashref based on the the
-default or custom configuration of the hash serializer L<Hash::Flatten>.
+The set_params method records new parameters and returns the new parameter count.
 
-    my $params = {
-        
-        user => {
-            login => 'member',
-            password => 'abc123456'
-        }
-        
-    };
-    
-    my $serialized_params = $self->flatten_params($params);
+    my $count = $self->set_params(..., ...);
 
 =cut
 
-sub flatten_params {
+sub set_params {
 
-    my ($self, $params) = @_;
+    my ($self, @params) = @_;
     
-    $params = $self->unflatten_params($params);
+    $self->params->add(@params)  if @params;
     
-    my $serializer = Hash::Flatten->new($self->hash_inflator);
-    
-    $self->{params} =
-        Validation::Class::Params->new($serializer->flatten($params));
-    
-    return $self->params->hash;
+    return $self->params->count;
 
 }
 

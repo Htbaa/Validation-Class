@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Simple Object System, Data Validation and Modeling Framework",
+  "ABSTRACT" => "Self-Validating Object System and Data Validation Framework",
   "AUTHOR" => "Al Newkirk <anewkirk\@ana.io>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
@@ -26,9 +26,9 @@ my %WriteMakefileArgs = (
     "Module::Find" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.01",
+  "VERSION" => "7.03",
   "test" => {
-    "TESTS" => "t/*.t t/archived/*.t t/archived/filters/*.t t/archived/validators/*.t"
+    "TESTS" => "t/*.t t/regression/*.t t/regression/filters/*.t t/regression/validators/*.t"
   }
 );
 
