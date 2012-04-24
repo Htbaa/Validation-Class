@@ -103,4 +103,60 @@ use Test::More;
     
 }
 
+{
+    
+    package TestClass::FieldAccessors;
+    use Validation::Class;
+    
+    fld 'name.first' => {
+        required => 1
+    };
+    
+    fld 'name.last' => {
+        required => 1
+    };
+    
+    fld 'name.phone:0' => {
+        required => 0
+    };
+    
+    fld 'name.phone:1' => {
+        required => 0
+    };
+    
+    fld 'name.phone:2' => {
+        required => 0
+    };
+    
+    package main;
+    
+    my $class = "TestClass::FieldAccessors";
+    my $self  = $class->new;
+    
+    ok $class eq ref $self, "$class instantiated";
+    
+    my @accessors = ();
+    
+    {
+        
+        no strict 'refs';
+        
+        @accessors =
+            sort grep { defined &{"$class\::$_"} && $_ =~ /^name/ }
+                %{"$class\::"};
+        
+        ok 5 == @accessors, 
+            "$class has 5 name* accessors";
+        
+    }
+    
+    ok $accessors[0] eq 'name_first',   "$class has the name_first accessor";
+    ok $accessors[1] eq 'name_last',    "$class has the name_last accessor";
+    ok $accessors[2] eq 'name_phone_0', "$class has the name_phone_0 accessor";
+    ok $accessors[3] eq 'name_phone_1', "$class has the name_phone_1 accessor";
+    ok $accessors[4] eq 'name_phone_2', "$class has the name_phone_2 accessor";
+    
+    
+}
+
 done_testing;
