@@ -1,7 +1,9 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
-    - introduce transactions - track class() usage and bubble-up errors
+    - profiles use transactions to track class/validation usage and raise errors
+    - change accessor naming and arguments for fields that match array elements
+    - smarter parameter handling (via accessors, params object, etc.)
 
 7.04 (2012-04-24)
     * using the 5.14 open pragma for one test cause failures on cpants
