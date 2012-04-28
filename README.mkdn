@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.04
+version 7.10_01
 
 # SYNOPSIS
 
@@ -324,10 +324,10 @@ underscore.
     $self->login($new_value); # arrayrefs and hashrefs will be flattened
     
 
-    $self->preference_send_reminders($value);
+    $self->preference_send_reminders;
     
 
-    $self->preference_send_reminders_text_0($value);
+    $self->preference_send_reminders_text_0;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword
