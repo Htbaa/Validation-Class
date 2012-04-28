@@ -5,6 +5,17 @@ TODO (0000-00-00)
     - change accessor naming and arguments for fields that match array elements
     - smarter parameter handling (via accessors, params object, etc.)
 
+7.10 (2012-04-27)
+    * enforcing field naming convention to reduce margin for error
+    * refactored and decoupled main validation routine
+    * added has() method to V::C::Collection
+    * various POD updates
+    * major engine refactoring
+    * renamed set_field_value to set_fields
+    * renamed default_field_value to get_value
+    * changed set_params
+    * remembered (+documented) why we dont reap cloned fields
+
 7.04 (2012-04-24)
     * using the 5.14 open pragma for one test cause failures on cpants
 

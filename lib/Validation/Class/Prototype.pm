@@ -726,7 +726,7 @@ overridden. This attribute is a L<Validation::Class::Errors> object.
 
 =cut
 
-hold 'errors' => sub { Validation::Class::Errors->new };
+hold 'errors' => sub {[]};
 
 =attribute fields
 
@@ -738,7 +738,7 @@ overridden. This attribute is a L<Validation::Class::Fields> object.
 
 =cut
 
-hold 'fields' => sub { Validation::Class::Fields->new };
+hold 'fields' => sub {{}};
 
 =attribute filtering
 
@@ -775,11 +775,17 @@ behaves. The value must be a hashref of L<Hash::Flatten/OPTIONS> options. Purely
 for the sake of consistency, you can use lowercase keys (with underscores) which
 will be converted to camel-cased keys before passed to the serializer.
 
-    my $options = $self->hash_inflator({
+    my $self = MyApp::Validation->new(hash_inflator => {
         hash_delimiter => '/',
         array_delimiter => '//'
     });
+    
     ...
+    
+    # then, hereinafter referred to as 
+    
+    $self->hash_inflator->{HashDelimiter} = '/';
+    $self->hash_inflator->{ArrayDelimiter} = '//';
 
 =cut
 
@@ -871,7 +877,7 @@ overridden. This attribute is a L<Validation::Class::Params> object.
 
 =cut
 
-hold 'params' => sub { Validation::Class::Params->new };
+hold 'params' => sub {{}};
 
 =attribute plugins
 
@@ -978,7 +984,7 @@ sub apply_filter {
 
     my ($self, $filter, $field) = @_;
 
-    if (defined $self->params->{$field}) {
+    if ($self->params->has($field)) {
         
         if ($self->filters->{$filter} || "CODE" eq ref $filter) {
         
@@ -987,8 +993,9 @@ sub apply_filter {
                 my $code = "CODE" eq ref $filter ?
                     $filter : $self->filters->{$filter};
                 
-                $self->fields->{$field}->{value} = $self->params->{$field} =
-                    $code->( $self->params->{$field} );
+                $self->set_value(
+                    $field => $code->($self->params->{$field})
+                );
                 
             }
         
@@ -1034,14 +1041,14 @@ sub apply_filters {
             $self->apply_filter($_, $name) for @{$config->filters};
             
             # set default value - absolute last resort
-            if (defined $self->params->{$name}) {
+            if ($self->params->has($name)) {
                 
                 if (!$self->params->{$name}) {
                     
                     if (defined $config->{default}) {
                         
                         $self->params->{$name} =
-                            $self->field_default_value($name);
+                            $self->get_value($name);
                         
                     }
                     
@@ -1100,7 +1107,7 @@ sub apply_mixin_field {
 
     # merge
     
-    $self->fields->{$target} = $self->merge_fields(
+    $self->fields->{$target} = $self->merge_field(
         $self->fields->{$target},
         $self->fields->{$field}
     );
@@ -1247,60 +1254,41 @@ sub class {
         hash_inflator
         ignore_failure
         ignore_unknown
-        params
         report_failure
         report_unknown
-        stashed
-    );  # to be copied
-    
-    my $child = $self->relatives->{$class}->new;
-    
-    my $proto = $child->proto;
+    );  # to be copied (stash and params copied later)
     
     my $delimiter = $self->hash_inflator->{'HashDelimiter'};
     
     my %defaults = ( map { $_ => $self->$_ } @attrs );
     
+    $defaults{'stash'}  = $self->stash; # copy stash
+    $defaults{'params'} = $self->get_params; # copy params
+    
     my %settings = %{ merge(\%args, \%defaults) };
     
-    if (defined $settings{params}) {
+    my $child = $self->relatives->{$class}->new(%settings);
     
-        if ("HASH" eq ref $settings{params}) {
-            
-            $proto->{params} =
-                delete $settings{params};
-            
-        }
+    my $proto = $child->proto;
+
+    if (defined $settings{'params'}) {
         
-        if ("Validation::Class::Params" eq ref $settings{params}) {
-            
-            $proto->{params} =
-                Validation::Class::Params->new(delete $settings{params});
-            
-        }
-    
-    }
-    
-    while (my($attr, $value) = each(%settings)) {
+        $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
         
-        $proto->$attr($value);
-        
-    }
-    
-    $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
-    
-    foreach my $name (keys %{$proto->params}) {
-        
-        if ($name =~ /^$class$delimiter(.*)/) {
+        foreach my $name ($proto->params->keys) {
             
-            if (defined $proto->fields->{$1}) {
+            if ($name =~ /^$class$delimiter(.*)/) {
                 
-                push @{$proto->fields->{$1}->{alias}}, $name;
+                if ($proto->fields->has($1)) {
+                    
+                    push @{$proto->fields->{$1}->{alias}}, $name;
+                    
+                }
                 
             }
             
         }
-        
+
     }
     
     return $child;
@@ -1404,7 +1392,7 @@ sub clear_queue {
     for (my $i = 0; $i < @names; $i++) {
         
         $names[$i] =~ s/^[\-\+]{1}//;
-        $_[$i] = $self->params->{$names[$i]};
+        $_[$i] = $self->param($names[$i]);
         
     }
     
@@ -1892,7 +1880,7 @@ sub configuration_validator_depends_on {
                 push @blanks,
                     $class->fields->{$dep}->{label} ||
                     $class->fields->{$dep}->{name} 
-                    if ! $class->params->{$dep};
+                    if ! $class->param($dep);
 
             }
                 
@@ -1954,7 +1942,7 @@ sub configuration_validator_matches {
         
         # build the regex
         my $this = $value;
-        my $that = $class->params->{$directive} || '';
+        my $that = $class->param($directive) || '';
         
         unless ( $this eq $that ) {
             
@@ -2280,6 +2268,43 @@ sub configuration_validator_options {
 
 }
 
+sub configuration_validator_pattern {
+
+    my ( $directive, $value, $field, $class ) = @_;
+
+    if ($value) {
+
+        # build the regex
+        my $regex = $directive;
+
+        unless ("Regexp" eq ref $regex) {
+
+            $regex =~ s/([^#X ])/\\$1/g;
+            $regex =~ s/#/\\d/g;
+            $regex =~ s/X/[a-zA-Z]/g;
+            $regex = qr/$regex/;
+
+        }
+
+        unless ( $value =~ $regex ) {
+
+            my $handle = $field->{label} || $field->{name};
+            
+            my $error = "$handle does not match the "
+                ."pattern $directive";
+            
+            $field->errors->add($field->{error} || $error);
+
+            return 0;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
 =method error_count
 
 The error_count method returns the total number of errors set at both the class
@@ -2372,99 +2397,11 @@ sub errors_to_string {
 
 }
 
-sub configuration_validator_pattern {
-
-    my ( $directive, $value, $field, $class ) = @_;
-
-    if ($value) {
-
-        # build the regex
-        my $regex = $directive;
-
-        unless ("Regexp" eq ref $regex) {
-
-            $regex =~ s/([^#X ])/\\$1/g;
-            $regex =~ s/#/\\d/g;
-            $regex =~ s/X/[a-zA-Z]/g;
-            $regex = qr/$regex/;
-
-        }
-
-        unless ( $value =~ $regex ) {
-
-            my $handle = $field->{label} || $field->{name};
-            
-            my $error = "$handle does not match the "
-                ."pattern $directive";
-            
-            $field->errors->add($field->{error} || $error);
-
-            return 0;
-
-        }
-
-    }
-
-    return 1;
-
-}
-
-=method field_default_value
-
-The field_default_value method returns the absolute value (hardcoded, default or
-parameter specified) for a given field from a hashref of parameters. This method
-executes specific logic which return the value a field is allowed to have. By 
-default, this method returns undefined.
-
-    my $value = $self->field_default_value('field_name');
-    
-    # given the following, the $suggested_value will be returned unless the
-    # field contains rules preventing it from accepting such a value
-    
-    my $value = $self->field_default_value('field_name', {
-        'field_name' => $suggested_value
-    });
-
-=cut
-
-sub field_default_value {
-    
-    my ($self, $field_name, $parameters) = @_;
-    
-    return 0 unless exists $self->fields->{$field_name};
-    
-    $parameters ||= $self->params;
-    
-    my $value = undef;
-    
-    if (exists $parameters->{$field_name}) {
-        
-        $value = $parameters->{$field_name}
-        
-    }
-    
-    unless (defined $value) {
-        
-        if (exists $self->fields->{$field_name}->{default}) {
-            
-            $value = "CODE" eq ref $self->fields->{$field_name}->{default} ?
-                $self->fields->{$field_name}->{default}->($self) :
-                $self->fields->{$field_name}->{default};
-            
-        }
-        
-    }
-    
-    return $value;
-    
-}
-
 =method flatten_params
 
-Depending on how parameters are being input into your application, if your
-input parameters are already complex hash structures, The flatten_params method
-will set and return the serialized version of your hashref based on the the
-default or custom configuration of the hash serializer L<Hash::Flatten>.
+The flatten_params method accepts a single hashref and will return the
+serialized version based on the the default or custom configuration of the hash
+serializer L<Hash::Flatten> as configured via the hash_inflator() attribute.
 
     my $params = {
         
@@ -2483,15 +2420,18 @@ sub flatten_params {
 
     my ($self, $params) = @_;
     
-    $params = $self->unflatten_params($params);
+    return undef unless "HASH" eq ref $params;
+    
+    my ($ad, $hd) = @{$self->hash_inflator}{
+        'ArrayDelimiter', 'HashDelimiter'
+    };
     
     my $serializer = Hash::Flatten->new($self->hash_inflator);
     
-    $self->{params} =
-        Validation::Class::Params->new($serializer->flatten($params));
+    return grep({ ref $_ } values %{$params}) ?
+        # do not flatten params if suspected to have already been flattened
+        $serializer->flatten($params) : $params;
     
-    return $self->params->hash;
-
 }
 
 =method get_errors
@@ -2566,15 +2506,31 @@ sub get_fields {
 
     my ($self, @fields) = @_;
     
-    # get fields as a list
-    return @fields ? (map { $self->fields->{$_} } @fields) : undef;
+    my $fields = {};
+    
+    $self->fields->each(sub{ $fields->{$_[0]} = $_[1] || {} });
+    
+    if (@fields) {
+    
+        return @fields ? (map { $fields->{$_} || undef } @fields) : ();
+    
+    }
+    
+    else {
+        
+        return $fields;
+        
+    }
 
 }
 
 =method get_params
 
-The get_params method returns the values of the parameters specified (as a list).
-This method will return undefined unless a list of parameter names are passed.
+The get_params method returns the values of the parameters specified (as a list,
+in the order specified). This method will return a list of key/value pairs if
+no parameter names are passed. Note, this method always returns
+exploded/unflattened parameters.
+
 
     if ($self->validate) {
     
@@ -2584,7 +2540,8 @@ This method will return undefined unless a list of parameter names are passed.
             $self->get_params(qw/name email login password/);
         
         # you should note that if the params dont exist they will return undef
-        # ... meaning you should check that it exists before checking its value
+        # ... meaning you should check that it is defined before doing any
+        # comparison checking -- as doing so would generate an error
         # e.g.
         
         if (defined $name) {
@@ -2604,6 +2561,12 @@ This method will return undefined unless a list of parameter names are passed.
         }
         
     }
+    
+    # alternatively ...
+    
+    my $params = $self->get_params; # return hashref of parameters
+    
+    print $params->{name};
 
 =cut
 
@@ -2611,12 +2574,80 @@ sub get_params {
 
     my ($self, @params) = @_;
     
-    # get param values as a list
-    return @params ? (map { $self->params->{$_} } @params) : (undef);
+    my $params = $self->params->hash || {};
+    
+    $params = $self->unflatten_params($params);
+    
+    if (@params) {
+    
+        return @params ? (map { $params->{$_} || undef } @params) : ();
+    
+    }
+    
+    else {
+        
+        return $params;
+        
+    }
     
 }
 
-sub merge_fields {
+=method get_value
+
+The get_value method returns the absolute value (hardcoded, default or
+parameter specified) for a given field. This method executes specific logic
+which returns the value a field has based on a set of internal conditions. This
+method otherwise returns undefined.
+
+    my $value = $self->get_value('field_name');
+
+=cut
+
+sub get_value {
+    
+    my ($self, $name) = @_;
+    
+    return undef unless $self->fields->has($name);
+    
+    my $field  = $self->fields->{$name};
+    
+    my $value = undef;
+    
+    if (exists $self->params->{$name}) {
+        
+        $value = $self->params->{$name};
+        
+    }
+    
+    else {
+    
+        my $params = $self->get_params; # unflattened params
+        
+        if (exists $params->{$name}) {
+            
+            $value = $params->{$name};
+            
+        }
+    
+    }
+    
+    unless (defined $value) {
+        
+        if (exists $field->{default}) {
+            
+            $value = "CODE" eq ref $field->{default} ?
+                $field->{default}->($self) :
+                $field->{default};
+            
+        }
+        
+    }
+    
+    return $value;
+    
+}
+
+sub merge_field {
 
     my ($self, $field, $mixin_field) = @_;
     
@@ -2783,14 +2814,6 @@ sub normalize {
     
     my $self = shift;
     
-    # automatically serialize params if nested hash is detected
-    
-    if (grep { ref($_) } values %{$self->params}) {
-        
-        $self->flatten_params($self->params);
-        
-    }
-    
     # reset fields
     # NOTICE: (called twice in this routine, not sure why, must
     # investigate further although it doesn't currently break anything)
@@ -2947,11 +2970,12 @@ sub normalize {
 
 =method param
 
-The param method gets/sets a single parameter by name.
+The param method gets/sets a single parameter by name. This method returns the
+value assigned or undefined if the parameter does not exist.
 
     my $value = $self->param('name');
     
-    $self->param('name', '...');
+    $self->param($name => $value);
 
 =cut
 
@@ -2959,11 +2983,25 @@ sub param {
     
     my  ($self, $name, $value) = @_;
     
-    return 0 unless $name;
+    if ($name && !ref($name)) {
     
-    $self->params->add($name => $value) if defined $value;
+        if (defined $value) {
+            
+            $self->set_params($name => $value);
+            
+            return $value;
+            
+        }
+        
+        if ($self->params->has($name)) {
+            
+            return $self->params->{$name};
+            
+        }
+        
+    }
     
-    return $self->params->{$name};
+    return undef;
 
 }
 
@@ -3007,6 +3045,7 @@ sub proxy_methods {
         get_errors
         fields
         filtering
+        hash_inflator
         ignore_failure
         ignore_unknown
         param
@@ -3133,6 +3172,30 @@ sub reset_fields {
 
 }
 
+=method reset_params
+
+The reset_params method is responsible for completely removing any existing
+parameters and adding those specified. This method returns the class object.
+This method takes a list of key/value pairs or a single hashref.
+
+    $self = $self->reset_params($new_params); # accepts list also
+
+=cut
+
+sub reset_params {
+
+    my $self = shift;
+    
+    my $params = @_ % 2 ? $_[0] : { @_ };
+    
+    $self->params->clear;
+    
+    $self->params->add($params);
+    
+    return $self;
+
+}
+
 =method set_errors
 
 The set_errors method pushes its arguments (error messages) onto the class-level
@@ -3149,6 +3212,29 @@ sub set_errors {
     $self->errors->add(@errors) if @errors;
     
     return $self->errors->count;
+
+}
+
+=method set_fields
+
+The set_fields method is responsible setting/overriding registered fields.
+This method returns the class object. This method takes a list of key/value
+pairs or a single hashref whose key should be a valid field name and whose
+value should be a hashref that is a valid field configuration object.
+
+    $self = $self->set_fields($name => $config); # accepts hashref also
+
+=cut
+
+sub set_fields {
+
+    my $self = shift;
+    
+    my $fields = @_ % 2 ? $_[0] : { @_ };
+    
+    $self->fields->add($fields);
+    
+    return $self;
 
 }
 
@@ -3194,19 +3280,81 @@ sub set_method {
 
 =method set_params
 
-The set_params method records new parameters and returns the new parameter count.
+The set_params method is responsible for setting/replacing parameters while
+ensuring that previously serialized parameters are taken into account. This
+method returns the class object. This method takes a list of key/value pairs or
+a single hashref whose key should match a field's name and whose value should
+be a scalar or arrayref.
 
-    my $count = $self->set_params(..., ...);
+    $self = $self->set_params($name => $value); # accepts hashref also
 
 =cut
 
 sub set_params {
 
-    my ($self, @params) = @_;
+    my $self = shift;
     
-    $self->params->add(@params)  if @params;
+    my $args = @_ % 2 ? $_[0] : { @_ };
     
-    return $self->params->count;
+    my $params = $self->get_params; # unflattened params
+    
+    while (my($k,$v) = each(%{$args})) {
+        
+        $params->{$k} = $v; # add new/overwrite existing
+        
+    }
+    
+    $params = $self->flatten_params($params);
+    
+    $self->params->clear;
+    
+    $self->params->add($params);
+    
+    return $self;
+
+}
+
+=method set_value
+
+The set_value method assigns a value to the specified field's parameter 
+unless the field is readonly.
+
+    $self = $self->set_value($name => $value);
+
+=cut
+
+sub set_value {
+
+    my ($self, $name, $value) = @_;
+    
+    if (! $self->fields->has($name)) {
+        
+        $self->pitch_error("Field $name does not exist");
+        
+    }
+    
+    else {
+        
+        my $error = qq{
+            "Field value for $name must be a scalar value or arrayref"
+        };
+        
+        $self->throw_error($error)
+            if ref($value) && "ARRAY" ne ref $value;
+        
+        unless (defined $self->fields->{$name}->{readonly}) {
+            
+            my $params = $self->unflatten_params($self->params->hash);
+            
+            $params->{$name} = $value;
+            
+            $self->set_params($name => $value);
+            
+        }
+        
+    }
+    
+    return $self;
 
 }
 
@@ -3297,32 +3445,18 @@ sub throw_error {
 
 =method unflatten_params
 
-If your fields and parameters are designed with complex hash-like structures,
-the unflatten_params method returns the deserialized hashref of registered
-parameters based on the the default or custom configuration of the hash
-serializer L<Hash::Flatten>. Please note, this functionality is called
-automatically during normalization which occurs at instantiation and
-validation, so chances are good that you'll likely not need to call this method.
+The unflatten_params method accepts a single *flat* hashref and will return the
+expanded version based on the the default or custom configuration of the hash
+serializer L<Hash::Flatten> as configured via the hash_inflator() attribute.
 
     my $params = {
         'user.login' => 'member',
         'user.password' => 'abc123456'
     };
     
-    $params = $self->unflatten_params;
+    $params = $self->unflatten_params($params);
         
     print $params->{user}->{login};
-    
-    $self->params->add(
-        'user.login' => 'member',
-        'user.password' => 'abc123456'
-    );
-    
-    if ($self->validate) {
-    
-        print $params->{user}->{login};
-        
-    }
 
 =cut
 
@@ -3330,15 +3464,11 @@ sub unflatten_params {
     
     my ($self, $params) = @_;
     
-    $self->params->add($params) if $params;
-    
-    $params = $self->params->hash;
+    return undef unless "HASH" eq ref $params;
     
     my $serializer = Hash::Flatten->new($self->hash_inflator);
     
-    $params = $serializer->unflatten($params);
-    
-    return $params;
+    return $serializer->unflatten($params) || {};
     
 }
 
@@ -3475,7 +3605,7 @@ sub validate {
         
         while (my($name, $alias) = each(%{$alias_map})) {
             
-            $self->params->{$alias} = delete $self->params->{$name};
+            $self->set_params($alias => delete $self->params->{$name});
             push @fields, $alias;
             
         }
@@ -3497,7 +3627,7 @@ sub validate {
                 
                 if (defined $self->params->{$alias}) {
                     
-                    $self->params->{$name} = delete $self->params->{$alias};
+                    $self->set_params($name => delete $self->params->{$alias});
                     push @fields, $name;
                     
                 }
@@ -3510,194 +3640,94 @@ sub validate {
     
     $self->fields->each($alias_mapping);
     
+    my @clones = ();
+    
+    # begin validation !!!
+    
     if ($self->params->count) {
         
-        # check for parameters that are arrayrefs and handle them appropriately
-    
-        my $params = $self->params->hash;
+        # check if any parameters are arrayrefs
+        # and handle them appropriately (clone, validate, then reap)
         
-        my ($ad, $hd) = @{$self->hash_inflator}
+        my ($ad, $hd) = @{$self->hash_inflator}{
             # ^^ pun here
-            {'ArrayDelimiter', 'HashDelimiter'};
+            'ArrayDelimiter', 'HashDelimiter'
+        };
         
         my %seen = ();
         
-        while (my($key, $value) = each(%{$params})) {
+        my $create_clones_routine = sub {
             
-            next unless my ($name) = $key =~ /(.*)$ad\d+$/;
+            my($key, $value) = @_;
             
-            next unless not $seen{$name};
+            my $name = $1 if $key =~ /(.*)$ad\d+$/;
             
-            my $field = $self->fields->{$name};
+            if (defined $name) {
             
-            next unless $field;
-            
-            $seen{$name}++;
-        
-            my $varcount = scalar grep { /$name$ad\d+$/ } keys %{ $params };
-            
-            for (my $i = 0; $i < $varcount; $i++) {
+                unless ($seen{$name}) {
                 
-                next if defined $self->fields->{"$name:$i"};
+                    my $field = $self->fields->{$name};
+                    
+                    if ($field) {
+                        
+                        $seen{$name}++;
+                        
+                        my $varcount = scalar grep { /$name$ad\d+$/ }
+                            $self->params->keys;
+                        
+                        for (my $i = 0; $i < $varcount; $i++) {
+                            
+                            unless (defined $self->fields->{"$name:$i"}) {
+                            
+                                my $label = ($field->{label} || $field->{name});
+                                
+                                $self->clone($name, "$name:$i", {
+                                    label  => $label . " #" . ($i+1)
+                                }); 
+                                
+                                push @clones, "$name:$i"; # to be reaped later
+                                push @fields, "$name:$i"  # black hackery
+                                    if @fields && grep { $_ eq $name } @fields;
+                            
+                            }
+                            
+                        }
+                        
+                        # like it never existed ...
+                        
+                        @fields = grep { $_ ne $name } @fields if @fields; # ...
+                    
+                    }
                 
-                my $label = ($field->{label} || $field->{name});
-                
-                $self->clone($name, "$name:$i", {
-                    label  => $label . " #" . ($i+1)
-                }); 
-                
-                push @fields, "$name:$i" # black hackery
-                    if @fields && grep { $_ eq $name } @fields;
-                
+                }
+            
             }
             
-            # like it never existed ...
-            
-            @fields = grep { $_ ne $name } @fields if @fields; # ... 
-            
-        }
+        };
+        
+        $self->params->each($create_clones_routine);
         
         # run pre-filtering if filtering is enabled
     
         $self->apply_filters('pre') if $self->filtering;
         
-        # validate all parameters against all defined fields because no fields
-        # were explicitly requested to be validated - i.e. not explicitly
-        # defining fields to be validated effectively allows the parameters
-        # submitted to dictate what gets validated (may not be ideal)
-    
-        if ( !@fields ) {
-
-            # process all params
-    
-            while (my($name, $param) = each(%{$self->params})) {
-                
-                if ( !defined $self->fields->{$name} ) {
-    
-                    $self->pitch_error(
-                        "Data validation field $name does not exist"
-                    );
-                    next;
-    
-                }
-                
-                my $field = $self->fields->{$name};
-                
-                $field->{name}  = $name;
-                $field->{value} = $self->field_default_value($name);
-                
-                # create arguments to be passed to the validation directive
-    
-                my @args = ($context, $field, $self->params);
-
-                # execute validator directives
-    
-                $self->apply_validator($name, $field);
-
-                # execute custom/validation directive
-    
-                if (defined $field->{validation} && $field->{value}) {
-                    
-                    my $count = $self->error_count;
-                    
-                    unless ($field->{validation}->(@args)) {
-                        
-                        # assuming the validation routine didnt issue an error
-    
-                        if ($count == $self->error_count) {
-                            
-                            if (defined $field->{error}) {
-    
-                                $field->{errors}->add($field->{error});
-    
-                            }
-    
-                            else {
-                                
-                                my $error_msg = join " ",
-                                
-                                    ($field->{label} || $field->{name}),
-                                    "could not be validated"
-                                ;
-                                
-                                $field->{errors}->add($error_msg);
-                                
-                            }
-                            
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
+        if (@fields) {
+            
+            # validate all parameters against only the fields explicitly
+            # requested to be validated
+            
+            $self->validate_params_specified($context, @fields);
             
         }
         
-        # validate all parameters against only the fields explicitly
-        # requested to be validated
-    
         else {
             
-            foreach my $field_name (@fields) {
-                
-                if (!defined $self->fields->{$field_name}) {
-                    
-                    $self->pitch_error(
-                        "Data validation field $field_name does not exist"
-                    );
-                    next;
-                    
-                }
-                
-                my $field = $self->fields->{$field_name};
-                
-                $field->{name}  = $field_name;
-                $field->{value} = $self->field_default_value($field_name);
-                    
-                my @args = ($context, $field, $self->params);
-
-                # execute simple validation
-    
-                $self->apply_validator($field_name, $field);
-
-                # custom validation
-    
-                if (defined $field->{validation} && $field->{value}) {
-                    
-                    my $count = $self->error_count;
-                    
-                    unless ($field->{validation}->(@args)) {
-                        
-                        # assuming the validation routine didnt issue an error
-    
-                        if ($count == $self->error_count) {
-                            
-                            if ( defined $field->{error} ) {
-    
-                                $field->{errors}->add($field->{error});
-    
-                            }
-    
-                            else {
-                                
-                                my $error_msg = join " ",
-                                
-                                    ($field->{label} || $field->{name}),
-                                    "could not be validated"
-                                ;
-                                
-                                $field->{errors}->add($error_msg);
-                                
-                            }
-                            
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
+            # validate all parameters against all defined fields because no fields
+            # were explicitly requested to be validated - i.e. not explicitly
+            # defining fields to be validated effectively allows the parameters
+            # submitted to dictate what gets validated (may not be ideal)
+            
+            $self->validate_params_discovered($context);
             
         }
         
@@ -3705,98 +3735,25 @@ sub validate {
     
     else {
         
-        # validate fields although no parameters were submitted
-        # will likely pass validation unless fields exist with
-        # a *required* directive or other validation logic
-        # expecting a value
-    
         if (@fields) {
             
-            foreach my $field_name (@fields) {
-                
-                if ( !defined $self->fields->{$field_name} ) {
-                    
-                    $self->pitch_error(
-                        "Data validation field $field_name does not exist"
-                    );
-                    next;
-                    
-                }
-                
-                my $field = $self->fields->{$field_name};
-                
-                $field->{name}  = $field_name;
-                $field->{value} = $self->field_default_value($field_name);
-                
-                my @args = ($context, $field, $self->params);
-
-                # execute simple validation
-    
-                $self->apply_validator($field_name, $field);
-
-                # custom validation
-    
-                if (defined $field->{validation} && $field->{value}) {
-                    
-                    my $count = $self->error_count;
-                    
-                    unless ($field->{validation}->(@args)) {
-                        
-                        # assuming the validation routine didnt issue an error
-                        if ($count == $self->error_count) {
-                            
-                            if (defined $field->{error}) {
-    
-                                $field->{errors}->add($field->{error});
-    
-                            }
-    
-                            else {
-                                
-                                my $error_msg = join " ",
-                                
-                                    ($field->{label} || $field->{name}),
-                                    "could not be validated"
-                                ;
-                                
-                                $field->{errors}->add($error_msg);
-                                
-                            }
-                            
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
+            # validate fields specified although no parameters were submitted
+            # will likely pass validation unless fields exist with
+            # a *required* directive or other validation logic
+            # expecting a value
+            
+            $self->validate_fields_specified($context, @fields);
             
         }
-
-        # if no parameters (or) fields are found ... you're screwed :)
-        # instead of dying, warn and continue, depending on configuration
-    
+        
         else {
             
-            my $error = "No parameters were submitted and no fields are "
-                      . "registered. Fields and parameters are required "
-                      . "for validation.";
+            # validate all defined fields although no parameters were submitted
+            # will likely pass validation unless fields exist with
+            # a *required* directive or other validation logic
+            # expecting a value
             
-            if ($self->ignore_unknown) {
-    
-                if ($self->report_unknown) {
-    
-                    $self->errors->add($error);
-    
-                }
-    
-            }
-    
-            else {
-    
-                $self->throw_error($error);
-    
-            }
+            $self->validate_fields_discovered($context);
             
         }
         
@@ -3805,22 +3762,22 @@ sub validate {
     my $valid = $self->error_count ? 0 : 1;
     
     # restore parameters from depreciated alias map functionality
-    # very depreciated but it remains for back-compat !!!
     
     if ( defined $alias_map ) {
         
         # reversal
         while (my($name, $alias) = each(%{$alias_map})) {
             
-            $self->params->{$name} = delete $self->params->{$alias};
+            $self->set_params($name => delete $self->params->{$alias});
             
         }
         
     }
     
-    # do I need to reap cloned fields ???
-    
-    # ...
+    # reap cloned fields
+    # we are currently NOT reaping clones, because we need them to stick around
+    # so we can reference any errors they may have generated ...
+    # $self->fields->remove($_) for @clones;
     
     # run post-validation filtering
     
@@ -3828,6 +3785,257 @@ sub validate {
 
     return $valid;    # returns true if no errors
 
+}
+
+sub validate_fields_discovered {
+    
+    my ($self, $context) = @_;
+    
+    my @fields = sort $self->fields->keys;
+    
+    if (@fields) {
+        
+        $self->validate_fields_specified($context, @fields);
+        
+    }
+    
+    else {
+        
+        # if no parameters (or) fields are found ... you're screwed :)
+        # instead of dying, warn and continue, depending on configuration
+        
+        my $error = qq{
+            No parameters were submitted and no fields are 
+            registered. Fields and parameters are required 
+            for validation
+        };
+        
+        if ($self->ignore_unknown) {
+            
+            if ($self->report_unknown) {
+                
+                $self->errors->add($error);
+                
+            }
+            
+        }
+        
+        else {
+        
+            $self->throw_error($error);
+            
+        }
+        
+    }
+
+}
+
+sub validate_fields_specified {
+    
+    my ($self, $context, @fields) = @_;
+    
+    foreach my $field_name (@fields) {
+        
+        if ( !defined $self->fields->{$field_name} ) {
+            
+            $self->pitch_error(
+                "Data validation field $field_name does not exist"
+            );
+            next;
+            
+        }
+        
+        my $field = $self->fields->{$field_name};
+        
+        $field->{name}  = $field_name;
+        $field->{value} = $self->get_value($field_name);
+        
+        my @args = ($context, $field, $self->params);
+
+        # execute simple validation
+
+        $self->apply_validator($field_name, $field);
+
+        # custom validation
+
+        if (defined $field->{validation} && $field->{value}) {
+            
+            my $count = $self->error_count;
+            
+            unless ($field->{validation}->(@args)) {
+                
+                # assuming the validation routine didnt issue an error
+                if ($count == $self->error_count) {
+                    
+                    if (defined $field->{error}) {
+
+                        $field->{errors}->add($field->{error});
+
+                    }
+
+                    else {
+                        
+                        my $error_msg = join " ",
+                        
+                            ($field->{label} || $field->{name}),
+                            "could not be validated"
+                        ;
+                        
+                        $field->{errors}->add($error_msg);
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+
+}
+
+sub validate_params_discovered {
+    
+    my ($self, $context) = @_;
+    
+    # process all params
+
+    my $validate_param = sub {
+        
+        my($name, $param) = @_;
+        
+        if ( ! $self->fields->has($name) ) {
+        
+            $self->pitch_error(
+                "Data validation field $name does not exist"
+            );
+        
+        }
+        
+        else {
+            
+            my $field = $self->fields->{$name};
+            
+            $field->{name}  = $name;
+            $field->{value} = $self->get_value($name);
+            
+            # create arguments to be passed to the validation directive
+    
+            my @args = ($context, $field, $self->params);
+    
+            # execute validator directives
+    
+            $self->apply_validator($name, $field);
+    
+            # execute custom/validation directive
+    
+            if (defined $field->{validation} && $field->{value}) {
+                
+                my $count = $self->error_count;
+                
+                unless ($field->{validation}->(@args)) {
+                    
+                    # assuming the validation routine didnt issue an error
+    
+                    if ($count == $self->error_count) {
+                        
+                        if (defined $field->{error}) {
+    
+                            $field->{errors}->add($field->{error});
+    
+                        }
+    
+                        else {
+                            
+                            my $error_msg = join " ",
+                            
+                                ($field->{label} || $field->{name}),
+                                "could not be validated"
+                            ;
+                            
+                            $field->{errors}->add($error_msg);
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+        
+        }
+        
+    };
+    
+    $self->params->each($validate_param);
+    
+}
+
+sub validate_params_specified {
+    
+    my ($self, $context, @fields) = @_;
+    
+    foreach my $field_name (@fields) {
+        
+        if (!defined $self->fields->{$field_name}) {
+            
+            $self->pitch_error(
+                "Data validation field $field_name does not exist"
+            );
+            next;
+            
+        }
+        
+        my $field = $self->fields->{$field_name};
+        
+        $field->{name}  = $field_name;
+        $field->{value} = $self->get_value($field_name);
+        
+        my @args = ($context, $field, $self->params);
+
+        # execute simple validation
+
+        $self->apply_validator($field_name, $field);
+
+        # custom validation
+
+        if (defined $field->{validation} && $field->{value}) {
+            
+            my $count = $self->error_count;
+            
+            unless ($field->{validation}->(@args)) {
+                
+                # assuming the validation routine didnt issue an error
+
+                if ($count == $self->error_count) {
+                    
+                    if ( defined $field->{error} ) {
+
+                        $field->{errors}->add($field->{error});
+
+                    }
+
+                    else {
+                        
+                        my $error_msg = join " ",
+                        
+                            ($field->{label} || $field->{name}),
+                            "could not be validated"
+                        ;
+                        
+                        $field->{errors}->add($error_msg);
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
 }
 
 =method validate_profile

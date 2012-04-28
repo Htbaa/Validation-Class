@@ -72,7 +72,7 @@ ok defined $v->fields->{something}->{required}
   'something field generated from multiple mixins';
 
 # define grouped fields
-$v->fields->{'auth:login'} = {
+$v->fields->{'auth.login'} = {
     mixin      => 'basic',
     label      => 'user login',
     error      => 'login invalid',
@@ -82,7 +82,7 @@ $v->fields->{'auth:login'} = {
       }
 };
 
-$v->fields->{'auth:password'} = {
+$v->fields->{'auth.password'} = {
     mixin      => 'basic',
     label      => 'user password',
     error      => 'password invalid',
@@ -92,7 +92,7 @@ $v->fields->{'auth:password'} = {
       }
 };
 
-$v->fields->{'user:name'} = {
+$v->fields->{'user.name'} = {
     mixin      => 'basic',
     label      => 'user name',
     error      => 'invalid name',
@@ -102,7 +102,7 @@ $v->fields->{'user:name'} = {
       }
 };
 
-$v->fields->{'user:phone'} = {
+$v->fields->{'user.phone'} = {
     mixin      => 'basic',
     label      => 'user phone',
     error      => 'phone invalid',
@@ -112,7 +112,7 @@ $v->fields->{'user:phone'} = {
       }
 };
 
-$v->fields->{'user:email'} = {
+$v->fields->{'user.email'} = {
     mixin      => 'basic',
     label      => 'user email',
     error      => 'email invalid',
@@ -141,7 +141,7 @@ ok scalar( keys %{ $v->params } ), 'params have been set at instantiation';
 ok !$v->error_count, 'error count reporting';
 
 # validate login only
-ok !$v->validate( { login => 'auth:login' } ), 'login field failed as expected';
+ok !$v->validate( { login => 'auth.login' } ), 'login field failed as expected';
 ok $v->error_count == 1, 'error count accurate';
 ok $v->errors_to_string eq 'login invalid',
   'error messages and error class to_string method works';

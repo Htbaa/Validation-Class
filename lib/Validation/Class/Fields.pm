@@ -46,6 +46,10 @@ sub add {
     
 }
 
-sub clear {} #noop
+sub clear {
+    
+    #noop - fields can't be deleted this way
+    
+}
 
 1;

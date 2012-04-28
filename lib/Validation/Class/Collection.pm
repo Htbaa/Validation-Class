@@ -117,9 +117,11 @@ sub each {
     
     my ($self, $transformer) = @_;
     
-    $transformer ||= sub {@_} ;
+    $transformer ||= sub {@_};
     
-    while (my @kv = each(%{$self})) {
+    my %hash = %{$self};
+    
+    while (my @kv = each(%hash)) {
         
         $transformer->(@kv);
         
@@ -147,6 +149,22 @@ sub find {
         for grep { $_ =~ $pattern } keys %{$self};
     
     return { %matches };
+    
+}
+
+=method has
+
+    if ($self->has($name)) {
+        ...
+    }
+
+=cut
+
+sub has {
+    
+    my ($self, $name) = @_;
+    
+    return defined $self->{$name} ? 1 : 0;
     
 }
 
@@ -183,6 +201,20 @@ sub keys {
 sub list {
     
     return (values %{$_[0]});
+    
+}
+
+=method remove
+
+    $object = $self->remove($name);
+
+=cut
+
+sub remove {
+    
+    my ($self, $name) = @_;
+    
+    return delete $self->{$name} if $name;
     
 }
 

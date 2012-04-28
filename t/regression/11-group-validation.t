@@ -57,7 +57,7 @@ ok $v->errors_to_string eq '', 'no error messages found';
 # extraction routines
 
 # my $obj = $v->unflatten_params(); - DEPRECIATED
-my $obj = $v->proto->unflatten_params();
+my $obj = $v->proto->unflatten_params($v->proto->params->hash);
 ok defined $obj->{user}->{login} && $obj->{user}->{login}, 'unflatten_params has user hash with login key';
 ok defined $obj->{user}->{password} && $obj->{user}->{password}, 'unflatten_params has user hash with password key';
 
@@ -115,7 +115,7 @@ ok $v->error_count == 0, 'error count is zero';
 ok $v->errors_to_string eq '', 'no error messages found';
 
 # $obj = $v->unflatten_params(); - DEPRECIATED
-$obj = $v->proto->unflatten_params();
+$obj = $v->proto->unflatten_params($v->proto->params->hash);
 ok defined $obj->{user}->{login} && $obj->{user}->{login}, 'unflatten_params has user hash with login key';
 ok defined $obj->{user}->{password} && $obj->{user}->{password}, 'unflatten_params has user hash with password key';
 

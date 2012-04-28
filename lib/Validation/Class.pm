@@ -517,9 +517,9 @@ underscore.
     
     $self->login($new_value); # arrayrefs and hashrefs will be flattened
     
-    $self->preference_send_reminders($value);
+    $self->preference_send_reminders;
     
-    $self->preference_send_reminders_text_0($value);
+    $self->preference_send_reminders_text_0;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword
@@ -533,6 +533,10 @@ sub field {
     my ($name, $data) = @_;
     
     return undef unless ($name && $data);
+    
+    confess "Error creating field $name, name is using unconventional naming"
+        unless $name =~ /^[a-zA-Z_](([\w\.]+)?\w)$/
+        xor    $name =~ /^[a-zA-Z_](([\w\.]+)?\w)\:\d+$/;
     
     return configure_class_proto sub {
         
@@ -560,35 +564,17 @@ sub field {
             
             my ($self, $data) = @_;
             
-            my $proto      = $self->proto;
-            my $fields     = $proto->fields;
-            my $parameters = $proto->unflatten_params;
-            
+            my $proto  = $self->proto;
+            my $fields = $proto->fields;
             my $result = undef;
             
-            if (defined $data && not defined $fields->{$name}->{readonly}) {
+            if (defined $data) {
                 
-                $parameters->{$name} = $data ;
-                
-                # OMG - this is sooo gross !!!
-                # are you really telling me that this is the best you can do
-                
-                # this method-of-operation is like soo computationally expensive
-                # due to the fact that each accessor call serializes/de-serializes
-                # the params hash
-                
-                # fix your work loser
-                
-                # --me
-                
-                $proto->{params} =
-                    Validation::Class::Params->new($parameters);
+                $proto->set_params($name => $data);
                 
             }
             
-            $result = $proto->field_default_value($name, $parameters);
-                
-            $proto->flatten_params($parameters);
+            $result = $proto->get_value($name);
             
             return $result;
             
@@ -1163,10 +1149,19 @@ sub new {
     
     my %ARGS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
     
-    # process collection assignments
+    # bless special collections
     
-    $proto->{fields} = delete $ARGS{fields} if defined $ARGS{fields};
-    $proto->{params} = delete $ARGS{params} if defined $ARGS{params};
+    $proto->{errors} = Validation::Class::Errors->new;
+    $proto->{params} = Validation::Class::Params->new;
+    $proto->{fields} = Validation::Class::Fields->new($proto->{fields}); #!!!
+    
+    # process overridable attributes
+    
+    my $fields = delete $ARGS{fields} if defined $ARGS{fields};
+    my $params = delete $ARGS{params} if defined $ARGS{params};
+    
+    $proto->set_fields($fields) if $fields;
+    $proto->set_params($params) if $params;
     
     # process attribute assignments
     
@@ -1175,12 +1170,6 @@ sub new {
         $self->$attr($value);
         
     }
-    
-    # bless specific collections
-    
-    $proto->{fields} = Validation::Class::Fields->new(%{$proto->{fields}});
-    
-    $proto->{params} = Validation::Class::Params->new(%{$proto->{params}});
     
     # process plugins
     

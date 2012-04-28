@@ -79,6 +79,12 @@ use Test::More;
     
     ok "ARRAY" eq ref $self->name, "$class name accessor returns an array";
     
+    ok ! ref $self->name(''), "$class name accessor returns nothing";
+    
+    ok "HASH" eq ref $self->name({1..4}), "$class name accessor returns a hash";
+    
+    ok "ARRAY" eq ref $self->name([1..5]), "$class name accessor returns an array";
+    
     ok ! $self->params->{name}, "$class flattened name param which is an array";
     
     ok 1 == $self->params->{'name:0'}
