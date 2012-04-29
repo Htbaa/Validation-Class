@@ -1,11 +1,10 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
-    - profiles use transactions to track class/validation usage and raise errors
-    - change accessor naming and arguments for fields that match array elements
     - smarter parameter handling (via accessors, params object, etc.)
+    - raise_error flag allows profiles to track class() usage and raise errors
 
-7.10 (2012-04-27)
+7.11 (2012-04-27)
     * enforcing field naming convention to reduce margin for error
     * refactored and decoupled main validation routine
     * added has() method to V::C::Collection
