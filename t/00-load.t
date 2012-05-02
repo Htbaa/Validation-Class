@@ -70,7 +70,6 @@ use Test::More;
         
         class
         clear_queue
-        copy_errors
         error
         error_count
         error_fields
@@ -140,7 +139,6 @@ use Test::More;
         
         class
         clear_queue
-        copy_errors
         error
         error_count
         error_fields
@@ -296,7 +294,6 @@ use Test::More;
 
     sub class            { 'noop' }
     sub clear_queue      { 'noop' }
-    sub copy_errors      { 'noop' }
     sub error            { 'noop' }
     sub error_count      { 'noop' }
     sub error_fields     { 'noop' }
@@ -355,7 +352,6 @@ use Test::More;
         
         class
         clear_queue
-        copy_errors
         error
         error_count
         error_fields

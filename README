@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.11
+    version 7.12
 
 SYNOPSIS
         package MyVal::User;
@@ -178,7 +178,7 @@ KEYWORDS
         
                 my $handle = $field->{label} || $field->{name};
             
-                $self->errors->add_error("$handle must be a valid email address");
+                $field->{errors}->add("$handle must be a valid email address");
             
                 return 0;
         
@@ -534,8 +534,9 @@ METHODS
   prototype
     The prototype method (or proto) returns an instance of the associated
     class prototype. The class prototype is responsible for manipulating and
-    validating the data model (current class). It is not likely that you'll
-    need to access this method directly.
+    validating the data model (the class). It is not likely that you'll need
+    to access this method directly, see "THE PROTOTYPE CLASS" in
+    Validation::Class.
 
         package MyApp;
     
@@ -551,17 +552,18 @@ METHODS
 
 THE PROTOTYPE CLASS
     This module provides mechanisms (sugar functions to model your data)
-    which allow you to define self-validating classes. Each class your
-    create is associated with a *prototype* class which provides data
-    validation functionality and keeps your class' namespace free from
-    pollution, please see Validation::Class::Prototype for more information
-    on specific methods, and attributes.
+    which allow you to define self-validating classes. Each class you create
+    is associated with a *prototype* class which provides data validation
+    functionality and keeps your class' namespace free from pollution,
+    please see Validation::Class::Prototype for more information on specific
+    methods, and attributes.
 
     All derived classes will have a prototype-class attached to it which
     does all the heavy lifting (regarding validation and error handling).
     The prototype injects a few proxy methods into your class which are
-    basically aliases to your prototype class, however it is possible to
-    access the prototype directly using the proto/prototype methods.
+    basically aliases to your prototype class methods, however it is
+    possible to access the prototype directly using the proto/prototype
+    methods.
 
         package MyApp::User;
     
@@ -579,8 +581,145 @@ THE OBJECT SYSTEM
     and simple object system Validation::Class provides. The standard *new*
     method should be used to instantiate a new object and the *bld/build*
     keywords can be used to hook into the instantiation process.
-    Validation::Class does NOT provide method modifiers but can be extended
-    with Class::Method::Modifiers.
+
+    As previously stated, Validation::Class injects a few proxy methods into
+    your class which are basically aliases to your prototype class methods.
+    You can find additional information on the prototype class and its
+    method at Validation::Class::Prototype. The following is a list of
+    *proxy* methods, methods which are injected into your class as shorthand
+    to methods defined in the prototype class (these methods are
+    overridable):
+
+  class
+        $self->class;
+
+    See "class" in Validation::Class::Prototype for full documentation.
+
+  clear_queue
+        $self->clear_queue;
+
+    See "clear_queue" in Validation::Class::Prototype for full
+    documentation.
+
+  error_count
+        $self->error_count;
+
+    See "error_count" in Validation::Class::Prototype for full
+    documentation.
+
+  error_fields
+        $self->error_fields;
+
+    See "error_fields" in Validation::Class::Prototype for full
+    documentation.
+
+  errors
+        $self->errors;
+
+    See "errors" in Validation::Class::Prototype for full documentation.
+
+    head2 errors_to_string
+
+        $self->errors_to_string;
+
+    See "errors_to_string" in Validation::Class::Prototype for full
+    documentation.
+
+  get_errors
+        $self->get_errors;
+
+    See "get_errors" in Validation::Class::Prototype for full documentation.
+
+  fields
+        $self->fields;
+
+    See "fields" in Validation::Class::Prototype for full documentation.
+
+  filtering
+        $self->filtering;
+
+    See "filtering" in Validation::Class::Prototype for full documentation.
+
+  hash_inflator
+        $self->hash_inflator;
+
+    See "hash_inflator" in Validation::Class::Prototype for full
+    documentation.
+
+  ignore_failure
+        $self->ignore_failure;
+
+    See "ignore_failure" in Validation::Class::Prototype for full
+    documentation.
+
+  ignore_unknown
+        $self->ignore_unknown;
+
+    See "ignore_unknown" in Validation::Class::Prototype for full
+    documentation.
+
+  param
+        $self->param;
+
+    See "param" in Validation::Class::Prototype for full documentation.
+
+  params
+        $self->params;
+
+    See "params" in Validation::Class::Prototype for full documentation.
+
+  queue
+        $self->queue;
+
+    See "queue" in Validation::Class::Prototype for full documentation.
+
+  report_failure
+        $self->report_failure;
+
+    See "report_failure" in Validation::Class::Prototype for full
+    documentation.
+
+  report_unknown
+        $self->report_unknown;
+
+    See "report_unknown" in Validation::Class::Prototype for full
+    documentation.
+
+  reset_errors
+        $self->reset_errors;
+
+    See "reset_errors" in Validation::Class::Prototype for full
+    documentation.
+
+  set_errors
+        $self->set_errors;
+
+    See "set_errors" in Validation::Class::Prototype for full documentation.
+
+  set_method
+        $self->set_method;
+
+    See "set_method" in Validation::Class::Prototype for full documentation.
+
+  stash
+        $self->stash;
+
+    See "stash" in Validation::Class::Prototype for full documentation.
+
+  validate
+        $self->validate;
+
+    See "validate" in Validation::Class::Prototype for full documentation.
+
+  validate_profile
+        $self->validate_profile;
+
+    See "validate_profile" in Validation::Class::Prototype for full
+    documentation.
+
+EXTENDING VALIDATION::CLASS
+    Validation::Class does NOT provide method modifiers but can be easily
+    extended with Class::Method::Modifiers.
 
   before
      before foo => sub { ... };

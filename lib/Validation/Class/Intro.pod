@@ -101,14 +101,20 @@ set-it-and-forget-it point-of-view.
 Prior to recent changes, the general idea was to have application developers
 create a validation class in addition to an existing data/object model (which is
 twice the work), this was the reasoning behind having the framework ship with a
-Moose adapter (no longer ... available, required, supported).
+Moose adapter (no longer available). Although the Moose adapter is no longer 
+supported, Validation::Class provides your classes with a simple object system 
+allowing you to develop your validation classes an models to become 
+one-on-the-same.
 
-Two noteworthy features of Validation::Class are, automatic generation of
-attributes accessors based on field names, and the method keyword which creates
-self-validating routines (sorta like method signatures). Simple as it may seem,
-these two features allow developers to easily create data models and objects with
-validatable attributes and methods with built-in validation and error handling
-while remaining fast and extensible due to its lean dependency chain.
+The Validation::Class object system provides automatic generation of attributes 
+accessors based on field names, a new method for creating instances of your 
+class and methods via the method keyword which creates self-validating routines 
+(sorta like method signatures). 
+
+Simple as it may seem, these features allow developers to easily create data 
+models and objects with validatable attributes and methods with built-in 
+validation and error handling while remaining fast and extensible due to its 
+lean dependency chain.
 
 =head2 Die On Your Own Terms
 
@@ -118,7 +124,7 @@ method validation failures. The ignore_unknown flag when set to false will
 confess to an attempt to validate a parameter with no matching field definition.
 
 Although the sentiment may not be shared by all, error handling is one of those
-things I'd just like to be available without worry too much about how its setup.
+things I'd just like to be available without worrying too much about how its setup.
 Validation and error handling are built-in mechanisms you are encouraged to
 leverage.
 

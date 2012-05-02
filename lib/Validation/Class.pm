@@ -411,7 +411,7 @@ packages to be used in all your classes.
         
             my $handle = $field->{label} || $field->{name};
             
-            $self->errors->add_error("$handle must be a valid email address");
+            $field->{errors}->add("$handle must be a valid email address");
             
             return 0;
         
@@ -1261,8 +1261,8 @@ sub profile {
 
 The prototype method (or proto) returns an instance of the associated class
 prototype. The class prototype is responsible for manipulating and validating
-the data model (current class). It is not likely that you'll need to access
-this method directly.
+the data model (the class). It is not likely that you'll need to access
+this method directly, see L<Validation::Class/"THE PROTOTYPE CLASS">.
 
     package MyApp;
     
@@ -1290,7 +1290,7 @@ sub prototype {
 =head1 THE PROTOTYPE CLASS
 
 This module provides mechanisms (sugar functions to model your data) which allow
-you to define self-validating classes. Each class your create is associated with
+you to define self-validating classes. Each class you create is associated with
 a *prototype* class which provides data validation functionality and keeps your
 class' namespace free from pollution, please see L<Validation::Class::Prototype>
 for more information on specific methods, and attributes.
@@ -1298,8 +1298,8 @@ for more information on specific methods, and attributes.
 All derived classes will have a prototype-class attached to it which does all
 the heavy lifting (regarding validation and error handling). The prototype
 injects a few proxy methods into your class which are basically aliases to your
-prototype class, however it is possible to access the prototype directly using
-the proto/prototype methods.
+prototype class methods, however it is possible to access the prototype directly 
+using the proto/prototype methods.
 
 
     package MyApp::User;
@@ -1319,8 +1319,162 @@ the proto/prototype methods.
 All derived classes will benefit from the light-weight, straight-forward and
 simple object system Validation::Class provides. The standard *new* method
 should be used to instantiate a new object and the *bld/build* keywords can be
-used to hook into the instantiation process. Validation::Class does NOT provide
-method modifiers but can be extended with L<Class::Method::Modifiers>.
+used to hook into the instantiation process. 
+
+As previously stated, Validation::Class injects a few proxy methods into your 
+class which are basically aliases to your prototype class methods. You can 
+find additional information on the prototype class and its method at 
+L<Validation::Class::Prototype>. The following is a list of *proxy* methods, 
+methods which are injected into your class as shorthand to methods defined in 
+the prototype class (these methods are overridable):
+
+=head2 class
+
+    $self->class;
+ 
+See L<Validation::Class::Prototype/class> for full documentation.
+
+=head2 clear_queue
+
+    $self->clear_queue;
+ 
+See L<Validation::Class::Prototype/clear_queue> for full documentation.
+
+=head2 error_count
+
+    $self->error_count;
+ 
+See L<Validation::Class::Prototype/error_count> for full documentation.
+
+=head2 error_fields
+
+    $self->error_fields;
+ 
+See L<Validation::Class::Prototype/error_fields> for full documentation.
+
+=head2 errors
+
+    $self->errors;
+ 
+See L<Validation::Class::Prototype/errors> for full documentation.
+
+head2 errors_to_string
+
+    $self->errors_to_string;
+ 
+See L<Validation::Class::Prototype/errors_to_string> for full 
+documentation.
+
+=head2 get_errors
+
+    $self->get_errors;
+ 
+See L<Validation::Class::Prototype/get_errors> for full documentation.
+
+=head2 fields
+
+    $self->fields;
+ 
+See L<Validation::Class::Prototype/fields> for full documentation.
+
+=head2 filtering
+
+    $self->filtering;
+ 
+See L<Validation::Class::Prototype/filtering> for full documentation.
+
+=head2 hash_inflator
+
+    $self->hash_inflator;
+ 
+See L<Validation::Class::Prototype/hash_inflator> for full 
+documentation.
+
+=head2 ignore_failure
+
+    $self->ignore_failure;
+ 
+See L<Validation::Class::Prototype/ignore_failure> for full 
+documentation.
+
+=head2 ignore_unknown
+
+    $self->ignore_unknown;
+ 
+See L<Validation::Class::Prototype/ignore_unknown> for full 
+documentation.
+
+=head2 param
+
+    $self->param;
+ 
+See L<Validation::Class::Prototype/param> for full documentation.
+
+=head2 params
+
+    $self->params;
+ 
+See L<Validation::Class::Prototype/params> for full documentation.
+
+=head2 queue
+
+    $self->queue;
+ 
+See L<Validation::Class::Prototype/queue> for full documentation.
+
+=head2 report_failure
+
+    $self->report_failure;
+ 
+See L<Validation::Class::Prototype/report_failure> for full 
+documentation.
+
+=head2 report_unknown
+
+    $self->report_unknown;
+ 
+See L<Validation::Class::Prototype/report_unknown> for full documentation.
+
+=head2 reset_errors
+
+    $self->reset_errors;
+ 
+See L<Validation::Class::Prototype/reset_errors> for full documentation.
+
+=head2 set_errors
+
+    $self->set_errors;
+ 
+See L<Validation::Class::Prototype/set_errors> for full documentation.
+
+=head2 set_method
+
+    $self->set_method;
+ 
+See L<Validation::Class::Prototype/set_method> for full documentation.
+
+=head2 stash
+
+    $self->stash;
+ 
+See L<Validation::Class::Prototype/stash> for full documentation.
+
+=head2 validate
+
+    $self->validate;
+ 
+See L<Validation::Class::Prototype/validate> for full documentation.
+
+=head2 validate_profile
+
+    $self->validate_profile;
+ 
+See L<Validation::Class::Prototype/validate_profile> for full documentation.
+
+=head1 EXTENDING VALIDATION::CLASS
+
+Validation::Class does NOT provide
+method modifiers but can be easily extended with L<Class::Method::Modifiers>.
 
 =cut
 

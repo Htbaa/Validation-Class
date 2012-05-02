@@ -1,4 +1,4 @@
-# ABSTRACT: Data Validation Engine for Validation::Class Classes
+# ABSTRACT: Prototype and Data Validation Engine for Validation::Class
 
 package Validation::Class::Prototype;
 
@@ -1191,6 +1191,66 @@ sub apply_validator {
 
 }
 
+sub check_field {
+    
+    my ( $self, $name, $spec ) = @_;
+
+    my $directives = $self->types->{field};
+
+    foreach ( keys %{$spec} ) {
+        
+        # check if the field's directives are registered
+        
+        if ( ! defined $directives->{$_} ) {
+            
+            my $error = qq{
+                The $_ directive supplied by the $name field is not supported
+            };
+
+            $self->pitch_error($error);
+            
+        }
+        
+    }
+
+    return 1;
+
+}
+
+sub check_mixin {
+    
+    my ( $self, $mixin, $spec ) = @_;
+
+    my $directives = $self->types->{mixin};
+
+    foreach ( keys %{$spec} ) {
+        
+        if ( ! defined $directives->{$_} ) {
+            
+            my $error = qq{
+                The $_ directive supplied by the $mixin mixin is not supported
+            };
+            
+            $self->pitch_error($error);
+            
+        }
+        
+        if ( ! $directives->{$_} ) {
+            
+            my $error = qq{
+                The $_ directive supplied by the $mixin mixin is empty
+            };
+            
+            $self->pitch_error($error);
+            
+        }
+        
+    }
+
+    return 1;
+
+}
+
 =method class
 
 The class method returns a new initialize validation class related to the
@@ -1292,66 +1352,6 @@ sub class {
     }
     
     return $child;
-
-}
-
-sub check_field {
-    
-    my ( $self, $name, $spec ) = @_;
-
-    my $directives = $self->types->{field};
-
-    foreach ( keys %{$spec} ) {
-        
-        # check if the field's directives are registered
-        
-        if ( ! defined $directives->{$_} ) {
-            
-            my $error = qq{
-                The $_ directive supplied by the $name field is not supported
-            };
-
-            $self->pitch_error($error);
-            
-        }
-        
-    }
-
-    return 1;
-
-}
-
-sub check_mixin {
-    
-    my ( $self, $mixin, $spec ) = @_;
-
-    my $directives = $self->types->{mixin};
-
-    foreach ( keys %{$spec} ) {
-        
-        if ( ! defined $directives->{$_} ) {
-            
-            my $error = qq{
-                The $_ directive supplied by the $mixin mixin is not supported
-            };
-            
-            $self->pitch_error($error);
-            
-        }
-        
-        if ( ! $directives->{$_} ) {
-            
-            my $error = qq{
-                The $_ directive supplied by the $mixin mixin is empty
-            };
-            
-            $self->pitch_error($error);
-            
-        }
-        
-    }
-
-    return 1;
 
 }
 
@@ -3035,8 +3035,8 @@ sub proxy_methods {
     return qw{
         
         class
+        reset_errors
         clear_queue
-        copy_errors
         error
         error_count
         error_fields
@@ -3053,7 +3053,6 @@ sub proxy_methods {
         queue
         report_failure
         report_unknown
-        reset_errors
         set_errors
         stash
         
