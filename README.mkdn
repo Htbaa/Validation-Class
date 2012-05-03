@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.13
+version 7.15
 
 # SYNOPSIS
 
@@ -770,6 +770,18 @@ documentation.
 
 See ["get_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get_errors) for full documentation.
 
+## get_fields
+
+    $self->get_fields;
+
+See ["get_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get_fields) for full documentation.
+
+## get_params
+
+    $self->get_params;
+
+See ["get_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get_params) for full documentation.
+
 ## fields
 
     $self->fields;
@@ -840,11 +852,35 @@ See ["report_unknown" in Validation::Class::Prototype](http://search.cpan.org/pe
 
 See ["reset_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset_errors) for full documentation.
 
+## reset_fields
+
+    $self->reset_fields;
+
+See ["reset_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset_fields) for full documentation.
+
+## reset_params
+
+    $self->reset_params;
+
+See ["reset_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset_params) for full documentation.
+
 ## set_errors
 
     $self->set_errors;
 
 See ["set_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set_errors) for full documentation.
+
+## set_fields
+
+    $self->set_fields;
+
+See ["set_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set_fields) for full documentation.
+
+## set_params
+
+    $self->set_params;
+
+See ["set_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set_params) for full documentation.
 
 ## set_method
 

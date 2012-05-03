@@ -4,9 +4,14 @@ TODO (0000-00-00)
     - raise_error flag allows profiles to track class() usage and raise errors
     - critique documentation
 
+7.15 (2012-05-03)
+    * added all *_errors, *_fields, and *_params methods to 
+      the proxy methods list
+    * update various POD bits
+
 7.12 (2012-05-02)
-    - better synopsis
-    - update various POD bits
+    * better synopsis
+    * update various POD bits
 
 7.11 (2012-04-27)
     * enforcing field naming convention to reduce margin for error

@@ -1371,6 +1371,18 @@ documentation.
  
 See L<Validation::Class::Prototype/get_errors> for full documentation.
 
+=head2 get_fields
+
+    $self->get_fields;
+ 
+See L<Validation::Class::Prototype/get_fields> for full documentation.
+
+=head2 get_params
+
+    $self->get_params;
+ 
+See L<Validation::Class::Prototype/get_params> for full documentation.
+
 =head2 fields
 
     $self->fields;
@@ -1441,11 +1453,35 @@ See L<Validation::Class::Prototype/report_unknown> for full documentation.
  
 See L<Validation::Class::Prototype/reset_errors> for full documentation.
 
+=head2 reset_fields
+
+    $self->reset_fields;
+ 
+See L<Validation::Class::Prototype/reset_fields> for full documentation.
+
+=head2 reset_params
+
+    $self->reset_params;
+ 
+See L<Validation::Class::Prototype/reset_params> for full documentation.
+
 =head2 set_errors
 
     $self->set_errors;
  
 See L<Validation::Class::Prototype/set_errors> for full documentation.
+
+=head2 set_fields
+
+    $self->set_fields;
+ 
+See L<Validation::Class::Prototype/set_fields> for full documentation.
+
+=head2 set_params
+
+    $self->set_params;
+ 
+See L<Validation::Class::Prototype/set_params> for full documentation.
 
 =head2 set_method
 

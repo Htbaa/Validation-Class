@@ -3035,7 +3035,6 @@ sub proxy_methods {
     return qw{
         
         class
-        reset_errors
         clear_queue
         error
         error_count
@@ -3043,6 +3042,8 @@ sub proxy_methods {
         errors
         errors_to_string
         get_errors
+        get_fields
+        get_params
         fields
         filtering
         hash_inflator
@@ -3053,7 +3054,12 @@ sub proxy_methods {
         queue
         report_failure
         report_unknown
+        reset_errors
+        reset_fields
+        reset_params
         set_errors
+        set_fields
+        set_params
         stash
         
     }
