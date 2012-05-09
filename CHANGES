@@ -2,7 +2,14 @@ This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
     - raise_error flag allows profiles to track class() usage and raise errors
+    - mixin fields across namespaces
     - critique documentation
+
+7.16 (2012-05-03)
+    * added V::C::Relatives collection class
+    * fixed slight oversight in V::C
+    * added test for method modifiers
+    * extended V::C::Intro POD
 
 7.15 (2012-05-03)
     * added all *_errors, *_fields, and *_params methods to 

@@ -8,7 +8,13 @@
 This documentation will serves as a brief overview of various usage scenarios
 for Validation::Class.
 
-=head1 EXAMPLE
+=head1 SCREENCAST
+
+The following L<"http://youtu.be/YCPViiB5jv0"/screencast> explains what
+L<Validation::Class> is, why it was created, and what it has to offer your
+application code.
+
+=head1 INTRODUCTION
 
     package MyApp::User;
     
@@ -35,9 +41,9 @@ for Validation::Class.
         
         validation => sub {
         
-            my ($self, $this_field, $all_params) = @_;
+            my ($self, $field, $params) = @_;
         
-            return $this_field->{value} eq 'admin' ? 1 : 0;
+            return $field->{value} eq 'admin' ? 1 : 0;
         
         }
         
@@ -52,9 +58,9 @@ for Validation::Class.
         
         validation    => sub {
         
-            my ($self, $this_field, $all_params) = @_;
+            my ($self, $field, $params) = @_;
         
-            return $this_field->{value} eq 'pass' ? 1 : 0;
+            return $field->{value} eq 'pass' ? 1 : 0;
         
         }
         
@@ -123,9 +129,10 @@ method validation failures. The ignore_unknown flag when set to false will
 confess to an attempt to validate a parameter with no matching field definition.
 
 Although the sentiment may not be shared by all, error handling is one of those
-things I'd just like to be available without worrying too much about how its setup.
-Validation and error handling are built-in mechanisms you are encouraged to
-leverage.
+things I'd just like to be available without worrying too much about how its
+setup. Validation and error handling are built-in mechanisms you are encouraged
+to leverage. Validation::Class is extremely extendable for those that wish to
+roll-their-own-solution.
 
 =head2 A Reasonably Realistic Example
 
@@ -232,11 +239,9 @@ usage scenarios:
     
     my $user = MyApp::User->new(first_name => '...', last_name => '...');
     
-    $user->register;
+    unless ($user->register) {
     
-    unless ($user->error_count) {
-    
-        ...
+        # $user->error_count
         
     }
 
@@ -317,8 +322,8 @@ A validation class is defined as follows:
 
         validation => sub {
 
-            my ($self, $this_field, $all_params) = @_;
-            return $this_field->{value} eq 'admin' ? 1 : 0;
+            my ($self, $field, $params) = @_;
+            return $field->{value} eq 'admin' ? 1 : 0;
 
         }
 
@@ -333,8 +338,8 @@ A validation class is defined as follows:
 
         validation    => sub {
 
-            my ($self, $this_field, $all_params) = @_;
-            return $this_field->{value} eq 'pass' ? 1 : 0;
+            my ($self, $field, $params) = @_;
+            return $field->{value} eq 'pass' ? 1 : 0;
 
         }
 
@@ -572,8 +577,8 @@ with a "+" symbol. The following is an example of including a plugin.
         error      => 'Login invalid.',
         required   => 1,
         validation => sub {
-            my ($self, $this_field, $all_params) = @_;
-            return $this_field->{value} eq 'admin' ? 1 : 0;
+            my ($self, $field, $params) = @_;
+            return $field->{value} eq 'admin' ? 1 : 0;
         }
     };
     
@@ -584,8 +589,8 @@ with a "+" symbol. The following is an example of including a plugin.
         error         => 'Password invalid.',
         required      => 1,
         validation    => sub {
-            my ($self, $this_field, $all_params) = @_;
-            return $this_field->{value} eq 'pass' ? 1 : 0;
+            my ($self, $field, $params) = @_;
+            return $field->{value} eq 'pass' ? 1 : 0;
         }
     };
     
@@ -595,7 +600,7 @@ Your plugin is loaded at runtime and can manipulate the calling class by
 declaring a B<new> method. The following is an example of a fictitious
 plugin for formatting telephone numbers:
 
-    package Validation::Class::Plugin::TelephoneFormatting;
+    package Validation::Class::Plugin::USTelephone;
     
     # hook into the instantiation process of the calling class at runtime
     
@@ -625,7 +630,7 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     use Validation::Class;
     
     set {
-        plugins => ['TelephoneFormatting']
+        plugins => ['USTelephone']
     };
     
     # a validation rule
@@ -635,8 +640,7 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
         error      => 'Phone number invalid.',
         required   => 1,
         filters    => ['telephone_usa'],
-        filtering  => 'post',
-        pattern    => '+1 (###) ###-####'
+        filtering  => 'post', # phone is only formatted if validation passes
     };
     
     package main ;
@@ -644,5 +648,245 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     my $input = MyApp::User->new(...);
     
     # ...
+
+=head1 INTROSPECT AND EXTEND
+
+Most users will never venture beyond the public API, but powerful abilities
+await the more adventureous developer and this section was written specifically
+for you. To assist you on along your journey, let me explain exactly what
+happens when you define and instantiate a validation class.
+
+Classes are defined using keywords (field, mixin, filter, etc) which register
+rule definitions on a cached class profile (of-sorts) associated with the class
+which is being constructed. On instantiation, the cached class profile is cloned
+then merged with any arguments provided to the constructor, this means that even
+in a persistent environment the original class profile is never altered.
+
+To begin introspection, simply look into the attributes attached to the class
+prototype, e.g. fields, mixins, filters, etc., the following examples will give
+you an idea of how to use introspection to extend your application code using
+Validation::Class.
+
+Please keep in mind that Validation::Class is likely to have most of the
+functionalty you would need to introspect your codebase. The following is an 
+introspect design template that will work in most cases:
+
+    package MyApp::Introspect;
+    
+    use Validation::Class;
+    set {
+        classes => ['MyApp'] # load MyApp and all MyApp::* child classes
+    };
+    
+    sub per_class {
+    
+        my ($self, $code) = @_;
+        
+        $self->proto->relatives->each(sub {
+            
+            my ($alias, $namespace) = @_;
+            
+            # do something with each class
+            $code->($namespace); 
+        
+        });
+    
+    }
+    
+    sub per_field_per_class {
+    
+        my ($self, $code) = @_;
+        
+        $self->per_class(sub {
+            
+            my $namespace = shift;
+            
+            my $class = $namespace->new;
+            
+            foreach my $field (sort $class->fields->keys) {
+            
+                # do something with each field
+                $code->($class, $class->fields->{$field}); 
+            
+            }
+            
+        });
+    
+    }
+    ...
+
+=head1 MISC TECHNIQUES
+
+What follows is a miscellaneous list of tips and tricks that leverage
+Validation::Class to perform additional operations.
+
+=head2 Client-Side Validation Library
+
+In the context of a web-application, it is often best to perform the initial
+input validation on the client (web-browser) before submitting data to the
+server for further validation and processing. In the following code we will
+generate javascript objects that match our Validation::Class data models which
+we will then use with jQuery to validate form data, etc.
+
+... in bin/generate_jsapi
+
+    # usage: ./generate_jsapi > app.api.js
+
+    use MyApp::Introspect;
+    
+    use JSON;
+    
+    my $classes = {};
+    
+    my $json = JSON->new->allow_blessed->convert_blessed->pretty([1]);
+    
+    my $introspection = MyApp::Introspect->new;
+    
+    $introspection->per_field_per_class(sub{
+    
+        my ($class, $field) = @_;
+        
+        my $namespace  = ref $class;
+        
+        # attributes we want in the js api
+        my $attributes = {
+            map { $_ => $field->{$_} }
+            qw(name label error filters required length min_length max_length)
+        };
+        
+        my $fieldspace =
+            $classes->{$namespace}->{$field->{name}} = $attributes;
+    
+    });
+    
+    # generate the JS API
+    
+    print "\n";
+    
+    print "var MyApp = MyApp || {};\n\n";
+    
+    while (my($namespace, $fields) = each(%{$classes})) {
+    
+        $namespace =~ s/::/./;
+        
+        my $objects = $json->encode($fields);
+        
+        chomp $objects;
+        
+        print "$namespace = $objects;\n\n";
+    
+    }
+
+The output of the following script should generate a file which looks similar
+to the following:
+    
+    var MyApp = MyApp || {};
+    
+    MyApp.Test = {
+       "email" : {
+          "name" : "email",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 3,
+          "length" : null,
+          "required" : 1,
+          "error" : null,
+          "label" : null,
+          "max_length" : 255
+       },
+       "password" : {
+          "name" : "password",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 5,
+          "length" : null,
+          "required" : 1,
+          "error" : null,
+          "label" : null,
+          "max_length" : 255
+       },
+       "name" : {
+          "name" : "name",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 5,
+          "length" : null,
+          "required" : 1,
+          "error" : null,
+          "label" : null,
+          "max_length" : 255
+       },
+       "id" : {
+          "name" : "id",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : null,
+          "length" : null,
+          "required" : 0,
+          "error" : null,
+          "label" : null,
+          "max_length" : 11
+       },
+       "login" : {
+          "name" : "login",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 5,
+          "length" : null,
+          "required" : 1,
+          "error" : null,
+          "label" : null,
+          "max_length" : 255
+       }
+    };
+    
+If its not obvious yet, we can easily use this generated javascript API with
+jQuery to validate forms, etc. The following are a few ideas on how we might do
+that.
+
+    <form action="/awesomeness" class="protected">
+    
+        <input id="name" name="name" value="" model="test-name" />
+    
+    </form>
+    
+    // validate any form with a 'protected' class 
+    $('form.protected').submit(function(){
+    
+        // all form fields submitted
+        $(':input', this).each(function(){
+        
+            var model = $(this).attr('model');
+            
+            if (model) {
+            
+                var cf = model.split("-");
+                
+                var class = cf[0];
+                var field = cf[1];
+                
+                // uppercase first
+                class = class.charAt(0).toUpperCase() + class.slice(1);
+                
+                // check model against element, e.g.
+                if (! $(this).val() && MyApp[class][field].required) {
+                    // ERROR, DANGER, KABOOM!!!
+                }
+                
+            }
+            
+        });
+    
+    });
 
 =cut
