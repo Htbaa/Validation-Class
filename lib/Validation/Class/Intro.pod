@@ -10,9 +10,8 @@ for Validation::Class.
 
 =head1 SCREENCAST
 
-The following L<"http://youtu.be/YCPViiB5jv0"/screencast> explains what
-L<Validation::Class> is, why it was created, and what it has to offer your
-application code.
+The following L<screencast|http://youtu.be/YCPViiB5jv0> explains what
+L<Validation::Class> is, why it was created, and what it has to offer.
 
 =head1 INTRODUCTION
 
@@ -720,6 +719,31 @@ introspect design template that will work in most cases:
 What follows is a miscellaneous list of tips and tricks that leverage
 Validation::Class to perform additional operations.
 
+=head2 Log All Validation Attempts
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    use Class::Method::Modifiers;
+    
+    ...
+    
+    after validate => sub {
+        
+        my ($self, @args) = @_;
+        
+        # maybe using Log::Log4Perl to write log validation attempts
+        
+    };
+    
+    after validate_profile => sub {
+        
+        my ($self, @args) = @_;
+        
+        # maybe using Log::Log4Perl to write log validation attempts
+        
+    };
+
 =head2 Client-Side Validation Library
 
 In the context of a web-application, it is often best to perform the initial
@@ -854,12 +878,16 @@ If its not obvious yet, we can easily use this generated javascript API with
 jQuery to validate forms, etc. The following are a few ideas on how we might do
 that.
 
+... the form
+
     <form action="/awesomeness" class="protected">
     
         <input id="name" name="name" value="" model="test-name" />
     
     </form>
-    
+
+... the javascript
+
     // validate any form with a 'protected' class 
     $('form.protected').submit(function(){
     
@@ -880,7 +908,9 @@ that.
                 
                 // check model against element, e.g.
                 if (! $(this).val() && MyApp[class][field].required) {
+                    
                     // ERROR, DANGER, KABOOM!!!
+                    
                 }
                 
             }
