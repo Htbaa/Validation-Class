@@ -719,31 +719,6 @@ introspect design template that will work in most cases:
 What follows is a miscellaneous list of tips and tricks that leverage
 Validation::Class to perform additional operations.
 
-=head2 Log All Validation Attempts
-
-    package MyApp::User;
-    
-    use Validation::Class;
-    use Class::Method::Modifiers;
-    
-    ...
-    
-    after validate => sub {
-        
-        my ($self, @args) = @_;
-        
-        # maybe using Log::Log4Perl to write log validation attempts
-        
-    };
-    
-    after validate_profile => sub {
-        
-        my ($self, @args) = @_;
-        
-        # maybe using Log::Log4Perl to write log validation attempts
-        
-    };
-
 =head2 Client-Side Validation Library
 
 In the context of a web-application, it is often best to perform the initial

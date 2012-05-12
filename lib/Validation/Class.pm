@@ -146,6 +146,8 @@ our @EXPORT = qw(
     method
     mxn
     mixin
+    obj
+    object
     pro
     profile
     set
@@ -950,11 +952,11 @@ sub method {
 
     return undef unless ($name && $data);
     
-    return configure_class_proto  sub {
+    return configure_class_proto sub {
         
         my ($proto) = @_;
         
-        $proto->{config}->{METHODS} ||= {};
+        $proto->{config}->{METHODS}    ||= {};
         $proto->{config}->{ATTRIBUTES} ||= {};
         
         confess "Error creating method $name on $proto->{package}, ".
@@ -1205,6 +1207,179 @@ sub new {
     # ready-set-go !!!
     
     return $self;
+
+}
+
+=keyword object
+
+The object keyword (or obj) registers a class object builder which builds and
+returns a class object on-demand. The object keyword also creates a method on
+the calling class which invokes the builder. Unlike class attributes, this
+method does not cache or otherwise store the returned class object it
+constructs.
+
+    package MyApp::Database;
+    
+    use DBI;
+    use Validation::Class;
+    
+    fld name => {
+        required => 1,
+    };
+    
+    fld host => {
+        required => 1,
+    };
+    
+    fld port => {
+        required => 1,
+    };
+    
+    fld user => {
+        required => 1,
+    };
+    
+    fld pass => {
+        # ...
+    };
+    
+    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh
+    obj _build_dbh => {
+        type => 'DBI',
+        init => 'connect', # defaults to new
+        args => sub {
+            
+            my ($self) = @_;
+            
+            my @conn_str_parts =
+                ('dbi', 'mysql', $self->name, $self->host, $self->port);
+            
+            return (
+                join(':', @conn_str_parts),
+                $self->user,
+                $self->pass
+            )
+            
+        }
+    };
+    
+    sub connect {
+    
+        my ($self) = @_;
+        
+        my @parameters = ('name', 'host', 'port', 'user');
+        
+        if ($self->validate(@parameters)) {
+        
+            if ($self->dbh) {
+                
+                my $db = $self->dbh;
+                
+                # ... do something else with DBI
+                
+                return 1;
+                
+            }
+            
+            $self->set_errors($DBI::errstr);
+        
+        }
+        
+        return 0;
+    
+    }
+    
+    package main;
+    
+    my $database = MyApp::Database->new(
+        name => 'test',
+        host => 'localhost',
+        port => '3306',
+        user => 'root'
+    );
+    
+    if ($database->connect) {
+    
+        # ...
+    
+    }
+    
+The object keyword takes two arguments, an object builder name and a hashref
+of key/value pairs which are used to instruct the builder on how to construct
+the object. The supplied hashref should be configured as follows:
+
+    {
+    
+        # class to construct
+        type => 'ClassName',
+        
+        # optional: constructor name (defaults to new)
+        init => 'new',
+        
+        # optional: coderef which returns arguments for the constructor
+        args => sub {}
+        
+    }
+
+=cut
+
+sub obj { goto &object }
+sub object {
+
+    my ($name, $data) = @_;
+
+    return undef unless ($name && $data);
+    
+    return configure_class_proto sub {
+        
+        my ($proto) = @_;
+        
+        $proto->{config}->{OBJECTS}    ||= {};
+        $proto->{config}->{ATTRIBUTES} ||= {};
+        
+        confess "Error creating method $name on $proto->{package}, ".
+            "collides with attribute $name"
+                if exists $proto->{config}->{ATTRIBUTES}->{$name};
+        
+        confess "Error creating method $name on $proto->{package}, ".
+            "collides with method $name"
+                if $proto->{package}->can($name);
+        
+        # create method
+        
+        confess "Error creating method $name, requires a 'type' option"
+            unless $data->{type};
+        
+        $proto->{config}->{OBJECTS}->{$name} = $data;
+        
+        no strict 'refs';
+        
+        *{"$proto->{package}\::$name"} = sub {
+            
+            my $self  = shift;
+            my @args  = @_;
+            
+            my $validator;
+            
+            my $type = $data->{'type'};
+            my $init = $data->{'init'} ||= 'new';
+            my $args = $data->{'args'};
+            
+            my @params = ($args->($self)) if "CODE" eq ref $args;
+            
+            # maybe merge @params with @args or vice versa ???
+            
+            if (my $instance = $type->$init(@params)) {
+                
+                return $instance;
+                
+            }
+            
+            return undef;
+            
+        };
+        
+    };
 
 }
 

@@ -5,12 +5,11 @@ BEGIN {
     
 }
 
-use utf8;
 use Test::More;
 
 SKIP: {
     
-    eval { require Class::Method::Modifiers };
+    eval { require 'Class/Method/Modifiers.pm' };
     
     plan skip_all => 'Class::Method::Modifiers is not installed.' if $@;
     
