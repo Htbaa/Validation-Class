@@ -11,58 +11,62 @@ SKIP: {
     
     eval { require 'DBI.pm' && require 'DBD/SQLite.pm' };
     
-    plan skip_all => 'DBI or DBD::SQLite is not installed.' if $@;
+    $@ ?
+        plan skip_all => 'DBI or DBD::SQLite is not installed.' :
+        eval <<'CLASS';
     
-    package TestClass::ObjectKeyword;
-    
-    use DBI;
-    use Validation::Class;
-    
-    fld name => {
-        required => 1,
-    };
-    
-    obj _build_dbh => {
-        type => 'DBI',
-        init => 'connect',
-        args => sub {
-            
-            my ($self) = @_;
-            
-            return (
-                join(':', 'dbi', 'SQLite', "dbname=". $self->name),
-                "",
-                ""
-            )
-            
-        }
-    };
-    
-    has dbh => sub { shift->_build_dbh };
-    
-    sub connect {
-    
+package TestClass::ObjectKeyword;
+
+use DBI;
+use Validation::Class;
+
+fld name => {
+    required => 1,
+};
+
+obj _build_dbh => {
+    type => 'DBI',
+    init => 'connect',
+    args => sub {
+        
         my ($self) = @_;
         
-        if ($self->validate('name')) {
+        return (
+            join(':', 'dbi', 'SQLite', "dbname=". $self->name),
+            "",
+            ""
+        )
         
-            if ($self->dbh) {
-                
-                my $db = $self->dbh;
-                
-                # ... do something else with DBI
-                
-                return 1;
-                
-            }
+    }
+};
+
+has dbh => sub { shift->_build_dbh };
+
+sub connect {
+
+    my ($self) = @_;
+    
+    if ($self->validate('name')) {
+    
+        if ($self->dbh) {
             
-            $self->set_errors($DBI::errstr);
-        
+            my $db = $self->dbh;
+            
+            # ... do something else with DBI
+            
+            return 1;
+            
         }
         
-        return 0;
+        $self->set_errors($DBI::errstr);
     
     }
+    
+    return 0;
+
+}
+
+CLASS
     
     package main;
     

@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.20
+version 7.21
 
 # SYNOPSIS
 
@@ -617,7 +617,6 @@ constructs.
     };
     
 
-    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh
     obj _build_dbh => {
         type => 'DBI',
         init => 'connect', # defaults to new
@@ -640,6 +639,9 @@ constructs.
 
         }
     };
+    
+
+    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
     
 
     sub connect {

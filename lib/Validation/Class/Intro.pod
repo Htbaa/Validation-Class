@@ -550,6 +550,97 @@ classes. The following is an example of this:
     
     1;
 
+=head1 BUILDING OBJECTS
+
+    package MyApp::Database;
+    
+    use DBI;
+    use Validation::Class;
+    
+    fld name => {
+        required => 1,
+    };
+    
+    fld host => {
+        required => 1,
+    };
+    
+    fld port => {
+        required => 1,
+    };
+    
+    fld user => {
+        required => 1,
+    };
+    
+    fld pass => {
+        # ...
+    };
+    
+    obj _build_dbh => {
+        type => 'DBI',
+        init => 'connect', # defaults to new
+        args => sub {
+            
+            my ($self) = @_;
+            
+            my @conn_str_parts =
+                ('dbi', 'mysql', $self->name, $self->host, $self->port);
+            
+            return (
+                join(':', @conn_str_parts),
+                $self->user,
+                $self->pass
+            )
+            
+        }
+    };
+    
+    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
+    
+    sub connect {
+    
+        my ($self) = @_;
+        
+        my @parameters = ('name', 'host', 'port', 'user');
+        
+        if ($self->validate(@parameters)) {
+        
+            if ($self->dbh) {
+                
+                my $db = $self->dbh;
+                
+                # ... do something else with DBI
+                
+                return 1;
+                
+            }
+            
+            $self->set_errors($DBI::errstr);
+        
+        }
+        
+        return 0;
+    
+    }
+    
+    package main;
+    
+    my $database = MyApp::Database->new(
+        name => 'test',
+        host => 'localhost',
+        port => '3306',
+        user => 'root'
+    );
+    
+    if ($database->connect) {
+    
+        # ...
+    
+    }
+
+More documentation to come ...
+
 =head1 BUILDING PLUGINS
 
 When creating B<official> Validation::Class plugins you should use the namespace
@@ -718,6 +809,33 @@ introspect design template that will work in most cases:
 
 What follows is a miscellaneous list of tips and tricks that leverage
 Validation::Class to perform additional operations.
+
+=head2 Log All Validation Attempts
+
+    package MyApp::User;
+    
+    use Validation::Class;
+    use Class::Method::Modifiers;
+    
+    ...
+    
+    after validate => sub {
+        
+        my ($self, @args) = @_;
+        
+        # maybe using Log::Log4Perl to write log validation attempts
+        
+    };
+    
+    after validate_profile => sub {
+        
+        my ($self, @args) = @_;
+        
+        # maybe using Log::Log4Perl to write log validation attempts
+        
+    };
+    
+More documentation to come ...
 
 =head2 Client-Side Validation Library
 

@@ -1243,7 +1243,6 @@ constructs.
         # ...
     };
     
-    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh
     obj _build_dbh => {
         type => 'DBI',
         init => 'connect', # defaults to new
@@ -1262,6 +1261,8 @@ constructs.
             
         }
     };
+    
+    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
     
     sub connect {
     

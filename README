@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.20
+    version 7.21
 
 SYNOPSIS
         package MyVal::User;
@@ -500,7 +500,6 @@ KEYWORDS
             # ...
         };
     
-        has dbh => sub { shift->_build_dbh }; # cache the _build_dbh
         obj _build_dbh => {
             type => 'DBI',
             init => 'connect', # defaults to new
@@ -519,6 +518,8 @@ KEYWORDS
             
             }
         };
+    
+        has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
     
         sub connect {
     

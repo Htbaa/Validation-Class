@@ -11,42 +11,46 @@ SKIP: {
     
     eval { require 'Class/Method/Modifiers.pm' };
     
-    plan skip_all => 'Class::Method::Modifiers is not installed.' if $@;
+    $@ ?
+        plan skip_all => 'Class::Method::Modifiers is not installed.' :
+        eval <<'CLASS';
+
+package TestClass::Modified;
+
+use Validation::Class;
+use Class::Method::Modifiers;
+
+fld name => {
+    required => 1
+};
+
+has log => 0;
+
+after validate => sub {
     
-    package TestClass::Modified;
+    my ($self) = @_;
     
-    use Validation::Class;
-    use Class::Method::Modifiers;
+    $self->log($self->error_count ? 1 : 0);
     
-    fld name => {
-        required => 1
-    };
+};
+
+mth change_log => {
+    input => ['name'],
+    using => sub {
+        shift->log('thank you')
+    }
+};
+
+after change_log => sub {
     
-    has log => 0;
+    my ($self) = @_;
     
-    after validate => sub {
-        
-        my ($self) = @_;
-        
-        $self->log($self->error_count ? 1 : 0);
-        
-    };
+    $self->log($self->log eq 'thank you' ? 1 : 0);
     
-    mth change_log => {
-        input => ['name'],
-        using => sub {
-            shift->log('thank you')
-        }
-    };
-    
-    after change_log => sub {
-        
-        my ($self) = @_;
-        
-        $self->log($self->log eq 'thank you' ? 1 : 0);
-        
-    };
-    
+};
+
+CLASS
+
     package main;
     
     my $class = "TestClass::Modified";

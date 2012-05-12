@@ -5,7 +5,10 @@ TODO (0000-00-00)
     - raise_error flag allows profiles to track class usage and raise errors
     - critique documentation
 
-7.20 (2012-05-20)
+7.21 (2012-05-12)
+    * fixed bad conditional in t/09-modifiers.t and t/02-keyword-object.t
+
+7.20 (2012-05-10)
     * fixed mistype in t/09-modifiers.t causing test failures
     * add the obj/object keyword (which defines class object builders)
     * add test for the object keyword
