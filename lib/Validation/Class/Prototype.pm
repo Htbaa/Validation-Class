@@ -1843,7 +1843,7 @@ sub configuration_validator_between {
     
     $value = length($value);
     
-    if ($value) {
+    if (defined $value) {
     
         unless ($value >= $min && $value <= $max) {
     
@@ -1866,7 +1866,7 @@ sub configuration_validator_depends_on {
 
     my ($directive, $value, $field, $class) = @_;
     
-    if ($value) {
+    if (defined $value) {
         
         my $dependents = "ARRAY" eq ref $directive ?
         $directive : [$directive];
@@ -1911,7 +1911,7 @@ sub configuration_validator_length {
     
     $value = length($value);
     
-    if ($value) {
+    if (defined $value) {
 
         unless ($value == $directive) {
 
@@ -1938,7 +1938,7 @@ sub configuration_validator_matches {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
         
         # build the regex
         my $this = $value;
@@ -1968,7 +1968,7 @@ sub configuration_validator_max_alpha {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[a-zA-Z]/g);
         
@@ -1997,7 +1997,7 @@ sub configuration_validator_max_digits {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[0-9]/g);
 
@@ -2026,7 +2026,7 @@ sub configuration_validator_max_length {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         unless ( length($value) <= $directive ) {
 
@@ -2053,7 +2053,7 @@ sub configuration_validator_max_sum {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         unless ( $value <= $directive ) {
 
@@ -2077,7 +2077,7 @@ sub configuration_validator_max_symbols {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[^0-9a-zA-Z]/g);
 
@@ -2106,7 +2106,7 @@ sub configuration_validator_min_alpha {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[a-zA-Z]/g);
 
@@ -2135,7 +2135,7 @@ sub configuration_validator_min_digits {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[0-9]/g);
 
@@ -2164,7 +2164,7 @@ sub configuration_validator_min_length {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         unless ( length($value) >= $directive ) {
 
@@ -2191,7 +2191,7 @@ sub configuration_validator_min_sum {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         unless ( $value >= $directive ) {
 
@@ -2215,7 +2215,7 @@ sub configuration_validator_min_symbols {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         my @i = ($value =~ /[^0-9a-zA-Z]/g);
 
@@ -2244,7 +2244,7 @@ sub configuration_validator_options {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         # build the regex
         my (@options) = "ARRAY" eq ref $directive ?
@@ -2254,7 +2254,8 @@ sub configuration_validator_options {
 
             my $handle  = $field->{label} || $field->{name};
             
-            my $error = "$handle must be " . join " or ", @options;
+            my $error = "$handle must be " .
+                join(", ", (@options[(0..($#options-1))])) . " or $options[-1]";
             
             $field->errors->add($field->{error} || $error);
 
@@ -2272,7 +2273,7 @@ sub configuration_validator_pattern {
 
     my ( $directive, $value, $field, $class ) = @_;
 
-    if ($value) {
+    if (defined $value) {
 
         # build the regex
         my $regex = $directive;

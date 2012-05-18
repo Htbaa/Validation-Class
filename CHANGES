@@ -1,9 +1,14 @@
 This file documents the revision history for the Perl library Validation::Class.
 
 TODO (0000-00-00)
-    - mixin fields across namespaces
     - raise_error flag allows profiles to track class usage and raise errors
     - critique documentation
+    - mixin fields across namespaces
+
+7.25 (2012-05-18)
+    * misc changes
+    * changed error message for options validator
+    * fixed major overlooked bug in the processing of core validators
 
 7.21 (2012-05-12)
     * fixed bad conditional in t/09-modifiers.t and t/02-keyword-object.t

@@ -1,5 +1,6 @@
 *
 
+!.eg/*
 !.gitignore
 !dist.ini
 !weaver.ini
