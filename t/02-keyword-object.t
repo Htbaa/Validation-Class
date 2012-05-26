@@ -31,11 +31,7 @@ obj _build_dbh => {
         
         my ($self) = @_;
         
-        return (
-            join(':', 'dbi', 'SQLite', "dbname=". $self->name),
-            "",
-            ""
-        )
+        return ( join(':', 'dbi', 'SQLite', "dbname=". $self->name), "", "" )
         
     }
 };

@@ -3,120 +3,86 @@ NAME
     Framework
 
 VERSION
-    version 7.25
+    version 7.35
 
 SYNOPSIS
         package MyVal::User;
     
         use Validation::Class;
     
-        # rules mixin
-    
-        mxn basic       => {
+        mixin basic     => {
             required    => 1,
             max_length  => 255,
             filters     => [qw/trim strip/]
         }; 
     
-        # attr(s) w/rules
-    
-        fld id          => {
-            mixin       => 'basic',
-            max_length  => 11,
-            required    => 0
-        };
-    
-        fld name        => {
-            mixin       => 'basic',
-            min_length  => 2
-        };
-    
-        fld email       => {
-            mixin       => 'basic',
-            min_length  => 3
-        };
-    
-        fld login       => {
+        field login     => {
             mixin       => 'basic',
             min_length  => 5
         };
     
-        fld password    => {
+        field password  => {
             mixin       => 'basic',
             min_length  => 5,
             min_symbols => 1
         };
     
-        # just an attr
-    
-        has attitude => 1; 
-    
-        # self-validating method (even better than method signatures)
-    
-        mth create  => {
-    
-            input   => [qw/name email login password/],
-            output  => ['+id'],
-        
-            using   => sub {
-            
-                my ($self, @args) = @_;
-            
-                # make sure to set id for output validation
-            
-            }
-    
-        }; 
-    
         package main;
     
-        my $user = MyVal::User->new(name => '...', email => '...');
+        my @parameters = (login => 'admin', password => 'secr3t');
     
-        unless ($user->create) {
+        my $user = MyVal::User->new(@parameters);
     
-            # did you forget your login and pass?
+        unless ($user->validate('login', 'password')) {
+    
+            print $user->error_to_string, "\n";
     
         }
     
         1;
 
     Validation::Class takes a different approach towards data modeling and
-    validation, it centralizes data validation rules to ensure consistency
-    through DRY (dont-repeat-yourself) code.
-
-        use MyApp;
-    
-        my $params = {
-           'user.login' => '...',
-           'user.pass' => '...'
-        };
-    
-        my $app = MyApp->new(params => $params);
-    
-        my $user = $app->class('user'); # instantiated MyApp::User object
-    
-        unless ($user->validate('login', 'pass')){
-    
-            # do something with ... $input->errors;
-    
-        }
+    validation, it centralizes data validation rules to ensure consistency.
 
 DESCRIPTION
     Validation::Class is much more than a robust data validation framework,
     in-fact it is more of a data modeling framework and can be used as an
     alternative to minimalistic object systems such as Moo, Mo, etc.
-
     Validation::Class aims to provide the building blocks for easily
-    definable self-validating data models.
+    definable self-validating data models. For more information on the
+    validation class object system, review "THE OBJECT SYSTEM" section.
 
-    When fields (attributes with validation rules) are defined, accessors
-    are automatically generated to make getting and setting their values
-    much easier.
+    Validation classes are typically defined using the following keywords:
 
-    Methods can be defined using the method keyword to create a
-    self-validating method, checking the defined input requirements against
-    existing validation rules before executing the routine, gaining
-    consistency and security.
+        * field     (a field is a data validation rule),
+        * mixin     (a field template),
+        * directive (a field/mixin rule attribute),
+        * filter    (a directive which transforms the field parameter value)
+        * method    (a self-validating sub-routine)
+        * object    (a simple object builder)
+
+    To keep your class namespace clean and free from polution, all inherited
+    functionality is configured on your class' prototype (a cached class
+    configuration object) which leaves you free to create and overwrite
+    method names in your class without breaking the Validation::Class
+    framework, this all happens much in the same way Moose uses it's MOP
+    (meta-object-protocol) having most of the framework functionality
+    residing in the Moose::Meta namespace. For more information on the
+    validation class prototype, review "THE PROTOTYPE CLASS" section.
+
+    One very important (and intentional) difference between Moose/Moose-like
+    classes and Validation::Class classes is in the handling of errors.
+    Validation::Class classes respect context in that it is not alway
+    desired and/or appropriate to crash from a failure to validate a
+    parameter. There are generally two types or errors that occur in an
+    application, user-errors which are expected and should be handled and
+    reported, and system-errors which are unexpected and should cause the
+    application to terminate immediately. In Validation::Class, the
+    application is not terminated automatically on validation errors unless
+    you configure it to.
+
+    Additionally, please review the Validation::Class::Intro for a more
+    in-depth understanding of how to leverage Validation::Class.
 
 KEYWORDS
   attribute
@@ -212,8 +178,8 @@ KEYWORDS
         directive 'new_addition' => sub {1};
 
   field
-    The field keyword (or fld) creates an attribute with validation rules
-    for reuse in code. The field name should correspond with the parameter
+    The field keyword (or fld) creates a data validation rule for reuse and
+    validation in code. The field name should correspond with the parameter
     name expected to be passed to your validation class.
 
         package MyApp::User;
