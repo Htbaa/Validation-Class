@@ -179,9 +179,7 @@ our @EXPORT = qw(
     
     package main;
     
-    my @parameters = (login => 'admin', password => 'secr3t');
-    
-    my $user = MyVal::User->new(@parameters);
+    my $user = MyVal::User->new(login => 'admin', password => 'secr3t');
     
     unless ($user->validate('login', 'password')) {
     
@@ -201,16 +199,16 @@ it is more of a data modeling framework and can be used as an alternative to
 minimalistic object systems such as L<Moo>, L<Mo>, etc. Validation::Class aims
 to provide the building blocks for easily definable self-validating data models.
 For more information on the validation class object system, review
-L</"THE OBJECT SYSTEM"> section.
+L<"the object system"|/"THE OBJECT SYSTEM"> section.
 
 Validation classes are typically defined using the following keywords:
 
-    * field     (a field is a data validation rule),
-    * mixin     (a field template),
-    * directive (a field/mixin rule attribute),
-    * filter    (a directive which transforms the field parameter value)
-    * method    (a self-validating sub-routine)
-    * object    (a simple object builder)
+    * field     - a field is a data validation rule
+    * mixin     - a field template
+    * directive - a field/mixin rule attribute
+    * filter    - a directive which transforms the field parameter value
+    * method    - a self-validating sub-routine
+    * object    - a simple object builder
 
 To keep your class namespace clean and free from polution, all inherited
 functionality is configured on your class' prototype (a cached class
@@ -218,8 +216,8 @@ configuration object) which leaves you free to create and overwrite method names
 in your class without breaking the Validation::Class framework, this all happens
 much in the same way L<Moose> uses it's MOP (meta-object-protocol) having most
 of the framework functionality residing in the Moose::Meta namespace. For more
-information on the validation class prototype, review L</"THE PROTOTYPE CLASS">
-section.
+information on the validation class prototype, review
+L<"the prototype class"|/"THE PROTOTYPE CLASS"> section.
 
 One very important (and intentional) difference between Moose/Moose-like classes
 and Validation::Class classes is in the handling of errors. Validation::Class 
