@@ -183,14 +183,17 @@ our @EXPORT = qw(
     
     unless ($user->validate('login', 'password')) {
     
-        print $user->error_to_string, "\n";
+        print $user->errors_to_string, "\n";
     
     }
     
     1;
 
-Validation::Class takes a different approach towards data modeling and
-validation, it centralizes data validation rules to ensure consistency.
+Validation::Class is an object system primarily focused on data validation and
+error handling. It allows you to model data and construct objects in a way which
+allows user input errors, terminating only on system errors. Validation::Class
+classes are designed to ensure consistency and promote reuse of data validation
+rules.
 
 =head1 DESCRIPTION
 
