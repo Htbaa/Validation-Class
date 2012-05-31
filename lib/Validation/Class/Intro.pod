@@ -5,8 +5,8 @@
 
 =head1 OVERVIEW
 
-This documentation will serves as a brief overview of various usage scenarios
-for Validation::Class.
+This documentation will serves as a brief overview of the rationale and various
+usage scenarios for Validation::Class.
 
 =head1 INTRODUCTION
 

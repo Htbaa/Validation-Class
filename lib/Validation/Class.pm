@@ -189,11 +189,12 @@ our @EXPORT = qw(
     
     1;
 
-Validation::Class is an object system primarily focused on data validation and
-error handling. It allows you to model data and construct objects in a way which
-allows user input errors, terminating only on system errors. Validation::Class
-classes are designed to ensure consistency and promote reuse of data validation
-rules.
+Validation::Class is a data validation framework and simple object system. It
+allows you to model data and construct objects with focus on structure and
+reusability. It expects user input errors (without dying), and validation only
+occurs when you ask for it. Validation::Class classes are designed to ensure
+consistency and promote reuse of data validation rules. L<Validation::Class::Intro>
+will help you better understand the framework's rationale and typical use-cases.
 
 =head1 DESCRIPTION
 
@@ -1687,6 +1688,15 @@ documentation.
  
 See L<< Class::Method::Modifiers/after method(s) => sub { ... } >> for full
 documentation.
+
+=cut
+
+=head1 SEE ALSO
+
+You might do well to look into L<Validate::Tiny> for simple use-cases, it has
+virtually no dependencies and solid test coverage. L<Data::Verifier> is a great
+approach to adding robust validation options to your existing Moose classes. I
+have also heard some good things about L<Data::FormValidator> as well.
 
 =cut
 
