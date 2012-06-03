@@ -4,6 +4,9 @@ TODO (0000-00-00)
     ? raise_error flag allows profiles to track class usage and raise errors
     ? mixin fields across namespaces
 
+7.39 (2012-06-03)
+    * fixed major bug in custom validation evaluation
+
 7.38 (2012-05-31)
     * more POD changes
 

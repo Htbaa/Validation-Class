@@ -3866,30 +3866,28 @@ sub validate_fields_specified {
 
         if (defined $field->{validation} && $field->{value}) {
             
-            my $count = $self->error_count;
+            my $count  = $self->error_count;
+            my $result = $field->{validation}->(@args);
             
-            unless ($field->{validation}->(@args)) {
+            if (! $result || $count < $self->error_count) {
                 
-                # assuming the validation routine didnt issue an error
-                if ($count == $self->error_count) {
+                # assuming the validation routine failed or issued an error
+                
+                if (defined $field->{error}) {
                     
-                    if (defined $field->{error}) {
-
-                        $field->{errors}->add($field->{error});
-
-                    }
-
-                    else {
-                        
-                        my $error_msg = join " ",
-                        
-                            ($field->{label} || $field->{name}),
-                            "could not be validated"
-                        ;
-                        
-                        $field->{errors}->add($error_msg);
-                        
-                    }
+                    $field->{errors}->add($field->{error});
+                    
+                }
+                
+                else {
+                    
+                    my $error_msg = join " ",
+                    
+                        ($field->{label} || $field->{name}),
+                        "could not be validated"
+                    ;
+                    
+                    $field->{errors}->add($error_msg);
                     
                 }
                 
@@ -3938,31 +3936,28 @@ sub validate_params_discovered {
     
             if (defined $field->{validation} && $field->{value}) {
                 
-                my $count = $self->error_count;
+                my $count  = $self->error_count;
+                my $result = $field->{validation}->(@args);
                 
-                unless ($field->{validation}->(@args)) {
+                if (! $result || $count < $self->error_count) {
                     
-                    # assuming the validation routine didnt issue an error
-    
-                    if ($count == $self->error_count) {
+                    # assuming the validation routine failed or issued an error
+                    
+                    if (defined $field->{error}) {
+                    
+                        $field->{errors}->add($field->{error});
+                    
+                    }
+                    
+                    else {
                         
-                        if (defined $field->{error}) {
-    
-                            $field->{errors}->add($field->{error});
-    
-                        }
-    
-                        else {
-                            
-                            my $error_msg = join " ",
-                            
-                                ($field->{label} || $field->{name}),
-                                "could not be validated"
-                            ;
-                            
-                            $field->{errors}->add($error_msg);
-                            
-                        }
+                        my $error_msg = join " ",
+                        
+                            ($field->{label} || $field->{name}),
+                            "could not be validated"
+                        ;
+                        
+                        $field->{errors}->add($error_msg);
                         
                     }
                     
@@ -4008,31 +4003,28 @@ sub validate_params_specified {
 
         if (defined $field->{validation} && $field->{value}) {
             
-            my $count = $self->error_count;
+            my $count  = $self->error_count;
+            my $result = $field->{validation}->(@args);
             
-            unless ($field->{validation}->(@args)) {
+            if (! $result || $count < $self->error_count) {
                 
-                # assuming the validation routine didnt issue an error
-
-                if ($count == $self->error_count) {
+                # assuming the validation routine failed or issued an error
+                
+                if ( defined $field->{error} ) {
+                
+                    $field->{errors}->add($field->{error});
+                
+                }
+                
+                else {
                     
-                    if ( defined $field->{error} ) {
-
-                        $field->{errors}->add($field->{error});
-
-                    }
-
-                    else {
-                        
-                        my $error_msg = join " ",
-                        
-                            ($field->{label} || $field->{name}),
-                            "could not be validated"
-                        ;
-                        
-                        $field->{errors}->add($error_msg);
-                        
-                    }
+                    my $error_msg = join " ",
+                    
+                        ($field->{label} || $field->{name}),
+                        "could not be validated"
+                    ;
+                    
+                    $field->{errors}->add($error_msg);
                     
                 }
                 
