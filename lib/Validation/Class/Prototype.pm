@@ -3593,9 +3593,13 @@ sub validate {
         
         if ($switch) {
             
-            # set fields toggle directive
+            # set field toggle directive
+            
             $field =~ s/^[\-\+]{1}//;
-            $self->fields->{$field}->{':toggle'} = $switch;
+            
+            $self->fields->{$field}->{':toggle'} = $switch
+                if $self->fields->has($field);
+            
         }
         
     }

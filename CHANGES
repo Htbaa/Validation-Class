@@ -4,6 +4,9 @@ TODO (0000-00-00)
     ? raise_error flag allows profiles to track class usage and raise errors
     ? mixin fields across namespaces
 
+7.40 (2012-06-06)
+    * fixed bug in validation toggling feature - github-issue-16
+
 7.39 (2012-06-03)
     * fixed major bug in custom validation evaluation
 
