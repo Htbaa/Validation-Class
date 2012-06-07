@@ -3605,7 +3605,7 @@ sub validate {
     }
     
     # create alias map manually if requested
-    # extremely-depreciated but it remains for back-compat and nostalgia !!!
+    # extremely-deprecated but it remains for back-compat and nostalgia !!!
     
     my $alias_map ;
     
@@ -3771,7 +3771,7 @@ sub validate {
     
     my $valid = $self->error_count ? 0 : 1;
     
-    # restore parameters from depreciated alias map functionality
+    # restore parameters from deprecated alias map functionality
     
     if ( defined $alias_map ) {
         

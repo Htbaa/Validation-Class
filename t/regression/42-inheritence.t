@@ -17,7 +17,7 @@ ok $v->fields->{email}, 'temp obj has email';
 ok $v->fields->{login}, 'temp obj has login';
 ok $v->fields->{password}, 'temp obj has password';
 
-# ok $v->mixins->{TMP}, 'temp obj has TMP mixin'; - DEPRECIATED
+# ok $v->mixins->{TMP}, 'temp obj has TMP mixin'; - DEPRECATED
 ok $v->proto->mixins->{TMP}, 'temp obj has TMP mixin';
 
 done_testing;

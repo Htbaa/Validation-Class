@@ -10,7 +10,7 @@ use warnings;
 use Carp 'confess';
 
 $ENV{'VALIDATION_CLASS_BC_WARNING'} = <<'WARNING'; # usage warning
-The method you're attempting to use is (or will be) DEPRECIATED.
+The method you're attempting to use is (or will be) DEPRECATED.
 WARNING
 
 sub warning {
@@ -34,7 +34,7 @@ sub warning {
 
 =head1 DESCRIPTION
 
-Validation::Class::Backwards is responsible for providing depreciated
+Validation::Class::Backwards is responsible for providing deprecated
 functionality to the L<Validation::Class::Prototype> layer whilst clearly
 remaining separate via namespacing.
 
@@ -47,7 +47,7 @@ unset the $ENV{'VALIDATION_CLASS_BC_WARNING'} environment variable.
 
 =method error
 
-DEPRECIATING:
+DEPRECATING:
 
 The error method is used to set and/or retrieve errors encountered during
 validation. The error method with no parameters returns the error message object
