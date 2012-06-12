@@ -77,7 +77,7 @@ TODO (0000-00-00)
     * removed load_classes and load_plugins
     * changed options accepted by the load/set method
     * no longer registering quickname for relatives
-    * depreciated load_plugins and load_classes methods
+    * deprecated load_plugins and load_classes methods
     * removed Array::Unique finally
     * cleanup error handling (needs its own class)
     * merge half-ass cookbook into intro POD

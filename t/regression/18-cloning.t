@@ -17,7 +17,7 @@ my $v = MyVal->new( params => {
 
 ok $v, 'initialization successful';
 
-   # $v->clone - DEPRECIATED
+   # $v->clone - DEPRECATED
    $v->proto->clone('email', 'email3', { label => 'Third Email', required => 0 });
    $v->proto->clone('email', 'email2');
    $v->proto->clone('email', 'email1');

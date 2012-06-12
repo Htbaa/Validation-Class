@@ -61,7 +61,7 @@ $nope->validate;
 ok $nope->params->{foobar} =~ /^1@%23abc45@%#@#%6d666ef\.\.$/,
   'explicit no-filtering after validate ok';
 
-# ok $nope->apply_filters('manual'), 'applying filters manually'; - DEPRECIATED
+# ok $nope->apply_filters('manual'), 'applying filters manually'; - DEPRECATED
 ok $nope->proto->apply_filters('manual'), 'applying filters manually';
 ok $nope->params->{foobar} =~ /^123abc456d666ef$/, 'filtering applied manually';
 
