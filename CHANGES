@@ -1,5 +1,8 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+7.55 (2012-06-14)
+    * fixed major bug cause by 7.50 (alternate syntax for the set/load keyword)
+
 7.50 (2012-06-13)
     * wrote tests to test the Validation::Class::Field object accessors
     * changed module::find usage - no longer loads unless used

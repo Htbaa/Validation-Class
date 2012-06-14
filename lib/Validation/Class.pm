@@ -726,14 +726,11 @@ executing load/set commands, the syntax is as follows:
 sub set { goto &load }
 sub load {
     
-    # check for alternate usages
-    
-    my $data  = pop @_;
-    my $self  = pop @_;
+    my $data  = @_ % 2 ? $_[0] || {} : {@_};
     
     return configure_class_proto sub {
         
-        my $proto = $self ? $self->proto : $_[0];
+        my ($proto) = @_;
         
         my $name = $proto->{package};
         

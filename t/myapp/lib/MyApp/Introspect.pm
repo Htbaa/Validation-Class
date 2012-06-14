@@ -1,9 +1,6 @@
 package MyApp::Introspect;
     
 use Validation::Class;
-set {
-    classes => ['MyApp'] # load MyApp and all MyApp::* child classes
-};
 
 sub per_class {
 
