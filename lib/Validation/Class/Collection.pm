@@ -21,7 +21,7 @@ use Carp 'confess';
 
 =head1 DESCRIPTION
 
-Validation::Class::Collection provides an all-purpose container for objects.
+Validation::Class::Collection provides an all-purpose container for hash objects.
 This class is primarily used as a base class for collection management classes.
 
 =cut
@@ -149,6 +149,20 @@ sub find {
         for grep { $_ =~ $pattern } keys %{$self};
     
     return { %matches };
+    
+}
+
+=method get
+
+    my $object = $self->get($name);
+
+=cut
+
+sub get {
+    
+    my ($self, $name) = @_;
+    
+    return $self->{$name};
     
 }
 

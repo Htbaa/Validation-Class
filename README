@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.40
+    version 7.50
 
 SYNOPSIS
         package MyVal::User;
@@ -33,7 +33,7 @@ SYNOPSIS
     
         unless ($user->validate('login', 'password')) {
     
-            print $user->errors_to_string, "\n";
+            # do something with the errors, e.g. print $user->errors_to_string
     
         }
     
@@ -41,11 +41,14 @@ SYNOPSIS
 
     Validation::Class is a data validation framework and simple object
     system. It allows you to model data and construct objects with focus on
-    structure and reusability. It expects user input errors (without dying),
-    and validation only occurs when you ask for it. Validation::Class
-    classes are designed to ensure consistency and promote reuse of data
-    validation rules. Validation::Class::Intro will help you better
-    understand the framework's rationale and typical use-cases.
+    structure, reusability and data validation. It expects user input errors
+    (without dying), validation only occurs when you ask it to.
+    Validation::Class classes are designed to ensure consistency and promote
+    reuse of data validation rules.
+
+    Validation::Class::Intro will help you better understand the framework's
+    rationale and typical use-cases while Validation::Class::Prototype will
+    help you discover all the bells-and-whistles included in the framework.
 
 DESCRIPTION
     Validation::Class is much more than a robust data validation framework,
@@ -328,6 +331,8 @@ KEYWORDS
 
         package MyVal;
     
+        use Validation::Class;
+    
         load {
             plugins => [
                 'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
@@ -344,6 +349,8 @@ KEYWORDS
 
         package MyVal::User;
     
+        use Validation::Class;
+    
         load {
             roles => [
                 'MyVal::Person'
@@ -351,6 +358,21 @@ KEYWORDS
         };
     
         1;
+
+    Purely for the sake of aesthetics we have designed an alternate syntax
+    for executing load/set commands, the syntax is as follows:
+
+        package MyVal::User;
+    
+        use Validation::Class;
+    
+        load roles => ['MyVal::Person'];
+        load classes => [__PACKAGE__];
+    
+        load plugins => [
+            'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
+            '+MyVal::Plugin'
+        ];
 
   method
     The method keyword (or mth) is used to create an auto-validating method.

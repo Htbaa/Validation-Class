@@ -1,8 +1,13 @@
 This file documents the revision history for the Perl library Validation::Class.
 
-TODO (0000-00-00)
-    ? raise_error flag allows profiles to track class usage and raise errors
-    ? mixin fields across namespaces
+7.50 (2012-06-13)
+    * wrote tests to test the Validation::Class::Field object accessors
+    * changed module::find usage - no longer loads unless used
+    * added get method to Validation::Class::Collection
+    * various POD changes
+    * refactored class method in V::C::P now accepts an alternate syntax
+    * V::C::P class method load unloaded modules as they're called
+    * add alternate syntax to the V::C load/set method
 
 7.40 (2012-06-06)
     * fixed bug in validation toggling feature - github-issue-16
