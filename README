@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.50
+    version 7.51
 
 SYNOPSIS
         package MyVal::User;

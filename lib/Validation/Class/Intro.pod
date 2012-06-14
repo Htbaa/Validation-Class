@@ -16,9 +16,7 @@ usage scenarios for Validation::Class.
     
     # import other class config, etc
     
-    set {
-        # ...
-    };
+    set ...;
     
     # a mixin template
     
@@ -144,9 +142,7 @@ usage scenarios:
     
     use Validation::Class;
     
-    set {
-        classes => [__PACKAGE__]; # load all sub-classes, MyApp::*
-    };
+    set classes => [__PACKAGE__]; # load all sub-classes, MyApp::*
     
     1;
     
@@ -175,9 +171,7 @@ usage scenarios:
     
     use Validation::Class;
     
-    set {
-        base => ['MyApp::Person']
-    };
+    set base => ['MyApp::Person'];
     
     fld 'login' => {
         mixin => 'basic'
@@ -266,8 +260,11 @@ usage scenarios:
         label      => 'user login',
         error      => 'login invalid',
         validation => sub {
+            
             my ($self, $field, $params) = @_;
-            return $field->{value} eq 'admin' ? 1 : 0;
+            
+            return $field->value eq 'admin' ? 1 : 0;
+            
         }
     };
     
@@ -278,8 +275,11 @@ usage scenarios:
         label         => 'user login',
         error         => 'login invalid',
         validation    => sub {
+            
             my ($self, $field, $params) = @_;
-            return $field->{value} eq 'pass' ? 1 : 0;
+            
+            return $field->value eq 'pass' ? 1 : 0;
+            
         }
     };
     
@@ -322,7 +322,8 @@ A validation class is defined as follows:
         validation => sub {
 
             my ($self, $field, $params) = @_;
-            return $field->{value} eq 'admin' ? 1 : 0;
+            
+            return $field->value eq 'admin' ? 1 : 0;
 
         }
 
@@ -338,7 +339,8 @@ A validation class is defined as follows:
         validation    => sub {
 
             my ($self, $field, $params) = @_;
-            return $field->{value} eq 'pass' ? 1 : 0;
+            
+            return $field->value eq 'pass' ? 1 : 0;
 
         }
 
@@ -401,6 +403,7 @@ various scenarios:
         }
         
         return 'you have authenticated';
+        
     };
 
 Lazy validation? Have your validation class automatically find the appropriate
@@ -412,7 +415,7 @@ parameters submitted (which you may or may not have control over).
     
     my $user = MyApp::User->new(params => $params);
     
-    unless ($user->validate){
+    unless ($user->validate) {
     
         return $input->errors_to_string;
     
@@ -432,6 +435,7 @@ of alternate names that can be matched against passed-in parameter names.
             'baz',
             'bax'
         ]
+        
     };
 
     package main;
@@ -536,7 +540,7 @@ classes. The following is an example of this:
     
     use Validation::Class;
     
-    set { classes => [__PACKAGE__] };
+    set classes => [__PACKAGE__];
     
     package main;
     
@@ -653,12 +657,10 @@ with a "+" symbol. The following is an example of including a plugin.
     
     use Validation::Class;
     
-    set {
-        plugins => [
-            'PluginName', # Validation::Class::Plugin::PluginName
-            '+MyApp::User::YourPluginName'
-        ]
-    };
+    set plugins => [
+        'PluginName', # Validation::Class::Plugin::PluginName
+        '+MyApp::User::YourPluginName'
+    ];
     
     # a validation rule
     
@@ -719,9 +721,7 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     
     use Validation::Class;
     
-    set {
-        plugins => ['USTelephone']
-    };
+    set plugins => ['USTelephone'];
     
     # a validation rule
     
@@ -764,9 +764,8 @@ introspect design template that will work in most cases:
     package MyApp::Introspect;
     
     use Validation::Class;
-    set {
-        classes => ['MyApp'] # load MyApp and all MyApp::* child classes
-    };
+    
+    set classes => ['MyApp']; # load MyApp and all MyApp::* child classes
     
     sub per_class {
     
@@ -863,16 +862,15 @@ we will then use with jQuery to validate form data, etc.
     
         my ($class, $field) = @_;
         
-        my $namespace  = ref $class;
+        my $namespace = ref $class;
         
         # attributes we want in the js api
-        my $attributes = {
-            map { $_ => $field->{$_} }
-            qw(name label error filters required length min_length max_length)
-        };
         
-        my $fieldspace =
-            $classes->{$namespace}->{$field->{name}} = $attributes;
+        my $attributes = { map { $_ => $field->{$_} } qw(
+            name label error filters required length min_length max_length
+        ) };
+        
+        my $fieldspace = $classes->{$namespace}->{$field->{name}} = $attributes;
     
     });
     
