@@ -888,7 +888,7 @@ The plugins attribute returns a hashref of loaded plugins.
 
 =cut
 
-has plugins => sub { shift->{config}->{PLUGINS} || {} };
+has plugins => sub {{}};
 
 =attribute profiles
 
@@ -1284,11 +1284,12 @@ prefixed with the name of the class being fetched, and adjust the matching rule
     my $child3  = $input->class('child');      # loads Class::Child;
     my $child4  = $input->class('step_child'); # loads Class::StepChild;
     
-    # use any non-alpha character except for underscore to split the namespace
+    # use any non-alphanumeric character or underscore as the namespace delimiter
     
-    my $child5  = $input->class('step-child'); # loads Class::Step::Child;
+    my $child5  = $input->class('step/child'); # loads Class::Step::Child;
     my $child5a = $input->class('step:child'); # loads Class::Step::Child;
     my $child5b = $input->class('step.child'); # loads Class::Step::Child;
+    my $child5c = $input->class('step-child'); # loads Class::Step::Child;
     
     my $child6  = $input->class('CHILD');      # loads Class::CHILD;
     
@@ -3106,6 +3107,67 @@ sub pitch_error {
     
 }
 
+=method plugin
+
+The plugin method returns the instantiated plugin object attached to the current
+class.
+
+    package Class;
+    
+    use Validation::Class;
+    
+    load plugin => ['TelephoneFormat'];
+    load plugin => ['+Class::Plugin::Form::Elements'];
+    
+    package main;
+    
+    my $input = Class->new(params => $params);
+    
+    # get object for Validation::Class::Plugin::TelephoneFormat;
+    
+    my $plugin = $input->plugin('telephone_format');
+    
+    # use any non-alphanumeric character or underscore as the namespace delimiter
+    # get object for Class::Plugin::Form::Elements;
+    # note the leading character/delimiter
+    
+    my $plugin = $input->plugin(':class:plugin:form:elements'); 
+    
+    # same as $input->proto->plugins->{'Class::Plugin::Form::Elements'};
+    
+    my $plugin = $input->plugin('Class::Plugin::Form::Elements');
+
+=cut
+
+sub plugin {
+    
+    my ($self, $class) = @_;
+    
+    return 0 unless $class;
+    
+    # transform what looks like a shortname
+    
+    if ($class !~ /::/) {
+        
+        my @parts = split /[^0-9A-Za-z_]/, $class;
+        
+        foreach my $part (@parts) {
+            
+            $part = ucfirst $part;
+            $part =~ s/([a-z])_([a-z])/$1\u$2/g;
+            
+        }
+        
+        ! $parts[0] ? shift @parts : push @parts, 'Validation::Class::Plugin';
+        
+        $class = join "::", @parts;
+        
+    }
+    
+    return $self->plugins->{$class};
+
+}
+
 sub proxy_methods {
     
     return qw{
@@ -3127,6 +3189,7 @@ sub proxy_methods {
         ignore_unknown
         param
         params
+        plugin
         queue
         report_failure
         report_unknown

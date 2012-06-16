@@ -14,7 +14,7 @@ usage scenarios for Validation::Class.
     
     use Validation::Class;
     
-    # import other class config, etc
+    # package commands
     
     set ...;
     
@@ -92,29 +92,29 @@ L<Validation::Class> is, why it was created, and what it has to offer.
 
 =head2 Data Modeling Fun
 
-Recently I've been experimenting with using Validation::Class to provide a
-self-validating data model in various projects. The DRY approach the library
-enforces ensures data integrity through consistency.
+Validation::Class is designed to provide you with a self-validating data model.
+The DRY approach the library enforces ensures data integrity through consistency.
 
-I personally prefer to check incoming data once and ensure it meets a specific
+This enables you to check incoming data once and ensure it meets a specific
 criteria then move on throughout various layers in the application stack with
 a level-of-certainty that the input is as it should be, ... sort've a
-set-it-and-forget-it point-of-view.
+set-it-and-forget-it approach.
 
-Prior to recent changes, the general idea was to have application developers
+Prior to Validation::Class version 7, the general idea was to have developers
 create a validation class in addition to an existing data/object model (which is
 twice the work), this was the reasoning behind having the framework ship with a
 Moose adapter (no longer available). Although the Moose adapter is no longer 
 supported, Validation::Class provides your classes with a simple object system 
-allowing your validation classes and models to become one-in-the-same.
+providing the tools necessary to combine your validation and model layers.
 
 The Validation::Class object system provides automatic generation of attributes 
-and accessors based on field names, a new method for creating instances of your 
-class and methods via the method keyword which creates self-validating routines 
-(like method signatures). 
+and accessors based on field names, and a new method for instantiating your
+classes. The method keyword creates self-validating routines (like method
+signatures) which allow you to focus on the handling of data instead of
+worrying if the data is as it should be. 
 
 Simple as it may seem, these features allow developers to easily create data 
-models and objects with validatable attributes and methods with built-in 
+models and objects with verifiable attributes and methods as well as built-in 
 validation and error handling functionality while remaining fast and extensible 
 due to its lean dependency chain.
 
@@ -649,7 +649,7 @@ More documentation to come ...
 
 When creating B<official> Validation::Class plugins you should use the namespace
 Validation::Class::Plugin::YourPluginName. This will allow users of your plugin
-to simply pass YourPluginName to C<load.plugins> option of the load() method.
+to simply pass YourPluginName to the C<plugins> option of the load() method.
 Otherwise you will need to pass the fully-qualified plugin package name prefixed
 with a "+" symbol. The following is an example of including a plugin.
 
@@ -657,7 +657,7 @@ with a "+" symbol. The following is an example of including a plugin.
     
     use Validation::Class;
     
-    set plugins => [
+    load plugins => [
         'PluginName', # Validation::Class::Plugin::PluginName
         '+MyApp::User::YourPluginName'
     ];
@@ -713,6 +713,8 @@ plugin for formatting telephone numbers:
         
         };
         
+        return bless {}, $plugin;
+        
     }
 
 Once we create, test and deploy our plugin, we can use it in our code as follows:
@@ -721,7 +723,7 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     
     use Validation::Class;
     
-    set plugins => ['USTelephone'];
+    load plugins => ['USTelephone'];
     
     # a validation rule
     
@@ -735,9 +737,13 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
     
     package main ;
     
-    my $input = MyApp::User->new(...);
+    #  the phone param will become +1 (215) 555-1212
     
-    # ...
+    my $input = MyApp::User->new(phone => '2155551212');
+    
+    # get direct access to the instantiated plugin
+    
+    my $plugin = $input->plugin('us_telephone');
 
 =head1 INTROSPECT AND EXTEND
 

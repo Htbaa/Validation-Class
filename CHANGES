@@ -1,5 +1,9 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+7.58 (2012-06-16)
+    * changed structure for defining and using plugins
+    * allow the retrieval of instantiated plugin objects
+
 7.55 (2012-06-14)
     * fixed major bug cause by 7.50 (alternate syntax for the set/load keyword)
 

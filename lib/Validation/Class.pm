@@ -631,7 +631,9 @@ class mainly involve copying the role's methods and configuration.
     # load stuff (extend MyApp)
     
     load {
-        ...
+        
+        # run package commands
+        
     };
     
     1;
@@ -714,12 +716,10 @@ executing load/set commands, the syntax is as follows:
     
     load roles => ['MyVal::Person'];
     load classes => [__PACKAGE__];
-    
     load plugins => [
         'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
         '+MyVal::Plugin'
-    ];
-    
+    ];    
 
 =cut
 
@@ -756,6 +756,7 @@ sub load {
             foreach my $parent (@parents) {
                 
                 # load class children and create relationship map (hash)
+                
                 foreach my $child (findallmod $parent) {
                 
                     my $nickname  = $child;
@@ -797,7 +798,7 @@ sub load {
             
             }
             
-            $proto->{config}->{PLUGINS}->{$_} = 1 for @plugins;
+            $proto->{config}->{PLUGINS}->{$_} = undef for @plugins;
             
         }
         
@@ -1173,7 +1174,8 @@ sub new {
     
     foreach my $plugin (keys %{$config->{PLUGINS}}) {
         
-        $plugin->new($self) if $plugin->can('new');
+        $proto->plugins->{$plugin} =
+            $plugin->new($self) if $plugin->can('new');
         
     }
     
@@ -1599,6 +1601,12 @@ See L<Validation::Class::Prototype/param> for full documentation.
     $self->params;
  
 See L<Validation::Class::Prototype/params> for full documentation.
+
+=head2 plugin
+
+    $self->plugin;
+ 
+See L<Validation::Class::Prototype/plugin> for full documentation.
 
 =head2 queue
 

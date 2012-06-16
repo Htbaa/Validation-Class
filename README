@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.55
+    version 7.58
 
 SYNOPSIS
         package MyVal::User;
@@ -284,7 +284,9 @@ KEYWORDS
         # load stuff (extend MyApp)
     
         load {
-            ...
+        
+            # run package commands
+        
         };
     
         1;
@@ -368,7 +370,6 @@ KEYWORDS
     
         load roles => ['MyVal::Person'];
         load classes => [__PACKAGE__];
-    
         load plugins => [
             'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
             '+MyVal::Plugin'
@@ -780,6 +781,11 @@ THE OBJECT SYSTEM
         $self->params;
 
     See "params" in Validation::Class::Prototype for full documentation.
+
+  plugin
+        $self->plugin;
+
+    See "plugin" in Validation::Class::Prototype for full documentation.
 
   queue
         $self->queue;

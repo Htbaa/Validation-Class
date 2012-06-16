@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 BEGIN {
     use FindBin;
@@ -57,3 +57,5 @@ $p = ValMy::Alt->new( params => { foo => 1 } );
 
 eval { $p->stash->{smell}->() && $p->stash->{squirt}->() };
 ok ! $@, 'glade plugin applied to person';
+
+ok ref $p->plugin('/my_val/plugin/glade'), 'plugin instance retrieved';
