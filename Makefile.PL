@@ -24,9 +24,10 @@ my %WriteMakefileArgs = (
     "Hash::Flatten" => 0,
     "Hash::Merge" => 0,
     "Module::Find" => 0,
+    "Module::Runtime" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.58",
+  "VERSION" => "7.65",
   "test" => {
     "TESTS" => "t/*.t t/regression/*.t t/regression/filters/*.t t/regression/validators/*.t"
   }

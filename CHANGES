@@ -1,5 +1,13 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+7.65 (2012-06-17)
+    * allow keywords to be called/used in OO fashion
+    * fixed V::C::Exporter which broke due to recent updates (needs tests)
+
+7.59 (2012-06-16)
+    * builders are also passed all arguments given to the constructor
+    * fixed breakage in V::C::Exporter
+
 7.58 (2012-06-16)
     * changed structure for defining and using plugins
     * allow the retrieval of instantiated plugin objects

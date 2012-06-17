@@ -8,6 +8,7 @@ use warnings;
 # VERSION
 
 use Module::Find;
+use Module::Runtime 'use_module';
 use Carp 'confess';
 use Hash::Merge 'merge';
 use Exporter ();
@@ -95,13 +96,13 @@ use Validation::Class::Prototype;
     
     sub configure_class_proto {
         
-        my $configuration_routine = shift;
+        my $configuration_routine = pop;
         
         return undef unless "CODE" eq ref $configuration_routine;
         
         no strict 'refs';
         
-        my $proto = return_class_proto;
+        my $proto = return_class_proto shift;
         
         $configuration_routine->($proto);
         
@@ -264,6 +265,8 @@ coderef that will be used as its default value.
 sub has { goto &attribute }
 sub attribute {
     
+    my $package = shift if @_ == 3;
+    
     my ($attrs, $default) = @_;
 
     return unless $attrs;
@@ -306,7 +309,7 @@ sub attribute {
             
         }
         
-        return configure_class_proto sub {
+        return configure_class_proto $package => sub {
             
             my ($proto) = @_;
             
@@ -348,11 +351,13 @@ class object.
 sub bld { goto &build }
 sub build {
     
+    my $package = shift if @_ == 2;
+    
     my ($code) = @_;
     
     return undef unless ("CODE" eq ref $code);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
@@ -424,11 +429,13 @@ you can create a no-op by simply returning true, e.g.:
 sub dir { goto &directive }
 sub directive {
     
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
     
     return undef unless ($name && $data);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
@@ -505,6 +512,8 @@ instead.
 sub fld { goto &field }
 sub field {
     
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
     
     return undef unless ($name && $data);
@@ -513,7 +522,7 @@ sub field {
         unless $name =~ /^[a-zA-Z_](([\w\.]+)?\w)$/
         xor    $name =~ /^[a-zA-Z_](([\w\.]+)?\w)\:\d+$/;
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
     
@@ -601,11 +610,13 @@ The coderef should also return the transformed value.
 sub flt { goto &filter }
 sub filter {
     
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
     
     return undef unless ($name && $data);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
@@ -726,16 +737,78 @@ executing load/set commands, the syntax is as follows:
 sub set { goto &load }
 sub load {
     
-    my $data  = @_ % 2 ? $_[0] || {} : {@_};
+    my $package;
+    my $data;
     
-    return configure_class_proto sub {
+    # handle different types of invocations
+    
+    # 1   - load({})
+    # 2+  - load(a => b)
+    # 2+  - package->load({})
+    # 3+  - package->load(a => b)
+    
+    # --
+    
+    # load({})
+    
+    if (@_ == 1) {
+        
+        if ("HASH" eq ref $_[0]) {
+            
+            $data = shift;
+            
+        }
+        
+    }
+    
+    # load(a => b)
+    # package->load({})
+    
+    elsif (@_ == 2) {
+        
+        if ("HASH" eq ref $_[-1]) {
+            
+            $package = shift;
+            $data    = shift;
+            
+        }
+        
+        else {
+            
+            $data = {@_};
+            
+        }
+        
+    }
+    
+    # load(a => b)
+    # package->load(a => b)
+    
+    elsif (@_ >= 3) {
+        
+        if (@_ % 2) {
+            
+            $package = shift;
+            $data    = {@_};
+            
+        }
+        
+        else {
+            
+            $data = {@_};
+            
+        }
+        
+    }
+    
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
         my $name = $proto->{package};
         
         $proto->{config}->{BUILDERS} ||= [];
-
+        
         if ($data->{classes}) {
             
             my @parents ;
@@ -788,14 +861,8 @@ sub load {
                 
                 $plugin =~ s/^\+//;
                 
-                # require plugin
-                my $file = $plugin;
-                   $file =~ s/::/\//g;
-                   $file .= ".pm";
+                use_module $plugin;
                 
-                eval "require $plugin"
-                    unless $INC{$file}; # unless already loaded
-            
             }
             
             $proto->{config}->{PLUGINS}->{$_} = undef for @plugins;
@@ -803,13 +870,14 @@ sub load {
         }
         
         # attach roles
+        
         if (grep { $data->{$_} } qw/base bases role roles/) {
             
             my @roles ;
             
             my $alias =
-                $data->{base} || $data->{role} ||
-                $data->{roles} || $data->{bases};
+                $data->{base}  || $data->{role} ||
+                $data->{roles} || $data->{bases}; # backwards compat
             
             if ($alias) {
                 
@@ -822,15 +890,9 @@ sub load {
                 
                 foreach my $role (@roles) {
                     
-                    # require plugin
-                    my $file = $role;
-                       $file =~ s/::/\//g;
-                       $file .= ".pm";
+                    use_module $role;
                     
                     no strict 'refs';
-                    
-                    eval "require $role"
-                        unless $INC{$file}; # unless already loaded
                     
                     my @routines = grep { defined &{"$role\::$_"} }
                         keys %{"$role\::"};
@@ -838,6 +900,7 @@ sub load {
                     if (@routines) {
                         
                         # copy methods
+                        
                         foreach my $routine (@routines) {
                             
                             eval {
@@ -845,8 +908,7 @@ sub load {
                                 *{"$proto->{package}\::$routine"} =
                                 *{"$role\::$routine"}
                             
-                            }   unless $proto->{package}->can($routine);
-                            # maybe I should issue a warning?
+                            } unless $proto->{package}->can($routine);
                             
                         }
                         
@@ -856,6 +918,7 @@ sub load {
                         $role_proto->{config}  ||= {}; # good measure
                         
                         # merge configs
+                        
                         $proto->{config} =
                             merge $proto->{config}, $role_proto->{config};
                         
@@ -935,11 +998,13 @@ validation failures are handled.
 sub mth { goto &method }
 sub method {
 
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
 
     return undef unless ($name && $data);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
@@ -1078,12 +1143,14 @@ pairs known as directives.
 
 sub mxn { goto &mixin }
 sub mixin {
+    
+    my $package = shift if @_ == 3;
 
     my ($name, $data) = @_;
     
     return undef unless ($name && $data);
 
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my $proto = shift;
         
@@ -1126,7 +1193,7 @@ sub new {
 
     my $class = shift;
     
-    my $proto  = return_class_proto $class;
+    my $proto  = return_class_proto ref $class || $class;
     
     my $config = $proto->{config};
     
@@ -1183,7 +1250,7 @@ sub new {
     
     foreach my $builder (@{$config->{BUILDERS}}) {
         
-        $builder->($self);
+        $builder->($self, %ARGS);
         
     }
     
@@ -1239,13 +1306,9 @@ constructs.
             my ($self) = @_;
             
             my @conn_str_parts =
-                ('dbi', 'mysql', $self->name, $self->host, $self->port);
+                ('dbi', 'mysql', map { $self->$_ } qw(name host port));
             
-            return (
-                join(':', @conn_str_parts),
-                $self->user,
-                $self->pass
-            )
+            return (join(':', @conn_str_parts), $self->user, $self->pass);
             
         }
     };
@@ -1315,11 +1378,13 @@ the object. The supplied hashref should be configured as follows:
 sub obj { goto &object }
 sub object {
 
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
 
     return undef unless ($name && $data);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         
@@ -1415,11 +1480,13 @@ be used to execute a sequence of actions for validation purposes.
 sub pro { goto &profile }
 sub profile {
 
+    my $package = shift if @_ == 3;
+    
     my ($name, $data) = @_;
 
     return undef unless ($name && "CODE" eq ref $data);
     
-    return configure_class_proto sub {
+    return configure_class_proto $package => sub {
         
         my ($proto) = @_;
         

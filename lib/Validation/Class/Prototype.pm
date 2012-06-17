@@ -11,6 +11,7 @@ use base 'Validation::Class::Backwards'; # I'm pro-life
 
 use Carp 'confess';
 use Hash::Merge 'merge';
+use Module::Runtime 'use_module';
 use Hash::Flatten;
 
 use Validation::Class::Base 'has', 'hold';
@@ -1392,16 +1393,7 @@ sub class {
     
     my $class_name = $self->relatives->{$class};
     
-    {
-        
-        # load class if not loaded
-        my $file = $class_name;
-           $file =~ s/::/\//g;
-           $file .= ".pm";
-        
-        eval "require $class_name" unless $INC{$file} ;
-        
-    }
+    use_module $class_name;
     
     my $child = $class_name->new(%settings);
     

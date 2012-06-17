@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.58
+    version 7.65
 
 SYNOPSIS
         package MyVal::User;
@@ -500,13 +500,9 @@ KEYWORDS
                 my ($self) = @_;
             
                 my @conn_str_parts =
-                    ('dbi', 'mysql', $self->name, $self->host, $self->port);
+                    ('dbi', 'mysql', map { $self->$_ } qw(name host port));
             
-                return (
-                    join(':', @conn_str_parts),
-                    $self->user,
-                    $self->pass
-                )
+                return (join(':', @conn_str_parts), $self->user, $self->pass);
             
             }
         };

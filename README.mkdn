@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.58
+version 7.65
 
 # SYNOPSIS
 
@@ -603,14 +603,10 @@ constructs.
             
 
             my @conn_str_parts =
-                ('dbi', 'mysql', $self->name, $self->host, $self->port);
+                ('dbi', 'mysql', map { $self->$_ } qw(name host port));
             
 
-            return (
-                join(':', @conn_str_parts),
-                $self->user,
-                $self->pass
-            )
+            return (join(':', @conn_str_parts), $self->user, $self->pass);
             
 
         }

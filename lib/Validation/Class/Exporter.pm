@@ -104,11 +104,9 @@ sub apply_spec {
     
     my $parent = caller(0);
     
-    my @keywords = @{ $args{keywords} } if $args{keywords};
-
-    my @routines = @{ $args{routines} } if $args{routines};
-    
-    my $settings = { @{ $args{settings} } } if $args{settings};
+    my @keywords =  @{$args{keywords}}   if $args{keywords};
+    my @routines =  @{$args{routines}}   if $args{routines};
+    my $settings = {@{$args{settings}}}  if $args{settings};
     
     *{"$parent\::import"} = sub {
        
