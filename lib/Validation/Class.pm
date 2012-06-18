@@ -72,6 +72,7 @@ use Validation::Class::Prototype;
             foreach my $alias (@wrapped_aliases) {
                 
                 # slight-of-hand
+                
                 *{"$TARGET_CLASS\::$alias"} = sub {
                     
                     my $self = shift @_;
@@ -337,9 +338,28 @@ in the same way the common BUILD routine is used in modern-day OO systems.
     
     build sub {
         
-        my $self = shift;
+        my ($self, %args) = @_;
         
         # ... do something
+        
+    };
+    
+    # die like a Moose
+    
+    use Carp;
+    
+    build sub {
+        
+        my ($self, %args) = @_;
+        
+        my @attributes = qw();
+        
+        foreach my $attribute (@attributes) {
+            
+            confess "Attribute ($attribute) is required"
+                unless $self->$attribute;
+            
+        }
         
     };
 
