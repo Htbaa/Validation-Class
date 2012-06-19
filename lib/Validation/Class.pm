@@ -53,6 +53,7 @@ use Validation::Class::Prototype;
             foreach my $alias (@aliases) {
                 
                 # slight-of-hand
+                
                 *{"$TARGET_CLASS\::$alias"} = sub {
                     
                     my $self = shift @_;
