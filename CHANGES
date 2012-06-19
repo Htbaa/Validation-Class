@@ -1,5 +1,14 @@
 This file documents the revision history for the Perl library Validation::Class.
 
+TODO (TBD)
+    ? refactor object construction to cooperate with other OO systems
+    ? split the Intro POD into documentation files
+    ? write new POD about cooperating with existing OO systems
+    ? added a "TODO" section of POD to the main module
+
+7.66 (2012-06-19)
+    * misc changes (experimental configs) -- should not impede normal usage
+
 7.65 (2012-06-17)
     * allow keywords to be called/used in OO fashion
     * fixed V::C::Exporter which broke due to recent updates (needs tests)

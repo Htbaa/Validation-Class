@@ -7,11 +7,11 @@ use warnings;
 
 # VERSION
 
+use Carp 'confess';
+use Exporter ();
+use Hash::Merge 'merge';
 use Module::Find;
 use Module::Runtime 'use_module';
-use Carp 'confess';
-use Hash::Merge 'merge';
-use Exporter ();
 
 use Validation::Class::Errors;
 use Validation::Class::Field;
@@ -40,9 +40,13 @@ use Validation::Class::Prototype;
                 config  => {}
             };
             
+            # respect a foreign new() constructor (which may be a bad idea)
+            
+            my $new = $TARGET_CLASS->can("new") ? "initialize" : "new";
+            
             # injected into every derived class
             
-            *{"$TARGET_CLASS\::new"}       = sub { goto \&new };
+            *{"$TARGET_CLASS\::$new"}      = sub { goto \&$new };
             *{"$TARGET_CLASS\::proto"}     = sub { goto \&prototype };
             *{"$TARGET_CLASS\::prototype"} = sub { goto \&prototype };
             
@@ -128,6 +132,80 @@ sub import {
     warnings->import;
     
     __PACKAGE__->export_to_level(1, @_);
+    
+}
+
+sub initialize {
+    
+    my $self   = shift;
+    
+    my $proto  = return_class_proto ref $self || $self;
+    
+    my $config = $proto->{config};
+    
+    # clone config values
+    
+    my @clonables = qw(fields filters methods mixins profiles relatives) ;
+    
+    $proto->{$_} = merge $proto->{config}->{uc $_}, $proto->{$_} for @clonables;
+    
+    my %ARGS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
+    
+    # bless special collections
+    
+    $proto->{errors}
+        = Validation::Class::Errors->new;
+    
+    $proto->{params}
+        = Validation::Class::Params->new;
+    
+    $proto->{fields}
+        = Validation::Class::Fields->new($proto->{fields}); #!!!
+    
+    $proto->{relatives}
+        = Validation::Class::Relatives->new($proto->{relatives});
+    
+    # process overridable attributes
+    
+    my $fields = delete $ARGS{fields} if defined $ARGS{fields};
+    my $params = delete $ARGS{params} if defined $ARGS{params};
+    
+    $proto->set_fields($fields) if $fields;
+    $proto->set_params($params) if $params;
+    
+    # process attribute assignments
+    
+    while (my($attr, $value) = each (%ARGS)) {
+        
+        $self->$attr($value);
+        
+    }
+    
+    # process plugins
+    
+    foreach my $plugin (keys %{$config->{PLUGINS}}) {
+        
+        $proto->plugins->{$plugin} =
+            $plugin->new($self) if $plugin->can('new');
+        
+    }
+    
+    # process builders
+    
+    foreach my $builder (@{$config->{BUILDERS}}) {
+        
+        $builder->($self, %ARGS);
+        
+    }
+    
+    # initialize prototype
+    
+    $proto->normalize;
+    $proto->apply_filters('pre') if $proto->filtering;
+    
+    # ready-set-go !!!
+    
+    return $self;
     
 }
 
@@ -229,14 +307,14 @@ of the framework functionality residing in the Moose::Meta namespace. For more
 information on the validation class prototype, review
 L<"the prototype class"|/"THE PROTOTYPE CLASS"> section.
 
-One very important (and intentional) difference between Moose/Moose-like classes
-and Validation::Class classes is in the handling of errors. Validation::Class 
-classes respect context in that it is not alway desired and/or appropriate to
-crash from a failure to validate a parameter. There are generally two types or
-errors that occur in an application, user-errors which are expected and should
-be handled and reported, and system-errors which are unexpected and should cause
-the application to terminate immediately. In Validation::Class, the application
-is not terminated automatically on validation errors unless you configure it to.
+One very important (and intentional) difference between Moose/Moose-like systems
+and Validation::Class classes is in the handling of errors. There are generally
+two types of errors that occur in an application, user-errors which are expected
+and should be handled and reported, and system-errors which are unexpected and
+should cause the application to terminate or otherwise handle the exception. It
+is not always desired and/or appropriate to crash from a failure to validate a
+particular parameter. In Validation::Class, the application is not terminated or
+validate automatically unless you configure it to.
 
 Additionally, please review the L<Validation::Class::Intro> for a more in-depth
 understanding of how to leverage Validation::Class.
@@ -245,11 +323,15 @@ understanding of how to leverage Validation::Class.
 
 =keyword attribute
 
-The attribute keyword (or has) creates a class attribute. 
+The attribute keyword (or has) creates a class attribute. This is only a
+minimalistic variant of what you may have encountered in other object systems
+such as L<Moose>, L<Mouse>, L<Moo>, L<Mo>, etc.
 
     package MyApp::User;
     
     use Validate::Class;
+    
+    attribute 'bothered' => 1;
     
     attribute 'attitude' => sub {
         
@@ -1214,73 +1296,11 @@ sub new {
 
     my $class = shift;
     
-    my $proto  = return_class_proto ref $class || $class;
+    my $proto = return_class_proto $class;
     
-    my $config = $proto->{config};
+    my $self  = bless {},  $class;
     
-    my $self = bless {},  $class;
-    
-    # clone config values
-    
-    my @clonables = qw(fields filters methods mixins profiles relatives) ;
-    
-    $proto->{$_} = merge $proto->{config}->{uc $_}, $proto->{$_} for @clonables;
-    
-    my %ARGS = @_ ? @_ > 1 ? @_ : "HASH" eq ref $_[0] ? %{$_[0]} : () : ();
-    
-    # bless special collections
-    
-    $proto->{errors}
-        = Validation::Class::Errors->new;
-    
-    $proto->{params}
-        = Validation::Class::Params->new;
-    
-    $proto->{fields}
-        = Validation::Class::Fields->new($proto->{fields}); #!!!
-    
-    $proto->{relatives}
-        = Validation::Class::Relatives->new($proto->{relatives});
-    
-    # process overridable attributes
-    
-    my $fields = delete $ARGS{fields} if defined $ARGS{fields};
-    my $params = delete $ARGS{params} if defined $ARGS{params};
-    
-    $proto->set_fields($fields) if $fields;
-    $proto->set_params($params) if $params;
-    
-    # process attribute assignments
-    
-    while (my($attr, $value) = each (%ARGS)) {
-        
-        $self->$attr($value);
-        
-    }
-    
-    # process plugins
-    
-    foreach my $plugin (keys %{$config->{PLUGINS}}) {
-        
-        $proto->plugins->{$plugin} =
-            $plugin->new($self) if $plugin->can('new');
-        
-    }
-    
-    # process builders
-    
-    foreach my $builder (@{$config->{BUILDERS}}) {
-        
-        $builder->($self, %ARGS);
-        
-    }
-    
-    # initialize prototype
-    
-    $proto->normalize;
-    $proto->apply_filters('pre') if $proto->filtering;
-    
-    # ready-set-go !!!
+    initialize $self, @_;
     
     return $self;
 

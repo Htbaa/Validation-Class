@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.65",
+  "VERSION" => "7.66",
   "test" => {
     "TESTS" => "t/*.t t/regression/*.t t/regression/filters/*.t t/regression/validators/*.t"
   }

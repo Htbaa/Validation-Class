@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.65
+version 7.66
 
 # SYNOPSIS
 
@@ -88,14 +88,14 @@ of the framework functionality residing in the Moose::Meta namespace. For more
 information on the validation class prototype, review
 ["the prototype class"](#THE PROTOTYPE CLASS) section.
 
-One very important (and intentional) difference between Moose/Moose-like classes
-and Validation::Class classes is in the handling of errors. Validation::Class 
-classes respect context in that it is not alway desired and/or appropriate to
-crash from a failure to validate a parameter. There are generally two types or
-errors that occur in an application, user-errors which are expected and should
-be handled and reported, and system-errors which are unexpected and should cause
-the application to terminate immediately. In Validation::Class, the application
-is not terminated automatically on validation errors unless you configure it to.
+One very important (and intentional) difference between Moose/Moose-like systems
+and Validation::Class classes is in the handling of errors. There are generally
+two types of errors that occur in an application, user-errors which are expected
+and should be handled and reported, and system-errors which are unexpected and
+should cause the application to terminate or otherwise handle the exception. It
+is not always desired and/or appropriate to crash from a failure to validate a
+particular parameter. In Validation::Class, the application is not terminated or
+validate automatically unless you configure it to.
 
 Additionally, please review the [Validation::Class::Intro](http://search.cpan.org/perldoc?Validation::Class::Intro) for a more in-depth
 understanding of how to leverage Validation::Class.
@@ -104,12 +104,17 @@ understanding of how to leverage Validation::Class.
 
 ## attribute
 
-The attribute keyword (or has) creates a class attribute. 
+The attribute keyword (or has) creates a class attribute. This is only a
+minimalistic variant of what you may have encountered in other object systems
+such as [Moose](http://search.cpan.org/perldoc?Moose), [Mouse](http://search.cpan.org/perldoc?Mouse), [Moo](http://search.cpan.org/perldoc?Moo), [Mo](http://search.cpan.org/perldoc?Mo), etc.
 
     package MyApp::User;
     
 
     use Validate::Class;
+    
+
+    attribute 'bothered' => 1;
     
 
     attribute 'attitude' => sub {
@@ -140,10 +145,38 @@ in the same way the common BUILD routine is used in modern-day OO systems.
     build sub {
         
 
-        my $self = shift;
+        my ($self, %args) = @_;
         
 
         # ... do something
+        
+
+    };
+    
+
+    # die like a Moose
+    
+
+    use Carp;
+    
+
+    build sub {
+        
+
+        my ($self, %args) = @_;
+        
+
+        my @attributes = qw();
+        
+
+        foreach my $attribute (@attributes) {
+            
+
+            confess "Attribute ($attribute) is required"
+                unless $self->$attribute;
+            
+
+        }
         
 
     };
