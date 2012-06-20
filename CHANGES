@@ -6,6 +6,9 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.67 (2012-06-20)
+    * misc POD changes
+
 7.66 (2012-06-19)
     * misc changes (experimental configs) -- should not impede normal usage
 

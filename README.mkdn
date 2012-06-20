@@ -4,11 +4,11 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.66
+version 7.67
 
 # SYNOPSIS
 
-    package MyVal::User;
+    package MyApp::User;
     
 
     use Validation::Class;
@@ -37,13 +37,14 @@ version 7.66
     package main;
     
 
-    my $user = MyVal::User->new(login => 'admin', password => 'secr3t');
+    my $user = MyApp::User->new(login => 'admin', password => 'secr3t');
     
 
     unless ($user->validate('login', 'password')) {
     
 
-        # do something with the errors, e.g. print $user->errors_to_string
+        # do something with the errors,
+        # e.g. print $user->errors_to_string
     
 
     }
@@ -79,7 +80,7 @@ Validation classes are typically defined using the following keywords:
     * method    - a self-validating sub-routine
     * object    - a simple object builder
 
-To keep your class namespace clean and free from polution, all inherited
+To keep your class namespace clean and free from pollution, all inherited
 functionality is configured on your class' prototype (a cached class
 configuration object) which leaves you free to create and overwrite method names
 in your class without breaking the Validation::Class framework, this all happens
@@ -867,16 +868,70 @@ using the proto/prototype methods.
 # THE OBJECT SYSTEM
 
 All derived classes will benefit from the light-weight, straight-forward and
-simple object system Validation::Class provides. The standard *new* method
-should be used to instantiate a new object and the *bld/build* keywords can be
-used to hook into the instantiation process. 
+simple object system Validation::Class provides. The conventional constructor
+`new` should be used to instantiate a new object, and the `bld`/`build`
+keywords can be used to hook into the instantiation process. Your classes can
+be configured to cooperate with an existing design or modern OO framework like
+[Moose](http://search.cpan.org/perldoc?Moose), [Mouse](http://search.cpan.org/perldoc?Mouse), [Moo](http://search.cpan.org/perldoc?Moo), etc. The following example explains how to setup a
+Validation::Class class in cooperation with Moose (while this example focuses
+on Moose, the approach is the same regardless of the existing system):
+
+    package MyApp;
+    
+
+    use Moose;
+    use Validation::Class 'field'; # only export as needed
+    
+
+    sub BUILD {
+        
+
+        my ($self, $args) = @_;
+        
+
+        # you must run initialization routines yourself ...
+        # automatically run initialization routines
+        
+
+        $self->initialize(params => $args->{params});
+        
+
+    }
+    
+
+    field login     => {
+        min_length  => 5
+        max_length  => 50
+    };
+    
+
+    field password  => {
+        min_length  => 8,
+        min_symbols => 1
+        max_length  => 50
+    };
+    
+
+    1;
+
+This cooperation works by simply detecting the existence of a method named `new`, 
+the name traditionally reserved for a class constructor which if detected signals
+Validation::Class to install a method named `initialize` as opposed to installing
+its own constructor. The installed method, `initialize`, encapsulates the
+functionality which prepares the class for interaction with its corresponding
+prototype class, this function must be called before using the Validation::Class
+features provided. If this concept isn't clear to you you needn't worry as this
+is very low-level, all you need you understand is that Validation::Class
+will install a constructor or a method named initialize if a constructor already
+exists, either way, the installed method should be called before executing
+methods on the class.
 
 As previously stated, Validation::Class injects a few proxy methods into your 
 class which are basically aliases to your prototype class methods. You can 
 find additional information on the prototype class and its method at 
 [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype). The following is a list of *proxy* methods, 
 methods which are injected into your class as shorthand to methods defined in 
-the prototype class (these methods are overridable):
+the prototype class (these methods are overridden):
 
 ## class
 
