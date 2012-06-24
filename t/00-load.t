@@ -6,6 +6,8 @@ BEGIN {
 }
 
 use Test::More;
+use Validation::Class ();
+use Validation::Class::Prototype ();
 
 {
     
@@ -41,57 +43,15 @@ use Test::More;
     "TestClass::Hack instantiated, via the setup hack";
     
     ok ! $class->can($_),
-    "TestClass::Hack has NOT been injected with the $_ method" for qw/
-        attribute
-        bld
-        build
-        dir
-        directive
-        fld
-        field
-        flt
-        filter
-        has
-        load
-        mth
-        method
-        mxn
-        mixin
-        pro
-        profile
-        set
-    /;
+    "TestClass::Hack has NOT been injected with the $_ method"
+    for @Validation::Class::EXPORT;
     
     ok $class->can($_),
-    "TestClass::Hack has been injected with the $_ method" for qw/
-        new
-        proto
-        prototype
-        
-        class
-        clear_queue
-        error
-        error_count
-        error_fields
-        errors
-        errors_to_string
-        get_errors
-        fields
-        filtering
-        ignore_failure
-        ignore_unknown
-        param
-        params
-        queue
-        report_failure
-        report_unknown
-        reset_errors
-        set_errors
-        stash
-        
-        validate
-        validate_profile
-    /;
+    "TestClass::Hack has been injected with the $_ method"
+    for qw/new proto prototype/,
+        @Validation::Class::Prototype::proxy_methods,
+        @Validation::Class::Prototype::proxy_methods_wrapped
+    ;
     
 }
 
@@ -110,57 +70,15 @@ use Test::More;
     "TestClass::Traditional instantiated, via the setup hack";
     
     ok $class->can($_),
-    "TestClass::Traditional has been injected with the $_ method" for qw/
-        attribute
-        bld
-        build
-        dir
-        directive
-        fld
-        field
-        flt
-        filter
-        has
-        load
-        mth
-        method
-        mxn
-        mixin
-        pro
-        profile
-        set
-    /;
+    "TestClass::Traditional has been injected with the $_ method"
+    for @Validation::Class::EXPORT;
     
     ok $class->can($_),
-    "TestClass::Traditional has been injected with the $_ method" for qw/
-        new
-        proto
-        prototype
-        
-        class
-        clear_queue
-        error
-        error_count
-        error_fields
-        errors
-        errors_to_string
-        get_errors
-        fields
-        filtering
-        ignore_failure
-        ignore_unknown
-        param
-        params
-        queue
-        report_failure
-        report_unknown
-        reset_errors
-        set_errors
-        stash
-        
-        validate
-        validate_profile
-    /;
+    "TestClass::Traditional has been injected with the $_ method"
+    for qw/new proto prototype/,
+        @Validation::Class::Prototype::proxy_methods,
+        @Validation::Class::Prototype::proxy_methods_wrapped
+    ;
     
 }
 
@@ -269,28 +187,30 @@ use Test::More;
     
     no warnings 'redefine';
     
-    sub attribute       { 'noop' }
-    sub bld             { 'noop' }
-    sub build           { 'noop' }
-    sub dir             { 'noop' }
-    sub directive       { 'noop' }
-    sub fld             { 'noop' }
-    sub field           { 'noop' }
-    sub flt             { 'noop' }
-    sub filter          { 'noop' }
-    sub has             { 'noop' }
-    sub load            { 'noop' }
-    sub mth             { 'noop' }
-    sub method          { 'noop' }
-    sub mxn             { 'noop' }
-    sub mixin           { 'noop' }
-    sub pro             { 'noop' }
-    sub profile         { 'noop' }
-    sub set             { 'noop' }
+    sub attribute        { 'noop' }
+    sub bld              { 'noop' }
+    sub build            { 'noop' }
+    sub dir              { 'noop' }
+    sub directive        { 'noop' }
+    sub fld              { 'noop' }
+    sub field            { 'noop' }
+    sub flt              { 'noop' }
+    sub filter           { 'noop' }
+    sub has              { 'noop' }
+    sub load             { 'noop' }
+    sub mth              { 'noop' }
+    sub method           { 'noop' }
+    sub mxn              { 'noop' }
+    sub mixin            { 'noop' }
+    sub obj              { 'noop' }
+    sub object           { 'noop' }
+    sub pro              { 'noop' }
+    sub profile          { 'noop' }
+    sub set              { 'noop' }
 
-    sub new             { 'noop' }
-    sub proto           { 'noop' }
-    sub prototype       { 'noop' }
+    sub new              { 'noop' }
+    sub proto            { 'noop' }
+    sub prototype        { 'noop' }
 
     sub class            { 'noop' }
     sub clear_queue      { 'noop' }
@@ -323,57 +243,15 @@ use Test::More;
     ok "TestClass::Overrider" eq ref $class, "TestClass::Overrider instantiated";
     
     ok 'noop' eq $class->$_,
-    "TestClass::Overrider method $_ method was overriden" for qw/
-        attribute
-        bld
-        build
-        dir
-        directive
-        fld
-        field
-        flt
-        filter
-        has
-        load
-        mth
-        method
-        mxn
-        mixin
-        pro
-        profile
-        set
-    /;
+    "TestClass::Overrider method $_ method was overriden"
+    for @Validation::Class::EXPORT;
     
     ok ! do { eval { 1 if 'noop' eq $class->$_ }; $@ },
-    "TestClass::Overrider method $_ method was overriden" for qw/
-        new
-        proto
-        prototype
-        
-        class
-        clear_queue
-        error
-        error_count
-        error_fields
-        errors
-        errors_to_string
-        get_errors
-        fields
-        filtering
-        ignore_failure
-        ignore_unknown
-        param
-        params
-        queue
-        report_failure
-        report_unknown
-        reset_errors
-        set_errors
-        stash
-        
-        validate
-        validate_profile
-    /;
+    "TestClass::Overrider method $_ method was overriden"
+    for qw/new proto prototype/,
+        @Validation::Class::Prototype::proxy_methods,
+        @Validation::Class::Prototype::proxy_methods_wrapped
+    ;
     
 }
 

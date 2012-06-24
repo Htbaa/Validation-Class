@@ -18,9 +18,8 @@ use Test::More;
     
     use Validation::Class;
     
-    set classes => 1;
-    
-    fld name => {
+    load  classes   => 1;
+    field name      => {
     
         required => 1
     
@@ -29,6 +28,7 @@ use Test::More;
     package main;
     
     my $class = "MyApp";
+    
     my $self  = $class->new(name => "don johnson");
     
     ok $class eq ref $self, "$class instantiated";

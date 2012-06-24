@@ -6,6 +6,13 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.69 (2012-06-24)
+    * added more tests
+
+7.68 (2012-06-20)
+    * updated some tests
+    * fixed plugin function and POD -- works better (with discovery)
+
 7.67 (2012-06-20)
     * misc POD changes
 

@@ -159,8 +159,7 @@ use Test::More;
     ok $accessors[1] eq 'name_last',    "$class has the name_last accessor";
     ok $accessors[2] eq 'name_phone_0', "$class has the name_phone_0 accessor";
     ok $accessors[3] eq 'name_phone_1', "$class has the name_phone_1 accessor";
-    ok $accessors[4] eq 'name_phone_2', "$class has the name_phone_2 accessor";
-    
+    ok $accessors[4] eq 'name_phone_2', "$class has the name_phone_2 accessor";    
     
 }
 

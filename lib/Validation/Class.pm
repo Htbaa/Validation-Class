@@ -965,7 +965,7 @@ sub load {
                 
                 $plugin =~ s/^\+//;
                 
-                use_module $plugin;
+                eval { use_module $plugin };
                 
             }
             
@@ -994,7 +994,7 @@ sub load {
                 
                 foreach my $role (@roles) {
                     
-                    use_module $role;
+                    eval { use_module $role };
                     
                     no strict 'refs';
                     

@@ -3123,7 +3123,14 @@ class.
     # get object for Class::Plugin::Form::Elements;
     # note the leading character/delimiter
     
-    my $plugin = $input->plugin(':class:plugin:form:elements'); 
+    # automatically resolves to the first matching namespace for $self
+    # or Validation::Class::Plugin 
+    
+    my $plugin = $input->plugin('plugin:form:elements');
+    
+    # prefix with a special character to denote a fully-qualified namespace
+    
+    my $plugin = $input->plugin('+class:plugin:form:elements'); 
     
     # same as $input->proto->plugins->{'Class::Plugin::Form::Elements'};
     
@@ -3150,9 +3157,36 @@ sub plugin {
             
         }
         
-        ! $parts[0] ? shift @parts : push @parts, 'Validation::Class::Plugin';
+        if (!$parts[0]) {
+            
+            shift @parts;
+            
+            $class = join "::", @parts;
+            
+        }
         
-        $class = join "::", @parts;
+        else {
+            
+            my @rootspaces = (
+                
+                $self->{package},
+                'Validation::Class::Plugin'
+                
+            );
+            
+            my $matched = 0;
+            
+            foreach my $rootspace (@rootspaces) {
+            
+                $class = join "::", $rootspace, @parts;
+                
+                eval '$matched = $class->can("new") ? 1 : 0';
+                
+                last if $matched;
+            
+            }
+            
+        }
         
     }
     

@@ -62,6 +62,7 @@ sub connect {
 
 }
 
+1;
 CLASS
     
     package main;
