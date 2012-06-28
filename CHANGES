@@ -6,6 +6,12 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.70 (2012-06-28)
+    * on initialization, only set registered accessors
+    * major bug fix - validation routine now reaps auto-cloned fields
+    * custom validation firing default failure message even if custom message
+      is used
+
 7.69 (2012-06-24)
     * added more tests
 

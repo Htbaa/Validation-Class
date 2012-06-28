@@ -3194,6 +3194,24 @@ sub plugin {
 
 }
 
+sub proxy_attributes {
+    
+    return qw{
+        
+        fields
+        filtering
+        hash_inflator
+        ignore_failure
+        ignore_unknown
+        params
+        report_failure
+        report_unknown
+        stash
+        
+    }
+    
+}
+
 sub proxy_methods {
     
     return qw{
@@ -3868,6 +3886,7 @@ sub validate {
                         }
                         
                         # like it never existed ...
+                        # remove clone subject from the fields list
                         
                         @fields = grep { $_ ne $name } @fields if @fields; # ...
                     
@@ -3949,9 +3968,23 @@ sub validate {
     }
     
     # reap cloned fields
-    # we are currently NOT reaping clones, because we need them to stick around
-    # so we can reference any errors they may have generated ...
-    # $self->fields->remove($_) for @clones;
+    
+    foreach my $clone (@clones) {
+        
+        my ($name, $index) = split /:/, $clone;
+        
+        if ($self->fields->has($name)) {
+            
+            my $field = $self->fields->get($name);
+            my $clone = $self->fields->get($clone);
+            
+            $field->errors->add($clone->errors->all);
+            
+        }
+        
+        $self->fields->remove($clone);
+        
+    }
     
     # run post-validation filtering
     
@@ -4034,10 +4067,10 @@ sub validate_fields_specified {
 
         if (defined $field->{validation} && $field->{value}) {
             
-            my $count  = $self->error_count;
-            my $result = $field->{validation}->(@args);
+            my $count  = $field->errors->count;
+            my $result = $field->validation->(@args);
             
-            if (! $result || $count < $self->error_count) {
+            if (! $result || $field->errors->count > $count) {
                 
                 # assuming the validation routine failed or issued an error
                 
@@ -4055,7 +4088,8 @@ sub validate_fields_specified {
                         "could not be validated"
                     ;
                     
-                    $field->{errors}->add($error_msg);
+                    $field->errors->add($error_msg)
+                        unless $field->errors->count > $count;
                     
                 }
                 
@@ -4104,10 +4138,10 @@ sub validate_params_discovered {
     
             if (defined $field->{validation} && $field->{value}) {
                 
-                my $count  = $self->error_count;
-                my $result = $field->{validation}->(@args);
+                my $count  = $field->errors->count;
+                my $result = $field->validation->(@args);
                 
-                if (! $result || $count < $self->error_count) {
+                if (! $result || $field->errors->count > $count) {
                     
                     # assuming the validation routine failed or issued an error
                     
@@ -4125,7 +4159,8 @@ sub validate_params_discovered {
                             "could not be validated"
                         ;
                         
-                        $field->{errors}->add($error_msg);
+                        $field->errors->add($error_msg)
+                            unless $field->errors->count > $count;
                         
                     }
                     
@@ -4171,10 +4206,10 @@ sub validate_params_specified {
 
         if (defined $field->{validation} && $field->{value}) {
             
-            my $count  = $self->error_count;
-            my $result = $field->{validation}->(@args);
+            my $count  = $field->errors->count;
+            my $result = $field->validation->(@args);
             
-            if (! $result || $count < $self->error_count) {
+            if (! $result || $field->errors->count > $count) {
                 
                 # assuming the validation routine failed or issued an error
                 
@@ -4192,7 +4227,8 @@ sub validate_params_specified {
                         "could not be validated"
                     ;
                     
-                    $field->{errors}->add($error_msg);
+                    $field->errors->add($error_msg)
+                        unless $field->errors->count > $count;
                     
                 }
                 

@@ -177,7 +177,12 @@ sub initialize {
     
     while (my($attr, $value) = each (%ARGS)) {
         
-        $self->$attr($value);
+        $self->$attr($value) if
+            $config->{FIELDS}->{$attr}     ||
+            $config->{ATTRIBUTES}->{$attr} ||
+            grep { $attr eq $_ }
+            ($proto->proxy_attributes)
+        ;
         
     }
     
