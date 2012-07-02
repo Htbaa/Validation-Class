@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.70
+version 7.72
 
 # SYNOPSIS
 
@@ -747,6 +747,9 @@ data relevant to a specific action.
         my ($self, @args) = @_;
         
 
+        # ... do other stuff
+        
+
         return $self->validate(qw(
             +name
             +email
@@ -798,7 +801,7 @@ instantiation process.
     build sub {
         
 
-        my ($self) = @_; # is instantiated
+        my ($self, @args) = @_; # is instantiated
         
 
     };
@@ -876,11 +879,18 @@ be configured to cooperate with an existing design or modern OO framework like
 Validation::Class class in cooperation with Moose (while this example focuses
 on Moose, the approach is the same regardless of the existing system):
 
+    # MOOSE AS YOUR PRIMARY OO SYSTEM
+    
+
     package MyApp;
     
 
     use Moose;
-    use Validation::Class 'field'; # only export as needed
+    use Validation::Class '!has'; # in cooperative mode, dont export has()
+    
+
+    # you must run initialization routines yourself ...
+    # specifying it in a BUILD routine will run it automatically
     
 
     sub BUILD {
@@ -889,14 +899,40 @@ on Moose, the approach is the same regardless of the existing system):
         my ($self, $args) = @_;
         
 
-        # you must run initialization routines yourself ...
-        # automatically run initialization routines
-        
-
-        $self->initialize(params => $args->{params});
+        $self->initialize_validator(
+            params => $args->{params}
+        );
         
 
     }
+    
+
+    field login     => {
+        min_length  => 5
+        max_length  => 50
+    };
+    
+
+    field password  => {
+        min_length  => 8,
+        min_symbols => 1
+        max_length  => 50
+    };
+    
+
+    # MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
+    
+
+    package MyApp;
+    
+
+    use Validation::Class '!has'; # avoids has() keyword clash
+    use Moose;
+    
+
+    has foo => (
+        is => 
+    );
     
 
     field login     => {

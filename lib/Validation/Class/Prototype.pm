@@ -1311,7 +1311,7 @@ prefixed with the name of the class being fetched, and adjust the matching rule
     
     # alternate syntax
     
-    my $child = $input->class(name => 'child', params => {});
+    my $child = $input->class(-name => 'child', params => {});
     
     1;
 
@@ -1332,8 +1332,8 @@ sub class {
     else {
         
         %args  = @_;
-        $class = $args{name};
-        delete $args{name};
+        $class = $args{'-name'}; # i hate this convention, not ideal but...
+        delete   $args{'-name'};
         
     }
     
@@ -1394,6 +1394,12 @@ sub class {
     my $class_name = $self->relatives->{$class};
     
     use_module $class_name;
+    
+    for (keys %settings) {
+        
+        delete $settings{$_} unless $class_name->can($_);
+        
+    }
     
     my $child = $class_name->new(%settings);
     

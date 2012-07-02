@@ -46,7 +46,7 @@ use Test::More;
     
     ok $@, "$class has no name field";
     
-    $self->initialize;
+    $self->initialize_validator;
     
     eval { $self->name };
     

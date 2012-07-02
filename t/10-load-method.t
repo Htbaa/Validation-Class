@@ -19,6 +19,7 @@ use Test::More;
     use Validation::Class;
     
     load  classes   => 1;
+    
     field name      => {
     
         required => 1
@@ -33,7 +34,11 @@ use Test::More;
     
     ok $class eq ref $self, "$class instantiated";
     
-    my $test  = $self->class(name => 'test');
+    my $test  = $self->class('test');
+    
+    ok "MyApp::Test" eq ref $test, ref($test) . " instantiated";
+    
+    $test     = $self->class(-name => 'test');
     
     ok "MyApp::Test" eq ref $test, ref($test) . " instantiated";
     
