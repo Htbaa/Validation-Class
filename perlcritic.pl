@@ -10,9 +10,9 @@ my @files = File::Find::Rule->file()->name('*.pm')->in($ver);
 
 foreach my $file (@files) {
 
-	print "processing $file\n";
-	system "perlcritic --profile=perlcriticrc $file" 
-		if $file =~ /\.pm$/;
+    print "processing $file\n";
+    system "perlcritic --profile=perlcriticrc $file" 
+            if $file =~ /\.pm$/;
 
 }
 

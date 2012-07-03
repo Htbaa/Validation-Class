@@ -1327,68 +1327,35 @@ constructs.
     use DBI;
     use Validation::Class;
     
-    fld name => {
+    field name => {
         required => 1,
     };
     
-    fld host => {
+    field host => {
         required => 1,
     };
     
-    fld port => {
+    field port => {
         required => 1,
     };
     
-    fld user => {
+    field user => {
         required => 1,
     };
     
-    fld pass => {
+    field pass => {
         # ...
     };
     
-    obj _build_dbh => {
+    object connect => {
         type => 'DBI',
         init => 'connect', # defaults to new
-        args => sub {
-            
-            my ($self) = @_;
-            
-            my @conn_str_parts =
-                ('dbi', 'mysql', map { $self->$_ } qw(name host port));
-            
-            return (join(':', @conn_str_parts), $self->user, $self->pass);
-            
+        args => sub {        
+            join(':', 'dbi', 'mysql', @{$_[0]}{qw/name host port/}),
+                @{$_[0]}{qw/user pass/})
+            ;
         }
     };
-    
-    has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
-    
-    sub connect {
-    
-        my ($self) = @_;
-        
-        my @parameters = ('name', 'host', 'port', 'user');
-        
-        if ($self->validate(@parameters)) {
-        
-            if ($self->dbh) {
-                
-                my $db = $self->dbh;
-                
-                # ... do something else with DBI
-                
-                return 1;
-                
-            }
-            
-            $self->set_errors($DBI::errstr);
-        
-        }
-        
-        return 0;
-    
-    }
     
     package main;
     
@@ -1399,28 +1366,20 @@ constructs.
         user => 'root'
     );
     
-    if ($database->connect) {
-    
-        # ...
-    
-    }
+    $database->connect or die $DBI::errstr;
     
 The object keyword takes two arguments, an object builder name and a hashref
 of key/value pairs which are used to instruct the builder on how to construct
 the object. The supplied hashref should be configured as follows:
 
-    {
+    # class to construct
+    type => 'ClassName',
     
-        # class to construct
-        type => 'ClassName',
-        
-        # optional: constructor name (defaults to new)
-        init => 'new',
-        
-        # optional: coderef which returns arguments for the constructor
-        args => sub {}
-        
-    }
+    # optional: constructor name (defaults to new)
+    init => 'new',
+    
+    # optional: coderef which returns arguments for the constructor
+    args => sub {}
 
 =cut
 
@@ -1617,7 +1576,7 @@ L<Moose>, L<Mouse>, L<Moo>, etc. The following example explains how to setup a
 Validation::Class class in cooperation with Moose (while this example focuses
 on Moose, the approach is the same regardless of the existing system):
 
-    # MOOSE AS YOUR PRIMARY OO SYSTEM
+    # USING MOOSE AS YOUR PRIMARY OO SYSTEM
     
     package MyApp;
     
@@ -1648,16 +1607,12 @@ on Moose, the approach is the same regardless of the existing system):
         max_length  => 50
     };
     
-    # MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
+    # USING MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
     
     package MyApp;
     
     use Validation::Class '!has'; # avoids has() keyword clash
     use Moose;
-    
-    has foo => (
-        is => 
-    );
     
     field login     => {
         min_length  => 5
@@ -1669,6 +1624,12 @@ on Moose, the approach is the same regardless of the existing system):
         min_symbols => 1
         max_length  => 50
     };
+    
+    has database => (
+        is  => 'rw',
+        isa => 'DBI::db',
+        ...
+    );
     
     1;
 
