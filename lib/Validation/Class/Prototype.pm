@@ -1403,26 +1403,39 @@ sub class {
     
     my $child = $class_name->new(%settings);
     
-    my $proto = $child->proto;
-
-    if (defined $settings{'params'}) {
+    {
         
-        $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
+        my $proto_method =
+            $child->can('proto') ? 'proto' :
+            $child->can('prototype') ? 'prototype' : undef
+        ;
         
-        foreach my $name ($proto->params->keys) {
+        if ($proto_method) {
             
-            if ($name =~ /^$shortname$delimiter(.*)/) {
+            my $proto = $child->$proto_method;
+            
+            if (defined $settings{'params'}) {
                 
-                if ($proto->fields->has($1)) {
+                $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
+                
+                foreach my $name ($proto->params->keys) {
                     
-                    push @{$proto->fields->{$1}->{alias}}, $name;
+                    if ($name =~ /^$shortname$delimiter(.*)/) {
+                        
+                        if ($proto->fields->has($1)) {
+                            
+                            push @{$proto->fields->{$1}->{alias}}, $name;
+                            
+                        }
+                        
+                    }
                     
                 }
                 
             }
             
         }
-
+        
     }
     
     return $child;

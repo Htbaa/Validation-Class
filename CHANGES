@@ -5,6 +5,9 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.74 (2012-07-03)
+    * allow class to cooperate with non-validation classes
+
 7.72 (2012-07-02)
     * main module POD changes
     * renamed constructor replacement to initialize_validator
