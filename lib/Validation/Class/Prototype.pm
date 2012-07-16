@@ -4285,7 +4285,7 @@ sub validate_method {
     
     confess
         "Context object ($self->{package} class instance) required ".
-        "to perform validation" unless $self->{package} eq ref $context;
+        "to perform method validation" unless $self->{package} eq ref $context;
     
     return 0 unless $name;
     
@@ -4300,7 +4300,7 @@ sub validate_method {
         
         if ("ARRAY" eq ref $input) {
             
-            return $self->validate(@{$input});
+            return $self->validate($context, @{$input});
             
         }
         
@@ -4342,7 +4342,7 @@ sub validate_profile {
     
     confess
         "Context object ($self->{package} class instance) required ".
-        "to perform validation" unless $self->{package} eq ref $context;
+        "to perform profile validation" unless $self->{package} eq ref $context;
     
     return 0 unless $name;
     
