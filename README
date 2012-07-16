@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.74
+    version 7.75
 
 SYNOPSIS
         package MyApp::User;
@@ -908,6 +908,12 @@ THE OBJECT SYSTEM
 
     See "validate" in Validation::Class::Prototype for full documentation.
 
+  validate_method
+        $self->validate_method;
+
+    See "validate_method" in Validation::Class::Prototype for full
+    documentation.
+
   validate_profile
         $self->validate_profile;
 
@@ -937,11 +943,13 @@ EXTENDING VALIDATION::CLASS
     full documentation.
 
 SEE ALSO
-    You might do well to look into Validate::Tiny for simple use-cases, it
-    has virtually no dependencies and solid test coverage. Data::Verifier is
-    a great approach to adding robust validation options to your existing
-    Moose classes. I have also heard some good things about
-    Data::FormValidator as well.
+    Additionally you may want to look elsewhere for your data validation
+    needs so the following is a list of recommended validation
+    libraries/frameworks you might do well to look into. Validate::Tiny is
+    nice for simple use-cases, it has virtually no dependencies and solid
+    test coverage. Data::Verifier is a great approach towards adding robust
+    validation options to your existing Moose classes. Also, I have also
+    heard some good things about Data::FormValidator as well.
 
 AUTHOR
     Al Newkirk <anewkirk@ana.io>

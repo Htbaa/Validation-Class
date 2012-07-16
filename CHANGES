@@ -5,6 +5,9 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.75 (2012-07-15)
+    * added the validate_profile method (untested atm)
+
 7.74 (2012-07-03)
     * allow class to cooperate with non-validation classes
 
