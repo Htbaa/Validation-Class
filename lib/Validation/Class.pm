@@ -611,8 +611,6 @@ underscore.
     $self->login($new_value); # arrayrefs and hashrefs will be flattened
     
     $self->preference_send_reminders;
-    
-    $self->preference_send_reminders_text_0;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword

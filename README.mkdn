@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.75
+version 7.77
 
 # SYNOPSIS
 
@@ -309,9 +309,6 @@ underscore.
     
 
     $self->preference_send_reminders;
-    
-
-    $self->preference_send_reminders_text_0;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword
