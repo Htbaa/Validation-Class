@@ -376,10 +376,8 @@ A validation class is defined as follows:
 The fields defined will be used to validate the specified input parameters.
 You specify the input parameters at/after instantiation, parameters should take
 the form of a hashref of key/value pairs passed to the params attribute, or
-attribute/value pairs. Multi-level (nested) hashrefs are allowed
-and are inflated/deflated in accordance with the rules of L<Hash::Flatten>.
-The following is an example on using your validate class to validate input in
-various scenarios:
+attribute/value pairs. The following is an example on using your validate class
+to validate input in various scenarios:
 
     # web app
     package MyApp;
@@ -479,7 +477,7 @@ parameters with complex data structures which means that you can set a parameter
 as an arrayref or hashref of nested data structures and validate against them, 
 likewise you can set a parameters using parameter names which are serialized
 string representations of the keys within the complex structure you wish to set
-and validate against. The serialization rules are as documented in L<Hash::Flatten>.
+and validate against.
 
 The following is an example of that:
 
@@ -507,7 +505,7 @@ The following is an example of that:
     # after filtering, validation, etc ... return your params as a hashref if
     # needed
     
-    my $params = $input->get_params_hash;
+    my $params = $input->get_params;
 
 =head2 Separation of Concerns
 

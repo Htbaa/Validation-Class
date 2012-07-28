@@ -5,6 +5,11 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.78 (2012-07-28)
+    * changed flatten/unflatten functionality, now only happens during validation
+    * fixed unneccessary serialization, field and values are always as expected
+    * better parameter handling (backwards-compatibility: some earlier functionality issues may occur)
+
 7.77 (2012-07-27)
     * better handling of custom validation (and registering resulting errors)
 

@@ -68,7 +68,7 @@ sub add {
     
     my ($self, @error_messages) = @_;
     
-    return undef unless @error_messages;
+    return 0 unless @error_messages;
     
     my %seen = map { $_ => 1 } @{$self};
     
@@ -160,7 +160,7 @@ sub find {
     
     my ($self, $pattern) = @_;
     
-    return undef unless "REGEXP" eq uc ref $pattern;
+    return 0 unless "REGEXP" eq uc ref $pattern;
     
     return ( grep { $_ =~ $pattern } $self->all );
     

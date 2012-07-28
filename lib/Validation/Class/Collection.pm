@@ -141,7 +141,7 @@ sub find {
     
     my ($self, $pattern) = @_;
     
-    return undef unless "REGEXP" eq uc ref $pattern;
+    return 0 unless "REGEXP" eq uc ref $pattern;
     
     my %matches = ();
     

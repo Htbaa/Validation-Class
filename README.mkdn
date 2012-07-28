@@ -4,7 +4,7 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.77
+version 7.78
 
 # SYNOPSIS
 
@@ -297,22 +297,17 @@ underscore.
     };
     
 
-    field 'preference.send_reminders.text:0' => {
-        ...
-    };
-    
-
     my $value = $self->login;
     
 
-    $self->login($new_value); # arrayrefs and hashrefs will be flattened
+    $self->login($new_value);
     
 
     $self->preference_send_reminders;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate blessed objects. Please see the *has* keyword
-instead.
+instead or use an object system with type constraints like [Moose](http://search.cpan.org/perldoc?Moose).
 
 ## filter
 
@@ -971,13 +966,6 @@ See ["fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Va
     $self->filtering;
 
 See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#filtering) for full documentation.
-
-## hash_inflator
-
-    $self->hash_inflator;
-
-See ["hash_inflator" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#hash_inflator) for full 
-documentation.
 
 ## ignore_failure
 

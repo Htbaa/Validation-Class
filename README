@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.77
+    version 7.78
 
 SYNOPSIS
         package MyApp::User;
@@ -244,19 +244,16 @@ KEYWORDS
             ...
         };
     
-        field 'preference.send_reminders.text:0' => {
-            ...
-        };
-    
         my $value = $self->login;
     
-        $self->login($new_value); # arrayrefs and hashrefs will be flattened
+        $self->login($new_value);
     
         $self->preference_send_reminders;
 
     Protip: Field directives are used to validate scalar and array data.
     Don't use fields to store and validate blessed objects. Please see the
-    *has* keyword instead.
+    *has* keyword instead or use an object system with type constraints like
+    Moose.
 
   filter
     The filter keyword (or flt) creates custom filters to be used in your
@@ -807,12 +804,6 @@ THE OBJECT SYSTEM
         $self->filtering;
 
     See "filtering" in Validation::Class::Prototype for full documentation.
-
-  hash_inflator
-        $self->hash_inflator;
-
-    See "hash_inflator" in Validation::Class::Prototype for full
-    documentation.
 
   ignore_failure
         $self->ignore_failure;

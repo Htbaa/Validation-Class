@@ -7,14 +7,14 @@ use warnings;
 
 # VERSION
 
-use base 'Validation::Class::Backwards'; # I'm pro-life
+use base 'Validation::Class::Backwards';
 
 use Carp 'confess';
+use Hash::Flatten 'unflatten';
 use Hash::Merge 'merge';
 use Module::Runtime 'use_module';
-use Hash::Flatten;
-
 use Validation::Class::Base 'has', 'hold';
+
 use Validation::Class::Params;
 use Validation::Class::Errors;
 use Validation::Class::Fields;
@@ -769,55 +769,6 @@ The filters attribute returns a hashref of pre-defined filter definitions.
 
 hold 'filters' => sub {{}};
 
-=attribute hash_inflator
-
-The hash_inflator attribute determines how the hash serializer (inflation/deflation)
-behaves. The value must be a hashref of L<Hash::Flatten/OPTIONS> options. Purely
-for the sake of consistency, you can use lowercase keys (with underscores) which
-will be converted to camel-cased keys before passed to the serializer.
-
-    my $self = MyApp::Validation->new(hash_inflator => {
-        hash_delimiter => '/',
-        array_delimiter => '//'
-    });
-    
-    ...
-    
-    # then, hereinafter referred to as 
-    
-    $self->hash_inflator->{HashDelimiter} = '/';
-    $self->hash_inflator->{ArrayDelimiter} = '//';
-
-=cut
-
-has 'hash_inflator' => sub {
-    
-    my $options = @_ > 1 ? pop @_ : {
-        hash_delimiter  => '.',
-        array_delimiter => ':',
-        escape_sequence => '',
-    };
-    
-    foreach my $option (keys %{$options}) {
-        
-        if ($option =~ /\_/) {
-        
-            my $cc_option = $option;
-            
-            $cc_option =~ s/([a-zA-Z])\_([a-zA-Z])/$1\u$2/gi;
-            
-            $options->{ucfirst $cc_option} = $options->{$option};
-            
-            delete $options->{$option};
-        
-        }
-        
-    }
-
-    return $options;
-    
-};
-
 =attribute ignore_failure
 
 The ignore_failure boolean determines whether your application will live or die
@@ -1373,15 +1324,12 @@ sub class {
     
     my @attrs = qw(
         
-        hash_inflator
         ignore_failure
         ignore_unknown
         report_failure
         report_unknown
         
     );  # to be copied (stash and params copied later)
-    
-    my $delimiter = $self->hash_inflator->{'HashDelimiter'};
     
     my %defaults = ( map { $_ => $self->$_ } @attrs );
     
@@ -1401,6 +1349,8 @@ sub class {
         
     }
     
+    return unless $class_name->can('new');
+    
     my $child = $class_name->new(%settings);
     
     {
@@ -1416,11 +1366,9 @@ sub class {
             
             if (defined $settings{'params'}) {
                 
-                $delimiter =~ s/([\.\+\-\:\,\\\/])/\\$1/g;
-                
                 foreach my $name ($proto->params->keys) {
                     
-                    if ($name =~ /^$shortname$delimiter(.*)/) {
+                    if ($name =~ /^$shortname\.(.*)/) {
                         
                         if ($proto->fields->has($1)) {
                             
@@ -2485,43 +2433,6 @@ sub errors_to_string {
 
 }
 
-=method flatten_params
-
-The flatten_params method accepts a single hashref and will return the
-serialized version based on the the default or custom configuration of the hash
-serializer L<Hash::Flatten> as configured via the hash_inflator() attribute.
-
-    my $params = {
-        
-        user => {
-            login => 'member',
-            password => 'abc123456'
-        }
-        
-    };
-    
-    my $serialized_params = $self->flatten_params($params);
-
-=cut
-
-sub flatten_params {
-
-    my ($self, $params) = @_;
-    
-    return undef unless "HASH" eq ref $params;
-    
-    my ($ad, $hd) = @{$self->hash_inflator}{
-        'ArrayDelimiter', 'HashDelimiter'
-    };
-    
-    my $serializer = Hash::Flatten->new($self->hash_inflator);
-    
-    return grep({ ref $_ } values %{$params}) ?
-        # do not flatten params if suspected to have already been flattened
-        $serializer->flatten($params) : $params;
-    
-}
-
 =method get_errors
 
 The get_errors method returns a list of combined class-and-field-level errors.
@@ -2616,9 +2527,7 @@ sub get_fields {
 
 The get_params method returns the values of the parameters specified (as a list,
 in the order specified). This method will return a list of key/value pairs if
-no parameter names are passed. Note, this method always returns
-exploded/unflattened parameters.
-
+no parameter names are passed.
 
     if ($self->validate) {
     
@@ -2627,10 +2536,9 @@ exploded/unflattened parameters.
         my ($name, $email, $login, $password) =
             $self->get_params(qw/name email login password/);
         
-        # you should note that if the params don't exist they will return undef
-        # ... meaning you should check that it is defined before doing any
-        # comparison checking -- as doing so would generate an error
-        # e.g.
+        # you should note that if the params don't exist they will return
+        # undef meaning you should check that it is defined before doing any
+        # comparison checking as doing so would generate an error, e.g.
         
         if (defined $name) {
         
@@ -2664,8 +2572,6 @@ sub get_params {
     
     my $params = $self->params->hash || {};
     
-    $params = $self->unflatten_params($params);
-    
     if (@params) {
     
         return @params ? (map { $params->{$_} || undef } @params) : ();
@@ -2695,7 +2601,7 @@ sub get_value {
     
     my ($self, $name) = @_;
     
-    return undef unless $self->fields->has($name);
+    return 0 unless $self->fields->has($name);
     
     my $field  = $self->fields->{$name};
     
@@ -2705,18 +2611,6 @@ sub get_value {
         
         $value = $self->params->{$name};
         
-    }
-    
-    else {
-    
-        my $params = $self->get_params; # unflattened params
-        
-        if (exists $params->{$name}) {
-            
-            $value = $params->{$name};
-            
-        }
-    
     }
     
     unless (defined $value) {
@@ -3089,7 +2983,7 @@ sub param {
         
     }
     
-    return undef;
+    return 0;
 
 }
 
@@ -3219,7 +3113,6 @@ sub proxy_attributes {
         
         fields
         filtering
-        hash_inflator
         ignore_failure
         ignore_unknown
         params
@@ -3247,7 +3140,6 @@ sub proxy_methods {
         get_params
         fields
         filtering
-        hash_inflator
         ignore_failure
         ignore_unknown
         param
@@ -3488,14 +3380,13 @@ sub set_method {
 
 =method set_params
 
-The set_params method is responsible for setting/replacing parameters while
-ensuring that previously serialized parameters are taken into account. This
+The set_params method is responsible for setting/replacing parameters. This
 method returns the class object. This method takes a list of key/value pairs or
-a single hashref whose key should match a field's name and whose value should
+a single hashref whose keys should match field names and whose value should
 be a scalar or arrayref.
 
-    $self = $self->set_params($name => $value); # accepts hashref also
-
+    $self->set_params($name => $value); # accepts a hashref also
+    
 =cut
 
 sub set_params {
@@ -3504,19 +3395,11 @@ sub set_params {
     
     my $args = @_ % 2 ? $_[0] : { @_ };
     
-    my $params = $self->get_params; # unflattened params
-    
     while (my($k,$v) = each(%{$args})) {
         
-        $params->{$k} = $v; # add new/overwrite existing
+        $self->params->add($k => $v); # add new/overwrite existing
         
     }
-    
-    $params = $self->flatten_params($params);
-    
-    $self->params->clear;
-    
-    $self->params->add($params);
     
     return $self;
 
@@ -3552,11 +3435,7 @@ sub set_value {
         
         unless (defined $self->fields->{$name}->{readonly}) {
             
-            my $params = $self->unflatten_params($self->params->hash);
-            
-            $params->{$name} = $value;
-            
-            $self->set_params($name => $value);
+            $self->params->add($name => $value);
             
         }
         
@@ -3651,33 +3530,14 @@ sub throw_error {
     
 }
 
-=method unflatten_params
-
-The unflatten_params method accepts a single *flat* hashref and will return the
-expanded version based on the the default or custom configuration of the hash
-serializer L<Hash::Flatten> as configured via the hash_inflator() attribute.
-
-    my $params = {
-        'user.login' => 'member',
-        'user.password' => 'abc123456'
-    };
-    
-    $params = $self->unflatten_params($params);
-        
-    print $params->{user}->{login};
-
-=cut
-
 sub unflatten_params {
-    
+ 
     my ($self, $params) = @_;
+ 
+    $params ||= $self->params->hash;
     
-    return undef unless "HASH" eq ref $params;
-    
-    my $serializer = Hash::Flatten->new($self->hash_inflator);
-    
-    return $serializer->unflatten($params) || {};
-    
+    return unflatten($params) || {};
+ 
 }
 
 =method validate
@@ -3858,13 +3718,33 @@ sub validate {
     
     if ($self->params->count) {
         
-        # check if any parameters are arrayrefs
-        # and handle them appropriately (clone, validate, then reap)
+        # flatten array params
         
-        my ($ad, $hd) = @{$self->hash_inflator}{
-            # ^^ pun here
-            'ArrayDelimiter', 'HashDelimiter'
+        my $params = $self->params->hash;
+        
+        my $flatten_array_params_routine = sub {
+        
+            my ($key, $value) = @_;
+            
+            if ("ARRAY" eq ref $value) {
+                
+                my $i = 0;
+                
+                foreach my $slice (@{$value}) {
+                    
+                    $self->params->{"$key:".$i++} = $slice;
+                    
+                }
+                
+                $self->params->remove($key);
+                
+            }
+            
         };
+        
+        $self->params->each($flatten_array_params_routine);
+        
+        # validate
         
         my %seen = ();
         
@@ -3872,7 +3752,7 @@ sub validate {
             
             my($key, $value) = @_;
             
-            my $name = $1 if $key =~ /(.*)$ad\d+$/;
+            my $name = $1 if $key =~ /(.*):\d+$/;
             
             if (defined $name) {
             
@@ -3884,7 +3764,7 @@ sub validate {
                         
                         $seen{$name}++;
                         
-                        my $varcount = scalar grep { /$name$ad\d+$/ }
+                        my $varcount = scalar grep { /$name:\d+$/ }
                             $self->params->keys;
                         
                         for (my $i = 0; $i < $varcount; $i++) {
@@ -3921,7 +3801,7 @@ sub validate {
         $self->params->each($create_clones_routine);
         
         # run pre-filtering if filtering is enabled
-    
+        
         $self->apply_filters('pre') if $self->filtering;
         
         if (@fields) {
@@ -3941,6 +3821,24 @@ sub validate {
             # submitted to dictate what gets validated (may not be ideal)
             
             $self->validate_params_discovered($context);
+            
+        }
+        
+        # unflatten array params
+        
+        foreach my $key (sort $self->params->keys) {
+            
+            my ($alt, $index) = $key =~ /(.*)\:(\d+)$/;
+            
+            if ($alt && defined $index) {
+                
+                my $value = $self->params->remove($key);
+                
+                $self->params->{$alt} ||= [];
+                
+                $self->params->{$alt}->[$index] = $value;
+                
+            }
             
         }
         

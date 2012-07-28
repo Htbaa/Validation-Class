@@ -81,30 +81,13 @@ use Test::More;
     
     ok ! ref $self->name(''), "$class name accessor returns nothing";
     
-    ok "HASH" eq ref $self->name({1..4}), "$class name accessor returns a hash";
+    ok ! $self->name({1..4}), "$class name accessor cant set a hash";
     
     ok "ARRAY" eq ref $self->name([1..5]), "$class name accessor returns an array";
     
-    ok ! $self->params->{name}, "$class flattened name param which is an array";
+    ok "ARRAY" eq ref $self->params->{name}, "$class name param is an array";
     
-    ok 1 == $self->params->{'name:0'}
-    && 2 == $self->params->{'name:1'}
-    && 3 == $self->params->{'name:2'}
-    && 4 == $self->params->{'name:3'}
-    && 5 == $self->params->{'name:4'},
-        "$class name param has all expected flatten values";
-    
-    ok "ARRAY" eq ref $self->name,
-        "$class name accessor returns the unflattened array";
-    
-    ok 5 == grep(/name/, $self->params->keys),
-        "$class params collection has 5 name elements";
-
-    ok "HASH" eq ref $self->name({ first => 'Zoi', last => 'Lee' }),
-        "$class name accessor has been set as a hashref";
-    
-    ok 2 == grep(/name/, $self->params->keys),
-        "$class params collection has 2 name elements (first and last)";
+    ok "ARRAY" eq ref $self->name, "$class name accessor returns the array";
     
 }
 
