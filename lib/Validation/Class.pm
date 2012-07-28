@@ -1323,51 +1323,41 @@ the calling class which invokes the builder. Unlike class attributes, this
 method does not cache or otherwise store the returned class object it
 constructs.
 
-    package MyApp::Database;
+    package MyApp::User::Input;
     
-    use DBI;
+    use MyApp::User; # a Moose class
+    
     use Validation::Class;
     
-    field name => {
+    field login => {
         required => 1,
     };
     
-    field host => {
+    field password => {
         required => 1,
     };
     
-    field port => {
-        required => 1,
-    };
+    object _build_user => {
+        
+        type => 'MyApp::User',
+        
+        # init => 'new', # defaults to new
+        # args => [qw/login password/], # defaults to all fields
+        # list => 'hash' # defaults to list
     
-    field user => {
-        required => 1,
-    };
-    
-    field pass => {
-        # ...
-    };
-    
-    object connect => {
-        type => 'DBI',
-        init => 'connect', # defaults to new
-        args => sub {        
-            join(':', 'dbi', 'mysql', @{$_[0]}{qw/name host port/}),
-                @{$_[0]}{qw/user pass/})
-            ;
-        }
     };
     
     package main;
     
-    my $database = MyApp::Database->new(
-        name => 'test',
-        host => 'localhost',
-        port => '3306',
-        user => 'root'
-    );
+    my $user_input = MyApp::User::Input->new(params => $params);
     
-    $database->connect or die $DBI::errstr;
+    if ($user_input->validate('login', 'password')) {
+        
+        my $user = $user_input->_build_user;
+        
+        # ...
+        
+    }
     
 The object keyword takes two arguments, an object builder name and a hashref
 of key/value pairs which are used to instruct the builder on how to construct
@@ -1379,8 +1369,14 @@ the object. The supplied hashref should be configured as follows:
     # optional: constructor name (defaults to new)
     init => 'new',
     
-    # optional: coderef which returns arguments for the constructor
+    # optional: arrayref of field names or a coderef which returns arguments for
+    # the constructor (defaults to all fields)
     args => sub {}
+    
+    # optional: if supplying an arrayref of fields to the args option, this
+    # option determines how the parameters will be supplied to the constructor,
+    # valid options are 'hash' or 'list' (defaults to list)
+    list => 'hash'
 
 =cut
 
@@ -1425,12 +1421,45 @@ sub object {
             my $validator;
             
             my $type = $data->{'type'};
-            my $init = $data->{'init'} ||= 'new';
             my $args = $data->{'args'};
+            my $init = $data->{'init'} ||= 'new';
+            my $list = $data->{'list'} ||= 'list';
             
-            my @params = ($args->($self)) if "CODE" eq ref $args;
+            my @params = ();
             
-            # maybe merge @params with @args or vice versa ???
+            if ("CODE" eq ref $args) {
+                
+                @params = ($args->($self));
+                
+            }
+            
+            else {
+                
+                my $params = {};
+                
+                my $fields = "ARRAY" eq ref $args ? $args :
+                    [$proto->fields->keys]
+                ;
+                
+                foreach my $field (@{$fields}) {
+                    
+                    $params->{$field} = $proto->get_value($field);
+                    
+                }
+                
+                if ($list eq 'hash') {
+                    
+                    push @params, $params;
+                    
+                }
+                
+                else {
+                    
+                    push @params, %{$params};
+                    
+                }
+                
+            }
             
             if (my $instance = $type->$init(@params)) {
                 

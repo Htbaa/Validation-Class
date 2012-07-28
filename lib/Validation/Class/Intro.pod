@@ -589,11 +589,7 @@ classes. The following is an example of this:
             my @conn_str_parts =
                 ('dbi', 'mysql', $self->name, $self->host, $self->port);
             
-            return (
-                join(':', @conn_str_parts),
-                $self->user,
-                $self->pass
-            )
+            return (join(':', @conn_str_parts), $self->user, $self->pass)
             
         }
     };
