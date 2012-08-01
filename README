@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.79
+    version 7.80
 
 SYNOPSIS
         package MyApp::User;
