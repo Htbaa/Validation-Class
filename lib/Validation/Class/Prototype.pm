@@ -945,8 +945,25 @@ sub apply_filter {
                 my $code = "CODE" eq ref $filter ?
                     $filter : $self->filters->{$filter};
                 
+                my $filtered_value = $self->params->{$field};
+                
+                if ("ARRAY" eq ref $filtered_value) {
+                    
+                    foreach my $value (@{$filtered_value}) {
+                        
+                        $value = $code->($value)
+                        
+                    }
+                    
+                }
+                else {
+                    
+                    $filtered_value = $code->($self->params->{$field});
+                    
+                }
+                
                 $self->set_value(
-                    $field => $code->($self->params->{$field})
+                    $field => $filtered_value
                 );
                 
             }

@@ -54,4 +54,56 @@ use Test::More;
     
 }
 
+{
+    
+    # testing initialization and parameter handling
+    
+    package MyApp::A;
+    
+    use Validation::Class;
+    
+    field numbers => {
+    
+        required => 1,
+        filters  => ['numeric']
+    
+    };
+    
+    package main;
+    
+    my $class = "MyApp::A";
+    
+    my $self  = $class->new(params => {numbers => [2,1]});
+    
+    ok "ARRAY" eq ref $self->numbers, "numbers method has an arrayref";
+    
+    ok $self->numbers->[0] == 2, "numbers array #0 is correct";
+    ok $self->numbers->[1] == 1, "numbers array #1 is correct";
+    
+}
+
+{
+    
+    # testing initialization and parameter handling
+    
+    package MyApp::B;
+    
+    use Validation::Class;
+    
+    field numbers => {
+    
+        required => 1
+    
+    };
+    
+    package main;
+    
+    my $class = "MyApp::A";
+    
+    my $self  = $class->new(numbers => 12345);
+    
+    ok 12345 == $self->numbers, "numbers method has 12345 as expected";
+    
+}
+
 done_testing;
