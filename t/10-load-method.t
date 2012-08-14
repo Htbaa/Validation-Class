@@ -38,9 +38,8 @@ use Test::More;
     
     ok "MyApp::Test" eq ref $test, ref($test) . " instantiated";
     
-    $test     = $self->class(-name => 'test');
-    
-    ok "MyApp::Test" eq ref $test, ref($test) . " instantiated";
+    # depreciated - $test = $self->class(-name => 'test');
+    #ok "MyApp::Test" eq ref $test, ref($test) . " instantiated";
     
 }
 

@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use Carp 'confess';
-use Hash::Flatten 'flatten';
+use Hash::Flatten 'flatten', 'unflatten';
 
 use base 'Validation::Class::Collection';
 
@@ -30,6 +30,16 @@ sub add {
     my $arguments = @_ % 2 ? $_[0] : {@_};
     
     $arguments = flatten $arguments;
+    
+    confess
+        
+        "Parameter configuration not supported, a Validation::Class parameter ".
+        "value must be a string or an arrayref of strings or nested hashrefs " . 
+        "of the aforementioned"
+        
+        if grep /\:\d+./, keys %{$arguments}
+        
+    ;
 
     foreach my $code (sort keys %{$arguments}) {
         
@@ -50,7 +60,7 @@ sub add {
     
     while (my($key, $value) = each(%{$arguments})) {
         
-        $key =~ s/[^\w\.]//g; # deceptively important, help flatten() play nice
+        $key =~ s/[^\w\.]//g; # deceptively important, re: &flatten
         
         $self->{$key} = $value;
         

@@ -609,8 +609,8 @@ underscore.
     $self->preference_send_reminders;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
-fields to store and validate blessed objects. Please see the *has* keyword
-instead or use an object system with type constraints like L<Moose>.
+fields to store and validate objects. Please see the *has* keyword instead or
+use an object system with type constraints like L<Moose>.
 
 =cut
 

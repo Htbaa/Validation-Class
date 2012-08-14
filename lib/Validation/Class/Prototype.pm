@@ -10,10 +10,11 @@ use warnings;
 use base 'Validation::Class::Backwards';
 
 use Carp 'confess';
-use Hash::Flatten 'unflatten';
+use Hash::Flatten 'flatten', 'unflatten';
 use Hash::Merge 'merge';
 use Module::Runtime 'use_module';
 use Validation::Class::Base 'has', 'hold';
+use Class::Forward 'clsf';
 
 use Validation::Class::Params;
 use Validation::Class::Errors;
@@ -1289,53 +1290,12 @@ sub class {
     
     my $self = shift;
     
-    my ($class, %args);
+    my ($name, %args) = @_;
     
-    if (@_ % 2) {
-        
-        ($class, %args) = @_;
-        
-    }
+    return 0 unless $name;
     
-    else {
-        
-        %args  = @_;
-        $class = $args{'-name'}; # i hate this convention, not ideal but...
-        delete   $args{'-name'};
-        
-    }
-    
-    return 0 unless $class;
-    
-    my $shortname;
-    
-    # transform what looks like a shortname
-    
-    if ($class !~ /::/) {
-        
-        $shortname = $class;
-        
-        my @parts = split /[^0-9A-Za-z_]/, $class;
-        
-        foreach my $part (@parts) {
-            
-            $part = ucfirst $part;
-            $part =~ s/([a-z])_([a-z])/$1\u$2/g;
-            
-        }
-        
-        $class = join "::", @parts;
-        
-    }
-    
-    else {
-        
-        $shortname = $class;
-        $shortname =~ s/([a-z])([A-Z])/$1_$2/g;
-        $shortname =~ s/::/\./g;
-        $shortname = lc $shortname;
-        
-    }
+    my $class =
+        Class::Forward->new(namespace => $self->{package})->forward($name);
     
     return 0 unless defined $self->relatives->{$class};
     
@@ -1383,13 +1343,13 @@ sub class {
             
             if (defined $settings{'params'}) {
                 
-                foreach my $name ($proto->params->keys) {
+                foreach my $key ($proto->params->keys) {
                     
-                    if ($name =~ /^$shortname\.(.*)/) {
+                    if ($key =~ /^$name\.(.*)/) {
                         
                         if ($proto->fields->has($1)) {
                             
-                            push @{$proto->fields->{$1}->{alias}}, $name;
+                            push @{$proto->fields->{$1}->{alias}}, $key;
                             
                         }
                         
