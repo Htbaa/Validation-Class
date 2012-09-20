@@ -5,6 +5,10 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.84 (2012-09-20)
+    * The import method has been modified to copy/merge meta-class configs based
+      on inheritance
+
 7.82 (2012-08-13)
     * The class method/functionality has been refactored (now using Class::Forward)
     * New invalid parameter structure error triggered when arrayrefs are discovered

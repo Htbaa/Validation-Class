@@ -123,18 +123,36 @@ use Validation::Class::Prototype;
 sub import {
     
     my $caller = caller(0) || caller(1);
-    
-    if ($caller) {
-        
-        return_class_proto $caller # create prototype instance when used
-        
-    }
-    
+
     strict->import;
     warnings->import;
     
     __PACKAGE__->export_to_level(1, @_);
-    
+
+    if ($caller) {
+        
+        # if requested, inherit config naturally via @ISA
+        
+        my $isa_string = "\@$caller\::ISA";
+        my @caller_isa = eval $isa_string;
+        
+        @caller_isa = grep !/^$caller$/, @caller_isa;
+        
+        if (@caller_isa) {
+            
+            my $loader = $caller->can('set');
+               $loader = $caller->can('load') unless $loader;
+            
+            if ($loader) {
+                $loader->($caller, { roles => [@caller_isa] });
+            }
+            
+        }
+        
+        return_class_proto $caller # create prototype instance when used
+        
+    }
+
 }
 
 sub initialize_validator {
@@ -746,6 +764,11 @@ The load keyword (or set), which can also be used as a method, provides options
 for extending the current class by attaching other L<Validation::Class> classes
 as relatives, roles, plugins, etc. The process of applying roles to the current
 class mainly involve copying the role's methods and configuration.
+
+NOTE: While the load/set functionality is not depreciated and will remain part
+of this library, its uses are no longer recommended as there are better ways to
+achieve the desired results. Additionally, the following usage scenarios can be
+refactored using traditional inheritance. 
 
     package MyApp;
     

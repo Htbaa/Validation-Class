@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 7.82
+    version 7.84
 
 SYNOPSIS
         package MyApp::User;
@@ -295,6 +295,12 @@ KEYWORDS
     Validation::Class classes as relatives, roles, plugins, etc. The process
     of applying roles to the current class mainly involve copying the role's
     methods and configuration.
+
+    NOTE: While the load/set functionality is not depreciated and will
+    remain part of this library, its uses are no longer recommended as there
+    are better ways to achieve the desired results. Additionally, the
+    following usage scenarios can be refactored using traditional
+    inheritance.
 
         package MyApp;
     
