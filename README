@@ -3,41 +3,41 @@ NAME
     Framework
 
 VERSION
-    version 7.831
+    version 7.84
 
 SYNOPSIS
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         mixin basic     => {
             required    => 1,
             max_length  => 255,
             filters     => [qw/trim strip/]
-        };
-
+        }; 
+    
         field login     => {
             mixin       => 'basic',
             min_length  => 5
         };
-
+    
         field password  => {
             mixin       => 'basic',
             min_length  => 5,
             min_symbols => 1
         };
-
+    
         package main;
-
+    
         my $user = MyApp::User->new(login => 'admin', password => 'secr3t');
-
+    
         unless ($user->validate('login', 'password')) {
-
+    
             # do something with the errors,
             # e.g. print $user->errors_to_string
-
+    
         }
-
+    
         1;
 
     Validation::Class is a data validation framework and simple object
@@ -98,17 +98,17 @@ KEYWORDS
     systems such as Moose, Mouse, Moo, Mo, etc.
 
         package MyApp::User;
-
+    
         use Validate::Class;
-
+    
         attribute 'bothered' => 1;
-
+    
         attribute 'attitude' => sub {
-
-            return $self->bothered ? 1 : 0
-
+        
+            return $self->bothered ? 1 : 0 
+        
         };
-
+    
         1;
 
     The attribute keyword takes two arguments, the attribute name and a
@@ -120,34 +120,34 @@ KEYWORDS
     modern-day OO systems.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         build sub {
-
+        
             my ($self, %args) = @_;
-
+        
             # ... do something
-
+        
         };
-
+    
         # die like a Moose
-
+    
         use Carp;
-
+    
         build sub {
-
+        
             my ($self, %args) = @_;
-
+        
             my @attributes = qw();
-
+        
             foreach my $attribute (@attributes) {
-
+            
                 confess "Attribute ($attribute) is required"
                     unless $self->$attribute;
-
+            
             }
-
+        
         };
 
     The build keyword takes one argument, a coderef which is passed the
@@ -160,40 +160,40 @@ KEYWORDS
     custom directive extension packages to be used in all your classes.
 
         package MyApp::Directives;
-
+    
         use Validation::Class;
         use Data::Validate::Email;
-
+    
         directive 'is_email' => sub {
-
+    
             my ($dir, $value, $field, $self) = @_;
-
+        
             my $validator = Data::Validate::Email->new;
-
+        
             unless ($validator->is_email($value)) {
-
+        
                 my $handle = $field->{label} || $field->{name};
-
+            
                 $field->{errors}->add("$handle must be a valid email address");
-
+            
                 return 0;
-
+        
             }
-
+        
             return 1;
-
+    
         };
-
+    
         package MyApp::User;
-
+    
         use Validate::Class;
         use MyApp::Directives;
-
+    
         field 'email' => {
             is_email => 1,
             ...
         };
-
+    
         1;
 
     The directive keyword takes two arguments, the name of the directive and
@@ -213,9 +213,9 @@ KEYWORDS
     name expected to be passed to your validation class.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         field 'login' => {
             required   => 1,
             min_length => 1,
@@ -237,17 +237,17 @@ KEYWORDS
             max_length => 255,
             ...
         };
-
+    
         field 'preference.send_reminders' => {
             required   => 1,
             max_length => 1,
             ...
         };
-
+    
         my $value = $self->login;
-
+    
         $self->login($new_value);
-
+    
         $self->preference_send_reminders;
 
     Protip: Field directives are used to validate scalar and array data.
@@ -262,26 +262,26 @@ KEYWORDS
     extension packages to be used in all your classes.
 
         package MyApp::Directives;
-
+    
         use Validation::Class;
-
+    
         filter 'flatten' => sub {
-
+        
             $_[0] =~ s/[\t\r\n]+/ /g;
             $_[0] # return
-
+    
         };
-
+    
         package MyApp::User;
-
+    
         use Validate::Class;
         use MyApp::Directives;
-
+    
         field 'description' => {
             filters => ['trim', 'flatten'],
             ...
         };
-
+    
         1;
 
     The filter keyword takes two arguments, the name of the filter and a
@@ -296,18 +296,24 @@ KEYWORDS
     of applying roles to the current class mainly involve copying the role's
     methods and configuration.
 
+    NOTE: While the load/set functionality is not depreciated and will
+    remain part of this library, its uses are no longer recommended as there
+    are better ways to achieve the desired results. Additionally, the
+    following usage scenarios can be refactored using traditional
+    inheritance.
+
         package MyApp;
-
+    
         use Validation::Class;
-
+    
         # load stuff (extend MyApp)
-
+    
         load {
-
+        
             # run package commands
-
+        
         };
-
+    
         1;
 
     The "load.classes" option, can be a constant or arrayref and uses
@@ -319,26 +325,26 @@ KEYWORDS
     This option accepts a constant or an arrayref of constants.
 
         package MyApp;
-
+    
         use Validation::Class;
-
+    
         # load all child classes
-
+    
         load {
             classes => [
                 __PACKAGE__
             ]
         };
-
+    
         package main;
-
+    
         my $app = MyApp->new;
-
+    
         my $rel = $app->class('relative'); # new MyApp::Relative object
-
+    
         my $rel = $app->class('data_source'); # MyApp::DataSource
         my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
-
+    
         1;
 
     The "load.plugins" option is used to load plugins that support
@@ -351,16 +357,16 @@ KEYWORDS
     constant or an arrayref of constants.
 
         package MyVal;
-
+    
         use Validation::Class;
-
+    
         load {
             plugins => [
                 'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
                 '+MyVal::Plugin'
             ]
         };
-
+    
         1;
 
     The "load.roles" option is used to load and inherit functionality from
@@ -369,24 +375,24 @@ KEYWORDS
     accepts a constant or an arrayref of constants.
 
         package MyVal::User;
-
+    
         use Validation::Class;
-
+    
         load {
             roles => [
                 'MyVal::Person'
             ]
         };
-
+    
         1;
 
     Purely for the sake of aesthetics we have designed an alternate syntax
     for executing load/set commands, the syntax is as follows:
 
         package MyVal::User;
-
+    
         use Validation::Class;
-
+    
         load roles => ['MyVal::Person'];
         load classes => [__PACKAGE__];
         load plugins => [
@@ -401,35 +407,35 @@ KEYWORDS
     required data necessary to proceed.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         method 'register' => {
-
+    
             input  => ['name', '+email', 'login', '+password'],
             output => ['+id'], # optional output validation, dies on failure
             using  => sub {
-
+        
                 my ($self, @args) = @_;
-
+            
                 # .... do something registrationy
-
+            
                 $self->id(...); # set the ID field for output validation
-
+            
                 return $self;
-
+        
             }
-
+    
         };
-
+    
         package main;
-
+    
         my $user = MyApp::User->new(params => $params);
-
+    
         if ($user->register) {
             ...
         }
-
+    
         1;
 
     The method keyword takes two arguments, the name of the method to be
@@ -460,16 +466,16 @@ KEYWORDS
     directives.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         mixin 'constrain' => {
             required   => 1,
             min_length => 1,
             max_length => 255,
             ...
         };
-
+    
         # e.g.
         field 'login' => {
             mixin => 'constrain',
@@ -487,39 +493,39 @@ KEYWORDS
     returned class object it constructs.
 
         package MyApp::User::Input;
-
+    
         use MyApp::User; # a Moose class
-
+    
         use Validation::Class;
-
+    
         field login => {
             required => 1,
         };
-
+    
         field password => {
             required => 1,
         };
-
+    
         object _build_user => {
-
+        
             type => 'MyApp::User',
-
+        
             # init => 'new', # defaults to new
             # args => [qw/login password/], # defaults to all fields
             # list => 'hash' # defaults to list
-
+    
         };
-
+    
         package main;
-
+    
         my $user_input = MyApp::User::Input->new(params => $params);
-
+    
         if ($user_input->validate('login', 'password')) {
-
+        
             my $user = $user_input->_build_user;
-
+        
             # ...
-
+        
         }
 
     The object keyword takes two arguments, an object builder name and a
@@ -529,14 +535,14 @@ KEYWORDS
 
         # class to construct
         type => 'ClassName',
-
+    
         # optional: constructor name (defaults to new)
         init => 'new',
-
+    
         # optional: arrayref of field names or a coderef which returns arguments for
         # the constructor (defaults to all fields)
         args => sub {}
-
+    
         # optional: if supplying an arrayref of fields to the args option, this
         # option determines how the parameters will be supplied to the constructor,
         # valid options are 'hash' or 'list' (defaults to list)
@@ -548,15 +554,15 @@ KEYWORDS
     routines that validate data relevant to a specific action.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         profile 'signup' => sub {
-
+        
             my ($self, @args) = @_;
-
+        
             # ... do other stuff
-
+        
             return $self->validate(qw(
                 +name
                 +email
@@ -565,17 +571,17 @@ KEYWORDS
                 +password
                 +password_confirmation
             ));
-
+        
         };
-
+    
         package main;
-
+    
         my $user = MyApp::User->new(params => $params);
-
+    
         unless ($user->validate_profile('signup')) {
-
+    
             die $user->errors_to_string;
-
+    
         }
 
     The profile keyword takes two arguments, a profile name and coderef
@@ -590,21 +596,21 @@ METHODS
     hooking into the instantiation process.
 
         package MyApp;
-
+    
         use Validation::Class;
-
+    
         # optionally
-
+    
         build sub {
-
+        
             my ($self, @args) = @_; # is instantiated
-
+        
         };
-
+    
         package main;
-
+    
         my $app = MyApp->new;
-
+    
         ...
 
   prototype
@@ -615,15 +621,15 @@ METHODS
     Validation::Class.
 
         package MyApp;
-
+    
         use Validation::Class;
-
+    
         package main;
-
+    
         my $app = MyApp->new;
-
+    
         my $prototype = $app->prototype;
-
+    
         ...
 
 THE PROTOTYPE CLASS
@@ -642,14 +648,14 @@ THE PROTOTYPE CLASS
     methods.
 
         package MyApp::User;
-
+    
         use Validation::Class;
-
+    
         package main;
-
+    
         my $user  = MyApp::User->new;
         my $proto = $user->prototype;
-
+    
         $proto->error_count # same as calling $self->error_count
 
 THE OBJECT SYSTEM
@@ -664,60 +670,60 @@ THE OBJECT SYSTEM
     same regardless of the existing system):
 
         # USING MOOSE AS YOUR PRIMARY OO SYSTEM
-
+    
         package MyApp;
-
+    
         use Moose;
         use Validation::Class '!has'; # in cooperative mode, dont export has()
-
+    
         # you must run initialization routines yourself ...
         # specifying it in a BUILD routine will run it automatically
-
+    
         sub BUILD {
-
+        
             my ($self, $args) = @_;
-
+        
             $self->initialize_validator(
                 params => $args->{params}
             );
-
+        
         }
-
+    
         field login     => {
             min_length  => 5
             max_length  => 50
         };
-
+    
         field password  => {
             min_length  => 8,
             min_symbols => 1
             max_length  => 50
         };
-
+    
         # USING MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
-
+    
         package MyApp;
-
+    
         use Validation::Class '!has'; # avoids has() keyword clash
         use Moose;
-
+    
         field login     => {
             min_length  => 5
             max_length  => 50
         };
-
+    
         field password  => {
             min_length  => 8,
             min_symbols => 1
             max_length  => 50
         };
-
+    
         has database => (
             is  => 'rw',
             isa => 'DBI::db',
             ...
         );
-
+    
         1;
 
     This cooperation works by simply detecting the existence of a method
