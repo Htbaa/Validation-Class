@@ -5,6 +5,10 @@ TODO (TBD)
     ? write new POD about cooperating with existing OO systems
     ? added a "TODO" section of POD to the main module
 
+7.85 (2012-09-21)
+    * The load/set and object/obj keywords documentation has been moved into the
+      intro document under hidden features
+
 7.84 (2012-09-20)
     * The import method has been modified to copy/merge meta-class configs based
       on inheritance
@@ -117,7 +121,7 @@ TODO (TBD)
     * extended V::C::Intro POD
 
 7.15 (2012-05-03)
-    * added all *_errors, *_fields, and *_params methods to 
+    * added all *_errors, *_fields, and *_params methods to
       the proxy methods list
     * update various POD bits
 

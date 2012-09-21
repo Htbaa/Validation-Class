@@ -11,78 +11,78 @@ usage scenarios for Validation::Class.
 =head1 INTRODUCTION
 
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     # package commands
-    
+
     set ...;
-    
+
     # a mixin template
-    
+
     mxn 'basic'  => {
         required   => 1
     };
-    
+
     # a validation rule
-    
+
     fld 'login'  => {
         label      => 'User Login',
         error      => 'Login invalid.',
         mixin      => 'basic',
-        
+
         validation => sub {
-        
+
             my ($self, $field, $params) = @_;
-        
+
             return $field->{value} eq 'admin' ? 1 : 0;
-        
+
         }
-        
+
     };
-    
+
     # a validation rule
-    
+
     fld 'password'  => {
         label         => 'User Password',
         error         => 'Password invalid.',
         mixin         => 'basic',
-        
+
         validation    => sub {
-        
+
             my ($self, $field, $params) = @_;
-        
+
             return $field->{value} eq 'pass' ? 1 : 0;
-        
+
         }
-        
+
     };
-    
+
     # a validation profile
-    
+
     pro 'registration'  => sub {
-        
+
         my ($self, @args) = @_;
-        
+
         return $self->validate(qw(+name +email -login +password))
-        
+
     };
-    
+
     # an auto-validating method
-    
+
     mth 'register'  => {
-        
+
         input => 'registration',
         using => sub {
-            
+
             my ($self, @args) = shift;
-            
+
             # ... do something
-            
+
         }
-        
+
     };
-    
+
     1;
 
 =head1 SCREENCAST
@@ -103,19 +103,19 @@ set-it-and-forget-it approach.
 Prior to Validation::Class version 7, the general idea was to have developers
 create a validation class in addition to an existing data/object model (which is
 twice the work), this was the reasoning behind having the framework ship with a
-Moose adapter (no longer available). Although the Moose adapter is no longer 
-supported, Validation::Class provides your classes with a simple object system 
+Moose adapter (no longer available). Although the Moose adapter is no longer
+supported, Validation::Class provides your classes with a simple object system
 providing the tools necessary to combine your validation and model layers.
 
-The Validation::Class object system provides automatic generation of attributes 
+The Validation::Class object system provides automatic generation of attributes
 and accessors based on field names, and a new method for instantiating your
 classes. The method keyword creates self-validating routines (like method
 signatures) which allow you to focus on the handling of data instead of
-worrying if the data is as it should be. 
+worrying if the data is as it should be.
 
-Simple as it may seem, these features allow developers to easily create data 
-models and objects with verifiable attributes and methods as well as built-in 
-validation and error handling functionality while remaining fast and extensible 
+Simple as it may seem, these features allow developers to easily create data
+models and objects with verifiable attributes and methods as well as built-in
+validation and error handling functionality while remaining fast and extensible
 due to its lean dependency chain.
 
 =head2 Die On Your Own Terms
@@ -139,111 +139,111 @@ usage scenarios:
 ... in MyApp.pm (the glue)
 
     package MyApp;
-    
+
     use Validation::Class;
-    
+
     set classes => [__PACKAGE__]; # load all sub-classes, MyApp::*
-    
+
     1;
-    
+
 ... in MyApp/Person.pm (the role/base-class)
 
     package MyApp::Person;
-    
+
     use Validation::Class;
-    
+
     mxn 'basic' => {
         require => 1,
         filters => ['trim', 'strip']
     };
-    
+
     fld 'first_name' => {
         mixin => 'basic'
     };
-    
+
     fld 'last_name' => {
         mixin => 'basic'
     };
-    
+
 ... in MyApp/User.pm (an app user)
 
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     set base => ['MyApp::Person'];
-    
+
     fld 'login' => {
         mixin => 'basic'
     };
-    
+
     fld 'password' => {
         mixin => 'basic'
     };
-    
+
     mth 'register' => {
         input => ['first_name', 'last_name', 'login', 'password'],
         using => sub {
-        
+
             my ($self) = @_;
-            
+
             # do something registrationy
-        
+
         }
     }
-    
+
 ... in myapp.pl (the script)
 
     use MyApp;
-    
+
     # find some parameters, e.g.
-    
+
     my $params = {
         'user.first_name' => '...',
         'user.last_name'  => '...',
         'user.login'      => '...',
         'user.password'   => '...'
     };
-    
+
     # or
-    
+
     my $params = {
-        
+
         user => {
             first_name => '...',
             last_name  => '...',
             login      => '...',
             password   => '...'
         }
-        
+
     };
-    
+
     my $app = MyApp->new(params => $params);
-    
+
     my $user = $app->class('user');
-    
+
     unless ($user->register) {
 
         print $user->errors_to_string # more error handling via V::C::Errors
 
     }
-    
+
     # or
-    
+
     my $user = MyApp::User->new(first_name => '...', last_name => '...');
-    
+
     unless ($user->register) {
-    
+
         # $user->error_count
-        
+
     }
 
 =head1 BUILDING CLASSES
 
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     # a validation rule template
 
     mixin 'basic'  => {
@@ -252,7 +252,7 @@ usage scenarios:
         max_length => 255,
         filters    => ['lowercase', 'alphanumeric']
     };
-    
+
     # a validation rule
 
     field 'login'  => {
@@ -260,14 +260,14 @@ usage scenarios:
         label      => 'user login',
         error      => 'login invalid',
         validation => sub {
-            
+
             my ($self, $field, $params) = @_;
-            
+
             return $field->value eq 'admin' ? 1 : 0;
-            
+
         }
     };
-    
+
     # a validation rule
 
     field 'password'  => {
@@ -275,14 +275,14 @@ usage scenarios:
         label         => 'user login',
         error         => 'login invalid',
         validation    => sub {
-            
+
             my ($self, $field, $params) = @_;
-            
+
             return $field->value eq 'pass' ? 1 : 0;
-            
+
         }
     };
-    
+
     1;
 
 Your validation class can be thought of as your data-model/input-firewall. The
@@ -303,15 +303,15 @@ like a firewall.
 A validation class is defined as follows:
 
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     # a mixin template
 
     mxn 'basic'  => {
         required   => 1
     };
-    
+
     # a validation rule
 
     fld 'login'  => {
@@ -322,13 +322,13 @@ A validation class is defined as follows:
         validation => sub {
 
             my ($self, $field, $params) = @_;
-            
+
             return $field->value eq 'admin' ? 1 : 0;
 
         }
 
     };
-    
+
     # a validation rule
 
     fld 'password'  => {
@@ -339,13 +339,13 @@ A validation class is defined as follows:
         validation    => sub {
 
             my ($self, $field, $params) = @_;
-            
+
             return $field->value eq 'pass' ? 1 : 0;
 
         }
 
     };
-    
+
     # a validation profile
 
     pro 'registration'  => sub {
@@ -353,26 +353,26 @@ A validation class is defined as follows:
         my ($self, @args) = @_;
 
         return $self->validate(qw(+name +email -login +password))
-        
+
     };
-    
+
     # an auto-validating method
 
     mth 'register'  => {
-        
+
         input => [qw/+login +password/],
         using => sub {
-            
+
             my ($self, @args) = shift;
-            
+
             # ... do something
-            
+
         }
-        
+
     };
-    
+
     1;
-    
+
 The fields defined will be used to validate the specified input parameters.
 You specify the input parameters at/after instantiation, parameters should take
 the form of a hashref of key/value pairs passed to the params attribute, or
@@ -381,27 +381,27 @@ to validate input in various scenarios:
 
     # web app
     package MyApp;
-    
+
     use MyApp::User;
     use Misc::WebAppFramework;
-    
+
     get '/auth' => sub {
-        
+
         # get user input parameters
         my $params = shift;
-    
+
         # initialize validation class and set input parameters
         my $user = MyApp::User->new(params => $params);
-        
+
         unless ($user->validate('login', 'password')) {
-            
+
             # print errors to browser unless validation is successful
             return $user->errors_to_string;
-            
+
         }
-        
+
         return 'you have authenticated';
-        
+
     };
 
 Lazy validation? Have your validation class automatically find the appropriate
@@ -410,21 +410,21 @@ not necessarily recommended as the execution and validation is dictated by the
 parameters submitted (which you may or may not have control over).
 
     use MyApp::User;
-    
+
     my $user = MyApp::User->new(params => $params);
-    
+
     unless ($user->validate) {
-    
+
         return $input->errors_to_string;
-    
+
     }
-    
+
 You can define an alias to automatically map a parameter to a validation field
 whereby a field definition will have an alias attribute containing an arrayref
 of alternate names that can be matched against passed-in parameter names.
 
     package MyApp::User;
-    
+
     field 'fu' => {
         ...,
         alias => [
@@ -433,21 +433,21 @@ of alternate names that can be matched against passed-in parameter names.
             'baz',
             'bax'
         ]
-        
+
     };
 
     package main;
 
     use MyApp::User;
-    
+
     my  $user = MyApp::User->new(params => { foo => 1 });
-    
+
     unless ($user->validate('fu'){
-    
+
         return $user->errors_to_string;
-    
+
     }
-    
+
     # OK because foo is an alias on the fu field
 
 =head2 Filtering Incoming Data
@@ -459,7 +459,7 @@ instantiation and again just before validation). As expected, this is configurab
 via the filtering attribute.
 
 A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
-which boosts application security and is best used with passive filtering 
+which boosts application security and is best used with passive filtering
 (e.g. converting character case - filtering which only alters the input in
 predictable ways), versus aggressive filtering (e.g. formatting a telephone
 number) which completely and permanently changes the incoming data ... so much
@@ -474,7 +474,7 @@ and applying the filters manually by calling the apply_filters() method.
 
 Validation::Class supports automatic serialization and deserialization of
 parameters with complex data structures which means that you can set a parameter
-as an arrayref or hashref of nested data structures and validate against them, 
+as an arrayref or hashref of nested data structures and validate against them,
 likewise you can set a parameters using parameter names which are serialized
 string representations of the keys within the complex structure you wish to set
 and validate against.
@@ -487,24 +487,24 @@ The following is an example of that:
             password => 'pass'
         }
     };
-    
+
     my $input = MyApp->new(params => $params);
-    
+
     # or
-    
+
     my $params = {
         'user.login' => 'admin',
         'user.password' => 'pass'
     };
-    
+
     my $input = MyApp->new(params => $params);
-    
+
     # field definition using field('user.login', ...)
     # and field('user.password', ...) will match against the parameters above
-    
+
     # after filtering, validation, etc ... return your params as a hashref if
     # needed
-    
+
     my $params = $input->get_params;
 
 =head2 Separation of Concerns
@@ -518,123 +518,123 @@ that will simply serve as your point of entry into your relative (child)
 classes. The following is an example of this:
 
     package MyVal::User;
-    
+
     use Validation::Class;
-    
+
     field name => { ... };
     field email => { ... };
     field login => { ... };
     field password => { ... };
-    
+
     package MyVal::Profile;
-    
+
     use Validation::Class;
-    
+
     field age => { ... };
     field sex => { ... };
     field birthday => { ... };
-    
+
     package MyVal;
-    
+
     use Validation::Class;
-    
+
     set classes => [__PACKAGE__];
-    
+
     package main;
-    
+
     my $input = MyVal->new(params => $params);
-    
+
     my $user = $input->class('user');
-    
+
     my $profile = $input->class('profile');
-    
+
     ...
-    
+
     1;
 
 =head1 BUILDING OBJECTS
 
     package MyApp::Database;
-    
+
     use DBI;
     use Validation::Class;
-    
+
     fld name => {
         required => 1,
     };
-    
+
     fld host => {
         required => 1,
     };
-    
+
     fld port => {
         required => 1,
     };
-    
+
     fld user => {
         required => 1,
     };
-    
+
     fld pass => {
         # ...
     };
-    
+
     obj _build_dbh => {
         type => 'DBI',
         init => 'connect', # defaults to new
         args => sub {
-            
+
             my ($self) = @_;
-            
+
             my @conn_str_parts =
                 ('dbi', 'mysql', $self->name, $self->host, $self->port);
-            
+
             return (join(':', @conn_str_parts), $self->user, $self->pass)
-            
+
         }
     };
-    
+
     has dbh => sub { shift->_build_dbh }; # cache the _build_dbh object
-    
+
     sub connect {
-    
+
         my ($self) = @_;
-        
+
         my @parameters = ('name', 'host', 'port', 'user');
-        
+
         if ($self->validate(@parameters)) {
-        
+
             if ($self->dbh) {
-                
+
                 my $db = $self->dbh;
-                
+
                 # ... do something else with DBI
-                
+
                 return 1;
-                
+
             }
-            
+
             $self->set_errors($DBI::errstr);
-        
+
         }
-        
+
         return 0;
-    
+
     }
-    
+
     package main;
-    
+
     my $database = MyApp::Database->new(
         name => 'test',
         host => 'localhost',
         port => '3306',
         user => 'root'
     );
-    
+
     if ($database->connect) {
-    
+
         # ...
-    
+
     }
 
 More documentation to come ...
@@ -648,16 +648,16 @@ Otherwise you will need to pass the fully-qualified plugin package name prefixed
 with a "+" symbol. The following is an example of including a plugin.
 
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     load plugins => [
         'PluginName', # Validation::Class::Plugin::PluginName
         '+MyApp::User::YourPluginName'
     ];
-    
+
     # a validation rule
-    
+
     field 'login'  => {
         label      => 'User Login',
         error      => 'Login invalid.',
@@ -667,9 +667,9 @@ with a "+" symbol. The following is an example of including a plugin.
             return $field->{value} eq 'admin' ? 1 : 0;
         }
     };
-    
+
     # a validation rule
-    
+
     field 'password'  => {
         label         => 'User Password',
         error         => 'Password invalid.',
@@ -679,48 +679,48 @@ with a "+" symbol. The following is an example of including a plugin.
             return $field->{value} eq 'pass' ? 1 : 0;
         }
     };
-    
+
     1;
-    
+
 Your plugin is loaded at runtime and can manipulate the calling class by
 declaring a B<new> method. The following is an example of a fictitious
 plugin for formatting telephone numbers:
 
     package Validation::Class::Plugin::USTelephone;
-    
+
     # hook into the instantiation process of the calling class at runtime
-    
+
     sub new {
-    
+
         my ($plugin, $caller) = @_;
-        
+
         # US Telephones
-        
+
         $caller->filters->{telephone_usa} = sub {
-        
+
             my $phone = shift;
                $phone =~ s/\D//g;
-            
+
             my ($area, $prefix, $xchng) = $phone =~ m/1?(\d{3})(\d{3})(\d{4});
-               
+
             return "+1 ($area) $prefix-$xchng";
-        
+
         };
-        
+
         return bless {}, $plugin;
-        
+
     }
 
 Once we create, test and deploy our plugin, we can use it in our code as follows:
-    
+
     package MyApp::User;
-    
+
     use Validation::Class;
-    
+
     load plugins => ['USTelephone'];
-    
+
     # a validation rule
-    
+
     field 'phone'  => {
         label      => 'Telephone Number',
         error      => 'Phone number invalid.',
@@ -728,15 +728,15 @@ Once we create, test and deploy our plugin, we can use it in our code as follows
         filters    => ['telephone_usa'],
         filtering  => 'post', # phone is only formatted if validation passes
     };
-    
+
     package main ;
-    
+
     #  the phone param will become +1 (215) 555-1212
-    
+
     my $input = MyApp::User->new(phone => '2155551212');
-    
+
     # get direct access to the instantiated plugin
-    
+
     my $plugin = $input->plugin('us_telephone');
 
 =head1 INTROSPECT AND EXTEND
@@ -758,49 +758,49 @@ you an idea of how to use introspection to extend your application code using
 Validation::Class.
 
 Please keep in mind that Validation::Class is likely to have most of the
-functionalty you would need to introspect your codebase. The following is an 
+functionalty you would need to introspect your codebase. The following is an
 introspect design template that will work in most cases:
 
     package MyApp::Introspect;
-    
+
     use Validation::Class;
-    
+
     set classes => ['MyApp']; # load MyApp and all MyApp::* child classes
-    
+
     sub per_class {
-    
+
         my ($self, $code) = @_;
-        
+
         $self->proto->relatives->each(sub {
-            
+
             my ($alias, $namespace) = @_;
-            
+
             # do something with each class
-            $code->($namespace); 
-        
+            $code->($namespace);
+
         });
-    
+
     }
-    
+
     sub per_field_per_class {
-    
+
         my ($self, $code) = @_;
-        
+
         $self->per_class(sub {
-            
+
             my $namespace = shift;
-            
+
             my $class = $namespace->new;
-            
+
             foreach my $field (sort $class->fields->keys) {
-            
+
                 # do something with each field
-                $code->($class, $class->fields->{$field}); 
-            
+                $code->($class, $class->fields->{$field});
+
             }
-            
+
         });
-    
+
     }
     ...
 
@@ -812,28 +812,28 @@ Validation::Class to perform additional operations.
 =head2 Log All Validation Attempts
 
     package MyApp::User;
-    
+
     use Validation::Class;
     use Class::Method::Modifiers;
-    
+
     ...
-    
+
     after validate => sub {
-        
+
         my ($self, @args) = @_;
-        
+
         # maybe using Log::Log4Perl to write log validation attempts
-        
+
     };
-    
+
     after validate_profile => sub {
-        
+
         my ($self, @args) = @_;
-        
+
         # maybe using Log::Log4Perl to write log validation attempts
-        
+
     };
-    
+
 More documentation to come ...
 
 =head2 Client-Side Validation Library
@@ -849,54 +849,54 @@ we will then use with jQuery to validate form data, etc.
     # usage: ./generate_jsapi > app.api.js
 
     use MyApp::Introspect;
-    
+
     use JSON;
-    
+
     my $classes = {};
-    
+
     my $json = JSON->new->allow_blessed->convert_blessed->pretty([1]);
-    
+
     my $introspection = MyApp::Introspect->new;
-    
+
     $introspection->per_field_per_class(sub{
-    
+
         my ($class, $field) = @_;
-        
+
         my $namespace = ref $class;
-        
+
         # attributes we want in the js api
-        
+
         my $attributes = { map { $_ => $field->{$_} } qw(
             name label error filters required length min_length max_length
         ) };
-        
+
         my $fieldspace = $classes->{$namespace}->{$field->{name}} = $attributes;
-    
+
     });
-    
+
     # generate the JS API
-    
+
     print "\n";
-    
+
     print "var MyApp = MyApp || {};\n\n";
-    
+
     while (my($namespace, $fields) = each(%{$classes})) {
-    
+
         $namespace =~ s/::/./;
-        
+
         my $objects = $json->encode($fields);
-        
+
         chomp $objects;
-        
+
         print "$namespace = $objects;\n\n";
-    
+
     }
 
 The output of the following script should generate a file which looks similar
 to the following:
-    
+
     var MyApp = MyApp || {};
-    
+
     MyApp.Test = {
        "email" : {
           "name" : "email",
@@ -964,7 +964,7 @@ to the following:
           "max_length" : 255
        }
     };
-    
+
 If its not obvious yet, we can easily use this generated javascript API with
 jQuery to validate forms, etc. The following are a few ideas on how we might do
 that.
@@ -972,42 +972,222 @@ that.
 ... the form
 
     <form action="/awesomeness" class="protected">
-    
+
         <input id="name" name="name" value="" model="test-name" />
-    
+
     </form>
 
 ... the javascript
 
-    // validate any form with a 'protected' class 
+    // validate any form with a 'protected' class
     $('form.protected').submit(function(){
-    
+
         // all form fields submitted
         $(':input', this).each(function(){
-        
+
             var model = $(this).attr('model');
-            
+
             if (model) {
-            
+
                 var cf = model.split("-");
-                
+
                 var class = cf[0];
                 var field = cf[1];
-                
+
                 // uppercase first
                 class = class.charAt(0).toUpperCase() + class.slice(1);
-                
+
                 // check model against element, e.g.
                 if (! $(this).val() && MyApp[class][field].required) {
-                    
+
                     // ERROR, DANGER, KABOOM!!!
-                    
+
                 }
-                
+
             }
-            
+
         });
-    
+
     });
+
+=head1 HIDDEN FEATURES
+
+The following are temporary, undocumented/half-documented, rogue and/or
+depreciated featues that you may want to know about.
+
+=head2 The load Keyword
+
+The load keyword (or set), which can also be used as a method, provides options
+for extending the current class by attaching other L<Validation::Class> classes
+as relatives, roles, plugins, etc. The process of applying roles to the current
+class mainly involve copying the role's methods and configuration.
+
+NOTE: While the load/set functionality is not depreciated and will remain part
+of this library, its uses are no longer recommended as there are better ways to
+achieve the desired results. Additionally, the following usage scenarios can be
+refactored using traditional inheritance.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    # load stuff (extend MyApp)
+
+    load {
+
+        # run package commands
+
+    };
+
+    1;
+
+The C<load.classes> option, can be a constant or arrayref and uses L<Module::Find>
+to load B<all> child classes (in-all-subdirectories) for convenient access
+through the class() method. Existing parameters and configuration options are
+passed to the child class' constructor. All attributes can be easily overwritten
+using the attribute's accessors on the child class. These child classes are
+often referred to as relatives. This option accepts a constant or an arrayref of
+constants.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    # load all child classes
+
+    load {
+        classes => [
+            __PACKAGE__
+        ]
+    };
+
+    package main;
+
+    my $app = MyApp->new;
+
+    my $rel = $app->class('relative'); # new MyApp::Relative object
+
+    my $rel = $app->class('data_source'); # MyApp::DataSource
+    my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
+
+    1;
+
+The C<load.plugins> option is used to load plugins that support Validation::Class.
+A Validation::Class plugin is little more than a class that implements a "new"
+method that extends the associated validation class object. As usual, an official
+Validation::Class plugin can be referred to using shorthand while custom plugins
+are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
+more about plugins at L<Validation::Class::Intro>. This option accepts a
+constant or an arrayref of constants.
+
+    package MyVal;
+
+    use Validation::Class;
+
+    load {
+        plugins => [
+            'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
+            '+MyVal::Plugin'
+        ]
+    };
+
+    1;
+
+The C<load.roles> option is used to load and inherit functionality from child
+classes, these classes should be used and thought-of as roles. Any validation
+class can be used as a role with this option. This option accepts a constant or
+an arrayref of constants.
+
+    package MyVal::User;
+
+    use Validation::Class;
+
+    load {
+        roles => [
+            'MyVal::Person'
+        ]
+    };
+
+    1;
+
+Purely for the sake of aesthetics we have designed an alternate syntax for
+executing load/set commands, the syntax is as follows:
+
+    package MyVal::User;
+
+    use Validation::Class;
+
+    load roles => ['MyVal::Person'];
+    load classes => [__PACKAGE__];
+    load plugins => [
+        'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
+        '+MyVal::Plugin'
+    ];
+
+=head2 The object Keyword
+
+The object keyword (or obj) registers a class object builder which builds and
+returns a class object on-demand. The object keyword also creates a method on
+the calling class which invokes the builder. Unlike class attributes, this
+method does not cache or otherwise store the returned class object it
+constructs.
+
+NOTE: While the object/obj functionality is not depreciated and will remain part
+of this library, its is mostly experimental.
+
+    package MyApp::User::Input;
+
+    use MyApp::User; # a Moose class
+
+    use Validation::Class;
+
+    field login => {
+        required => 1,
+    };
+
+    field password => {
+        required => 1,
+    };
+
+    object _build_user => {
+
+        type => 'MyApp::User',
+
+        # init => 'new', # defaults to new
+        # args => [qw/login password/], # defaults to all fields
+        # list => 'hash' # defaults to list
+
+    };
+
+    package main;
+
+    my $user_input = MyApp::User::Input->new(params => $params);
+
+    if ($user_input->validate('login', 'password')) {
+
+        my $user = $user_input->_build_user;
+
+        # ...
+
+    }
+
+The object keyword takes two arguments, an object builder name and a hashref
+of key/value pairs which are used to instruct the builder on how to construct
+the object. The supplied hashref should be configured as follows:
+
+    # class to construct
+    type => 'ClassName',
+
+    # optional: constructor name (defaults to new)
+    init => 'new',
+
+    # optional: arrayref of field names or a coderef which returns arguments for
+    # the constructor (defaults to all fields)
+    args => sub {}
+
+    # optional: if supplying an arrayref of fields to the args option, this
+    # option determines how the parameters will be supplied to the constructor,
+    # valid options are 'hash' or 'list' (defaults to list)
+    list => 'hash'
 
 =cut
