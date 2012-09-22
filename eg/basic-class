@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+BEGIN {
+    
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+    use lib $FindBin::Bin . "/../t/myapp/lib";
+    
+}
+
+package MyApp::Basic;
+ 
+use Validation::Class;
+ 
+fld name => {
+    
+    required => 1,
+    
+};
+ 
+fld email => {
+    
+    required => 1,
+    
+};
+ 
+fld type => {
+    
+    required => 1,
+    options  => ['A'..'Z']
+    
+};
+ 
+fld login => {
+    
+    # ...
+    
+};
+ 
+fld password => {
+    
+    required => 1,
+    
+};
+
+package main;
+
+my $basic = MyApp::Basic->new(@ARGV);
+
+print $basic->validate(qw/name type/) ?
+    "parameters are valid\n" : "parameters are invalid\n" . $basic->errors_to_string . "\n" ;
+
+1;

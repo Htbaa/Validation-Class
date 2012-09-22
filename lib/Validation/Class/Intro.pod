@@ -1010,7 +1010,7 @@ that.
 
     });
 
-=head1 HIDDEN FEATURES
+=head1 UNDOCUMENTED FEATURES
 
 The following are temporary, undocumented/half-documented, rogue and/or
 depreciated featues that you may want to know about.

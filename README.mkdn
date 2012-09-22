@@ -4,56 +4,46 @@ Validation::Class - Self-Validating Object System and Data Validation Framework
 
 # VERSION
 
-version 7.84
+version 7.85
 
 # SYNOPSIS
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     mixin basic     => {
         required    => 1,
         max_length  => 255,
         filters     => [qw/trim strip/]
-    }; 
-    
+    };
 
     field login     => {
         mixin       => 'basic',
         min_length  => 5
     };
-    
 
     field password  => {
         mixin       => 'basic',
         min_length  => 5,
         min_symbols => 1
     };
-    
 
     package main;
-    
 
     my $user = MyApp::User->new(login => 'admin', password => 'secr3t');
-    
 
     unless ($user->validate('login', 'password')) {
-    
 
         # do something with the errors,
         # e.g. print $user->errors_to_string
-    
 
     }
-    
 
     1;
 
 Validation::Class is a data validation framework and simple object system. It
-allows you to model data and construct objects with focus on structure, 
+allows you to model data and construct objects with focus on structure,
 reusability and data validation. It expects user input errors (without dying),
 validation only occurs when you ask it to. Validation::Class classes are designed
 to ensure consistency and promote reuse of data validation rules.
@@ -110,22 +100,16 @@ minimalistic variant of what you may have encountered in other object systems
 such as [Moose](http://search.cpan.org/perldoc?Moose), [Mouse](http://search.cpan.org/perldoc?Mouse), [Moo](http://search.cpan.org/perldoc?Moo), [Mo](http://search.cpan.org/perldoc?Mo), etc.
 
     package MyApp::User;
-    
 
     use Validate::Class;
-    
 
     attribute 'bothered' => 1;
-    
 
     attribute 'attitude' => sub {
-        
 
-        return $self->bothered ? 1 : 0 
-        
+        return $self->bothered ? 1 : 0
 
     };
-    
 
     1;
 
@@ -138,47 +122,33 @@ The build keyword (or bld) registers a coderef to be run at instantiation much
 in the same way the common BUILD routine is used in modern-day OO systems.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     build sub {
-        
 
         my ($self, %args) = @_;
-        
 
         # ... do something
-        
 
     };
-    
 
     # die like a Moose
-    
 
     use Carp;
-    
 
     build sub {
-        
 
         my ($self, %args) = @_;
-        
 
         my @attributes = qw();
-        
 
         foreach my $attribute (@attributes) {
-            
 
             confess "Attribute ($attribute) is required"
                 unless $self->$attribute;
-            
 
         }
-        
 
     };
 
@@ -193,54 +163,39 @@ table before runtime and is ideal for creating custom directive extension
 packages to be used in all your classes.
 
     package MyApp::Directives;
-    
 
     use Validation::Class;
     use Data::Validate::Email;
-    
 
     directive 'is_email' => sub {
-    
 
         my ($dir, $value, $field, $self) = @_;
-        
 
         my $validator = Data::Validate::Email->new;
-        
 
         unless ($validator->is_email($value)) {
-        
 
             my $handle = $field->{label} || $field->{name};
-            
 
             $field->{errors}->add("$handle must be a valid email address");
-            
 
             return 0;
-        
 
         }
-        
 
         return 1;
-    
 
     };
-    
 
     package MyApp::User;
-    
 
     use Validate::Class;
     use MyApp::Directives;
-    
 
     field 'email' => {
         is_email => 1,
         ...
     };
-    
 
     1;
 
@@ -262,10 +217,8 @@ in code. The field name should correspond with the parameter name expected to
 be passed to your validation class.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     field 'login' => {
         required   => 1,
@@ -288,20 +241,16 @@ underscore.
         max_length => 255,
         ...
     };
-    
 
     field 'preference.send_reminders' => {
         required   => 1,
         max_length => 1,
         ...
     };
-    
 
     my $value = $self->login;
-    
 
     $self->login($new_value);
-    
 
     $self->preference_send_reminders;
 
@@ -317,33 +266,25 @@ runtime and is ideal for creating custom directive extension packages to be used
 in all your classes.
 
     package MyApp::Directives;
-    
 
     use Validation::Class;
-    
 
     filter 'flatten' => sub {
-        
 
         $_[0] =~ s/[\t\r\n]+/ /g;
         $_[0] # return
-    
 
     };
-    
 
     package MyApp::User;
-    
 
     use Validate::Class;
     use MyApp::Directives;
-    
 
     field 'description' => {
         filters => ['trim', 'flatten'],
         ...
     };
-    
 
     1;
 
@@ -351,137 +292,6 @@ The filter keyword takes two arguments, the name of the filter and a
 coderef which will be used to filter the value the associated field. The coderef
 is passed the value of the field and that value MUST be operated on directly.
 The coderef should also return the transformed value.
-
-## load
-
-The load keyword (or set), which can also be used as a method, provides options
-for extending the current class by attaching other [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) classes
-as relatives, roles, plugins, etc. The process of applying roles to the current
-class mainly involve copying the role's methods and configuration.
-
-NOTE: While the load/set functionality is not depreciated and will remain part
-of this library, its uses are no longer recommended as there are better ways to
-achieve the desired results. Additionally, the following usage scenarios can be
-refactored using traditional inheritance. 
-
-    package MyApp;
-    
-
-    use Validation::Class;
-    
-
-    # load stuff (extend MyApp)
-    
-
-    load {
-        
-
-        # run package commands
-        
-
-    };
-    
-
-    1;
-
-The `load.classes` option, can be a constant or arrayref and uses [Module::Find](http://search.cpan.org/perldoc?Module::Find)
-to load __all__ child classes (in-all-subdirectories) for convenient access
-through the class() method. Existing parameters and configuration options are
-passed to the child class' constructor. All attributes can be easily overwritten
-using the attribute's accessors on the child class. These child classes are
-often referred to as relatives. This option accepts a constant or an arrayref of
-constants.
-
-    package MyApp;
-    
-
-    use Validation::Class;
-    
-
-    # load all child classes
-    
-
-    load {
-        classes => [
-            __PACKAGE__
-        ]
-    };
-    
-
-    package main;
-    
-
-    my $app = MyApp->new;
-    
-
-    my $rel = $app->class('relative'); # new MyApp::Relative object
-    
-
-    my $rel = $app->class('data_source'); # MyApp::DataSource
-    my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
-    
-
-    1;
-
-The `load.plugins` option is used to load plugins that support Validation::Class. 
-A Validation::Class plugin is little more than a class that implements a "new"
-method that extends the associated validation class object. As usual, an official
-Validation::Class plugin can be referred to using shorthand while custom plugins
-are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
-more about plugins at [Validation::Class::Intro](http://search.cpan.org/perldoc?Validation::Class::Intro). This option accepts a
-constant or an arrayref of constants.
-
-    package MyVal;
-    
-
-    use Validation::Class;
-    
-
-    load {
-        plugins => [
-            'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
-            '+MyVal::Plugin'
-        ]
-    };
-    
-
-    1;
-
-The `load.roles` option is used to load and inherit functionality from child
-classes, these classes should be used and thought-of as roles. Any validation
-class can be used as a role with this option. This option accepts a constant or
-an arrayref of constants.
-
-    package MyVal::User;
-    
-
-    use Validation::Class;
-    
-
-    load {
-        roles => [
-            'MyVal::Person'
-        ]
-    };
-    
-
-    1;
-
-Purely for the sake of aesthetics we have designed an alternate syntax for
-executing load/set commands, the syntax is as follows:
-
-    package MyVal::User;
-    
-
-    use Validation::Class;
-    
-
-    load roles => ['MyVal::Person'];
-    load classes => [__PACKAGE__];
-    load plugins => [
-        'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
-        '+MyVal::Plugin'
-    ];    
 
 ## method
 
@@ -491,47 +301,34 @@ validation rules and profiles to ensure a method has the required data necessary
 to proceed.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     method 'register' => {
-    
 
         input  => ['name', '+email', 'login', '+password'],
         output => ['+id'], # optional output validation, dies on failure
         using  => sub {
-        
 
             my ($self, @args) = @_;
-            
 
             # .... do something registrationy
-            
 
             $self->id(...); # set the ID field for output validation
-            
 
             return $self;
-        
 
         }
-    
 
     };
-    
 
     package main;
-    
 
     my $user = MyApp::User->new(params => $params);
-    
 
     if ($user->register) {
         ...
     }
-    
 
     1;
 
@@ -562,10 +359,8 @@ applied to any field using the mixin directive. Mixin directives are processed
 first so existing field directives will override the mixed-in directives.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     mixin 'constrain' => {
         required   => 1,
@@ -573,7 +368,6 @@ first so existing field directives will override the mixed-in directives.
         max_length => 255,
         ...
     };
-    
 
     # e.g.
     field 'login' => {
@@ -584,106 +378,21 @@ first so existing field directives will override the mixed-in directives.
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values
 pairs known as directives.
 
-## object
-
-The object keyword (or obj) registers a class object builder which builds and
-returns a class object on-demand. The object keyword also creates a method on
-the calling class which invokes the builder. Unlike class attributes, this
-method does not cache or otherwise store the returned class object it
-constructs.
-
-    package MyApp::User::Input;
-    
-
-    use MyApp::User; # a Moose class
-    
-
-    use Validation::Class;
-    
-
-    field login => {
-        required => 1,
-    };
-    
-
-    field password => {
-        required => 1,
-    };
-    
-
-    object _build_user => {
-        
-
-        type => 'MyApp::User',
-        
-
-        # init => 'new', # defaults to new
-        # args => [qw/login password/], # defaults to all fields
-        # list => 'hash' # defaults to list
-    
-
-    };
-    
-
-    package main;
-    
-
-    my $user_input = MyApp::User::Input->new(params => $params);
-    
-
-    if ($user_input->validate('login', 'password')) {
-        
-
-        my $user = $user_input->_build_user;
-        
-
-        # ...
-        
-
-    }
-
-The object keyword takes two arguments, an object builder name and a hashref
-of key/value pairs which are used to instruct the builder on how to construct
-the object. The supplied hashref should be configured as follows:
-
-    # class to construct
-    type => 'ClassName',
-    
-
-    # optional: constructor name (defaults to new)
-    init => 'new',
-    
-
-    # optional: arrayref of field names or a coderef which returns arguments for
-    # the constructor (defaults to all fields)
-    args => sub {}
-    
-
-    # optional: if supplying an arrayref of fields to the args option, this
-    # option determines how the parameters will be supplied to the constructor,
-    # valid options are 'hash' or 'list' (defaults to list)
-    list => 'hash'
-
 ## profile
 
 The profile keyword (or pro) stores a validation profile (coderef) which as in
 the traditional use of the term is a sequence of validation routines that validate
-data relevant to a specific action. 
+data relevant to a specific action.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     profile 'signup' => sub {
-        
 
         my ($self, @args) = @_;
-        
 
         # ... do other stuff
-        
 
         return $self->validate(qw(
             +name
@@ -693,22 +402,16 @@ data relevant to a specific action.
             +password
             +password_confirmation
         ));
-        
 
     };
-    
 
     package main;
-    
 
     my $user = MyApp::User->new(params => $params);
-    
 
     unless ($user->validate_profile('signup')) {
-    
 
         die $user->errors_to_string;
-    
 
     }
 
@@ -725,28 +428,20 @@ method should never be overridden. Use the build keyword to hooking into the
 instantiation process.
 
     package MyApp;
-    
 
     use Validation::Class;
-    
 
     # optionally
-    
 
     build sub {
-        
 
         my ($self, @args) = @_; # is instantiated
-        
 
     };
-    
 
     package main;
-    
 
     my $app = MyApp->new;
-    
 
     ...
 
@@ -758,19 +453,14 @@ the data model (the class). It is not likely that you'll need to access
 this method directly, see ["THE PROTOTYPE CLASS" in Validation::Class](http://search.cpan.org/perldoc?Validation::Class#THE PROTOTYPE CLASS).
 
     package MyApp;
-    
 
     use Validation::Class;
-    
 
     package main;
-    
 
     my $app = MyApp->new;
-    
 
     my $prototype = $app->prototype;
-    
 
     ...
 
@@ -785,21 +475,17 @@ for more information on specific methods, and attributes.
 All derived classes will have a prototype-class attached to it which does all
 the heavy lifting (regarding validation and error handling). The prototype
 injects a few proxy methods into your class which are basically aliases to your
-prototype class methods, however it is possible to access the prototype directly 
+prototype class methods, however it is possible to access the prototype directly
 using the proto/prototype methods.
 
     package MyApp::User;
-    
 
     use Validation::Class;
-    
 
     package main;
-    
 
     my $user  = MyApp::User->new;
     my $proto = $user->prototype;
-    
 
     $proto->error_count # same as calling $self->error_count
 
@@ -815,79 +501,63 @@ Validation::Class class in cooperation with Moose (while this example focuses
 on Moose, the approach is the same regardless of the existing system):
 
     # USING MOOSE AS YOUR PRIMARY OO SYSTEM
-    
 
     package MyApp;
-    
 
     use Moose;
     use Validation::Class '!has'; # in cooperative mode, dont export has()
-    
 
     # you must run initialization routines yourself ...
     # specifying it in a BUILD routine will run it automatically
-    
 
     sub BUILD {
-        
 
         my ($self, $args) = @_;
-        
 
         $self->initialize_validator(
             params => $args->{params}
         );
-        
 
     }
-    
 
     field login     => {
         min_length  => 5
         max_length  => 50
     };
-    
 
     field password  => {
         min_length  => 8,
         min_symbols => 1
         max_length  => 50
     };
-    
 
     # USING MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
-    
 
     package MyApp;
-    
 
     use Validation::Class '!has'; # avoids has() keyword clash
     use Moose;
-    
 
     field login     => {
         min_length  => 5
         max_length  => 50
     };
-    
 
     field password  => {
         min_length  => 8,
         min_symbols => 1
         max_length  => 50
     };
-    
 
     has database => (
         is  => 'rw',
         isa => 'DBI::db',
         ...
     );
-    
 
     1;
 
-This cooperation works by simply detecting the existence of a method named `new`, 
+This cooperation works by simply detecting the existence of a method named `new`,
 the name traditionally reserved for a class constructor which if detected signals
 Validation::Class to install a method named `initialize` as opposed to installing
 its own constructor. The installed method, `initialize`, encapsulates the
@@ -899,11 +569,11 @@ will install a constructor or a method named initialize if a constructor already
 exists, either way, the installed method should be called before executing
 methods on the class.
 
-As previously stated, Validation::Class injects a few proxy methods into your 
-class which are basically aliases to your prototype class methods. You can 
-find additional information on the prototype class and its method at 
-[Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype). The following is a list of *proxy* methods, 
-methods which are injected into your class as shorthand to methods defined in 
+As previously stated, Validation::Class injects a few proxy methods into your
+class which are basically aliases to your prototype class methods. You can
+find additional information on the prototype class and its method at
+[Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype). The following is a list of *proxy* methods,
+methods which are injected into your class as shorthand to methods defined in
 the prototype class (these methods are overridden):
 
 ## class
@@ -940,7 +610,7 @@ head2 errors_to_string
 
     $self->errors_to_string;
 
-See ["errors_to_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors_to_string) for full 
+See ["errors_to_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors_to_string) for full
 documentation.
 
 ## get_errors
@@ -977,14 +647,14 @@ See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc
 
     $self->ignore_failure;
 
-See ["ignore_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore_failure) for full 
+See ["ignore_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore_failure) for full
 documentation.
 
 ## ignore_unknown
 
     $self->ignore_unknown;
 
-See ["ignore_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore_unknown) for full 
+See ["ignore_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore_unknown) for full
 documentation.
 
 ## param
@@ -1015,7 +685,7 @@ See ["queue" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Val
 
     $self->report_failure;
 
-See ["report_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report_failure) for full 
+See ["report_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report_failure) for full
 documentation.
 
 ## report_unknown
@@ -1118,7 +788,7 @@ documentation.
 
 # SEE ALSO
 
-Additionally you may want to look elsewhere for your data validation needs so 
+Additionally you may want to look elsewhere for your data validation needs so
 the following is a list of recommended validation libraries/frameworks you
 might do well to look into. [Validate::Tiny](http://search.cpan.org/perldoc?Validate::Tiny) is nice for simple use-cases, it
 has virtually no dependencies and solid test coverage. [Data::Verifier](http://search.cpan.org/perldoc?Data::Verifier) is a

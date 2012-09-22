@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+BEGIN {
+    
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+    use lib $FindBin::Bin . "/../t/myapp/lib";
+    
+}
+
+package MyApp::Basic;
+
+our $i=0;
+
+use Moose 'has', 'extends';
+use Validation::Class '!has';
+
+fld name => {
+    
+    required => 1,
+    
+};
+ 
+fld type => {
+    
+    required => 1,
+    options  => ['A'..'Z']
+    
+};
+
+has data => (
+    
+    is       => 'rw',
+    required => 1
+    
+);
+
+sub BUILD {
+    
+    my ($self, $args) = @_;
+    $i++;
+    $self->initialize_validator(params => $args->{params});
+    
+}
+ 
+package main;
+
+my $a = 1;
+
+my $basic = MyApp::Basic->new(
+    data => 'this', params => { name => 'Linux', type => 'U' }
+);
+
+if ($i) {
+    print "HAS BUILD\n";
+    if ($i && $basic->validate(qw/name type/)) {
+        print "OK\n"
+    }
+    else {
+        print "NOK\n";
+        print $basic->errors_to_string, "\n";
+    }
+}
+else {
+    print "NO BUILD\n";
+    if (!$i && $basic->validate(qw/name type/)) {
+        print "OK\n"
+    }
+    else {
+        print "NOK\n";
+        print $basic->errors_to_string, "\n";
+    }
+}
+
+1;

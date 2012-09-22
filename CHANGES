@@ -8,6 +8,8 @@ TODO (TBD)
 7.85 (2012-09-21)
     * The load/set and object/obj keywords documentation has been moved into the
       intro document under hidden features
+    * Fixed Class::Forward version dependency which cause test failures in
+      previous versions
 
 7.84 (2012-09-20)
     * The import method has been modified to copy/merge meta-class configs based

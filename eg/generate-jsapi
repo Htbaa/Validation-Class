@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+BEGIN {
+    
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+    use lib $FindBin::Bin . "/../t/myapp/lib";
+    
+}
+
+use MyApp::Introspect;
+
+use JSON;
+
+my $classes = {};
+
+my $json = JSON->new->allow_blessed->convert_blessed->pretty([1]);
+
+my $introspection = MyApp::Introspect->new;
+
+$introspection->per_field_per_class(sub{
+
+    my ($class, $field) = @_;
+    
+    my $namespace  = ref $class;
+    
+    # attributes we want in the js api
+    my $attributes = {
+        map { $_ => $field->{$_} }
+        qw(name label error filters required length min_length max_length)
+    };
+    
+    my $fieldspace =
+        $classes->{$namespace}->{$field->{name}} = $attributes;
+
+});
+
+# generate the JS API
+
+print "\n";
+
+print "var MyApp = MyApp || {};\n\n";
+
+while (my($namespace, $fields) = each(%{$classes})) {
+
+    $namespace =~ s/::/./;
+    
+    my $objects = $json->encode($fields);
+    
+    chomp $objects;
+    
+    print "$namespace = $objects;\n\n";
+
+}
