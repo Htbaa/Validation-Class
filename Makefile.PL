@@ -21,14 +21,14 @@ my %WriteMakefileArgs = (
   "NAME" => "Validation::Class",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Class::Forward" => "0.08",
+    "Class::Forward" => 0,
     "Hash::Flatten" => 0,
     "Hash::Merge" => 0,
     "Module::Find" => 0,
     "Module::Runtime" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.86",
+  "VERSION" => "7.87",
   "test" => {
     "TESTS" => "t/*.t t/regression/*.t t/regression/filters/*.t t/regression/validators/*.t"
   }

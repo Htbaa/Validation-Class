@@ -1,4 +1,4 @@
-# ABSTRACT: Self-Validating Object System and Data Validation Framework
+# ABSTRACT: Data Validation Framework
 
 package Validation::Class;
 
@@ -289,69 +289,38 @@ our @EXPORT = qw(
 
     unless ($user->validate('login', 'password')) {
 
-        # do something with the errors,
+        # do something with the errors
         # e.g. print $user->errors_to_string
+
+        # or   my @errors     = $user->get_errors
+        # or   my $has_errors = $user->error_count
+
+        # etc ...
 
     }
 
     1;
 
-Validation::Class is a data validation framework and simple object system. It
-allows you to model data and construct objects with focus on structure,
-reusability and data validation. It expects user input errors (without dying),
-validation only occurs when you ask it to. Validation::Class classes are designed
-to ensure consistency and promote reuse of data validation rules.
-
-L<Validation::Class::Intro> will help you better understand the framework's
-rationale and typical use-cases while L<Validation::Class::Prototype> will help
-you discover all the bells-and-whistles included in the framework.
-
 =head1 DESCRIPTION
 
-Validation::Class is much more than a robust data validation framework, in-fact
-it is more of a data modeling framework and can be used as an alternative to
-minimalistic object systems such as L<Moo>, L<Mo>, etc. Validation::Class aims
-to provide the building blocks for easily definable self-validating data models.
-For more information on the validation class object system, review
-L<"the object system"|/"THE OBJECT SYSTEM"> section.
+Validation::Class is a robust data validation framework which aims to provide
+the building blocks for easily definable self-validating classes.
 
-Validation classes are typically defined using the following keywords:
+Validation::Class provides a light-weight object system, self-validating
+sub-routines, validation profiles, compartmentalization, input filtering,
+extensibility (create your own custom validators and input filters), class
+inheritance, automatic array handling, and much more.
 
-    * field     - a field is a data validation rule
-    * mixin     - a field template
-    * directive - a field/mixin rule attribute
-    * filter    - a directive which transforms the field parameter value
-    * method    - a self-validating sub-routine
-    * object    - a simple object builder
-
-To keep your class namespace clean and free from pollution, all inherited
-functionality is configured on your class' prototype (a cached class
-configuration object) which leaves you free to create and overwrite method names
-in your class without breaking the Validation::Class framework, this all happens
-much in the same way L<Moose> uses it's MOP (meta-object-protocol) having most
-of the framework functionality residing in the Moose::Meta namespace. For more
-information on the validation class prototype, review
-L<"the prototype class"|/"THE PROTOTYPE CLASS"> section.
-
-One very important (and intentional) difference between Moose/Moose-like systems
-and Validation::Class classes is in the handling of errors. There are generally
-two types of errors that occur in an application, user-errors which are expected
-and should be handled and reported, and system-errors which are unexpected and
-should cause the application to terminate or otherwise handle the exception. It
-is not always desired and/or appropriate to crash from a failure to validate a
-particular parameter. In Validation::Class, the application is not terminated or
-validate automatically unless you configure it to.
-
-Additionally, please review the L<Validation::Class::Intro> for a more in-depth
-understanding of how to leverage Validation::Class.
+If you are new to Validation::Class, or would like more information on the
+underpinnings of this library and how it views and approaches data validation,
+please review L<Validation::Class::Manual::Intro>.
 
 =cut
 
 =keyword attribute
 
 The attribute keyword (or has) creates a class attribute. This is only a
-minimalistic variant of what you may have encountered in other object systems
-such as L<Moose>, L<Mouse>, L<Moo>, L<Mo>, etc.
+minimalistic variant of what you may have encountered in other object systems.
 
     package MyApp::User;
 
@@ -757,6 +726,117 @@ sub filter {
     };
 
 }
+
+=keyword load
+
+The load keyword (or set), which can also be used as a method, provides options
+for extending the current class by attaching other L<Validation::Class> classes
+as relatives, roles, plugins, etc. The process of applying roles to the current
+class mainly involve copying the role's methods and configuration.
+
+NOTE: While the load/set functionality is not depreciated and will remain part
+of this library, its uses are no longer recommended as there are better ways to
+achieve the desired results. Additionally, the following usage scenarios can be
+refactored using traditional inheritance.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    # load stuff (extend MyApp)
+
+    load {
+
+        # run package commands
+
+    };
+
+    1;
+
+The C<load.classes> option, can be a constant or arrayref and uses L<Module::Find>
+to load B<all> child classes (in-all-subdirectories) for convenient access
+through the class() method. Existing parameters and configuration options are
+passed to the child class' constructor. All attributes can be easily overwritten
+using the attribute's accessors on the child class. These child classes are
+often referred to as relatives. This option accepts a constant or an arrayref of
+constants.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    # load all child classes
+
+    load {
+        classes => [
+            __PACKAGE__
+        ]
+    };
+
+    package main;
+
+    my $app = MyApp->new;
+
+    my $rel = $app->class('relative'); # new MyApp::Relative object
+
+    my $rel = $app->class('data_source'); # MyApp::DataSource
+    my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
+
+    1;
+
+The C<load.plugins> option is used to load plugins that support Validation::Class.
+A Validation::Class plugin is little more than a class that implements a "new"
+method that extends the associated validation class object. As usual, an official
+Validation::Class plugin can be referred to using shorthand while custom plugins
+are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
+more about plugins at L<Validation::Class::Intro>. This option accepts a
+constant or an arrayref of constants.
+
+    package MyVal;
+
+    use Validation::Class;
+
+    load {
+        plugins => [
+            'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
+            '+MyVal::Plugin'
+        ]
+    };
+
+    1;
+
+The C<load.roles> option is used to load and inherit functionality from child
+classes, these classes should be used and thought-of as roles. Any validation
+class can be used as a role with this option. This option accepts a constant or
+an arrayref of constants.
+
+    package MyVal::User;
+
+    use Validation::Class;
+
+    load {
+        roles => [
+            'MyVal::Person'
+        ]
+    };
+
+    1;
+
+Purely for the sake of aesthetics we have designed an alternate syntax for
+executing load/set commands, the syntax is as follows:
+
+    package MyVal::User;
+
+    use Validation::Class;
+
+    load roles => ['MyVal::Person'];
+    load classes => [__PACKAGE__];
+    load plugins => [
+        'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
+        '+MyVal::Plugin'
+    ];
+
+=cut
 
 sub set { goto &load }
 sub load {
@@ -1227,6 +1307,74 @@ sub new {
 
 }
 
+=keyword object
+
+The object keyword (or obj) registers a class object builder which builds and
+returns a class object on-demand. The object keyword also creates a method on
+the calling class which invokes the builder. Unlike class attributes, this
+method does not cache or otherwise store the returned class object it
+constructs.
+
+NOTE: While the object/obj functionality is not depreciated and will remain part
+of this library, its is mostly experimental.
+
+    package MyApp::User::Input;
+
+    use MyApp::User; # a Moose class
+
+    use Validation::Class;
+
+    field login => {
+        required => 1,
+    };
+
+    field password => {
+        required => 1,
+    };
+
+    object _build_user => {
+
+        type => 'MyApp::User',
+
+        # init => 'new', # defaults to new
+        # args => [qw/login password/], # defaults to all fields
+        # list => 'hash' # defaults to list
+
+    };
+
+    package main;
+
+    my $user_input = MyApp::User::Input->new(params => $params);
+
+    if ($user_input->validate('login', 'password')) {
+
+        my $user = $user_input->_build_user;
+
+        # ...
+
+    }
+
+The object keyword takes two arguments, an object builder name and a hashref
+of key/value pairs which are used to instruct the builder on how to construct
+the object. The supplied hashref should be configured as follows:
+
+    # class to construct
+    type => 'ClassName',
+
+    # optional: constructor name (defaults to new)
+    init => 'new',
+
+    # optional: arrayref of field names or a coderef which returns arguments for
+    # the constructor (defaults to all fields)
+    args => sub {}
+
+    # optional: if supplying an arrayref of fields to the args option, this
+    # option determines how the parameters will be supplied to the constructor,
+    # valid options are 'hash' or 'list' (defaults to list)
+    list => 'hash'
+
+=cut
+
 sub obj { goto &object }
 sub object {
 
@@ -1415,343 +1563,16 @@ sub prototype {
 
 }
 
-=head1 THE PROTOTYPE CLASS
-
-This module provides mechanisms (sugar functions to model your data) which allow
-you to define self-validating classes. Each class you create is associated with
-a *prototype* class which provides data validation functionality and keeps your
-class' namespace free from pollution, please see L<Validation::Class::Prototype>
-for more information on specific methods, and attributes.
-
-All derived classes will have a prototype-class attached to it which does all
-the heavy lifting (regarding validation and error handling). The prototype
-injects a few proxy methods into your class which are basically aliases to your
-prototype class methods, however it is possible to access the prototype directly
-using the proto/prototype methods.
-
-
-    package MyApp::User;
-
-    use Validation::Class;
-
-    package main;
-
-    my $user  = MyApp::User->new;
-    my $proto = $user->prototype;
-
-    $proto->error_count # same as calling $self->error_count
-
-
-=head1 THE OBJECT SYSTEM
-
-All derived classes will benefit from the light-weight, straight-forward and
-simple object system Validation::Class provides. The conventional constructor
-C<new> should be used to instantiate a new object, and the C<bld>/C<build>
-keywords can be used to hook into the instantiation process. Your classes can
-be configured to cooperate with an existing design or modern OO framework like
-L<Moose>, L<Mouse>, L<Moo>, etc. The following example explains how to setup a
-Validation::Class class in cooperation with Moose (while this example focuses
-on Moose, the approach is the same regardless of the existing system):
-
-    # USING MOOSE AS YOUR PRIMARY OO SYSTEM
-
-    package MyApp;
-
-    use Moose;
-    use Validation::Class '!has'; # in cooperative mode, dont export has()
-
-    # you must run initialization routines yourself ...
-    # specifying it in a BUILD routine will run it automatically
-
-    sub BUILD {
-
-        my ($self, $args) = @_;
-
-        $self->initialize_validator(
-            params => $args->{params}
-        );
-
-    }
-
-    field login     => {
-        min_length  => 5
-        max_length  => 50
-    };
-
-    field password  => {
-        min_length  => 8,
-        min_symbols => 1
-        max_length  => 50
-    };
-
-    # USING MOOSE AS YOUR SECONDARY/BACKUP OO SYSTEM
-
-    package MyApp;
-
-    use Validation::Class '!has'; # avoids has() keyword clash
-    use Moose;
-
-    field login     => {
-        min_length  => 5
-        max_length  => 50
-    };
-
-    field password  => {
-        min_length  => 8,
-        min_symbols => 1
-        max_length  => 50
-    };
-
-    has database => (
-        is  => 'rw',
-        isa => 'DBI::db',
-        ...
-    );
-
-    1;
-
-This cooperation works by simply detecting the existence of a method named C<new>,
-the name traditionally reserved for a class constructor which if detected signals
-Validation::Class to install a method named C<initialize> as opposed to installing
-its own constructor. The installed method, C<initialize>, encapsulates the
-functionality which prepares the class for interaction with its corresponding
-prototype class, this function must be called before using the Validation::Class
-features provided. If this concept isn't clear to you you needn't worry as this
-is very low-level, all you need you understand is that Validation::Class
-will install a constructor or a method named initialize if a constructor already
-exists, either way, the installed method should be called before executing
-methods on the class.
-
-As previously stated, Validation::Class injects a few proxy methods into your
-class which are basically aliases to your prototype class methods. You can
-find additional information on the prototype class and its method at
-L<Validation::Class::Prototype>. The following is a list of *proxy* methods,
-methods which are injected into your class as shorthand to methods defined in
-the prototype class (these methods are overridden):
-
-=head2 class
-
-    $self->class;
-
-See L<Validation::Class::Prototype/class> for full documentation.
-
-=head2 clear_queue
-
-    $self->clear_queue;
-
-See L<Validation::Class::Prototype/clear_queue> for full documentation.
-
-=head2 error_count
-
-    $self->error_count;
-
-See L<Validation::Class::Prototype/error_count> for full documentation.
-
-=head2 error_fields
-
-    $self->error_fields;
-
-See L<Validation::Class::Prototype/error_fields> for full documentation.
-
-=head2 errors
-
-    $self->errors;
-
-See L<Validation::Class::Prototype/errors> for full documentation.
-
-head2 errors_to_string
-
-    $self->errors_to_string;
-
-See L<Validation::Class::Prototype/errors_to_string> for full
-documentation.
-
-=head2 get_errors
-
-    $self->get_errors;
-
-See L<Validation::Class::Prototype/get_errors> for full documentation.
-
-=head2 get_fields
-
-    $self->get_fields;
-
-See L<Validation::Class::Prototype/get_fields> for full documentation.
-
-=head2 get_params
-
-    $self->get_params;
-
-See L<Validation::Class::Prototype/get_params> for full documentation.
-
-=head2 fields
-
-    $self->fields;
-
-See L<Validation::Class::Prototype/fields> for full documentation.
-
-=head2 filtering
-
-    $self->filtering;
-
-See L<Validation::Class::Prototype/filtering> for full documentation.
-
-=head2 ignore_failure
-
-    $self->ignore_failure;
-
-See L<Validation::Class::Prototype/ignore_failure> for full
-documentation.
-
-=head2 ignore_unknown
-
-    $self->ignore_unknown;
-
-See L<Validation::Class::Prototype/ignore_unknown> for full
-documentation.
-
-=head2 param
-
-    $self->param;
-
-See L<Validation::Class::Prototype/param> for full documentation.
-
-=head2 params
-
-    $self->params;
-
-See L<Validation::Class::Prototype/params> for full documentation.
-
-=head2 plugin
-
-    $self->plugin;
-
-See L<Validation::Class::Prototype/plugin> for full documentation.
-
-=head2 queue
-
-    $self->queue;
-
-See L<Validation::Class::Prototype/queue> for full documentation.
-
-=head2 report_failure
-
-    $self->report_failure;
-
-See L<Validation::Class::Prototype/report_failure> for full
-documentation.
-
-=head2 report_unknown
-
-    $self->report_unknown;
-
-See L<Validation::Class::Prototype/report_unknown> for full documentation.
-
-=head2 reset_errors
-
-    $self->reset_errors;
-
-See L<Validation::Class::Prototype/reset_errors> for full documentation.
-
-=head2 reset_fields
-
-    $self->reset_fields;
-
-See L<Validation::Class::Prototype/reset_fields> for full documentation.
-
-=head2 reset_params
-
-    $self->reset_params;
-
-See L<Validation::Class::Prototype/reset_params> for full documentation.
-
-=head2 set_errors
-
-    $self->set_errors;
-
-See L<Validation::Class::Prototype/set_errors> for full documentation.
-
-=head2 set_fields
-
-    $self->set_fields;
-
-See L<Validation::Class::Prototype/set_fields> for full documentation.
-
-=head2 set_params
-
-    $self->set_params;
-
-See L<Validation::Class::Prototype/set_params> for full documentation.
-
-=head2 set_method
-
-    $self->set_method;
-
-See L<Validation::Class::Prototype/set_method> for full documentation.
-
-=head2 stash
-
-    $self->stash;
-
-See L<Validation::Class::Prototype/stash> for full documentation.
-
-=head2 validate
-
-    $self->validate;
-
-See L<Validation::Class::Prototype/validate> for full documentation.
-
-=head2 validate_method
-
-    $self->validate_method;
-
-See L<Validation::Class::Prototype/validate_method> for full documentation.
-
-=head2 validate_profile
-
-    $self->validate_profile;
-
-See L<Validation::Class::Prototype/validate_profile> for full documentation.
-
-=head1 EXTENDING VALIDATION::CLASS
-
-Validation::Class does NOT provide
-method modifiers but can be easily extended with L<Class::Method::Modifiers>.
-
-=cut
-
-=head2 before
-
- before foo => sub { ... };
-
-See L<< Class::Method::Modifiers/before method(s) => sub { ... } >> for full
-documentation.
-
-=head2 around
-
- around foo => sub { ... };
-
-See L<< Class::Method::Modifiers/around method(s) => sub { ... } >> for full
-documentation.
-
-=head2 after
-
- after foo => sub { ... };
-
-See L<< Class::Method::Modifiers/after method(s) => sub { ... } >> for full
-documentation.
-
-=cut
-
 =head1 SEE ALSO
 
 Additionally you may want to look elsewhere for your data validation needs so
 the following is a list of recommended validation libraries/frameworks you
-might do well to look into. L<Validate::Tiny> is nice for simple use-cases, it
-has virtually no dependencies and solid test coverage. L<Data::Verifier> is a
-great approach towards adding robust validation options to your existing Moose
-classes. Also, I have also heard some good things about L<Data::FormValidator>
-as well.
+might do well to look into.
+
+L<Validate::Tiny> is nice for simple use-cases, it has virtually no dependencies
+and solid test coverage. L<Data::Verifier> is a great approach towards adding
+robust validation options to your existing Moose classes. Also, I have also
+heard some good things about L<Data::FormValidator> as well.
 
 =cut
 

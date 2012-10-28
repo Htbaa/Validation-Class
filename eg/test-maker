@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
 BEGIN {
-    
+
     use FindBin;
     use lib $FindBin::Bin . "/../lib";
     use lib $FindBin::Bin . "/../t/myapp/lib";
-    
+
 }
 
 use strict;
@@ -17,20 +17,21 @@ use File::Find::Rule;
 use String::TT 'tt';
 use Data::Section::Simple 'get_data_section';
 
-use Validation::Class ();
+use Validation::Class            ();
 use Validation::Class::Prototype ();
 
-my  @class_routines = ();
+my @class_routines = ();
 
 push @class_routines,
     grep { defined &{"Validation\::Class\::$_"} } %{Validation::Class::};
 
 foreach my $routine (@class_routines) {
-    
+
     print "found subroutine $routine\n";
     write_file $FindBin::Bin . "/../t/10-$routine-method.t",
-        tt get_data_section 'test_case' unless -f $FindBin::Bin . "/../t/10-$routine-method.t";
-    
+        tt get_data_section 'test_case'
+        unless -f $FindBin::Bin . "/../t/10-$routine-method.t";
+
 }
 
 __DATA__
@@ -38,37 +39,37 @@ __DATA__
 @@ test_case
 
 BEGIN {
-    
+
     use FindBin;
     use lib $FindBin::Bin . "/myapp/lib";
-    
+
 }
 
 use utf8;
 use Test::More;
 
 {
-    
+
     # testing the [% routine %] method
     # this method is designed to ....
-    
+
     package MyApp;
-    
+
     use Validation::Class;
-    
+
     fld name => {
-    
+
         required => 1
-    
+
     };
-    
+
     package main;
-    
+
     my $class = "MyApp";
     my $self  = $class->new(name => "...");
-    
+
     ok $class eq ref $self, "$class instantiated";
-    
+
 }
 
 done_testing;
