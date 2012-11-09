@@ -1,6 +1,6 @@
-# ABSTRACT: Container Class for Validation::Class::Field Objects
+# ABSTRACT: Container Class for Validation::Class::Mixin Objects
 
-package Validation::Class::Fields;
+package Validation::Class::Mixins;
 
 use Validation::Class::Core 'build_args';
 
@@ -8,11 +8,11 @@ use Validation::Class::Core 'build_args';
 
 use base 'Validation::Class::Mapping';
 
-use Validation::Class::Field;
+use Validation::Class::Mixin;
 
 =head1 DESCRIPTION
 
-Validation::Class::Fields is a container class for L<Validation::Class::Field>
+Validation::Class::Mixins is a container class for L<Validation::Class::Mixin>
 objects and is derived from the L<Validation::Class::Mapping> class.
 
 =cut
@@ -28,8 +28,8 @@ sub add {
         # do not overwrite
         unless (defined $self->{$key}) {
             $self->{$key} = $value; # accept an object as a value
-            $self->{$key} = Validation::Class::Field->new($value)
-                unless "Validation::Class::Field" eq ref $self->{$key}
+            $self->{$key} = Validation::Class::Mixin->new($value)
+                unless "Validation::Class::Mixin" eq ref $self->{$key}
             ;
         }
 

@@ -1,6 +1,6 @@
-# ABSTRACT: Field Object for Validation::Class Classes
+# ABSTRACT: Mixin Object for Validation::Class Classes
 
-package Validation::Class::Field;
+package Validation::Class::Mixin;
 
 use Validation::Class::Errors;
 use Validation::Class::Core;
@@ -21,7 +21,7 @@ INIT {
 
         # create accessors from default configuration (once)
 
-        if ($directive->field) {
+        if ($directive->mixin) {
 
             my $name = $directive->name;
 
@@ -43,8 +43,8 @@ INIT {
 
 =head1 DESCRIPTION
 
-Validation::Class::Field provides functions for processing for field objects
-and provides accessors for field directives. This class is derived from the
+Validation::Class::Mixin provides functions for processing for mixin objects
+and provides accessors for mixin directives. This class is derived from the
 L<Validation::Class::Mapping> class.
 
 =cut
@@ -55,7 +55,7 @@ sub new {
 
     my $config = $class->build_args(@_);
 
-    carp "Can't create a new field object without a name attribute"
+    carp "Can't create a new mixin object without a name attribute"
         unless $config->{name}
     ;
 

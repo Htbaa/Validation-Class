@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+    use lib $FindBin::Bin . "/../t/myapp/lib";
+
+}
+
+use strict;
+use warnings;
+
+use Validation::Class::Configuration;
+
+my $conf = Validation::Class::Configuration->new;
+my $dirs = $conf->directives;
+
+printf "has %s directives\n", $dirs->count;
+
+my $i=0;
+
+foreach my $dir ($dirs->grep('^\w')) {
+    print $i . ". $dir\n";
+    $i++;
+}
+
+1;

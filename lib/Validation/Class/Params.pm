@@ -2,72 +2,67 @@
 
 package Validation::Class::Params;
 
-use strict;
-use warnings;
+use Validation::Class::Core 'build_args';
+use Hash::Flatten 'flatten', 'unflatten';
+use Carp 'carp', 'confess';
 
 # VERSION
 
-use Carp 'confess';
-use Hash::Flatten 'flatten', 'unflatten';
-
-use base 'Validation::Class::Collection';
-
-=head1 SYNOPSIS
-
-    ...
+use base 'Validation::Class::Mapping';
 
 =head1 DESCRIPTION
 
-Validation::Class::Params is a container class for standard data input
-parameters and is derived from the L<Validation::Class::Collection> class.
+Validation::Class::Params is a container class for input parameters and is
+derived from the L<Validation::Class::Mapping> class.
 
 =cut
 
 sub add {
-    
+
     my $self = shift;
-    
-    my $arguments = @_ % 2 ? $_[0] : {@_};
-    
+
+    my $arguments = $self->build_args(@_);
+
+    return $self unless my @keys = keys %{$arguments};
+
     $arguments = flatten $arguments;
-    
-    confess
-        
-        "Parameter configuration not supported, a Validation::Class parameter ".
-        "value must be a string or an arrayref of strings or nested hashrefs " . 
-        "of the aforementioned"
-        
-        if grep /\:\d+./, keys %{$arguments}
-        
+
+    carp
+
+        "Parameter values must be strings, arrays of strings, or hashrefs " .
+        "whose values are any of the previously mentioned values"
+
+        if grep /\:\d+./, keys @keys
+
     ;
 
-    foreach my $code (sort keys %{$arguments}) {
-        
+    foreach my $code (sort @keys) {
+
         my ($key, $index) = $code =~ /(.*):(\d+)$/;
-        
+
         if ($key && defined $index) {
-            
+
             my $value = delete $arguments->{$code};
-            
+
             $arguments->{$key} ||= [];
             $arguments->{$key}   = [] if "ARRAY" ne ref $arguments->{$key};
-            
+
             $arguments->{$key}->[$index] = $value;
-            
+
         }
-        
+
     }
-    
+
     while (my($key, $value) = each(%{$arguments})) {
-        
+
         $key =~ s/[^\w\.]//g; # deceptively important, re: &flatten
-        
+
         $self->{$key} = $value;
-        
+
     }
-    
+
     return $self;
-    
+
 }
 
 1;
