@@ -2,12 +2,15 @@
 
 package Validation::Class::Fields;
 
-use Validation::Class::Core 'build_args';
+use Validation::Class::Core 'build_args', '!has';
+use Hash::Flatten ();
+use Carp 'confess';
 
 # VERSION
 
 use base 'Validation::Class::Mapping';
 
+use Validation::Class::Mapping;
 use Validation::Class::Field;
 
 =head1 DESCRIPTION
@@ -35,12 +38,27 @@ sub add {
 
     }
 
+    confess
+
+        "Illegal field names detected, possible attempt to define validation " .
+        "rules for a parameter containing an array with nested structures"
+
+        if $self->flatten->grep(qr/(:.*:|:\d+.)/)
+
+    ;
+
     return $self;
 
 }
 
-#sub clear {
-#    #noop - fields can't be deleted this way
-#}
+sub flatten {
+
+    my ($self) = @_;
+
+    return Validation::Class::Mapping->new(
+        Hash::Flatten::flatten($self->hash)
+    );
+
+}
 
 1;

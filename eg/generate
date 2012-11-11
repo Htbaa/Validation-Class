@@ -11,18 +11,14 @@ BEGIN {
 use strict;
 use warnings;
 
-use Validation::Class::Configuration;
+use Data::Dumper;
+use Validation::Class::Params;
 
-my $conf = Validation::Class::Configuration->new;
-my $dirs = $conf->directives;
+my $params = Validation::Class::Params->new;
 
-printf "has %s directives\n", $dirs->count;
+#$params->add(count => {a => {one => 1}, b => {two => 2}, c => {three => [1..9]}});
+$params->add(three => [1..9]);
 
-my $i=0;
 
-foreach my $dir ($dirs->grep('^\w')) {
-    print $i . ". $dir\n";
-    $i++;
-}
+print Dumper $params->flatten->hash;
 
-1;

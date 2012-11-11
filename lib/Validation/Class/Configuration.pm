@@ -10,8 +10,7 @@ use Validation::Class::Core;
 
 use Module::Find 'usesub';
 
-my @loaded_directives = usesub 'Validation::Class::Directive';
-my @loaded_filters    = usesub 'Validation::Class::Filter';
+our $_directives = [usesub 'Validation::Class::Directive'];
 
 # VERSION
 
@@ -50,6 +49,7 @@ sub configure_profile {
     my ($self) = @_;
 
     $self->configure_profile_register_directives;
+    $self->configure_profile_register_filters;
     $self->configure_profile_register_events;
 
     return $self;
@@ -62,7 +62,7 @@ sub configure_profile_register_directives {
 
     # automatically attach discovered directive classes
 
-    foreach my $class (@loaded_directives) {
+    foreach my $class (@{$_directives}) {
 
         my $object = $class->new;
         my $name   = $object->name;
@@ -70,6 +70,24 @@ sub configure_profile_register_directives {
         $self->directives->add($name => $object);
 
     }
+
+    return $self;
+
+}
+
+sub configure_profile_register_filters {
+
+    my ($self) = @_;
+
+    # automatically attach filters registered on in the filters directive
+
+    my $directives = $self->directives;
+
+    my $filters = $directives->get('filters');
+
+    return unless $filters;
+
+    $self->filters->add($filters->defaults);
 
     return $self;
 
@@ -85,11 +103,10 @@ sub configure_profile_register_events {
 
         my $events = {
             # hookable events list, keyed by directive name
-            'on_after_validate'  => {},
-            'on_before_validate' => {},
-            'on_filter'          => {},
-            'on_normalize'       => {},
-            'on_validate'        => {}
+            'on_after_validation'   => {},
+            'on_before_validation'  => {},
+            'on_normalize'          => {},
+            'on_validate'           => {}
         };
 
         while (my($name, $container) = each(%{$events})) {
@@ -97,9 +114,9 @@ sub configure_profile_register_events {
             ($name) = $name =~ /^on_(\w+)/;
 
             foreach my $directive (@directives) {
-                next unless my $event = $container->{$name};
+                next if defined $container->{$name};
                 if (my $routine = $directive->can($name)) {
-                    $event->{$directive} = $routine;
+                    $container->{$directive->name} = $routine;
                 }
             }
 

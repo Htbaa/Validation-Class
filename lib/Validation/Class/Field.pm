@@ -5,7 +5,7 @@ package Validation::Class::Field;
 use Validation::Class::Errors;
 use Validation::Class::Core;
 
-use Carp 'carp';
+use Carp 'confess';
 
 # VERSION
 
@@ -55,7 +55,7 @@ sub new {
 
     my $config = $class->build_args(@_);
 
-    carp "Can't create a new field object without a name attribute"
+    confess "Can't create a new field object without a name attribute"
         unless $config->{name}
     ;
 

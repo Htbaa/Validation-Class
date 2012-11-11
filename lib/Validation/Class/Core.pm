@@ -6,7 +6,7 @@ use warnings;
 # VERSION
 
 use Module::Runtime 'use_module';
-use Carp 'carp';
+use Carp 'confess';
 use Exporter ();
 
 our @ISA    = qw(Exporter);
@@ -31,16 +31,17 @@ sub build_args {
     my $class = ref $self || $self;
 
     if ( scalar @_ == 1 ) {
-        unless ( defined $_[0] && ref $_[0] eq 'HASH' ) {
-            carp "The new() method for $class expects single arguments to " .
-                "take the form of a hash reference"
-            ;
-        }
+        confess
+            "The new() method for $class expects single arguments to " .
+            "take the form of a hash reference"
+            unless defined $_[0] && ref $_[0] eq 'HASH'
+        ;
         return {%{$_[0]}};
     }
 
     elsif ( @_ % 2 ) {
-        carp "The new() method for $class expects a hash reference or a " .
+        confess
+            "The new() method for $class expects a hash reference or a " .
             "key/value list. You passed an odd number of arguments"
         ;
     }
@@ -66,14 +67,14 @@ sub has {
 
     return unless $attrs;
 
-    carp "Error creating accessor, default must be a coderef or constant"
+    confess "Error creating accessor, default must be a coderef or constant"
         if ref $default && ref $default ne 'CODE';
 
     $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
 
     for my $attr (@$attrs) {
 
-        carp "Error creating accessor '$attr', name has invalid characters"
+        confess "Error creating accessor '$attr', name has invalid characters"
             unless $attr =~ /^[a-zA-Z_]\w*$/;
 
         my $code;
@@ -125,14 +126,14 @@ sub hold {
 
     return unless $attrs;
 
-    carp "Error creating accessor, default is required and must be a coderef"
+    confess "Error creating accessor, default is required and must be a coderef"
         if ref $default ne 'CODE';
 
     $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
 
     for my $attr (@$attrs) {
 
-        carp "Error creating accessor '$attr', name has invalid characters"
+        confess "Error creating accessor '$attr', name has invalid characters"
             unless $attr =~ /^[a-zA-Z_]\w*$/;
 
         my $code;
@@ -145,7 +146,7 @@ sub hold {
             }
 
             # values are read-only cannot be changed
-            carp "Error attempting to modify the read-only attribute ($attr)";
+            confess "Error attempting to modify the read-only attribute ($attr)";
 
         };
 

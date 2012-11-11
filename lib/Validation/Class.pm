@@ -9,7 +9,6 @@ use Module::Find;
 use Validation::Class::Core '!has';
 use Module::Runtime 'use_module';
 use Hash::Merge 'merge';
-use Carp 'carp';
 use Exporter ();
 
 use Validation::Class::Prototype;

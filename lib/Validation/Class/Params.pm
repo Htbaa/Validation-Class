@@ -2,13 +2,15 @@
 
 package Validation::Class::Params;
 
-use Validation::Class::Core 'build_args';
-use Hash::Flatten 'flatten', 'unflatten';
-use Carp 'carp', 'confess';
+use Validation::Class::Core 'build_args', '!has';
+use Hash::Flatten ();
+use Carp 'confess';
 
 # VERSION
 
 use base 'Validation::Class::Mapping';
+
+use Validation::Class::Mapping;
 
 =head1 DESCRIPTION
 
@@ -23,45 +25,33 @@ sub add {
 
     my $arguments = $self->build_args(@_);
 
-    return $self unless my @keys = keys %{$arguments};
-
-    $arguments = flatten $arguments;
-
-    carp
-
-        "Parameter values must be strings, arrays of strings, or hashrefs " .
-        "whose values are any of the previously mentioned values"
-
-        if grep /\:\d+./, keys @keys
-
-    ;
-
-    foreach my $code (sort @keys) {
-
-        my ($key, $index) = $code =~ /(.*):(\d+)$/;
-
-        if ($key && defined $index) {
-
-            my $value = delete $arguments->{$code};
-
-            $arguments->{$key} ||= [];
-            $arguments->{$key}   = [] if "ARRAY" ne ref $arguments->{$key};
-
-            $arguments->{$key}->[$index] = $value;
-
-        }
-
-    }
-
-    while (my($key, $value) = each(%{$arguments})) {
-
-        $key =~ s/[^\w\.]//g; # deceptively important, re: &flatten
+    while (my ($key, $value) = each %{$arguments}) {
 
         $self->{$key} = $value;
 
     }
 
+    confess
+
+        "Parameter values must be strings, arrays of strings, or hashrefs " .
+        "whose values are any of the previously mentioned values, i.e. an " .
+        "array with nested structures is illegal"
+
+        if $self->flatten->grep(qr/(:.*:|:\d+.)/)
+
+    ;
+
     return $self;
+
+}
+
+sub flatten {
+
+    my ($self) = @_;
+
+    return Validation::Class::Mapping->new(
+        Hash::Flatten::flatten($self->hash)
+    );
 
 }
 

@@ -26,14 +26,4 @@ has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 1;
 
-sub normalize {
-
-    my ($self, $proto, $field) = @_;
-
-
-
-    return $self;
-
-}
-
 1;

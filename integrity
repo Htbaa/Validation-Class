@@ -11,11 +11,11 @@ my @files = $find->file()->name('*.pm','*.t')->in($ver);
 
 foreach my $file (sort @files) {
 
-    #print "criticizing $file\n";
-    #die if system "perlcritic --profile=perlcriticrc $file";
+    print "criticizing $file\n";
+    die if system "perlcritic --profile=.integrity.perlcriticrc $file";
 
     print "tidying $file\n";
-    die if system "perltidy --profile=perltidyrc $file";
+    die if system "perltidy --profile=.integrity.perltidyrc $file";
 
     if (-f "$file.bak") {
         print "unlinking $file.bak\n";

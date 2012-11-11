@@ -3,6 +3,7 @@
 package Validation::Class::Listing;
 
 use Validation::Class::Core '!has', '!hold';
+use List::MoreUtils 'uniq';
 
 # VERSION
 
@@ -344,6 +345,20 @@ sub sort {
 
     return "CODE" eq ref $code ?
         sort { $a->$code($b) } ($self->keys) : sort { $a cmp $b } ($self->list);
+
+}
+
+=method unique
+
+    my @list = $self->unique();
+
+=cut
+
+sub unique {
+
+    my ($self) = @_;
+
+    return uniq ($self->list);
 
 }
 

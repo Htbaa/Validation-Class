@@ -26,4 +26,27 @@ has 'mixin' => 1;
 has 'field' => 1;
 has 'multi' => 1;
 
+sub normalize {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # set the field value
+
+    unless (defined $field->{value}) {
+
+        if (defined $field->{default}) {
+            $field->{value} = $field->{default};
+        }
+
+        else {
+            $field->{value} = $param;
+        }
+
+    }
+
+    return $self;
+
+}
+
+
 1;

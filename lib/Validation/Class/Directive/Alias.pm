@@ -26,4 +26,34 @@ has 'mixin' => 0;
 has 'field' => 1;
 has 'multi' => 0;
 
+sub before_validation {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # create a map from aliases if applicable
+
+    if (defined $field->{alias}) {
+
+        my $name = $field->{name};
+
+        my $aliases = isa_arrayref($field->{alias}) ?
+            $field->{alias} : [$field->{alias}]
+        ;
+
+        foreach my $alias (@{$aliases}) {
+
+            if ($self->params->has($alias)) {
+
+                $self->params($name => $self->params->delete($alias));
+
+                push @{$self->stash->{'validation.fields'}}, $name;
+
+            }
+
+        }
+
+    }
+
+}
+
 1;

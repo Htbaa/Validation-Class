@@ -25,4 +25,42 @@ has 'mixin' => 0;
 has 'field' => 1;
 has 'multi' => 0;
 
+sub before_validation {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    if (defined $field->{toggle}) {
+
+        my $stash = $proto->stash->{'directive.toggle'};
+
+        # to be restored after validation
+        $stash->{$field->{name}}->{'required'} = $field->{required};
+
+        $field->{required} = 1 if ($field->{toggle} =~ /^([+]|1)$/);
+        $field->{required} = 0 if ($field->{toggle} =~ /^([-]|0)$/);
+
+    }
+
+    return $self;
+
+}
+
+sub after_validation {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    if (defined $field->{toggle}) {
+
+        my $stash = $proto->stash->{'directive.toggle'};
+
+        # restore field state from stash after validation
+        $field->{required} = $stash->{$field->{name}}->{'required'};
+        delete $stash->{$field->{name}};
+
+    }
+
+    return $self;
+
+}
+
 1;
