@@ -239,6 +239,17 @@ unknown fields will NOT be registered as class-level variables.
 
 has 'report_unknown' => 0;
 
+=attribute validated
+
+The validated boolean simply denotes whether the validation routine has been
+executed since the last normalization process (which occurs at instantiation
+and before validation). Note, this is NOT an indicator of whether validation
+has passed or failed.
+
+=cut
+
+has 'validated' => 0;
+
 =comment stashed
 
 The stashed attribute is a general purpose hash object.
@@ -1091,6 +1102,28 @@ sub get_value {
 
 }
 
+=method is_valid
+
+The is_valid method returns a boolean value which is true if the last validation
+attempt was successful, and false if it was not (which is determined by looking
+for errors at the class and field levels).
+
+    return "OK" if $self->is_valid;
+
+=cut
+
+sub is_valid {
+
+    my ($self) = @_;
+
+    my $i = $self->errors->count;
+
+    $i += $_->errors->count for $self->fields->values;
+
+    return $i ? 0 : 1;
+
+}
+
 sub merge_field {
 
     my ($self, $field_a, $field_b) = @_;
@@ -1254,6 +1287,8 @@ automatically at instantiation and again just before each validation event.
 sub normalize {
 
     my $self = shift;
+
+    $self->validated(0);
 
     # reset fields
     # NOTICE: (called twice in this routine, not sure why, must
@@ -1709,17 +1744,13 @@ sub register_field {
 
         my $proto  = $self->proto;
 
-        my $result = undef;
-
         if (defined $data) {
 
-            $proto->set_params($name, $data);
+            $proto->params->add($name, $data);
 
         }
 
-        $result = $proto->get_params($name);
-
-        return $result;
+        return $proto->params->get($name);
 
     };
 
@@ -2059,10 +2090,9 @@ sub reset_fields {
     foreach my $field ( $self->fields->values ) {
 
         # set default, special directives, etc
-        $field->{name}   = $field;
+        $field->{name}   = $field->name;
         $field->{toggle} = undef;
-
-        delete $field->{value};
+        $field->{value}  = '';
 
     }
 
@@ -2261,6 +2291,8 @@ sub snapshot {
 
         }
 
+        $self->builders->add($config->builders->list);
+
     }
 
     return $self;
@@ -2362,8 +2394,8 @@ sub trigger_event {
     my $param;
 
     $event = $self->events->get($event);
-    $field = $self->fields->get($field);
     $param = $self->params->has($field) ? $self->params->get($field) : undef;
+    $field = $self->fields->get($field);
 
     return unless defined $event;
     return unless defined $field;
@@ -2466,7 +2498,7 @@ sub validate {
 
     ;
 
-    # normalize
+    # normalize/sanitize
 
     $self->normalize();
 
@@ -2536,7 +2568,7 @@ sub validate {
         # were explicitly requested to be validated, e.g. not explicitly
         # defining fields to be validated effectively allows the parameters
         # submitted to dictate what gets validated (may not be dangerous)
-        @fields = ($self->params->keys);
+        @fields = (map { $self->fields->has($_) ? $_ : () } $self->params->keys);
     }
 
     elsif (@fields && !$self->params->count) {
@@ -2551,6 +2583,12 @@ sub validate {
         # directive or other validation logic expecting a value
         @fields = ($self->fields->keys);
     }
+
+    # stash the current context object
+
+    $self->stash->{'validation.context'} =
+        $context
+    ;
 
     # stash fields targeted for validation
 
@@ -2589,7 +2627,7 @@ sub validate {
 
     }
 
-    return ;
+    return $self->is_valid;
 
 }
 

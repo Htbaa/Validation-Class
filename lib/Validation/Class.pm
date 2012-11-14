@@ -178,6 +178,8 @@ sub initialize_validator {
 
     my $arguments = $proto->build_args(@_);
 
+    # provision a validation class configuration
+
     $proto->snapshot;
 
     # override prototype attibutes if requested
@@ -331,7 +333,7 @@ sub attribute {
 
             my ($proto) = @_;
 
-            $proto->create_attribute($attribute => $default);
+            $proto->register_attribute($attribute => $default);
 
             return $proto;
 
@@ -374,7 +376,7 @@ sub build {
 
         my ($proto) = @_;
 
-        $proto->create_builder($code);
+        $proto->register_builder($code);
 
         return $proto;
 
@@ -437,7 +439,7 @@ sub directive {
 
         my ($proto) = @_;
 
-        $proto->create_directive($name, $code);
+        $proto->register_directive($name, $code);
 
         return $proto;
 
@@ -566,7 +568,7 @@ sub filter {
 
         my ($proto) = @_;
 
-        $proto->create_filter($name, $code);
+        $proto->register_filter($name, $code);
 
         return $proto;
 

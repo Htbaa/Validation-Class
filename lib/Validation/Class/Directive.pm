@@ -31,7 +31,7 @@ use Validation::Class::Core 'build_args', 'has';
     has 'mixin' => 0;
     has 'field' => 1;
     has 'multi' => 0;
-
+    has 'message' => '%s was not processed successfully';
     has 'validator' => sub {
 
     };
@@ -50,7 +50,7 @@ directives.
 has 'mixin'     => 0;
 has 'field'     => 0;
 has 'multi'     => 0;
-
+has 'message'   => '%s was not processed successfully';
 has 'validator' => sub{1};
 
 sub new {
@@ -84,6 +84,16 @@ sub name {
     $name = lc $name;
 
     return $name;
+
+}
+
+sub error {
+
+    my ($self, $name) = @_;
+
+    $name ||= $self->name;
+
+    return sprintf $self->message, $name;
 
 }
 

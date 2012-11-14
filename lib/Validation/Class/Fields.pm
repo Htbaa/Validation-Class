@@ -13,6 +13,8 @@ use base 'Validation::Class::Mapping';
 use Validation::Class::Mapping;
 use Validation::Class::Field;
 
+use Data::Dumper;
+
 =head1 DESCRIPTION
 
 Validation::Class::Fields is a container class for L<Validation::Class::Field>
@@ -25,10 +27,21 @@ sub add {
     my $self = shift;
 
     my $arguments = $self->build_args(@_);
+    my @suspects  = sort keys %{$arguments};
+
+    confess
+
+        "Illegal field names detected, possible attempt to define validation " .
+        "rules for a parameter containing an array of nested structures on " .
+        "the following fields: " . join ", ", @suspects
+
+        if grep /(:.*:|:\d+.)/, @suspects
+
+    ;
 
     while (my ($key, $value) = each %{$arguments}) {
 
-        # do not overwrite
+        # never overwrite
         unless (defined $self->{$key}) {
             $self->{$key} = $value; # accept an object as a value
             $self->{$key} = Validation::Class::Field->new($value)
@@ -37,15 +50,6 @@ sub add {
         }
 
     }
-
-    confess
-
-        "Illegal field names detected, possible attempt to define validation " .
-        "rules for a parameter containing an array with nested structures"
-
-        if $self->flatten->grep(qr/(:.*:|:\d+.)/)
-
-    ;
 
     return $self;
 

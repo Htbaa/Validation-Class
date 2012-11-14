@@ -27,6 +27,15 @@ sub add {
 
     while (my ($key, $value) = each %{$arguments}) {
 
+        confess
+
+            "A parameter value must be a string or an array of strings, all " .
+            "other structures are illegal"
+
+            unless ("ARRAY" eq (ref($value) || "ARRAY"))
+
+        ;
+
         $self->{$key} = $value;
 
     }

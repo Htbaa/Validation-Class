@@ -22,9 +22,9 @@ sub add {
 
     return unless @arguments;
 
-    my %seen = map { $_ => 1 } ($self->list);
+    push @{$self}, @arguments;
 
-    push @{$self}, grep { !$seen{$_} } @arguments;
+    @{$self} = ($self->unique);
 
     return $self;
 

@@ -22,9 +22,10 @@ documented it just yet.
 
 =cut
 
-has 'mixin' => 0;
-has 'field' => 1;
-has 'multi' => 0;
+has 'mixin'   => 0;
+has 'field'   => 1;
+has 'multi'   => 0;
+has 'message' => '%s could not be validated';
 
 sub after_validation {
 
@@ -107,6 +108,54 @@ sub before_validation_create_clones {
             grep { $_ ne $name } @{$self->stash->{'validation.fields'}}
             if @{$self->stash->{'validation.fields'}}
         ;
+
+    }
+
+    return $self;
+
+}
+
+sub validate {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    if (defined $field->{validation}) {
+
+        my $context = $proto->stash->{'validation.context'};
+
+        my $count  = ($proto->errors->count+$field->errors->count);
+        my $failed = !$field->validation->($context,$field,$proto->params)?1:0;
+        my $errors = ($proto->errors->count+$field->errors->count)>$count ?1:0;
+
+        # error handling; did the validation routine pass or fail?
+
+        # validation passed with no errors
+        if (!$failed && !$errors) {
+            # noop
+        }
+
+        # validation failed with no errors
+        elsif ($failed && !$errors) {
+            # use custom or default errors
+            if ($field->error) {
+                $field->errors->add($field->error);
+            }
+            else {
+                $field->errors->add(
+                    $self->error($field->label||$field->name)
+                );
+            }
+        }
+
+        # validation passed with errors
+        elsif (!$failed && $errors) {
+            # noop -- but acknowledge errors have been set
+        }
+
+        # validation failed with errors
+        elsif ($failed && $errors) {
+            # assume errors have been set from inside the validation routine
+        }
 
     }
 
