@@ -25,34 +25,33 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must contain %s or less non-alphabetic-numeric characters';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        my @i = ($value =~ /[^0-9a-zA-Z]/g);
+    if (defined $field->{max_symbols}) {
 
-        unless ( @i <= $directive ) {
+        my $max_symbols = $field->{max_symbols};
 
-            my $handle = $field->{label} || $field->{name};
-            my $characters = int( $directive ) > 1 ?
-                "symbols" : "symbol";
+        if ( $field->{required} || $param ) {
 
-            my $error = "$handle can't contain more than "
-                ."$directive $characters";
+            my @i = ($param =~ /[^a-zA-Z0-9]/g);
 
-            $field->errors->add($field->{error} || $error);
+            if (@i > $max_symbols) {
 
-            return 0;
+                $self->error(@_, $max_symbols);
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

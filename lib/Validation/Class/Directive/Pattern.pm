@@ -22,45 +22,41 @@ documented it just yet.
 
 =cut
 
-has 'mixin'     => 1;
-has 'field'     => 1;
-has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 0;
+has 'message' => '%s is not formatted properly';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my ($self, $proto, $field, $param) = @_;
 
-    if (defined $value) {
+    if (defined $field->{pattern}) {
 
-        # build the regex
-        my $regex = $directive;
+        my $pattern = $field->{pattern};
 
-        unless ("Regexp" eq ref $regex) {
+        if ( $field->{required} || $param ) {
 
-            $regex =~ s/([^#X ])/\\$1/g;
-            $regex =~ s/#/\\d/g;
-            $regex =~ s/X/[a-zA-Z]/g;
-            $regex = qr/$regex/;
+            unless ( isa_regexp($pattern) ) {
 
-        }
+                $pattern =~ s/([^#X ])/\\$1/g;
+                $pattern =~ s/#/\\d/g;
+                $pattern =~ s/X/[a-zA-Z]/g;
+                $pattern = qr/$pattern/;
 
-        unless ( $value =~ $regex ) {
+            }
 
-            my $handle = $field->{label} || $field->{name};
+            unless ( $param =~ $pattern ) {
 
-            my $error = "$handle does not match the "
-                ."pattern $directive";
+                $self->error($proto, $field);
 
-            $field->errors->add($field->{error} || $error);
-
-            return 0;
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

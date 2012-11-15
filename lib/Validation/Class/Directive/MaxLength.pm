@@ -25,32 +25,31 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must be %s or less characters';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        unless ( length($value) <= $directive ) {
+    if (defined $field->{max_length}) {
 
-            my $handle = $field->{label} || $field->{name};
-            my $characters = int( $directive ) > 1 ?
-                "characters" : "character";
+        my $max_length = $field->{max_length};
 
-            my $error = "$handle can't contain more than "
-                ."$directive $characters";
+        if ( $field->{required} || $param ) {
 
-            $field->errors->add($field->{error} || $error);
+            if (length($param) > $max_length) {
 
-            return 0;
+                $self->error(@_, $max_length);
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

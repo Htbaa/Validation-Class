@@ -5,8 +5,8 @@ BEGIN {
 
 }
 
-use utf8;
 use Test::More;
+use utf8;
 
 {
 

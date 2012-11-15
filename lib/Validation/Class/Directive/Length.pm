@@ -22,37 +22,34 @@ documented it just yet.
 
 =cut
 
-has 'mixin'     => 1;
-has 'field'     => 1;
-has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 0;
+has 'message' => '%s does not contain the correct number of characters';
 
-sub _build_validator {
+sub validate {
 
-    my ($directive, $value, $field, $class) = @_;
+    my $self = shift;
 
-    $value = length($value);
+    my ($proto, $field, $param) = @_;
 
-    if (defined $value) {
+    if (defined $field->{length}) {
 
-        unless ($value == $directive) {
+        my $length = $field->{length};
 
-            my $handle = $field->{label} || $field->{name};
-            my $characters = $directive > 1 ?
-            "characters" : "character";
+        if ($field->{required} || $param) {
 
-            my $error = "$handle must contain exactly " .
-                "$directive $characters";
+            unless (length($param) == $length) {
 
-            $field->errors->add($field->{error} || $error);
+                $self->error(@_);
 
-            return 0;
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

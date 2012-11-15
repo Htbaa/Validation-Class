@@ -25,29 +25,31 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must be greater than %s';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        unless ( $value >= $directive ) {
+    if (defined $field->{max_sum}) {
 
-            my $handle = $field->{label} || $field->{name};
-            my $error = "$handle can't be less than "
-            ."$directive";
+        my $min_sum = $field->{max_sum};
 
-            $field->errors->add($field->{error} || $error);
+        if ( $field->{required} || $param ) {
 
-            return 0;
+            if (int($param) < int($min_sum)) {
+
+                $self->error(@_, $min_sum);
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

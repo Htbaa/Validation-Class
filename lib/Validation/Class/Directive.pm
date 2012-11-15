@@ -3,6 +3,7 @@
 package Validation::Class::Directive;
 
 use Validation::Class::Core 'build_args', 'has';
+use Carp 'confess';
 
 # VERSION
 
@@ -16,7 +17,7 @@ use Validation::Class::Core 'build_args', 'has';
         multi     => 0,
         validator => sub {
 
-            my ($directive_value, $parameter_value, $field_object) = @_;
+            my ($self, $proto, $field, $param) = @_;
 
         }
     );
@@ -32,9 +33,7 @@ use Validation::Class::Core 'build_args', 'has';
     has 'field' => 1;
     has 'multi' => 0;
     has 'message' => '%s was not processed successfully';
-    has 'validator' => sub {
-
-    };
+    has 'validator' => sub {};
 
     1;
 
@@ -51,25 +50,8 @@ has 'mixin'     => 0;
 has 'field'     => 0;
 has 'multi'     => 0;
 has 'message'   => '%s was not processed successfully';
-has 'validator' => sub{1};
-
-sub new {
-
-    my $class = shift;
-
-    my $arguments = $class->build_args(@_);
-
-    my $self = bless {}, $class;
-
-    while (my($key, $value) = each %{$arguments}) {
-        $self->$key($value);
-    }
-
-    return $self;
-
-}
-
-sub name {
+has 'validator' => sub {1};
+has 'name'      => sub {
 
     my ($self) = @_;
 
@@ -85,15 +67,61 @@ sub name {
 
     return $name;
 
+};
+
+sub new {
+
+    my $class = shift;
+
+    my $arguments = $class->build_args(@_);
+
+    confess
+        "Error creating directive without a name, specifying a name is " .
+        "required to instatiate a new non-subclass directive"
+
+        if 'Validation::Class::Directive' eq $class && ! $arguments->{name}
+
+    ;
+
+    my $self = bless {}, $class;
+
+    while (my($key, $value) = each %{$arguments}) {
+        $self->$key($value);
+    }
+
+    return $self;
+
 }
 
 sub error {
 
-    my ($self, $name) = @_;
+    my ($self, $proto, $field, $param, @tokens) = @_;
 
-    $name ||= $self->name;
+    my $name = $field->label || $field->name;
 
-    return sprintf $self->message, $name;
+    unshift @tokens, $name;
+
+    # use custom or default error message
+
+    if ($field->error) {
+        $field->errors->add($field->error);
+    }
+
+    else {
+        $field->errors->add(sprintf($self->message, @tokens));
+    }
+
+    return $self;
+
+}
+
+sub validate {
+
+    my $self = shift;
+
+    my ($proto, $field, $param) = @_;
+
+    $self->validator->(@_);
 
 }
 

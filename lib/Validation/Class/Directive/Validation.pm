@@ -117,7 +117,9 @@ sub before_validation_create_clones {
 
 sub validate {
 
-    my ($self, $proto, $field, $param) = @_;
+    my $self = shift;
+
+    my ($proto, $field, $param) = @_;
 
     if (defined $field->{validation}) {
 
@@ -136,15 +138,7 @@ sub validate {
 
         # validation failed with no errors
         elsif ($failed && !$errors) {
-            # use custom or default errors
-            if ($field->error) {
-                $field->errors->add($field->error);
-            }
-            else {
-                $field->errors->add(
-                    $self->error($field->label||$field->name)
-                );
-            }
+            $self->error(@_);
         }
 
         # validation passed with errors

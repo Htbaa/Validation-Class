@@ -208,7 +208,7 @@ sub initialize_validator {
 
     # process plugins
 
-    foreach my $plugin ($proto->plugins->sort) {
+    foreach my $plugin ($proto->plugins->list) {
 
         $proto->plugins->add($plugin => $plugin->new($self))
             if $plugin->can('new')
@@ -227,7 +227,6 @@ sub initialize_validator {
     # initialize prototype
 
     $proto->normalize;
-    $proto->apply_filters('pre') if $proto->filtering;
 
     # ready-set-go !!!
 

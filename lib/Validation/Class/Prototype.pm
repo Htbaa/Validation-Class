@@ -523,16 +523,16 @@ sub check_field {
 
     my $directives = $self->directives;
 
-    my $fields = $self->fields->get($name);
+    my $field = $self->fields->get($name);
 
-    foreach my $key ($fields->keys) {
+    foreach my $key ($field->keys) {
 
         my $directive = $directives->get($key);
 
         unless (defined $directive) {
             $self->pitch_error(
-                "The $_ directive supplied by the ".
-                "$key field is not supported"
+                "The $key directive supplied by the ".
+                "$name field is not supported"
             );
         }
 
@@ -548,23 +548,16 @@ sub check_mixin {
 
     my $directives = $self->directives;
 
-    my $mixins = $self->mixins->get($name);
+    my $mixin = $self->mixins->get($name);
 
-    foreach my $key ($mixins->keys) {
+    foreach my $key ($mixin->keys) {
 
         my $directive = $directives->get($key);
 
         unless (defined $directive) {
             $self->pitch_error(
-                "The $_ directive supplied by the ".
-                "$key mixin is not supported"
-            );
-        }
-
-        unless ($directive) {
-            $self->pitch_error(
-                "The $_ directive supplied by the ".
-                "$key mixin is empty"
+                "The $key directive supplied by the ".
+                "$name mixin is not supported"
             );
         }
 
@@ -1304,11 +1297,9 @@ sub normalize {
 
     }
 
-    # validate field directives and execute normalization events
+    # execute normalization events
 
     foreach my $key ($self->fields->keys) {
-
-        $self->check_field($key);
 
         $self->trigger_event('on_normalize', $key);
 
@@ -1330,8 +1321,8 @@ sub normalize {
 
         next unless $field;
 
-        $self->apply_mixin_field($key, $field->mixin_field)
-            if $field->can('mixin_field') && $field->mixin_field
+        $self->apply_mixin_field($key, $field->{mixin_field})
+            if $field->can('mixin_field') && $field->{mixin_field}
         ;
 
     }
@@ -1389,6 +1380,14 @@ sub normalize {
     # restore order to the land
 
     $self->reset_fields;
+
+    # final checkpoint, validate field directives
+
+    foreach my $key ($self->fields->keys) {
+
+        $self->check_field($key);
+
+    }
 
     return $self;
 
@@ -1706,7 +1705,10 @@ sub register_directive {
 
     my ($self, $name, $code) = @_;
 
-    my $directive = Validation::Class::Directive->new(validator => $code);
+    my $directive = Validation::Class::Directive->new(
+        name      => $name,
+        validator => $code
+    );
 
     $self->configuration->directives->add($name, $directive);
 
@@ -2185,8 +2187,12 @@ sub set_method {
 
     my ($self, $name, $code) = @_;
 
+    # proto and prototype methods cannnot be overriden
+
     confess "Error creating method $name, method already exists"
-        if $self->package->can($name);
+        if ($name eq 'proto' || $name eq 'prototype')
+        && $self->package->can($name)
+    ;
 
     # place routines on the calling class
 
@@ -2402,13 +2408,18 @@ sub trigger_event {
 
     foreach my $key (sort keys %{$event}) {
 
+        # skip if the field doesn't have the subscribing directive
+        next unless exists $field->{$key};
+
         my $routine   = $event->{$key};
         my $directive = $self->directives->get($key);
 
-        # execute the event routine associated with the directive
+        # execute the directive routine associated with the event
         $routine->($directive, $self, $field, $param);
 
     }
+
+    return $self;
 
 }
 
@@ -2584,6 +2595,9 @@ sub validate {
         @fields = ($self->fields->keys);
     }
 
+    # establish the bypass validation flag
+    $self->stash->{'validation.bypass_event'} = 0;
+
     # stash the current context object
 
     $self->stash->{'validation.context'} =
@@ -2604,15 +2618,20 @@ sub validate {
 
     # execute on_validate events
 
-    $self->trigger_event('on_validate', $_)
-        for @{$self->stash->{'validation.fields'}}
-    ;
+    unless ($self->stash->{'validation.bypass_event'}) {
+        $self->trigger_event('on_validate', $_)
+            for @{$self->stash->{'validation.fields'}}
+        ;
+    }
 
     # execute on_after_validation events
 
     $self->trigger_event('on_after_validation', $_)
         for @{$self->stash->{'validation.fields'}}
     ;
+
+    # re-establish the bypass validation flag
+    $self->stash->{'validation.bypass_event'} = 0;
 
     # restore params from alias map manually if requested
     # ... extremely-deprecated but it remains for back-compat and nostalgia !!!

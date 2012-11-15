@@ -22,8 +22,28 @@ documented it just yet.
 
 =cut
 
-has 'mixin' => 1;
-has 'field' => 1;
-has 'multi' => 0;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 0;
+has 'message' => '%s is required';
+
+sub before_validate {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    if (defined $field->{required}) {
+
+        if ($field->{required} && (! defined $param || $param eq '')) {
+
+            $self->error($proto, $field);
+            $self->stash->{'validation.bypass_event'}++;
+
+        }
+
+    }
+
+    return $self;
+
+}
 
 1;

@@ -25,34 +25,33 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must contain %s or more digits';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        my @i = ($value =~ /[0-9]/g);
+    if (defined $field->{min_digits}) {
 
-        unless ( @i >= $directive ) {
+        my $min_digits = $field->{min_digits};
 
-            my $handle = $field->{label} || $field->{name};
-            my $characters = int( $directive ) > 1 ?
-                "digits" : "digit";
+        if ( $field->{required} || $param ) {
 
-            my $error = "$handle must contain at-least "
-                ."$directive $characters";
+            my @i = ($param =~ /[0-9]/g);
 
-            $field->errors->add($field->{error} || $error);
+            if (@i < $min_digits) {
 
-            return 0;
+                $self->error(@_, $min_digits);
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

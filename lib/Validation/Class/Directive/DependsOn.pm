@@ -12,7 +12,7 @@ use Validation::Class::Core;
 
     use Validation::Class::Directive::DependsOn;
 
-    my $directive = Validation::Class::Directive::DependsOn->new;
+    my $specification = Validation::Class::Directive::DependsOn->new;
 
 =head1 DESCRIPTION
 
@@ -22,43 +22,48 @@ documented it just yet.
 
 =cut
 
-has 'mixin'     => 1;
-has 'field'     => 1;
-has 'multi'     => 1;
-has 'validator' => \&_build_validator;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 1;
+has 'message' => '%s requires %s';
 
-sub _build_validator {
+sub validate {
 
-    my ($directive, $value, $field, $class) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        my $dependents = "ARRAY" eq ref $directive ?
-        $directive : [$directive];
+    if (defined $field->{depends_on}) {
 
-        if (@{$dependents}) {
+        my $specification = $field->{depends_on};
 
-            my @blanks = ();
+        if ($field->{required} || $param) {
 
-            foreach my $dep (@{$dependents}) {
+            my $dependents = isa_arrayref($specification) ?
+                $specification : [$specification]
+            ;
 
-                push @blanks,
-                    $class->fields->{$dep}->{label} ||
-                    $class->fields->{$dep}->{name}
-                    if ! $class->param($dep);
+            if (@{$dependents}) {
 
-            }
+                my @required_fields = ();
 
-            if (@blanks) {
+                foreach my $dependent (@{$dependents}) {
 
-                my $handle = $field->{label} || $field->{name};
+                    my $field = $proto->fields->get($dependent);
 
-                my $error = "$handle requires " . join(", ", @blanks) .
-                    " to have " . (@blanks > 1 ? "values" : "a value");
+                    push @required_fields, $field->label || $field->name
+                        unless $proto->params->has($dependent)
+                    ;
 
-                $field->errors->add($field->{error} || $error);
+                }
 
-                return 0;
+                if (my @r = @required_fields) {
+
+                    my$list=(join(' and ',join(', ',@r[0..$#r-1])||(),$r[-1]));
+
+                    $self->error(@_, $list);
+
+                }
 
             }
 
@@ -66,7 +71,7 @@ sub _build_validator {
 
     }
 
-    return 1;
+    return $self;
 
 }
 

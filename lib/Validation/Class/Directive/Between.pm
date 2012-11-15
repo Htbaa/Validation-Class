@@ -22,39 +22,44 @@ documented it just yet.
 
 =cut
 
-has 'mixin'     => 1;
-has 'field'     => 1;
-has 'multi'     => 1;
-has 'validator' => \&_build_validator;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 1;
+has 'message' => '%s must contain between %s characters';
 
-sub _build_validator {
+sub validate {
 
-    my ($directive, $value, $field, $class) = @_;
+    my $self = shift;
 
-    my ($min, $max) = "ARRAY" eq ref $directive ?
-        @{$directive} : split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $directive;
+    my ($proto, $field, $param) = @_;
 
-    $min = scalar($min);
-    $max = scalar($max);
+    if (defined $field->{between}) {
 
-    $value = length($value);
+        my $between = $field->{between};
 
-    if (defined $value) {
+        if ( $field->{required} || $param ) {
 
-        unless ($value >= $min && $value <= $max) {
+            my ( $min, $max )
+                = isa_arrayref($between)
+                ? @{$between}
+                : split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $between;
 
-            my $handle = $field->{label} || $field->{name};
-            my $error  = "$handle must contain between $directive characters";
+            $min = scalar($min);
+            $max = scalar($max);
 
-            $field->errors->add($field->{error} || $error);
+            my $value = length($param);
 
-            return 0;
+            unless ( $value >= $min && $value <= $max ) {
+
+                $self->error(@_, "$min-$max");
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

@@ -25,34 +25,33 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must contain %s or more alphabetic characters';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        my @i = ($value =~ /[a-zA-Z]/g);
+    if (defined $field->{min_alpha}) {
 
-        unless ( @i >= $directive ) {
+        my $min_alpha = $field->{min_alpha};
 
-            my $handle = $field->{label} || $field->{name};
-            my $characters = int( $directive ) > 1 ?
-                "characters" : "character";
+        if ( $field->{required} || $param ) {
 
-            my $error = "$handle must contain at-least "
-                ."$directive alphabetic $characters";
+            my @i = ($param =~ /[a-zA-Z]/g);
 
-            $field->errors->add($field->{error} || $error);
+            if (@i < $min_alpha) {
 
-            return 0;
+                $self->error(@_, $min_alpha);
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

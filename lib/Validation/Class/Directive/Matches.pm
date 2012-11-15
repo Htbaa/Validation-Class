@@ -22,38 +22,59 @@ documented it just yet.
 
 =cut
 
-has 'mixin'     => 1;
-has 'field'     => 1;
-has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'mixin'   => 1;
+has 'field'   => 1;
+has 'multi'   => 1;
+has 'message' => '%s should match %s';
 
-sub _build_validator {
+sub validate {
 
-    my ( $directive, $value, $field, $class ) = @_;
+    my $self = shift;
 
-    if (defined $value) {
+    my ($proto, $field, $param) = @_;
 
-        # build the regex
-        my $this = $value;
-        my $that = $class->param($directive) || '';
+    if (defined $field->{matches}) {
 
-        unless ( $this eq $that ) {
+        my $specification = $field->{matches};
 
-            my $handle  = $field->{label} || $field->{name};
-            my $handle2 = $class->fields->{$directive}->{label}
-                || $class->fields->{$directive}->{name};
+        if ($field->{required} || $param) {
 
-            my $error = "$handle does not match $handle2";
+            my $dependents = isa_arrayref($specification) ?
+                $specification : [$specification]
+            ;
 
-            $field->errors->add($field->{error} || $error);
+            if (@{$dependents}) {
 
-            return 0;
+                my @required_fields = ();
+
+                foreach my $dependent (@{$dependents}) {
+
+                    $param ||= '';
+
+                    my $field  = $proto->fields->get($dependent);
+                    my $param2 = $proto->params->get($dependent) || '';
+
+                    push @required_fields, $field->label || $field->name
+                        unless $param eq $param2
+                    ;
+
+                }
+
+                if (my @r = @required_fields) {
+
+                    my$list=(join(' and ',join(', ',@r[0..$#r-1])||(),$r[-1]));
+
+                    $self->error(@_, $list);
+
+                }
+
+            }
 
         }
 
     }
 
-    return 1;
+    return $self;
 
 }
 

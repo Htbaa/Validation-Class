@@ -25,7 +25,7 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'validator' => \&_build_validator;
+has 'message'   => '%s must be either %s';
 
 sub _build_validator {
 
@@ -53,6 +53,42 @@ sub _build_validator {
     }
 
     return 1;
+
+}
+
+sub validate {
+
+    my $self = shift;
+
+    my ($proto, $field, $param) = @_;
+
+    if (defined $field->{options}) {
+
+        my $options = $field->{options};
+
+        if ( $field->{required} || $param ) {
+
+            my (@options) = isa_arrayref($options) ?
+                @{$options} : split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $options
+            ;
+
+            unless (grep { $param =~ /^$_$/ } @options) {
+
+                if (my @o = @options) {
+
+                    my$list=(join(' or ',join(', ',@o[0..$#o-1])||(),$o[-1]));
+
+                    $self->error(@_, $list);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return $self;
 
 }
 
