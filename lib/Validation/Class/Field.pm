@@ -2,39 +2,36 @@
 
 package Validation::Class::Field;
 
+use Validation::Class::Directives;
 use Validation::Class::Errors;
-use Validation::Class::Core;
 
+use Validation::Class::Core;
 use Carp 'confess';
 
 # VERSION
 
 use base 'Validation::Class::Mapping';
 
-INIT {
+my $directives = Validation::Class::Directives->new;
 
-    use Validation::Class::Configuration;
+foreach my $directive ($directives->values) {
 
-    my $conf = Validation::Class::Configuration->new;
+    # create accessors from default configuration (once)
 
-    foreach my $directive ($conf->directives->values) {
+    if ($directive->field) {
 
-        # create accessors from default configuration (once)
+        my $name = $directive->name;
 
-        if ($directive->field) {
+        next if __PACKAGE__->can($name);
 
-            my $name = $directive->name;
+        # errors object
+        if ($name eq 'errors') {
+            has $name => sub { Validation::Class::Errors->new };
+        }
 
-            # errors object
-            if ($name eq 'errors') {
-                has $name => sub { Validation::Class::Errors->new };
-            }
-
-            # everything else
-            else {
-                has $name => sub { undef };
-            }
-
+        # everything else
+        else {
+            has $name => sub { undef };
         }
 
     }
@@ -55,7 +52,7 @@ sub new {
 
     my $config = $class->build_args(@_);
 
-    confess "Can't create a new field object without a name attribute"
+    confess "Cannot create a new field object without a name attribute"
         unless $config->{name}
     ;
 

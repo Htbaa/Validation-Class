@@ -22,9 +22,10 @@ documented it just yet.
 
 =cut
 
-has 'mixin' => 1;
-has 'field' => 1;
-has 'multi' => 1;
+has 'mixin'         => 1;
+has 'field'         => 1;
+has 'multi'         => 1;
+has 'dependencies'  => sub {['readonly']};
 
 sub after_validation {
 
@@ -56,7 +57,7 @@ sub normalize {
 
     # set the field value
 
-    $field->{value} = ($field->{default} || $param) || '';
+    $field->{value} = $param || $field->{default} || '';
 
     return $self;
 

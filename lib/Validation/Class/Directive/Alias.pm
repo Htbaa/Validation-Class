@@ -46,7 +46,7 @@ sub before_validation {
 
                 $self->params($name => $self->params->delete($alias));
 
-                push @{$self->stash->{'validation.fields'}}, $name;
+                push @{$proto->stash->{'validation.fields'}}, $name;
 
             }
 

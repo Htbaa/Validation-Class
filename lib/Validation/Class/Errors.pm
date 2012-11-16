@@ -2,7 +2,7 @@
 
 package Validation::Class::Errors;
 
-use Validation::Class::Core 'build_args';
+use Validation::Class::Core 'build_args', '!has';
 
 # VERSION
 

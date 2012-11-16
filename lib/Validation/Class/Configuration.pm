@@ -2,6 +2,7 @@
 
 package Validation::Class::Configuration;
 
+use Validation::Class::Directives;
 use Validation::Class::Listing;
 use Validation::Class::Mapping;
 use Validation::Class::Fields;
@@ -10,21 +11,12 @@ use Validation::Class::Core;
 
 use Module::Find 'usesub';
 
-our $_directives = [usesub 'Validation::Class::Directive'];
-
 # VERSION
-
-=head1 SYNOPSIS
-
-    use Validation::Class::Configuration;
-
-    my $conf = Validation::Class::Configuration->new;
 
 =head1 DESCRIPTION
 
-Validation::Class::Configuration provides a configuration profile in form of a
-singleton which is inherited by derived validation classes. This class inherits
-from L<Validation::Class::Base>.
+Validation::Class::Configuration provides a default configuration profile used
+by validation classes and many class prototype methods.
 
 =cut
 
@@ -62,12 +54,13 @@ sub configure_profile_register_directives {
 
     # automatically attach discovered directive classes
 
-    foreach my $class (@{$_directives}) {
+    my $directives = Validation::Class::Directives->new;
 
-        my $object = $class->new;
-        my $name   = $object->name;
+    foreach my $directive ($directives->values) {
 
-        $self->directives->add($name => $object);
+        my $name = $directive->name;
+
+        $self->directives->add($name => $directive);
 
     }
 

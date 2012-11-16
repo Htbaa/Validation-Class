@@ -27,7 +27,7 @@ has 'field'   => 1;
 has 'multi'   => 0;
 has 'message' => '%s is required';
 
-sub before_validate {
+sub before_validation {
 
     my ($self, $proto, $field, $param) = @_;
 
@@ -36,7 +36,7 @@ sub before_validate {
         if ($field->{required} && (! defined $param || $param eq '')) {
 
             $self->error($proto, $field);
-            $self->stash->{'validation.bypass_event'}++;
+            $proto->stash->{'validation.bypass_event'}++;
 
         }
 

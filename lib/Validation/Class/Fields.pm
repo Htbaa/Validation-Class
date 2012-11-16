@@ -13,8 +13,6 @@ use base 'Validation::Class::Mapping';
 use Validation::Class::Mapping;
 use Validation::Class::Field;
 
-use Data::Dumper;
-
 =head1 DESCRIPTION
 
 Validation::Class::Fields is a container class for L<Validation::Class::Field>

@@ -25,5 +25,6 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 1;
+has 'dependencies'  => sub {['value']};
 
 1;

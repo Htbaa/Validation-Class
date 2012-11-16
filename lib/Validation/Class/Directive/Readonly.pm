@@ -36,6 +36,7 @@ sub normalize {
 
         my $name = $field->name;
 
+        # probably shouldn't be deleting the submitted parameters !!!
         delete $proto->params->{$name} if exists $proto->params->{$name};
 
     }

@@ -2,7 +2,7 @@
 
 package Validation::Class::Mixins;
 
-use Validation::Class::Core 'build_args';
+use Validation::Class::Core 'build_args', '!has';
 
 # VERSION
 

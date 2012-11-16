@@ -46,12 +46,13 @@ directives.
 
 # defaults
 
-has 'mixin'     => 0;
-has 'field'     => 0;
-has 'multi'     => 0;
-has 'message'   => '%s was not processed successfully';
-has 'validator' => sub {1};
-has 'name'      => sub {
+has 'mixin'         => 0;
+has 'field'         => 0;
+has 'multi'         => 0;
+has 'message'       => '%s was not processed successfully';
+has 'validator'     => sub { sub{1} }; # nasty hack, we need a better way !!!
+has 'dependencies'  => sub { [] };
+has 'name'          => sub {
 
     my ($self) = @_;
 
@@ -121,7 +122,11 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    $self->validator->(@_);
+    my $context = $proto->stash->{'validation.context'};
+
+    $self->validator->($context, $field, $proto->params);
+
+    return $self;
 
 }
 

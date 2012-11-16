@@ -144,29 +144,7 @@ sub import {
 
     __PACKAGE__->export_to_level(1, @_);
 
-    if ($caller) {
-
-        # if requested, inherit config naturally via @ISA
-
-        my $isa_string = "\@$caller\::ISA";
-        my @caller_isa = eval $isa_string;
-
-        @caller_isa = grep !/^$caller$/, @caller_isa;
-
-        if (@caller_isa) {
-
-            my $loader = $caller->can('set');
-               $loader = $caller->can('load') unless $loader;
-
-            if ($loader) {
-                $loader->($caller, { roles => [@caller_isa] });
-            }
-
-        }
-
-        return_class_proto $caller # create prototype instance when used
-
-    }
+    return_class_proto $caller # provision prototype when used
 
 }
 

@@ -28,14 +28,14 @@ has 'multi' => 1;
 
 sub normalize {
 
-    my ($self, $proto, $field) = @_;
+    my ($self, $proto, $field, $param) = @_;
 
     # by default fields should have a filtering directive
     # unless already specified
 
     unless (defined $field->{filtering}) {
 
-        $field->{filtering} = $proto->filtering if $proto->filtering;
+        $field->{filtering} = $proto->filtering || 'pre';
 
     }
 

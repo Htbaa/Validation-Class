@@ -2,39 +2,36 @@
 
 package Validation::Class::Mixin;
 
+use Validation::Class::Directives;
 use Validation::Class::Errors;
-use Validation::Class::Core;
 
+use Validation::Class::Core;
 use Carp 'confess';
 
 # VERSION
 
 use base 'Validation::Class::Mapping';
 
-INIT {
+my $directives = Validation::Class::Directives->new;
 
-    use Validation::Class::Configuration;
+foreach my $directive ($directives->values) {
 
-    my $conf = Validation::Class::Configuration->new;
+    # create accessors from default configuration (once)
 
-    foreach my $directive ($conf->directives->values) {
+    if ($directive->mixin) {
 
-        # create accessors from default configuration (once)
+        my $name = $directive->name;
 
-        if ($directive->mixin) {
+        next if __PACKAGE__->can($name);
 
-            my $name = $directive->name;
+        # errors object
+        if ($name eq 'errors') {
+            has $name => sub { Validation::Class::Errors->new };
+        }
 
-            # errors object
-            if ($name eq 'errors') {
-                has $name => sub { Validation::Class::Errors->new };
-            }
-
-            # everything else
-            else {
-                has $name => sub { undef };
-            }
-
+        # everything else
+        else {
+            has $name => sub { undef };
         }
 
     }

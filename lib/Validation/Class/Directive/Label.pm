@@ -22,9 +22,9 @@ documented it just yet.
 
 =cut
 
-has 'mixin' => 0;
-has 'field' => 1;
-has 'multi' => 0;
+has 'mixin'        => 0;
+has 'field'        => 1;
+has 'multi'        => 0;
 
 sub normalize {
 

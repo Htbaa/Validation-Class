@@ -3,6 +3,7 @@
 package Validation::Class::Prototype;
 
 use Validation::Class::Configuration;
+use Validation::Class::Directives;
 use Validation::Class::Listing;
 use Validation::Class::Mapping;
 use Validation::Class::Params;
@@ -14,12 +15,13 @@ use Validation::Class::Core;
 
 use Hash::Flatten 'flatten', 'unflatten';
 use Module::Runtime 'use_module';
+use Module::Find 'findallmod';
 use List::MoreUtils 'uniq';
 use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 
-my $_prototypes = Validation::Class::Mapping->new; # prototype class cache
+my $_registry = Validation::Class::Mapping->new; # prototype class registry
 
 =attribute attributes
 
@@ -278,7 +280,7 @@ sub new {
 
     my $self = bless $arguments, $class;
 
-    $_prototypes->add($class, $self);
+    $_registry->add($arguments->{package}, $self);
 
     return $self;
 
@@ -288,35 +290,35 @@ sub apply_filter {
 
     my ($self, $filter, $field) = @_;
 
-    if ($self->params->has($field)) {
+    my $name = $field;
 
-        if ($self->filters->{$filter} || "CODE" eq ref $filter) {
+    $field  = $self->fields->get($field);
+    $filter = $self->filters->get($filter);
 
-            if ($self->params->{$field}) {
+    return unless $field && $filter;
 
-                my $code = "CODE" eq ref $filter ?
-                    $filter : $self->filters->{$filter};
+    if ($self->params->has($name)) {
 
-                my $filtered_value = $self->params->{$field};
+        if (isa_coderef($filter)) {
 
-                if ("ARRAY" eq ref $filtered_value) {
+            if (my $value = $self->params->get($name)) {
 
-                    foreach my $value (@{$filtered_value}) {
+                if (isa_arrayref($value)) {
 
-                        $value = $code->($value)
+                    foreach my $el (@{$value}) {
+
+                        $el = $filter->($el);
 
                     }
 
                 }
                 else {
 
-                    $filtered_value = $code->($self->params->{$field});
+                    $value = $filter->($value);
 
                 }
 
-                $self->set_value(
-                    $field => $filtered_value
-                );
+                $self->params->add($name, $value);
 
             }
 
@@ -348,32 +350,19 @@ sub apply_filters {
     $state ||= 'pre'; # state defaults to (pre) filtering
 
     # check for and process input filters and default values
-    my $process = sub {
+    my $run_filter = sub {
 
-        my ($name, $config) = @_;
+        my ($name, $spec) = @_;
 
-        if ($config->filtering eq $state) {
+        if ($spec->filtering) {
 
-            # the filters directive should always be an arrayref
-            $config->filters([$config->filters])
-                unless "ARRAY" eq ref $config->filters;
+            if ($spec->filtering eq $state) {
 
-            # apply filters
-            $self->apply_filter($_, $name) for @{$config->filters};
+                # the filters directive should always be an arrayref
+                $spec->filters([$spec->filters]) unless isa_arrayref($spec->filters);
 
-            # set default value - absolute last resort
-            if ($self->params->has($name)) {
-
-                if (!$self->params->{$name}) {
-
-                    if (defined $config->{default}) {
-
-                        $self->params->{$name} =
-                            $self->get_value($name);
-
-                    }
-
-                }
+                # apply filters
+                $self->apply_filter($_, $name) for @{$spec->filters};
 
             }
 
@@ -381,7 +370,7 @@ sub apply_filters {
 
     };
 
-    $self->fields->each($process);
+    $self->fields->each($run_filter);
 
     return $self;
 
@@ -820,9 +809,11 @@ sub error_count {
 
     my ($self) = @_;
 
-    my $count = scalar($self->get_errors) || 0;
+    my $i = $self->errors->count;
 
-    return $count;
+    $i += $_->errors->count for $self->fields->values;
+
+    return $i;
 
 }
 
@@ -1550,12 +1541,6 @@ sub plugin {
 
 }
 
-sub prototypes {
-
-    return $_prototypes;
-
-}
-
 sub proxy_attributes {
 
     return qw{
@@ -1986,6 +1971,8 @@ sub register_settings {
 
         if (@roles) {
 
+            no strict 'refs';
+
             foreach my $role (@roles) {
 
                 eval { use_module $role };
@@ -2025,6 +2012,12 @@ sub register_settings {
     }
 
     return $self;
+
+}
+
+sub registry {
+
+    return $_registry;
 
 }
 
@@ -2196,7 +2189,8 @@ sub set_method {
 
     # place routines on the calling class
 
-    no strict 'refs';
+    no strict   'refs';
+    no warnings 'redefine';
 
     return *{join('::', $self->package, $name)} = $code;
 
@@ -2398,6 +2392,9 @@ sub trigger_event {
     return unless $field;
 
     my $param;
+    my @order;
+    my $directives;
+    my $process_all = 1 if $event eq 'on_normalize';
 
     $event = $self->events->get($event);
     $param = $self->params->has($field) ? $self->params->get($field) : undef;
@@ -2406,13 +2403,24 @@ sub trigger_event {
     return unless defined $event;
     return unless defined $field;
 
-    foreach my $key (sort keys %{$event}) {
+    unless ($event eq 'on_normalize') {
+        # order events via dependency resolution
+        my $e = {map{$_=>$self->directives->get($_)}(sort keys %{$event})};
+        $directives = Validation::Class::Directives->new($e);
+        @order = ($directives->resolve_dependencies);
+    }
+
+    @order = keys(%{$event}) unless @order;
+
+    foreach my $i (@order) {
 
         # skip if the field doesn't have the subscribing directive
-        next unless exists $field->{$key};
+        unless ($process_all) {
+            next unless exists $field->{$i};
+        }
 
-        my $routine   = $event->{$key};
-        my $directive = $self->directives->get($key);
+        my $routine   = $event->{$i};
+        my $directive = $directives->get($i);
 
         # execute the directive routine associated with the event
         $routine->($directive, $self, $field, $param);
@@ -2599,25 +2607,24 @@ sub validate {
     $self->stash->{'validation.bypass_event'} = 0;
 
     # stash the current context object
+    $self->stash->{'validation.context'} = $context;
 
-    $self->stash->{'validation.context'} =
-        $context
+    # report fields requested that do not exist
+    $self->pitch_error("Data validation field $_ does not exist")
+        for grep {!$self->fields->has($_)} uniq @fields
     ;
 
     # stash fields targeted for validation
-
     $self->stash->{'validation.fields'} =
         [grep {$self->fields->has($_)} uniq @fields]
     ;
 
     # execute on_before_validation events
-
     $self->trigger_event('on_before_validation', $_)
         for @{$self->stash->{'validation.fields'}}
     ;
 
     # execute on_validate events
-
     unless ($self->stash->{'validation.bypass_event'}) {
         $self->trigger_event('on_validate', $_)
             for @{$self->stash->{'validation.fields'}}
@@ -2625,7 +2632,6 @@ sub validate {
     }
 
     # execute on_after_validation events
-
     $self->trigger_event('on_after_validation', $_)
         for @{$self->stash->{'validation.fields'}}
     ;
@@ -2875,7 +2881,7 @@ sub validate_method {
     return 0 unless $name;
 
     $self->normalize();
-    $self->apply_filters('pre') if $self->filtering;
+    $self->apply_filters('pre');
 
     my $methspec = $self->methods->{$name};
 
@@ -2927,16 +2933,17 @@ sub validate_profile {
 
     confess
         "Context object ($self->{package} class instance) required ".
-        "to perform profile validation" unless $self->{package} eq ref $context;
+        "to perform profile validation" unless $self->{package} eq ref $context
+    ;
 
     return 0 unless $name;
 
     $self->normalize();
-    $self->apply_filters('pre') if $self->filtering;
+    $self->apply_filters('pre');
 
-    if ("CODE" eq ref $self->profiles->{$name}) {
+    if (isa_coderef($self->profiles->{$name})) {
 
-        return $self->profiles->{$name}->($context, @args)
+        return $self->profiles->{$name}->($context, @args);
 
     }
 

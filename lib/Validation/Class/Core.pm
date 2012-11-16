@@ -6,6 +6,7 @@ use warnings;
 # VERSION
 
 use Module::Runtime 'use_module';
+use Scalar::Util 'blessed';
 use Carp 'confess';
 use Exporter ();
 
@@ -18,6 +19,7 @@ our @EXPORT = qw(
     has
     hold
     isa_arrayref
+    isa_classref
     isa_coderef
     isa_hashref
     isa_regexp
@@ -176,6 +178,14 @@ sub isa_arrayref {
 
 }
 
+sub isa_classref {
+
+    my ($object) = @_;
+
+    return blessed(shift) ? 1 : 0;
+
+}
+
 sub isa_coderef {
 
     return "CODE" eq ref(shift) ? 1 : 0;
@@ -197,7 +207,7 @@ sub isa_regexp {
 sub proto_classes {
 
     # Validation::Class::Prototype should be already loaded
-    return Validation::Class::Prototype->prototypes;
+    return Validation::Class::Prototype->registry;
 
 }
 

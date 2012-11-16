@@ -1,34 +1,34 @@
 Revision history for the Perl library Validation::Class
 
-TODO  0000-00-00
+7.90  0000-00-00
 
-  - Rework the documentation using new style, placing conceptual information
-    under the Validation::Class::Manual namespace
+  - Created Validation::Class::Whitepaper as a sounding-board and source for FAQs
 
-  - Re-writing of the V::C::Intro POD to communicate the philosophy
+  - Rewrite of all documentation iteratively, under the Validation::Class::Manual namespace
 
-  - Introduction of the V::C::Cookbook POD (best practices, concepts, etc)
+  - Rewrite of Validation::Class, main module provides sugar for configuration only
+
+  - Rewrite of Validation::Class::Prototype, now is configurable using OO
+
+  - Removed inheritence support via 'base' as it existed in 7.85
+
+  - Removed the object keyword and support as it existed in 7.85
 
 7.85  2012-09-21
 
-  - The load/set and object/obj keywords documentation has been moved into the
-    intro document under hidden features
+  - The load/set and object/obj keywords documentation has been moved into the intro document under hidden features
 
-  - Fixed Class::Forward version dependency which cause test failures in
-    previous versions
+  - Fixed Class::Forward version dependency which cause test failures in previous versions
 
 7.84  2012-09-20
 
-  - The import method has been modified to copy/merge meta-class configs based
-    on inheritance
+  - The import method has been modified to copy/merge meta-class configs based on inheritance
 
 7.82  2012-08-13
 
-  - The class method/functionality has been refactored and is now using
-    Class::Forward
+  - The class method/functionality has been refactored and is now using Class::Forward
 
-  - New invalid parameter error triggered when arrayrefs are
-    discovered with nested structures (non-scalars)
+  - New invalid parameter error triggered when arrayrefs are discovered with nested structures (non-scalars)
 
 7.81  2012-08-11
 
@@ -44,13 +44,11 @@ TODO  0000-00-00
 
 7.78  2012-07-28
 
-  - changed flatten/unflatten functionality, now only happens during
-    validation
+  - changed flatten/unflatten functionality, now only happens during validation
 
   - fixed unneccessary serialization, field and values are always as expected
 
-  - better parameter handling (backwards-compatibility: some earlier
-    functionality issues may occur)
+  - better parameter handling (backwards-compatibility: some earlier functionality issues may occur)
 
 7.77  2012-07-27
 
@@ -78,8 +76,7 @@ TODO  0000-00-00
 
   - major bug fix   validation routine now reaps auto-cloned fields
 
-  - custom validation firing default failure message even if custom message
-    is used
+  - custom validation firing default failure message even if custom message is used
 
 7.69  2012-06-24
 

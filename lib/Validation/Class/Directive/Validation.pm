@@ -92,21 +92,21 @@ sub before_validation_create_clones {
             $self->clone($name => $clone, { label  => "$label #" . ($i+1) });
 
             # add clones to field list to be validated
-            push @{$self->stash->{'validation.fields'}}, $clone
-                if grep { $_ eq $name } @{$self->stash->{'validation.fields'}}
+            push @{$proto->stash->{'validation.fields'}}, $clone
+                if grep { $_ eq $name } @{$proto->stash->{'validation.fields'}}
             ;
 
             # record clones (to be reaped later)
-            push @{$self->stash->{'directive.validation.clones'}}, $clone;
+            push @{$proto->stash->{'directive.validation.clones'}}, $clone;
 
         }
 
         $self->params->delete($name);
 
         # remove the field the clones are based on from the fields list
-        @{$self->stash->{'validation.fields'}} =
-            grep { $_ ne $name } @{$self->stash->{'validation.fields'}}
-            if @{$self->stash->{'validation.fields'}}
+        @{$proto->stash->{'validation.fields'}} =
+            grep { $_ ne $name } @{$proto->stash->{'validation.fields'}}
+            if @{$proto->stash->{'validation.fields'}}
         ;
 
     }
