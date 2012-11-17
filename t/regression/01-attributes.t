@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 7;
 
 package MyVal;
 
@@ -18,7 +18,7 @@ ok $v->proto->filters, 'filters attr ok';
 ok $v->proto->mixins, 'mixins attr ok';
 
 # ok $v->types({}), 'types attr ok'; - DEPRECATED
-ok $v->proto->types, 'types attr ok';
+#ok $v->proto->types, 'types attr ok'; - DROPPED
 
 ok $v->ignore_unknown(1), 'ignore unknown attr ok';
 ok $v->report_unknown(1), 'report unknown attr ok';

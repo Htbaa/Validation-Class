@@ -2,7 +2,7 @@
 
 package Validation::Class::Fields;
 
-use Validation::Class::Core 'build_args', '!has';
+use Validation::Class::Core '!has';
 use Hash::Flatten ();
 use Carp 'confess';
 
@@ -41,10 +41,12 @@ sub add {
 
         # never overwrite
         unless (defined $self->{$key}) {
+            if (isa_hashref($value)) {
+                $value->{name} = $key;
+            }
             $self->{$key} = $value; # accept an object as a value
-            $self->{$key} = Validation::Class::Field->new($value)
-                unless "Validation::Class::Field" eq ref $self->{$key}
-            ;
+            $self->{$key} = Validation::Class::Field->new($value) unless
+                "Validation::Class::Field" eq ref $self->{$key}; # unless obj
         }
 
     }

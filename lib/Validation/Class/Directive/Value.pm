@@ -22,10 +22,9 @@ documented it just yet.
 
 =cut
 
-has 'mixin'         => 1;
-has 'field'         => 1;
-has 'multi'         => 1;
-has 'dependencies'  => sub {['readonly']};
+has 'mixin' => 1;
+has 'field' => 1;
+has 'multi' => 1;
 
 sub after_validation {
 

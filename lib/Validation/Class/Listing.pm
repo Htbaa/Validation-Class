@@ -109,6 +109,20 @@ sub delete {
 
 }
 
+=method defined
+
+    $true if $self->defined($name) # defined
+
+=cut
+
+sub defined {
+
+    my ($self, $index) = @_;
+
+    return defined $self->[$index];
+
+}
+
 =method each
 
     $self = $self->each(sub{
@@ -181,9 +195,7 @@ sub grep {
 
 =method has
 
-    if ($self->has($index)) {
-
-    }
+    $true if $self->has($name) # defined
 
 =cut
 
@@ -191,17 +203,20 @@ sub has {
 
     my ($self, $index) = @_;
 
-    return defined $self->[$index] ? 1 : 0;
+    return $self->defined($index) ? 1 : 0;
 
 }
 
 =method iterator
 
     my $next = $self->iterator();
-    # i.e. $self->iterator('sort', sub{ (shift) cmp (shift) })
 
-    while (my $key = $next->()) {
+    # defaults: keys
+    # accepts: sort, rsort, nsort, or rnsort
+    # e.g. $self->iterator('sort', sub{ (shift) cmp (shift) });
 
+    while (my $item = $next->()) {
+        ...
     }
 
 =cut
@@ -210,7 +225,8 @@ sub iterator {
 
     my ($self, $function, @arguments) = @_;
 
-    $function ||= 'list';
+    $function = 'list'
+        unless grep { $function eq $_ } ('sort', 'rsort', 'nsort', 'rnsort');
 
     my @keys = ($self->$function(@arguments));
 

@@ -69,7 +69,7 @@ ok $v->fields->{email_confirm}->{min_length} == 5, 'email_confirm min_length ok'
 ok $v->fields->{email_confirm}->{max_length} == 500, 'email_confirm max_length ok';
 ok $v->fields->{email_confirm}->{label} eq 'Object Email Confirm', 'email_confirm label ok';
 ok $v->fields->{email_confirm}->{error} eq 'Object Email confirmation error', 'email_confirm error ok';
-ok $v->params->{name} =~ /P3RLC0DR/, 'trim, strip and uppercase filters all applied';
+ok $v->params->{name} =~ /^P3RLC0DR$/, 'trim, strip and uppercase filters all applied';
 
 my $w = MyVal->new( params => { name => ' p3rlc0dr    ' } );
-ok $w->params->{name} =~ /P3RLC0DR/, 'trim, strip and uppercase filters all applied';
+ok $w->params->{name} =~ /^P3RLC0DR$/, 'trim, strip and uppercase filters all applied';

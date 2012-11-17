@@ -2,7 +2,7 @@
 
 package Validation::Class::Errors;
 
-use Validation::Class::Core 'build_args', '!has';
+use Validation::Class::Core '!has', '!hold';
 
 # VERSION
 
@@ -18,11 +18,11 @@ from the L<Validation::Class::Listing> class.
 
 sub add {
 
-    my ($self, @arguments) = @_;
+    my $self = shift;
 
-    return unless @arguments;
+    my $arguments = isa_arrayref($_[0]) ? $_[0] : [@_];
 
-    push @{$self}, @arguments;
+    push @{$self}, @{$arguments};
 
     @{$self} = ($self->unique);
 

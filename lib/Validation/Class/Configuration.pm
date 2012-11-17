@@ -80,7 +80,7 @@ sub configure_profile_register_filters {
 
     return unless $filters;
 
-    $self->filters->add($filters->defaults);
+    $self->filters->add($filters->registry);
 
     return $self;
 

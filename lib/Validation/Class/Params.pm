@@ -2,7 +2,7 @@
 
 package Validation::Class::Params;
 
-use Validation::Class::Core 'build_args', '!has';
+use Validation::Class::Core '!has';
 use Hash::Flatten ();
 use Carp 'confess';
 
@@ -46,7 +46,7 @@ sub add {
         "whose values are any of the previously mentioned values, i.e. an " .
         "array with nested structures is illegal"
 
-        if $self->flatten->grep(qr/(:.*:|:\d+.)/)
+        if $self->flatten->grep(qr/(:.*:|:\d+.)/)->count
 
     ;
 
@@ -60,6 +60,16 @@ sub flatten {
 
     return Validation::Class::Mapping->new(
         Hash::Flatten::flatten($self->hash)
+    );
+
+}
+
+sub unflatten {
+
+    my ($self) = @_;
+
+    return Validation::Class::Mapping->new(
+        Hash::Flatten::unflatten($self->hash)
     );
 
 }

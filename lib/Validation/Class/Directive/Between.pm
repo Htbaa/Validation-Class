@@ -41,8 +41,10 @@ sub validate {
 
             my ( $min, $max )
                 = isa_arrayref($between)
+                ? @{$between} > 1
                 ? @{$between}
-                : split /(?:\s{1,})?[,\-]{1,}(?:\s{1,})?/, $between;
+                : (split /(?:\s{1,})?\D{1,}(?:\s{1,})?/, $between->[0])
+                : (split /(?:\s{1,})?\D{1,}(?:\s{1,})?/, $between);
 
             $min = scalar($min);
             $max = scalar($max);

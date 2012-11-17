@@ -8,6 +8,21 @@ use Validation::Class::Core;
 
 # VERSION
 
+our $_registry = {
+
+    alpha        => \&filter_alpha,
+    alphanumeric => \&filter_alphanumeric,
+    capitalize   => \&filter_capitalize,
+    decimal      => \&filter_decimal,
+    lowercase    => \&filter_lowercase,
+    numeric      => \&filter_numeric,
+    strip        => \&filter_strip,
+    titlecase    => \&filter_titlecase,
+    trim         => \&filter_trim,
+    uppercase    => \&filter_uppercase
+
+};
+
 =head1 SYNOPSIS
 
     use Validation::Class::Directive::Filters;
@@ -22,20 +37,11 @@ documented it just yet.
 
 =cut
 
-sub defaults {{
+sub registry {
 
-    alpha        => \&filter_alpha,
-    alphanumeric => \&filter_alphanumeric,
-    capitalize   => \&filter_capitalize,
-    decimal      => \&filter_decimal,
-    lowercase    => \&filter_lowercase,
-    numeric      => \&filter_numeric,
-    strip        => \&filter_strip,
-    titlecase    => \&filter_titlecase,
-    trim         => \&filter_trim,
-    uppercase    => \&filter_uppercase
+    return $_registry;
 
-}}
+}
 
 sub filter_alpha {
 
@@ -116,27 +122,7 @@ sub after_validation {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{filters} && defined $field->{filtering}) {
-
-            if ($field->{filtering} eq 'post') {
-
-            my @filters = map { $proto->filters->get($_) }
-                isa_arrayref($field->{filters}) ?
-                    @{$field->{filters}} : ($field->{filters})
-            ;
-
-            my @values = isa_arrayref($param) ?
-                @{$param} : ($param)
-            ;
-
-            foreach my $value (@values) {
-                next if ! $value;
-                $value = $_->($value) for @filters;
-            }
-
-        }
-
-    }
+    $self->execute_filtering($proto, $field, $param, 'post');
 
     return $self;
 
@@ -146,27 +132,7 @@ sub before_validation {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{filters} && defined $field->{filtering}) {
-
-            if ($field->{filtering} eq 'pre') {
-
-            my @filters = map { $proto->filters->get($_) }
-                isa_arrayref($field->{filters}) ?
-                    @{$field->{filters}} : ($field->{filters})
-            ;
-
-            my @values = isa_arrayref($param) ?
-                @{$param} : ($param)
-            ;
-
-            foreach my $value (@values) {
-                next if ! $value;
-                $value = $_->($value) for @filters;
-            }
-
-        }
-
-    }
+    $self->execute_filtering($proto, $field, $param, 'pre');
 
     return $self;
 
@@ -182,6 +148,51 @@ sub normalize {
     if (! defined $field->{filters}) {
 
         $field->{filters} = [];
+
+    }
+
+    # run any existing filters on instantiation
+    # if the field is set to pre-filter
+
+    else {
+
+        $self->before_validation($proto, $field, $param);
+
+    }
+
+    return $self;
+
+}
+
+sub execute_filtering {
+
+    my ($self, $proto, $field, $param, $state) = @_;
+
+    return unless $state;
+
+    if (defined $field->{filters} && defined $field->{filtering}) {
+
+            if ($field->{filtering} eq $state) {
+
+            my @filters = map { $proto->filters->get($_) }
+                isa_arrayref($field->{filters}) ?
+                    @{$field->{filters}} : ($field->{filters})
+            ;
+
+            my $values = $param;
+
+            foreach my $value (isa_arrayref($param) ? @{$param} : ($param)) {
+                next if ! $value;
+                foreach my $filter (@filters) {
+                    $value = $filter->($value);
+                }
+            }
+
+            my $name = $field->name;
+
+            $proto->params->add($name, $param);
+
+        }
 
     }
 

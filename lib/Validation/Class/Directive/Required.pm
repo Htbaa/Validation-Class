@@ -22,10 +22,11 @@ documented it just yet.
 
 =cut
 
-has 'mixin'   => 1;
-has 'field'   => 1;
-has 'multi'   => 0;
-has 'message' => '%s is required';
+has 'mixin'        => 1;
+has 'field'        => 1;
+has 'multi'        => 0;
+has 'message'      => '%s is required';
+has 'dependencies' => sub { ['alias'] };
 
 sub before_validation {
 

@@ -10,6 +10,10 @@ Revision history for the Perl library Validation::Class
 
   - Rewrite of Validation::Class::Prototype, now is configurable using OO
 
+  - Added the Multiples directive which better enforces array handling
+
+  - Renamed the clone method to clone_field
+
   - Removed inheritence support via 'base' as it existed in 7.85
 
   - Removed the object keyword and support as it existed in 7.85

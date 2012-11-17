@@ -22,9 +22,10 @@ parameter value.
 
 =cut
 
-has 'mixin' => 0;
-has 'field' => 1;
-has 'multi' => 0;
+has 'mixin'        => 0;
+has 'field'        => 1;
+has 'multi'        => 0;
+has 'dependencies' => sub { ['name'] };
 
 sub before_validation {
 
@@ -42,11 +43,14 @@ sub before_validation {
 
         foreach my $alias (@{$aliases}) {
 
-            if ($self->params->has($alias)) {
+            if ($proto->params->has($alias)) {
 
-                $self->params($name => $self->params->delete($alias));
+                # rename the submitted parameter alias with the field name
+                $proto->params->add($name => $proto->params->delete($alias));
 
-                push @{$proto->stash->{'validation.fields'}}, $name;
+                push @{$proto->stash->{'validation.fields'}}, $name unless
+                    grep { $name eq $_} @{$proto->stash->{'validation.fields'}}
+                ;
 
             }
 

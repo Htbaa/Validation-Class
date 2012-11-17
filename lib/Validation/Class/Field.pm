@@ -5,7 +5,7 @@ package Validation::Class::Field;
 use Validation::Class::Directives;
 use Validation::Class::Errors;
 
-use Validation::Class::Core;
+use Validation::Class::Core '!has';
 use Carp 'confess';
 
 # VERSION
@@ -26,12 +26,16 @@ foreach my $directive ($directives->values) {
 
         # errors object
         if ($name eq 'errors') {
-            has $name => sub { Validation::Class::Errors->new };
+            my %spec =
+                ($name => sub { Validation::Class::Errors->new });
+                Validation::Class::Core::has(%spec);
         }
 
         # everything else
         else {
-            has $name => sub { undef };
+            my %spec =
+                ($name => sub { undef });
+                Validation::Class::Core::has(%spec);
         }
 
     }

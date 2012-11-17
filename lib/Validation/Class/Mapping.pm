@@ -35,6 +35,8 @@ sub new {
 
     my $class = shift;
 
+    $class = ref $class if ref $class;
+
     my $arguments = $class->build_args(@_);
 
     my $self = bless {}, $class;
@@ -109,6 +111,20 @@ sub delete {
 
 }
 
+=method defined
+
+    $true if $self->defined($name) # defined
+
+=cut
+
+sub defined {
+
+    my ($self, $index) = @_;
+
+    return defined $self->{$index};
+
+}
+
 =method each
 
     $self = $self->each(sub{
@@ -135,6 +151,20 @@ sub each {
 
 }
 
+=method exists
+
+    $true if $self->exists($name) # exists
+
+=cut
+
+sub exists {
+
+    my ($self, $name) = @_;
+
+    return exists $self->{$name} ? 1 : 0;
+
+}
+
 =method get
 
     my $value = $self->get($name); # i.e. $self->{$name}
@@ -151,7 +181,7 @@ sub get {
 
 =method grep
 
-    my @keys = $self->grep(qr/update_/);
+    $new_list = $self->grep(qr/update_/);
 
 =cut
 
@@ -161,15 +191,13 @@ sub grep {
 
     $pattern = qr/$pattern/ unless "REGEXP" eq uc ref $pattern;
 
-    return (grep { $_ =~ $pattern } keys %{$self});
+    return $self->new(map {$_=>$self->get($_)}grep{$_=~$pattern}($self->keys));
 
 }
 
 =method has
 
-    if ($self->has($name)) {
-
-    }
+    $true if $self->has($name) # defined or exists
 
 =cut
 
@@ -177,7 +205,7 @@ sub has {
 
     my ($self, $name) = @_;
 
-    return defined $self->{$name} ? 1 : 0;
+    return ($self->defined($name) || $self->exists($name)) ? 1 : 0;
 
 }
 
@@ -196,10 +224,13 @@ sub hash {
 =method iterator
 
     my $next = $self->iterator();
-    # i.e. $self->iterator('sort', sub{ (shift) cmp (shift) })
 
-    while (my $value = $next->()) {
+    # defaults: keys
+    # accepts: sort, rsort, nsort, or rnsort
+    # e.g. $self->iterator('sort', sub{ (shift) cmp (shift) });
 
+    while (my $item = $next->()) {
+        ...
     }
 
 =cut
@@ -208,7 +239,8 @@ sub iterator {
 
     my ($self, $function, @arguments) = @_;
 
-    $function ||= 'keys';
+    $function = 'keys'
+        unless grep { $function eq $_ } ('sort', 'rsort', 'nsort', 'rnsort');
 
     my @keys = ($self->$function(@arguments));
 
@@ -319,7 +351,7 @@ sub rmerge {
 
     my $arguments = $self->build_args(@_);
 
-    $self->add(merge($arguments, $self->hash));
+    $self->add(Hash::Merge::merge($arguments, $self->hash));
 
     return $self;
 

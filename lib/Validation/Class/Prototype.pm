@@ -398,7 +398,7 @@ sub apply_mixin {
 
         next unless $mixin;
 
-        $field->add($self->merge_mixin($field->name, $mixin->name));
+        $self->merge_mixin($field->name, $mixin->name);
 
     }
 
@@ -429,7 +429,7 @@ sub apply_mixin_field {
 
     # merge
 
-    $field_b->add($self->merge_field($field_b->hash, $field_a->hash));
+    $self->merge_field($field_a->name, $field_b->name);
 
     # restore
 
@@ -627,13 +627,11 @@ sub class {
 
     my ($name, %args) = @_;
 
-    return 0 unless $name;
+    return unless $name;
 
-    my $class =
-        Class::Forward->new(namespace => $self->{package})->forward($name);
+    my $class = Class::Forward->new(namespace=>$self->{package})->forward($name);
 
-    #return 0 unless defined $self->relatives->{$class};
-    return 0 unless $class;
+    return unless $class;
 
     my @attrs = qw(
 
@@ -746,9 +744,9 @@ sub clear_queue {
 
 }
 
-=method clone
+=method clone_field
 
-The clone method is used to create new fields (rules) from existing fields
+The clone_field method is used to create new fields (rules) from existing fields
 on-the-fly. This is useful when you have a variable number of parameters being
 validated that can share existing validation rules.
 
@@ -766,9 +764,9 @@ validated that can share existing validation rules.
     my $self = Class->new(params => $params);
 
     # clone phone rule at run-time to validate dynamically created parameters
-    $self->clone('phone', 'phone2', { label => 'Other Phone', required => 0 });
-    $self->clone('phone', 'phone3', { label => 'Third Phone', required => 0 });
-    $self->clone('phone', 'phone4', { label => 'Forth Phone', required => 0 });
+    $self->clone_field('phone', 'phone2', { label => 'Phone A', required => 0 });
+    $self->clone_field('phone', 'phone3', { label => 'Phone B', required => 0 });
+    $self->clone_field('phone', 'phone4', { label => 'Phone C', required => 0 });
 
     $self->validate(qw/phone phone2 phone3 phone4/);
 
@@ -776,7 +774,7 @@ validated that can share existing validation rules.
 
 =cut
 
-sub clone {
+sub clone_field {
 
     my ($self, $field, $new_field, $directives) = @_;
 
@@ -790,7 +788,7 @@ sub clone {
         $new_field => Validation::Class::Field->new($directives)
     );
 
-    $self->apply_mixin_field($field, $new_field);
+    $self->apply_mixin_field($new_field, $field);
 
     return $self;
 
@@ -874,19 +872,17 @@ and fields using the specified delimiter (defaulting to comma-space (", ")).
 
 sub errors_to_string {
 
-    my ($self, $delimiter, $transformer) = @_;
+    my $self = shift;
 
-    my $errors = Validation::Class::Errors->new([]); # handle combined errors
+    # combine class anf field errors
+
+    my $errors = Validation::Class::Errors->new([]);
 
     $errors->add($self->errors->list);
 
-    $self->fields->each(sub{
+    $errors->add($_->errors->list) for ($self->fields->values);
 
-        $errors->add($_[1]->errors->list);
-
-    });
-
-    return $errors->to_string($delimiter, $transformer);
+    return $errors->to_string(@_);
 
 }
 
@@ -906,41 +902,29 @@ sub get_errors {
 
     my ($self, @criteria) = @_;
 
-    my $errors = Validation::Class::Errors->new([]); # handle combined errors
+    my $errors = Validation::Class::Errors->new([]); # combined errors
 
     if (!@criteria) {
 
         $errors->add($self->errors->list);
 
-        $self->fields->each(sub{
-
-            $errors->add($_[1]->errors->list);
-
-        });
+        $errors->add($_->errors->list) for ($self->fields->values);
 
     }
 
-    elsif ("REGEXP" eq uc ref $criteria[0]) {
+    elsif (isa_regexp($criteria[0])) {
 
         my $query = $criteria[0];
 
-        $errors->add($self->errors->find($query));
-
-        $self->fields->each(sub{
-
-            $errors->add($_[1]->errors->find($query));
-
-        });
+        $errors->add($self->errors->grep($query)->list);
+        $errors->add($_->errors->grep($query)->list) for $self->fields->values;
 
     }
 
     else {
 
-        for (@criteria) {
-
-            $errors->add($self->fields->{$_}->errors->list);
-
-        }
+        $errors->add($_->errors->list)
+            for map {$self->fields->get($_)} @criteria;
 
     }
 
@@ -1119,6 +1103,8 @@ sub merge_field {
     $field_a = $self->fields->get($field_a);
     $field_b = $self->fields->get($field_b);
 
+    return unless $field_a && $field_b;
+
     # keep in mind that in this case we're using field_b as a mixin
 
     foreach my $pair ($field_b->pairs) {
@@ -1288,19 +1274,16 @@ sub normalize {
 
     }
 
-    # execute normalization events
-
-    foreach my $key ($self->fields->keys) {
-
-        $self->trigger_event('on_normalize', $key);
-
-    }
-
     # check for and process a mixin directive
 
     foreach my $key ($self->fields->keys) {
 
-        $self->apply_mixin($key);
+        my $field = $self->fields->get($key);
+
+        next unless $field;
+
+        $self->apply_mixin($key, $field->{mixin})
+            if $field->can('mixin') && $field->{mixin};
 
     }
 
@@ -1315,6 +1298,14 @@ sub normalize {
         $self->apply_mixin_field($key, $field->{mixin_field})
             if $field->can('mixin_field') && $field->{mixin_field}
         ;
+
+    }
+
+    # execute normalization events
+
+    foreach my $key ($self->fields->keys) {
+
+        $self->trigger_event('on_normalize', $key);
 
     }
 
@@ -2391,20 +2382,18 @@ sub trigger_event {
     return unless $event;
     return unless $field;
 
-    my $param;
     my @order;
     my $directives;
     my $process_all = 1 if $event eq 'on_normalize';
 
     $event = $self->events->get($event);
-    $param = $self->params->has($field) ? $self->params->get($field) : undef;
     $field = $self->fields->get($field);
 
     return unless defined $event;
     return unless defined $field;
 
     unless ($event eq 'on_normalize') {
-        # order events via dependency resolution
+        # order events via dependency resolution EXCEPT for on_normalize
         my $e = {map{$_=>$self->directives->get($_)}(sort keys %{$event})};
         $directives = Validation::Class::Directives->new($e);
         @order = ($directives->resolve_dependencies);
@@ -2421,6 +2410,11 @@ sub trigger_event {
 
         my $routine   = $event->{$i};
         my $directive = $directives->get($i);
+
+        # something else might fudge with the params so we wait
+        # until now to collect its value
+        my $name  = $field->name;
+        my $param = $self->params->has($name) ? $self->params->get($name) : undef;
 
         # execute the directive routine associated with the event
         $routine->($directive, $self, $field, $param);

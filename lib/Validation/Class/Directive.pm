@@ -2,7 +2,8 @@
 
 package Validation::Class::Directive;
 
-use Validation::Class::Core 'build_args', 'has';
+use Validation::Class::Core;
+
 use Carp 'confess';
 
 # VERSION

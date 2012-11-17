@@ -61,4 +61,4 @@ $v->params->{foobar} = '111-1111';
 ok ! $v->validate('foobar'), 'foobar rule doesnt validate';
 ok ! $v->validate, 'alternate use of validation doesnt validate';
 ok $v->error_count == 1, 'error count is correct';
-ok $v->errors_to_string =~ 'pattern', 'pattern error message found';
+ok $v->errors_to_string =~ 'not formatted', 'pattern error message found';

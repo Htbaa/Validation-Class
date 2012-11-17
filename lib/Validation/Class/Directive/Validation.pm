@@ -22,98 +22,42 @@ documented it just yet.
 
 =cut
 
-has 'mixin'   => 0;
-has 'field'   => 1;
-has 'multi'   => 0;
-has 'message' => '%s could not be validated';
-
-sub after_validation {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    $self->after_validation_delete_clones($proto, $field, $param);
-
-    return $self;
-
-}
-
-sub after_validation_delete_clones {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    my $name = $field->name;
-
-    my ($key, $index) = $name =~ /(.*)\:(\d+)$/;
-
-    if ($key && defined $index) {
-
-        my $value = $self->params->delete($name);
-
-        $self->params->{$key} ||= [];
-
-        $self->params->{$key}->[$index] = $value;
-
-    }
-
-    return $self;
-
-}
-
-sub before_validation {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    $self->before_validation_create_clones($proto, $field, $param);
-
-    return $self;
-
-}
-
-sub before_validation_create_clones {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    # clone fields to handle parameters with multi-values
-
-    if (isa_arrayref($param)) {
-
-        # clone deterministically
-
-        my $name = $field->name;
-
-        for (my $i=0; $i < @{$param}; $i++) {
-
-            my $clone = "$name:$i";
-
-            $self->params->add($clone => $param->[$i]);
-
-            my $label = ($field->label || $name);
-
-            $self->clone($name => $clone, { label  => "$label #" . ($i+1) });
-
-            # add clones to field list to be validated
-            push @{$proto->stash->{'validation.fields'}}, $clone
-                if grep { $_ eq $name } @{$proto->stash->{'validation.fields'}}
-            ;
-
-            # record clones (to be reaped later)
-            push @{$proto->stash->{'directive.validation.clones'}}, $clone;
-
-        }
-
-        $self->params->delete($name);
-
-        # remove the field the clones are based on from the fields list
-        @{$proto->stash->{'validation.fields'}} =
-            grep { $_ ne $name } @{$proto->stash->{'validation.fields'}}
-            if @{$proto->stash->{'validation.fields'}}
-        ;
-
-    }
-
-    return $self;
-
-}
+has 'mixin'        => 0;
+has 'field'        => 1;
+has 'multi'        => 0;
+has 'message'      => '%s could not be validated';
+# ensure most core directives execute before this one
+has 'dependencies' => sub {[qw(
+    alias
+    between
+    default
+    depends_on
+    error
+    errors
+    filtering
+    filters
+    label
+    length
+    matches
+    max_alpha
+    max_digits
+    max_length
+    max_sum
+    min_alpha
+    min_digits
+    min_length
+    min_sum
+    mixin
+    mixin_field
+    multiples
+    name
+    options
+    pattern
+    readonly
+    required
+    toggle
+    value
+)]};
 
 sub validate {
 
