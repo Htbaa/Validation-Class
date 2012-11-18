@@ -45,7 +45,7 @@ our @EXPORT = qw(
 
         my $class = shift || caller(2);
 
-        return proto_classes->get($class) || do {
+        return vc_prototypes->get($class) || do {
 
             # build new prototype class
 
@@ -109,7 +109,7 @@ our @EXPORT = qw(
             }
 
             # cache prototype
-            proto_classes->add($class => $proto);
+            vc_prototypes->add($class => $proto);
 
             $proto; # return-once
 
@@ -176,19 +176,21 @@ sub initialize_validator {
 
     while (my($name, $value) = each (%{$arguments})) {
 
-        $self->$name($value) if
-            $proto->fields->has($name) ||
-            $proto->attributes->has($name) ||
-            grep { $name eq $_ } ($proto->proxy_attributes)
-        ;
+        my $ok = 0;
+
+        $ok++ if $proto->fields->has($name);
+        $ok++ if $proto->attributes->has($name);
+        $ok++ if grep { $name eq $_ } ($proto->proxy_methods);
+
+        $self->$name($value) if $self->can($name) && $ok;
 
     }
 
     # process plugins
 
-    foreach my $plugin ($proto->plugins->list) {
+    foreach my $plugin ($proto->plugins->keys) {
 
-        $proto->plugins->add($plugin => $plugin->new($self))
+        $proto->plugins->add($plugin => $plugin->new($proto))
             if $plugin->can('new')
         ;
 

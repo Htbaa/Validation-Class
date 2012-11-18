@@ -1,4 +1,4 @@
-use Test::More tests => 18;
+use Test::More tests => 17;
 
 package MyVal;
 
@@ -63,7 +63,7 @@ ok $v->proto->mixins,  'mixins attr ok';
 ok $v->proto->filters, 'filters attr ok';
 
 # ok $v->types,   'types attr ok'; - DEPRECATED
-ok $v->proto->types,   'types attr ok';
+# ok $v->proto->types,   'types attr ok';
 
 # process field with multiple mixins
 ok defined $v->fields->{something}->{required}
@@ -132,7 +132,7 @@ my $params = {
     email        => 'awncorp2cpan.org'
 };
 
-$v = MyVal->new( params => $params, fields => $v->fields );
+$v = MyVal->new( params => $params, fields => $v->fields->hash );
 
 # params set at new function
 ok scalar( keys %{ $v->params } ), 'params have been set at instantiation';
@@ -160,7 +160,7 @@ $v->fields->{'password_cfm'} = {
     }
 };
 
-$v = MyVal->new( params => $v->params, fields => $v->fields );
+$v = MyVal->new( params => $v->params->hash, fields => $v->fields->hash );
 
 ok $v->validate('password'), 'password field validates';
 ok $v->validate( 'password', 'password_cfm' ),

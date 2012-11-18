@@ -292,7 +292,9 @@ sub merge {
 
     my $arguments = $self->build_args(@_);
 
-    $self->add(Hash::Merge::merge($self->hash, $arguments));
+    my $merger = Hash::Merge->new('LEFT_PRECEDENT');
+
+    $self->add($merger->merge($arguments, $self->hash));
 
     return $self;
 
@@ -351,7 +353,9 @@ sub rmerge {
 
     my $arguments = $self->build_args(@_);
 
-    $self->add(Hash::Merge::merge($arguments, $self->hash));
+    my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
+
+    $self->add($merger->merge($arguments, $self->hash));
 
     return $self;
 

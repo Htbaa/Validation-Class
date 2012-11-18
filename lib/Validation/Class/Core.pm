@@ -15,14 +15,16 @@ our @EXPORT = qw(
 
     build_args
     build_args_collection
-    proto_classes
     has
     hold
     isa_arrayref
     isa_classref
     isa_coderef
     isa_hashref
+    isa_listing
+    isa_mapping
     isa_regexp
+    vc_prototypes
 
 );
 
@@ -198,13 +200,25 @@ sub isa_hashref {
 
 }
 
+sub isa_listing {
+
+    return "Validation::Class::Listing" eq ref(shift) ? 1 : 0;
+
+}
+
+sub isa_mapping {
+
+    return "Validation::Class::Mapping" eq ref(shift) ? 1 : 0;
+
+}
+
 sub isa_regexp {
 
     return "REGEXP" eq uc(ref(shift)) ? 1 : 0;
 
 }
 
-sub proto_classes {
+sub vc_prototypes {
 
     # Validation::Class::Prototype should be already loaded
     return Validation::Class::Prototype->registry;

@@ -71,7 +71,9 @@ sub add {
 
 sub resolve_dependencies {
 
-    my ($self) = @_;
+    my ($self, $type) = @_;
+
+    $type ||= 'validation';
 
     my $dependencies = {};
 
@@ -79,44 +81,69 @@ sub resolve_dependencies {
 
         my $class      = $self->get($key);
         my $name       = $class->name;
-        my $dependents = $class->dependencies;
+        my $dependents = $class->dependencies->{$type};
 
         # avoid invalid dependencies by excluding the unknown
         $dependencies->{$name} = [grep { $self->has($_) } @{$dependents}];
 
     }
 
-    my @pending = keys %$dependencies;
     my @ordered;
     my %found;
     my %track;
 
+    my @pending =  keys %$dependencies;
+    my $limit   =  scalar(keys %$dependencies);
+       $limit   += scalar(@{$_}) for values %$dependencies;
+
     while (@pending) {
+
         my $k = shift @pending;
-        if ( grep { $_ eq $k } @{ $dependencies->{$k} } ) {
-            confess "Direct circular dependency: $k -> $k";
+
+        if (grep { $_ eq $k } @{$dependencies->{$k}}) {
+
+            confess sprintf 'Direct circular dependency on event %s: %s -> %s',
+            $type, $k, $k;
+
         }
-        elsif ( grep !exists $found{$_}, @{ $dependencies->{$k} } ) {
-            confess "Invalid dependency in dependency list: $k -> " . join ',',
-                @{ $dependencies->{$k} } if grep !exists $dependencies->{$_},
-                @{ $dependencies->{$k} };
-            confess "Indirect circular dependency: $k -> " . join ',',
-                @{ $dependencies->{$k} } if $track{$k} && $track{$k} > 1;
+
+        elsif (grep !exists $found{$_}, @{$dependencies->{$k}}) {
+
+            confess sprintf 'Invalid dependency on event %s: %s -> %s',
+            $type, $k, join(',', @{$dependencies->{$k}})
+            if grep !exists $dependencies->{$_}, @{$dependencies->{$k}};
+
+            confess
+            sprintf 'Indirect circular dependency on event %s: %s -> %s ',
+            $type, $k, join(',', @{$dependencies->{$k}})
+            if $track{$k} && $track{$k} > $limit; # allowed circular iterations
+
             $track{$k}++ if push @pending, $k;
+
         }
+
         else {
+
             $found{$k} = 1;
             push @ordered, $k;
+
         }
+
     }
 
     my $charmap = join '', reverse @ordered;
 
-    foreach my $el ( keys %$dependencies ) {
-        for ( @{ $dependencies->{$el} } ) {
-            confess "Broken dependency chain via $el versus $_"
-                if index( $charmap, $el ) > index( $charmap, $_ );
+    foreach my $el (keys %$dependencies) {
+
+        for (@{$dependencies->{$el}}) {
+
+            confess sprintf
+            'Broken dependency chain; Faulty ordering on event %s: %s before %s',
+            $type, $el, $_
+            if index($charmap,$el) > index($charmap, $_);
+
         }
+
     }
 
     return (@ordered);

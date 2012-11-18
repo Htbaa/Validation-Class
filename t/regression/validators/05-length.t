@@ -18,16 +18,16 @@ my $r = MyVal->new(
 
 ok  $r->validate(), 'foobar validates';
     $r->params->{foobar} = 'abc';
-    
+
 ok  ! $r->validate(), 'foobar doesnt validate';
-ok  'foobar must contain exactly 1 character' eq $r->errors_to_string(),
+ok  $r->errors_to_string() =~ /does not contain the correct number of characters/,
     'displays proper error message';
-    
+
     $r->params->{foobar} = 'a';
     $r->fields->{foobar}->{length} = 2;
-    
+
 ok  ! $r->validate(), 'foobar doesnt validate';
-ok  'foobar must contain exactly 2 characters' eq $r->errors_to_string(),
+ok  $r->errors_to_string() =~ /does not contain the correct number of characters/,
     'displays proper error message';
-    
+
 #warn $r->errors_to_string();

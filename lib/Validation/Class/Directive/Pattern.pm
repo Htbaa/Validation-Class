@@ -35,7 +35,7 @@ sub validate {
 
         my $pattern = $field->{pattern};
 
-        if ( $field->{required} || $param ) {
+        if (defined $param) {
 
             unless ( isa_regexp($pattern) ) {
 

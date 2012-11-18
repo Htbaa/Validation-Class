@@ -33,7 +33,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{between}) {
+    if (defined $field->{between} && defined $param) {
 
         my $between = $field->{between};
 

@@ -25,6 +25,63 @@ documented it just yet.
 has 'mixin'        => 1;
 has 'field'        => 1;
 has 'multi'        => 1;
-has 'dependencies' => sub { ['value'] };
+has 'dependencies' => sub {{
+    normalization => ['filters'],
+    validation    => ['value']
+}};
+
+sub after_validation {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # override parameter value if default exists
+
+    if (defined $field->{default}) {
+
+        my $name = $field->name;
+
+        $proto->params->add($name, $field->{default});
+
+    }
+
+    return $self;
+
+}
+
+sub before_validation {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # override parameter value if default exists
+
+    if (defined $field->{default}) {
+
+        my $name = $field->name;
+
+        $proto->params->add($name, $field->{default});
+
+    }
+
+    return $self;
+
+}
+
+sub normalize {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # override parameter value if default exists
+
+    if (defined $field->{default}) {
+
+        my $name = $field->name;
+
+        $proto->params->add($name, $field->{default});
+
+    }
+
+    return $self;
+
+}
 
 1;

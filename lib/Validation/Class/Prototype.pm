@@ -392,9 +392,9 @@ sub apply_mixin {
 
     my $mixins = isa_arrayref($mixin) ? $mixin : [$mixin];
 
-    foreach my $mixin (@{$mixins}) {
+    foreach my $name (@{$mixins}) {
 
-        $mixin = $self->mixins->get($mixin);
+        my $mixin = $self->mixins->get($name);
 
         next unless $mixin;
 
@@ -644,9 +644,8 @@ sub class {
 
     my %defaults = ( map { $_ => $self->$_ } @attrs );
 
-    $defaults{'stash'}  = $self->stash; # copy stash
-
-    $defaults{'params'} = $self->get_params; # copy params
+    $defaults{'stash'}  = $self->stashed;     # copy stash
+    $defaults{'params'} = $self->get_params;  # copy params
 
     my %settings = %{ merge \%args, \%defaults };
 
@@ -1117,7 +1116,7 @@ sub merge_field {
 
         # do not override existing keys but multi values append
 
-        if (grep { $key eq $_ } ($field_a->keys)) {
+        if ($field_a->has($key)) {
 
             next unless $directives->get($key)->multi;
 
@@ -1186,7 +1185,7 @@ sub merge_mixin {
 
         # do not override existing keys but multi values append
 
-        if (grep { $key eq $_ } ($field->keys)) {
+        if ($field->has($key)) {
 
             next unless $directives->get($key)->multi;
 
@@ -1258,11 +1257,9 @@ sub normalize {
 
     my $self = shift;
 
-    $self->validated(0);
+    # resets
 
-    # reset fields
-    # NOTICE: (called twice in this routine, not sure why, must
-    # investigate further although it doesn't currently break anything)
+    $self->validated(0);
 
     $self->reset_fields;
 
@@ -1358,10 +1355,6 @@ sub normalize {
         }
 
     }
-
-    # restore order to the land
-
-    $self->reset_fields;
 
     # final checkpoint, validate field directives
 
@@ -1529,23 +1522,6 @@ sub plugin {
     }
 
     return $self->plugins->{$class};
-
-}
-
-sub proxy_attributes {
-
-    return qw{
-
-        fields
-        filtering
-        ignore_failure
-        ignore_unknown
-        params
-        report_failure
-        report_unknown
-        stash
-
-    }
 
 }
 
@@ -1986,7 +1962,7 @@ sub register_settings {
 
                     }
 
-                    my $role_proto = $self->prototypes->get($role);
+                    my $role_proto = $self->registry->get($role);
 
                     # merge configurations
 
@@ -2028,6 +2004,8 @@ sub reset {
         $self->queued([]);
 
         $self->reset_fields;
+
+        $self->reset_params;
 
     return $self;
 
@@ -2076,9 +2054,8 @@ sub reset_fields {
     foreach my $field ( $self->fields->values ) {
 
         # set default, special directives, etc
-        $field->{name}   = $field->name;
-        $field->{toggle} = undef;
-        $field->{value}  = '';
+        $field->{name}  = $field->name;
+        $field->{value} = '';
 
     }
 
@@ -2270,6 +2247,7 @@ sub snapshot {
             filters
             methods
             mixins
+            plugins
             profiles
             relatives
         );
@@ -2325,40 +2303,13 @@ into context/instance specific operations.
 
 sub stash {
 
-    my ($self, @requests) = @_;
+    my $self = shift;
 
-    if (@requests) {
+    return $self->stashed->get($_[0]) if @_ == 1 && ! ref $_[0];
 
-        if (@requests == 1) {
-
-            my $request = $requests[0];
-
-            if ("HASH" eq ref $request) {
-
-                @requests = %{$request};
-
-            }
-            else {
-
-                return $self->stashed->{$request};
-
-            }
-
-        }
-
-        if (@requests > 1) {
-
-            my %data = @requests;
-
-            while (my($key, $value) = each %data) {
-
-                $self->stashed->{$key} = $value;
-
-            }
-
-        }
-
-    }
+    $self->stashed->add($_[0]->hash) if @_ == 1 && isa_mapping($_[0]);
+    $self->stashed->add($_[0])       if @_ == 1 && isa_hashref($_[0]);
+    $self->stashed->add(@_)          if @_ > 1;
 
     return $self->stashed;
 
@@ -2384,7 +2335,8 @@ sub trigger_event {
 
     my @order;
     my $directives;
-    my $process_all = 1 if $event eq 'on_normalize';
+    my $process_all = $event eq 'on_normalize' ? 1 : 0;
+    my $event_type  = $event eq 'on_normalize' ? 'normalization' : 'validation';
 
     $event = $self->events->get($event);
     $field = $self->fields->get($field);
@@ -2392,14 +2344,15 @@ sub trigger_event {
     return unless defined $event;
     return unless defined $field;
 
-    unless ($event eq 'on_normalize') {
-        # order events via dependency resolution EXCEPT for on_normalize
-        my $e = {map{$_=>$self->directives->get($_)}(sort keys %{$event})};
-        $directives = Validation::Class::Directives->new($e);
-        @order = ($directives->resolve_dependencies);
-    }
+    # order events via dependency resolution
 
+    $directives = Validation::Class::Directives->new(
+        {map{$_=>$self->directives->get($_)}(sort keys %{$event})}
+    );
+    @order = ($directives->resolve_dependencies($event_type));
     @order = keys(%{$event}) unless @order;
+
+    # execute events
 
     foreach my $i (@order) {
 
@@ -2551,7 +2504,7 @@ sub validate {
 
     foreach my $field (@fields) {
 
-        my ($switch) = $field =~ /^[+-]./;
+        my ($switch) = $field =~ /^([+-])./;
 
         if ($switch) {
 
@@ -2561,7 +2514,8 @@ sub validate {
 
             if (my $field = $self->fields->get($field)) {
 
-                $field->toggle($switch);
+                $field->toggle(1) if $switch eq '+';
+                $field->toggle(0) if $switch eq '-';
 
             }
 

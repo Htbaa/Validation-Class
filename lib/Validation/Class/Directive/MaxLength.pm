@@ -33,7 +33,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{max_length}) {
+    if (defined $field->{max_length} && defined $param) {
 
         my $max_length = $field->{max_length};
 

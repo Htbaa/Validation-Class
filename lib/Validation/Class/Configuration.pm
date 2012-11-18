@@ -211,6 +211,14 @@ sub new {
 
 }
 
+sub plugins {
+
+    my ($self) = @_;
+
+    return $self->profile->{PLUGINS};
+
+}
+
 sub profile {
 
     my ($self) = @_;

@@ -18,9 +18,9 @@ my $r = MyVal->new(
 
 ok  $r->validate(), 'foobar validates';
     $r->fields->{foobar}->{min_length} = 6;
-    
+
 ok  ! $r->validate(), 'foobar doesnt validate';
-ok  'foobar must contain at-least 6 characters' eq $r->errors_to_string(),
+ok  $r->errors_to_string() =~ /must be 6 or more characters/,
     'displays proper error message';
-    
+
 #warn $r->errors_to_string();

@@ -37,7 +37,7 @@ ok $post->params->{foobar} =~ /^123abc456d666ef$/,
 my $nope = MyVal->new(
     fields    => { foobar => { filters => 'alphanumeric' } },
     params    => { foobar => '1@%23abc45@%#@#%6d666ef..' },
-    filtering => ''
+    filtering => 'off'
 );
 
 ok $nope->params->{foobar} =~ /^1@%23abc45@%#@#%6d666ef\.\.$/,
@@ -77,4 +77,3 @@ $nope->fields->{foobar}->{pattern} = qr/^\d{3}\w{3}\d{3}\w\d{3}\w{2}$/;
 $nope->params->{foobar} = '1@%23abc45@%#@#%6d666ef..';
 
 ok $nope->validate, 'pre-filtering allowed validation';
-

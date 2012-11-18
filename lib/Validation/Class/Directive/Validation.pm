@@ -27,37 +27,40 @@ has 'field'        => 1;
 has 'multi'        => 0;
 has 'message'      => '%s could not be validated';
 # ensure most core directives execute before this one
-has 'dependencies' => sub {[qw(
-    alias
-    between
-    default
-    depends_on
-    error
-    errors
-    filtering
-    filters
-    label
-    length
-    matches
-    max_alpha
-    max_digits
-    max_length
-    max_sum
-    min_alpha
-    min_digits
-    min_length
-    min_sum
-    mixin
-    mixin_field
-    multiples
-    name
-    options
-    pattern
-    readonly
-    required
-    toggle
-    value
-)]};
+has 'dependencies' => sub {{
+    normalization => [],
+    validation    => [qw(
+        alias
+        between
+        default
+        depends_on
+        error
+        errors
+        filtering
+        filters
+        label
+        length
+        matches
+        max_alpha
+        max_digits
+        max_length
+        max_sum
+        min_alpha
+        min_digits
+        min_length
+        min_sum
+        mixin
+        mixin_field
+        multiples
+        name
+        options
+        pattern
+        readonly
+        required
+        toggle
+        value
+    )]
+}};
 
 sub validate {
 
@@ -65,7 +68,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{validation}) {
+    if (defined $field->{validation} && defined $param) {
 
         my $context = $proto->stash->{'validation.context'};
 

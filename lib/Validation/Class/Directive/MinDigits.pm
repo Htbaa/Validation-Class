@@ -33,7 +33,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{min_digits}) {
+    if (defined $field->{min_digits} && defined $param) {
 
         my $min_digits = $field->{min_digits};
 

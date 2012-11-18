@@ -24,7 +24,11 @@ documented it just yet.
 
 has 'mixin' => 1;
 has 'field' => 1;
-has 'multi' => 1;
+has 'multi' => 0;
+has 'dependencies' => sub {{
+    normalization => [],
+    validation    => []
+}};
 
 sub normalize {
 
@@ -33,11 +37,7 @@ sub normalize {
     # by default fields should have a filtering directive
     # unless already specified
 
-    unless (defined $field->{filtering}) {
-
-        $field->{filtering} = $proto->filtering || 'pre';
-
-    }
+    $field->{filtering} = $proto->filtering || 'pre' if ! defined $field->{filtering};
 
     return $self;
 

@@ -33,7 +33,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{max_alpha}) {
+    if (defined $field->{max_alpha} && defined $param) {
 
         my $max_alpha = $field->{max_alpha};
 

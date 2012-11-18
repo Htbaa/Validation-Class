@@ -26,7 +26,10 @@ has 'mixin'        => 1;
 has 'field'        => 1;
 has 'multi'        => 0;
 has 'message'      => '%s is required';
-has 'dependencies' => sub { ['alias'] };
+has 'dependencies' => sub {{
+    normalization => [],
+    validation    => ['alias', 'toggle']
+}};
 
 sub before_validation {
 
@@ -42,6 +45,18 @@ sub before_validation {
         }
 
     }
+
+    return $self;
+
+}
+
+sub normalize {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # by default, field validation is optional
+
+    $field->{required} = 0 unless defined $field->{required};
 
     return $self;
 

@@ -25,7 +25,7 @@ documented it just yet.
 has 'mixin'   => 1;
 has 'field'   => 1;
 has 'multi'   => 1;
-has 'message' => '%s should match %s';
+has 'message' => '%s does not match %s';
 
 sub validate {
 
@@ -37,7 +37,7 @@ sub validate {
 
         my $specification = $field->{matches};
 
-        if ($field->{required} || $param) {
+        if (defined $param) {
 
             my $dependents = isa_arrayref($specification) ?
                 $specification : [$specification]

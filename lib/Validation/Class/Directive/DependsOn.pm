@@ -33,7 +33,7 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{depends_on}) {
+    if (defined $field->{depends_on} && defined $param) {
 
         my $specification = $field->{depends_on};
 

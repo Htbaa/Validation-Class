@@ -23,21 +23,20 @@ my $v1 = MyVal->new(
 # check that an array parameters is handled properly on-the-fly
 ok ! $v1->validate('foobar'), 'validation does not pass';
 ok $v1->error_count == 1, '1 errors set, 1 wrong element of the param array value';
-ok $v1->errors_to_string =~ /#/, 'error message identifies the problem param array element';
+ok $v1->errors_to_string =~ /multiple/, 'error message identifies no array handling specified';
 
 my $v2 = MyVal->new(
     fields => {
         'foobar.barbaz' => {
-            min_length => 5
+            min_length => 5,
+            multiples  => 1
         }
     },
     params => {
-        foobar => {
-            barbaz => [
-                join('', 1..4),
-                join('', 1..5),
-            ]
-        }
+        'foobar.barbaz' => [
+            join('', 1..4),
+            join('', 1..5),
+        ]
     }
 );
 
@@ -47,7 +46,7 @@ ok $v2->errors_to_string =~ /#/, 'error message identifies the problem param arr
 
 my $v3 = MyVal->new(
     fields => {
-        'foobar.barbaz' => {
+        'foobar.barbaz:0' => {
             min_length => 5
         }
     },
@@ -57,9 +56,9 @@ my $v3 = MyVal->new(
     }
 );
 
-ok ! $v3->validate('foobar.barbaz'), 'validation does not pass';
+ok ! $v3->validate('foobar.barbaz:0'), 'validation does not pass';
 ok $v3->error_count == 1, '1 errors set, 1 wrong element of the param array value';
-ok $v3->errors_to_string =~ /#/, 'error message identifies the problem param array element';
+ok $v3->errors_to_string =~ /5 or more/, 'error message identifies the problem param array element';
 
 my $v4 = MyVal->new(
     fields => {

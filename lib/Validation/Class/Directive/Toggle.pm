@@ -31,13 +31,15 @@ sub before_validation {
 
     if (defined $field->{toggle}) {
 
-        my $stash = $proto->stash->{'directive.toggle'};
+        my $stash = $proto->stash->{'directive.toggle'} ||= {};
 
         # to be restored after validation
-        $stash->{$field->{name}}->{'required'} = $field->{required};
 
-        $field->{required} = 1 if ($field->{toggle} =~ /^([+]|1)$/);
-        $field->{required} = 0 if ($field->{toggle} =~ /^([-]|0)$/);
+        $stash->{$field->{name}}->{'required'} =
+            defined $field->{required} ? $field->{required} == 0 ? 0 : 1 : 0;
+
+        $field->{required} = 1 if ($field->{toggle} =~ /^(\+|1)$/);
+        $field->{required} = 0 if ($field->{toggle} =~ /^(\-|0)$/);
 
     }
 
@@ -51,13 +53,33 @@ sub after_validation {
 
     if (defined $field->{toggle}) {
 
-        my $stash = $proto->stash->{'directive.toggle'};
+        my $stash = $proto->stash->{'directive.toggle'} ||= {};
 
-        # restore field state from stash after validation
-        $field->{required} = $stash->{$field->{name}}->{'required'};
-        delete $stash->{$field->{name}};
+        if (defined $stash->{$field->{name}}->{'required'}) {
+
+            # restore field state from stash after validation
+
+            $field->{required} = $stash->{$field->{name}}->{'required'};
+
+            delete $stash->{$field->{name}};
+
+        }
 
     }
+
+    delete $field->{toggle} if exists $field->{toggle};
+
+    return $self;
+
+}
+
+sub normalize {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # on normalize, always remove the toggle directive
+
+    delete $field->{toggle} if exists $field->{toggle};
 
     return $self;
 

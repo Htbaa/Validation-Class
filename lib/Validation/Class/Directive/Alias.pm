@@ -25,7 +25,10 @@ parameter value.
 has 'mixin'        => 0;
 has 'field'        => 1;
 has 'multi'        => 0;
-has 'dependencies' => sub { ['name'] };
+has 'dependencies' => sub {{
+    normalization => [],
+    validation    => ['name']
+}};
 
 sub before_validation {
 

@@ -51,15 +51,15 @@ has 'mixin'         => 0;
 has 'field'         => 0;
 has 'multi'         => 0;
 has 'message'       => '%s was not processed successfully';
-has 'validator'     => sub { sub{1} }; # nasty hack, we need a better way !!!
-has 'dependencies'  => sub { [] };
+has 'validator'     => sub { sub{1} };
+has 'dependencies'  => sub {{ normalization => [], validation => [] }};
 has 'name'          => sub {
 
     my ($self) = @_;
 
     my $name = ref $self || $self;
 
-    my $regexp = qr/V[^:]+::C[^:]+::D[^:]+::(.*)$/;
+    my $regexp = qr/Validation::Class::Directive::(.*)$/;
 
     ($name) = $name =~ $regexp;
 
@@ -125,6 +125,7 @@ sub validate {
 
     my $context = $proto->stash->{'validation.context'};
 
+    # nasty hack, we need a better way !!!
     $self->validator->($context, $field, $proto->params);
 
     return $self;

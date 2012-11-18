@@ -2,14 +2,13 @@ package MyVal::Plugin::Glade;
 
 sub new {
 
-    my ($plugin, $caller) = @_;
+    my ($self, $proto) = @_;
 
-    $caller->stash(smell  => \&smell);
-    $caller->stash(squirt => \&squirt);
+    $proto->stash(smell  => \&smell);
+    $proto->stash(squirt => \&squirt);
+    $proto->set_method(squash => sub {'abc'});
 
-    $caller->set_method(squash => sub {'abc'});
-
-    return bless {}, $plugin;
+    return bless {}, $self;
 
 }
 

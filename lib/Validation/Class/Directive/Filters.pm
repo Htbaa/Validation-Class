@@ -117,6 +117,10 @@ sub filter_uppercase {
 has 'mixin' => 1;
 has 'field' => 1;
 has 'multi' => 1;
+has 'dependencies' => sub {{
+    normalization => ['filtering'],
+    validation    => []
+}};
 
 sub after_validation {
 
@@ -156,7 +160,7 @@ sub normalize {
 
     else {
 
-        $self->before_validation($proto, $field, $param);
+        $self->execute_filtering($proto, $field, $param, 'pre');
 
     }
 
@@ -170,22 +174,30 @@ sub execute_filtering {
 
     return unless $state;
 
-    if (defined $field->{filters} && defined $field->{filtering}) {
+    if (defined $field->{filters} && defined $field->{filtering} && defined $param) {
 
-            if ($field->{filtering} eq $state) {
+            if ($field->{filtering} eq $state && $state ne 'off') {
 
-            my @filters = map { $proto->filters->get($_) }
-                isa_arrayref($field->{filters}) ?
-                    @{$field->{filters}} : ($field->{filters})
-            ;
+            my @filters = isa_arrayref($field->{filters}) ?
+                    @{$field->{filters}} : ($field->{filters});
 
             my $values = $param;
 
             foreach my $value (isa_arrayref($param) ? @{$param} : ($param)) {
+
                 next if ! $value;
+
                 foreach my $filter (@filters) {
-                    $value = $filter->($value);
+
+                    $filter = $proto->filters->get($filter)
+                        unless isa_coderef($filter);
+
+                    next if ! $filter;
+
+                    $value  = $filter->($value);
+
                 }
+
             }
 
             my $name = $field->name;

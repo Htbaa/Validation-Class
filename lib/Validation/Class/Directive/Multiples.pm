@@ -27,36 +27,37 @@ has 'field'        => 1;
 has 'multi'        => 0;
 has 'message'      => '%s does not support multiple values';
 # ensure most core directives execute before this one
-has 'dependencies' => sub {[qw(
-    alias
-    between
-    default
-    depends_on
-    error
-    errors
-    filtering
-    filters
-    label
-    length
-    matches
-    max_alpha
-    max_digits
-    max_length
-    max_sum
-    min_alpha
-    min_digits
-    min_length
-    min_sum
-    mixin
-    mixin_field
-    name
-    options
-    pattern
-    readonly
-    required
-    toggle
-    value
-)]};
+has 'dependencies' => sub {{
+    normalization => [],
+    validation    => [qw(
+        alias
+        between
+        depends_on
+        error
+        errors
+        filtering
+        filters
+        label
+        length
+        matches
+        max_alpha
+        max_digits
+        max_length
+        max_sum
+        min_alpha
+        min_digits
+        min_length
+        min_sum
+        mixin
+        mixin_field
+        name
+        options
+        pattern
+        readonly
+        required
+        toggle
+    )]
+}};
 
 sub after_validation {
 
@@ -64,7 +65,7 @@ sub after_validation {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{multiples}) {
+    if (defined $field->{multiples} && defined $param) {
 
         $self->after_validation_delete_clones($proto, $field, $param);
 
@@ -108,7 +109,7 @@ sub before_validation {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{multiples}) {
+    if (defined $field->{multiples} && defined $param) {
 
         $self->before_validation_create_clones($proto, $field, $param);
 

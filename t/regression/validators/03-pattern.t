@@ -22,12 +22,12 @@ my $r = MyVal->new(
 
 ok  $r->validate('telephone'), 'telephone validates';
     $r->params->{telephone} = '1234567890';
-    
+
 ok  ! $r->validate('telephone'), 'telephone doesnt validate';
-ok  'telephone does not match the pattern ### ###-####' eq $r->errors_to_string(),
+ok  $r->errors_to_string() =~ /is not formatted properly/,
     'displays proper error message';
-    
+
 ok  ! $r->validate('url'), 'url doesnt validate';
     $r->params->{url} = 'http://dept.site.com/';
-    
+
 ok  $r->validate('url'), 'url validates';
