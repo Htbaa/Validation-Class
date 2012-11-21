@@ -4,6 +4,8 @@ Revision history for the Perl library Validation::Class
 
   - Created Validation::Class::Whitepaper as a sounding-board and source for FAQs
 
+  - Changed the version number scheme (again) to slow down incrementing of the major number
+
   - Created Validation::Class::Simple for ad-hoc validation needs
 
   - Created various container classes, .e.g. Fields, Params, Directives, etc
