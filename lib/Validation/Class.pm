@@ -1,4 +1,4 @@
-# ABSTRACT: Data Validation Framework
+# ABSTRACT: Powerful Data Validation Framework
 
 package Validation::Class;
 
@@ -215,41 +215,35 @@ sub initialize_validator {
 
 =head1 SYNOPSIS
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validation::Class;
 
+    # a mixin is a data validation template
     mixin basic     => {
         required    => 1,
         max_length  => 255,
         filters     => [qw/trim strip/]
     };
 
+    # data validation rules for the login parameter
     field login     => {
         mixin       => 'basic',
         min_length  => 5
     };
 
+    # data validation rules for the password parameter
     field password  => {
         mixin       => 'basic',
         min_length  => 5,
         min_symbols => 1
     };
 
-    package main;
+    # ... elsewhere in your application
+    my $person = MyApp::Person->new(login => 'admin', password => 'secr3t');
 
-    my $user = MyApp::User->new(login => 'admin', password => 'secr3t');
-
-    unless ($user->validate('login', 'password')) {
-
-        # do something with the errors
-        # e.g. print $user->errors_to_string
-
-        # or   my @errors     = $user->get_errors
-        # or   my $has_errors = $user->error_count
-
-        # etc ...
-
+    unless ($person->validate) {
+        # handle the failures
     }
 
     1;
@@ -259,31 +253,39 @@ sub initialize_validator {
 Validation::Class is a robust data validation framework which aims to provide
 the building blocks for easily definable self-validating classes.
 
-Validation::Class provides a light-weight object system, self-validating
-sub-routines, validation profiles, compartmentalization, input filtering,
-extensibility (create your own custom validators and input filters), class
-inheritance, automatic array handling, and much more.
+Validation::Class provides an extensible framework for developing clean yet
+sophisticated data validation objects. The core feature-set consist of
+self-validating methods, validation profiles, reusable validation rules and
+templates, pre and post validation input filtering, class inheritance, automatic
+array handling, as well as extensibility (i.e. override default error messages,
+create custom validators and input filters and much more).
+
+If you are looking for a simple in-line data validation module built using the
+same tenets and principles as Validation::Class, please review
+L<Validation::Class::Simple>.
 
 If you are new to Validation::Class, or would like more information on the
 underpinnings of this library and how it views and approaches data validation,
-please review L<Validation::Class::Manual::Intro>.
+please review L<Validation::Class::WhitePaper::Validation>.
 
 =cut
 
 =keyword attribute
 
-The attribute keyword (or has) creates a class attribute. This is only a
+The attribute keyword (or has) registers a class attribute. This is only a
 minimalistic variant of what you may have encountered in other object systems.
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validate::Class;
 
-    attribute 'bothered' => 1;
+    attribute 'first_name' => 'Peter';
+    attribute 'last_name'  => 'Venkman';
 
-    attribute 'attitude' => sub {
+    attribute 'full_name'  => sub {
 
-        return $self->bothered ? 1 : 0
+        my ($self) = @_;
+        return join ', ', $self->last_name, $self->first_name;
 
     };
 
@@ -319,15 +321,17 @@ sub has { goto &attribute } sub attribute {
 =keyword build
 
 The build keyword (or bld) registers a coderef to be run at instantiation much
-in the same way the common L<Moose> BUILD routine is used.
+in the same way the common BUILD routine is used in modern OO frameworks.
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validation::Class;
 
     build sub {
 
         my ($self, $args) = @_;
+
+        # run after instantiation in the order declared
 
     };
 
@@ -358,22 +362,27 @@ sub bld { goto &build } sub build {
 
 =keyword directive
 
-The directive keyword (or dir) creates custom validator directives to be used in
-your field definitions. It is a means of extending the pre-existing directives
-table before runtime and is ideal for creating custom directive extension
-packages to be used in all your classes.
+The directive keyword (or dir) registers custom validator directives to be used
+in your field definitions. It is a means of extending the core field directives
+before instantiation.
 
-    directive 'is_email' => sub {
+    package MyApp::Directives;
 
-        my ($directive_value, $parameter_value, $field_object) = @_;
+    use Validation::Class 'directive';
+
+    use Data::Validate::Email;
+
+    directive 'isa_email_address' => sub {
+
+        my ($self, $prototype, $field, $param) = @_;
 
         my $validator = Data::Validate::Email->new;
 
-        unless ($validator->is_email($parameter_value)) {
+        unless ($validator->is_email($param)) {
 
-            my $handle = $field_object->label || $field_object->name;
+            my $handle = $field->label || $field->name;
 
-            $field_object->errors->add("$handle must be a valid email address");
+            $field->errors->add("$handle must be a valid email address");
 
             return 0;
 
@@ -383,18 +392,24 @@ packages to be used in all your classes.
 
     };
 
+    package MyApp::Person;
+
+    use Validate::Class;
+
+    use MyApp::Directives;
+
+    field 'email_address' => {
+        isa_email_address => 1
+    };
+
     1;
 
 The directive keyword takes two arguments, the name of the directive and a
 coderef which will be used to validate the associated field. The coderef is
-passed four ordered parameters, the value of directive, the value of the
-field (parameter value), the field object (hashref), and the instantiated class
-object. The validator MUST return true or false.
-
-Additionally, if you only desire to extend the list of acceptable directives,
-you can create a no-op by simply returning true, e.g.:
-
-    directive 'new_addition' => sub {1};
+passed four ordered parameters; a directive object, the class prototype object,
+the current field object, and the matching parameter's value. The validator
+(coderef) is evaluated by its return value as well as whether it altered any
+error containers.
 
 =cut
 
@@ -420,19 +435,18 @@ sub dir { goto &directive } sub directive {
 
 =keyword field
 
-The field keyword (or fld) creates a data validation rule for reuse and validation
-in code. The field name should correspond with the parameter name expected to
-be passed to your validation class.
+The field keyword (or fld) registers a data validation rule for reuse and
+validation in code. The field name should correspond with the parameter name
+expected to be passed to your validation class.
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validation::Class;
 
     field 'login' => {
         required   => 1,
         min_length => 1,
-        max_length => 255,
-        ...
+        max_length => 255
     };
 
 The field keyword takes two arguments, the field name and a hashref of
@@ -443,24 +457,10 @@ field's corresponding parameter value(s). Accessors will be created using the
 field's name as a label having any special characters replaced with an
 underscore.
 
-    field 'login' => {
-        required   => 1,
-        min_length => 1,
-        max_length => 255,
-        ...
-    };
-
+    # accessor will be created as preference_send_reminders
     field 'preference.send_reminders' => {
-        required   => 1,
-        max_length => 1,
-        ...
+        length   => 1
     };
-
-    my $value = $self->login;
-
-    $self->login($new_value);
-
-    $self->preference_send_reminders;
 
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate objects. Please see the *has* keyword instead or
@@ -490,10 +490,10 @@ sub fld { goto &field } sub field {
 
 =keyword filter
 
-The filter keyword (or flt) creates custom filters to be used in your field
-definitions. It is a means of extending the pre-existing filters table before
-runtime and is ideal for creating custom directive extension packages to be used
-in all your classes.
+The filter keyword (or flt) registers custom filters to be used in your field
+definitions. It is a means of extending the pre-existing filters declared by
+the L<Validation::Class::Directive::Filters|"filters directive"> before
+instantiation.
 
     package MyApp::Directives;
 
@@ -502,18 +502,18 @@ in all your classes.
     filter 'flatten' => sub {
 
         $_[0] =~ s/[\t\r\n]+/ /g;
-        $_[0] # return
+        return $_[0];
 
     };
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validate::Class;
+
     use MyApp::Directives;
 
-    field 'description' => {
-        filters => ['trim', 'flatten'],
-        ...
+    field 'biography' => {
+        filters => ['trim', 'flatten']
     };
 
     1;
@@ -547,112 +547,58 @@ sub flt { goto &filter } sub filter {
 
 =keyword load
 
-The load keyword (or set), which can also be used as a method, provides options
-for extending the current class by attaching other L<Validation::Class> classes
-as relatives, roles, plugins, etc. The process of applying roles to the current
-class mainly involve copying the role's methods and configuration.
+The load keyword (or set), which can also be used as a class method, provides
+options for extending the current class by declaring roles, plugins, etc.
 
-NOTE: While the load/set functionality is not depreciated and will remain part
-of this library, its uses are no longer recommended as there are better ways to
-achieve the desired results. Additionally, the following usage scenarios can be
-refactored using traditional inheritance.
+The process of applying roles to the current class mainly involves copying the
+subject's methods and prototype configuration.
 
-    package MyApp;
+    package MyApp::Person;
 
     use Validation::Class;
 
-    # load stuff (extend MyApp)
-
-    load {
-
-        # run package commands
-
-    };
+    load role => 'MyApp::User';
 
     1;
 
-The C<load.classes> option, can be a constant or arrayref and uses L<Module::Find>
-to load B<all> child classes (in-all-subdirectories) for convenient access
-through the class() method. Existing parameters and configuration options are
-passed to the child class' constructor. All attributes can be easily overwritten
-using the attribute's accessors on the child class. These child classes are
-often referred to as relatives. This option accepts a constant or an arrayref of
-constants.
+The `classes` (or class) option, can be a constant or arrayref and uses
+L<Module::Find> to load all child classes (in-all-subdirectories) for convenient
+access through the L<Validation::Class::Prototype/class> method.
+
+Existing parameters and configuration options are passed to the child class
+constructor. All attributes can be easily overwritten using the attribute's
+accessors on the child class. These child classes are often referred to as
+relatives. This option accepts a constant or an arrayref of constants.
 
     package MyApp;
 
     use Validation::Class;
 
     # load all child classes
-
-    load {
-        classes => [
-            __PACKAGE__
-        ]
-    };
+    load classes => [__PACKAGE__];
 
     package main;
 
     my $app = MyApp->new;
 
-    my $rel = $app->class('relative'); # new MyApp::Relative object
-
-    my $rel = $app->class('data_source'); # MyApp::DataSource
-    my $rel = $app->class('datasource-first'); # MyApp::Datasource::First
+    my $person = $app->class('person'); # return a new MyApp::Person object
 
     1;
 
-The C<load.plugins> option is used to load plugins that support Validation::Class.
-A Validation::Class plugin is little more than a class that implements a "new"
-method that extends the associated validation class object. As usual, an official
-Validation::Class plugin can be referred to using shorthand while custom plugins
-are called by prefixing a plus symbol to the fully-qualified plugin name. Learn
-more about plugins at L<Validation::Class::Intro>. This option accepts a
-constant or an arrayref of constants.
+The `roles` (or role) option is used to load and inherit functionality from
+other validation classes.
 
-    package MyVal;
+These classes should be used and thought-of as roles although they can also be
+fully-functioning validation classes. This option accepts a constant or an
+arrayref of constants.
+
+    package MyApp::Person;
 
     use Validation::Class;
 
-    load {
-        plugins => [
-            'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
-            '+MyVal::Plugin'
-        ]
-    };
+    load roles => ['MyApp::User', MyApp::Visitor'];
 
     1;
-
-The C<load.roles> option is used to load and inherit functionality from child
-classes, these classes should be used and thought-of as roles. Any validation
-class can be used as a role with this option. This option accepts a constant or
-an arrayref of constants.
-
-    package MyVal::User;
-
-    use Validation::Class;
-
-    load {
-        roles => [
-            'MyVal::Person'
-        ]
-    };
-
-    1;
-
-Purely for the sake of aesthetics we have designed an alternate syntax for
-executing load/set commands, the syntax is as follows:
-
-    package MyVal::User;
-
-    use Validation::Class;
-
-    load roles => ['MyVal::Person'];
-    load classes => [__PACKAGE__];
-    load plugins => [
-        'CPANPlugin', # Validation::Class::Plugin::CPANPlugin
-        '+MyVal::Plugin'
-    ];
 
 =cut
 
@@ -736,24 +682,24 @@ sub set { goto &load } sub load {
 
 =keyword method
 
-The method keyword (or mth) is used to create an auto-validating method. Similar
-to method signatures, an auto-validating method can leverage pre-existing
+The method keyword (or mth) is used to register an auto-validating method.
+Similar to method signatures, an auto-validating method can leverage pre-existing
 validation rules and profiles to ensure a method has the required data necessary
-to proceed.
+for execution.
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validation::Class;
 
     method 'register' => {
 
-        input  => ['name', '+email', 'login', '+password'],
+        input  => ['name', '+email', 'login', '+password', '+password2'],
         output => ['+id'], # optional output validation, dies on failure
         using  => sub {
 
             my ($self, @args) = @_;
 
-            # .... do something registrationy
+            # do something registrationy
 
             $self->id(...); # set the ID field for output validation
 
@@ -765,30 +711,32 @@ to proceed.
 
     package main;
 
-    my $user = MyApp::User->new(params => $params);
+    my $person = MyApp::Person->new(params => $params);
 
-    if ($user->register) {
-        ...
+    if ($person->register) {
+
+        # handle the successful registration
+
     }
 
     1;
 
 The method keyword takes two arguments, the name of the method to be created
-and a hashref of required key/value pairs. The hashref must have an "input"
-variable whose value is either an arrayref of fields to be validated,
-or a constant value which matches a validation profile name. The hashref must
-also have a "using" variable whose value is a coderef which will be executed upon
-successfully validating the input. Whether and what the method returns is yours
-to decide.
+and a hashref of required key/value pairs. The hashref must have an `input`
+key whose value is either an arrayref of fields to be validated, or a constant
+value which matches a validation profile name. The hashref must also have a
+`using` key whose value is a coderef which will be executed upon successfully
+validating the input. Whether and what the method returns is yours to decide.
 
-Optionally the required hashref can have an "output" variable whose value is
-either an arrayref of fields to be validated, or a constant value which matches
+Optionally the required hashref can have an `output` key whose value is either
+an arrayref of fields to be validated, or a constant value which matches
 a validation profile name which will be used to perform data validation B<after>
-the coderef has been executed. Please note that output validation failure will
-cause the program to die, the premise behind this decision is based on the
-assumption that given successfully validated input a routine's output should be
-predictable and if an error occurs it is most-likely a program error as opposed
-to a user error.
+the aforementioned coderef has been executed.
+
+Please note that output validation failure will cause the program to die,
+the premise behind this decision is based on the assumption that given
+successfully validated input a routine's output should be predictable and if an
+error occurs it is most-likely a program error as opposed to a user error.
 
 See the ignore_failure and report_failure switch to control how method input
 validation failures are handled.
@@ -817,25 +765,27 @@ sub mth { goto &method } sub method {
 
 =keyword mixin
 
-The mixin keyword (or mxn) creates a validation rules template that can be
-applied to any field using the mixin directive. Mixin directives are processed
-first so existing field directives will override the mixed-in directives.
+The mixin keyword (or mxn) registers a validation rule template that can be
+applied (or "mixed-in") to any field by specifying the mixin directive.
 
-    package MyApp::User;
+Mixin directives are processed first so existing field directives will override
+any directives created by the mixin directive.
+
+    package MyApp::Person;
 
     use Validation::Class;
 
-    mixin 'constrain' => {
+    mixin 'boilerplate' => {
         required   => 1,
         min_length => 1,
         max_length => 255,
         ...
     };
 
-    # e.g.
+    # login will have a min_length, max_length
     field 'login' => {
-        mixin => 'constrain',
-        ...
+        mixin    => 'boilerplate',
+        required => 0 # but will not be required
     };
 
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values
@@ -867,26 +817,33 @@ sub mxn { goto &mixin } sub mixin {
 
 The new method instantiates a new class object, it performs a series of actions
 (magic) required for the class function properly, and for that reason, this
-method should never be overridden. Use the build keyword to hooking into the
+method should never be overridden. Use the build keyword for hooking into the
 instantiation process.
 
-    package MyApp;
+In the event a foreign `new` method is detected, an `initialize_validator`
+method will be injected into the class containing the code (magic) neccessary to
+normalize your environment.
+
+    package MyApp::Person;
 
     use Validation::Class;
 
-    # optionally
-
+    # hook
     build sub {
 
-        my ($self, @args) = @_; # is instantiated
+        my ($self, @args) = @_; # on instantiation
 
     };
 
-    package main;
+    sub new {
 
-    my $app = MyApp->new;
+        # rolled my own
+        my $self = bless {}, shift;
 
-    ...
+        # execute magic
+        $self->initialize_validator;
+
+    }
 
 =cut
 
@@ -906,39 +863,34 @@ sub new {
 
 =keyword profile
 
-The profile keyword (or pro) stores a validation profile (coderef) which as in
-the traditional use of the term is a sequence of validation routines that validate
-data relevant to a specific action.
+The profile keyword (or pro) registers a validation profile (coderef) which as
+in the traditional use of the term is a sequence of validation routines that
+validates data relevant to a specific action.
 
-    package MyApp::User;
+    package MyApp::Person;
 
     use Validation::Class;
 
-    profile 'signup' => sub {
+    profile 'check_email' => sub {
 
         my ($self, @args) = @_;
 
-        # ... do other stuff
+        if ($self->email_exists) {
+            my $email = $self->fields->get('email');
+            $email->errors->add('Email already exists');
+            return 0;
+        }
 
-        return $self->validate(qw(
-            +name
-            +email
-            +email_confirmation
-            -login
-            +password
-            +password_confirmation
-        ));
+        return 1;
 
     };
 
     package main;
 
-    my $user = MyApp::User->new(params => $params);
+    my $user = MyApp::Person->new(params => $params);
 
-    unless ($user->validate_profile('signup')) {
-
-        die $user->errors_to_string;
-
+    unless ($user->validate_profile('check_email')) {
+        # handle failures
     }
 
 The profile keyword takes two arguments, a profile name and coderef which will
@@ -971,17 +923,17 @@ sub pro { goto &profile } sub profile {
 The prototype method (or proto) returns an instance of the associated class
 prototype. The class prototype is responsible for manipulating and validating
 the data model (the class). It is not likely that you'll need to access
-this method directly, see L<Validation::Class/"THE PROTOTYPE CLASS">.
+this method directly, see L<Validation::Class::Prototype>.
 
-    package MyApp;
+    package MyApp::Person;
 
     use Validation::Class;
 
     package main;
 
-    my $app = MyApp->new;
+    my $person = MyApp::Person->new;
 
-    my $prototype = $app->prototype;
+    my $prototype = $person->prototype;
 
     ...
 
@@ -997,14 +949,36 @@ sub proto { goto &prototype } sub prototype {
 
 =head1 SEE ALSO
 
-Additionally you may want to look elsewhere for your data validation needs so
-the following is a list of recommended validation libraries/frameworks you
-might do well to look into.
+B<If you have simple data validation needs, please review:>
 
-L<Validate::Tiny> is nice for simple use-cases, it has virtually no dependencies
-and solid test coverage. L<Data::Verifier> is a great approach towards adding
-robust validation options to your existing Moose classes. Also, I have also
-heard some good things about L<Data::FormValidator> as well.
+=over
+
+=item L<Validation::Class::Simple>
+
+=back
+
+Additionally you may want to look elsewhere for your data validation needs so
+the following is a list of other validation libraries/frameworks you might do
+well to review.
+
+=over
+
+=item L<HTML::FormHandler>
+
+This library seems to be the defacto standard for designing Moose classes with
+HTML-centric data validation rules.
+
+=item L<Data::Verifier>
+
+This library is a great approach towards adding robust validation logic to
+your existing Moose-based codebase.
+
+=item L<Validate::Tiny>
+
+This library is nice for simple use-cases, it has virtually no dependencies
+and solid test coverage.
+
+=back
 
 =cut
 

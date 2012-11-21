@@ -11,32 +11,32 @@ package MyApp::Basic;
 
 use Validation::Class;
 
-fld name => {
+field name => {
 
     required => 1,
 
 };
 
-fld email => {
+field email => {
 
     required => 1,
 
 };
 
-fld type => {
+field type => {
 
     required => 1,
     options  => [ 'A' .. 'Z' ]
 
 };
 
-fld login => {
+field login => {
 
     # ...
 
 };
 
-fld password => {
+field password => {
 
     required => 1,
 
