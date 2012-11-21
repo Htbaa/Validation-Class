@@ -586,11 +586,9 @@ relatives. This option accepts a constant or an arrayref of constants.
     1;
 
 The `roles` (or role) option is used to load and inherit functionality from
-other validation classes.
-
-These classes should be used and thought-of as roles although they can also be
-fully-functioning validation classes. This option accepts a constant or an
-arrayref of constants.
+other validation classes. These classes should be used and thought-of as roles
+although they can also be fully-functioning validation classes. This option
+accepts a constant or an arrayref of constants.
 
     package MyApp::Person;
 
@@ -766,10 +764,9 @@ sub mth { goto &method } sub method {
 =keyword mixin
 
 The mixin keyword (or mxn) registers a validation rule template that can be
-applied (or "mixed-in") to any field by specifying the mixin directive.
-
-Mixin directives are processed first so existing field directives will override
-any directives created by the mixin directive.
+applied (or "mixed-in") to any field by specifying the mixin directive. Mixin
+directives are processed first so existing field directives will override any
+directives created by the mixin directive.
 
     package MyApp::Person;
 
@@ -778,14 +775,13 @@ any directives created by the mixin directive.
     mixin 'boilerplate' => {
         required   => 1,
         min_length => 1,
-        max_length => 255,
-        ...
+        max_length => 255
     };
 
-    # login will have a min_length, max_length
+    # min_length, max_length, but not required
     field 'login' => {
         mixin    => 'boilerplate',
-        required => 0 # but will not be required
+        required => 0
     };
 
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values
@@ -935,8 +931,6 @@ this method directly, see L<Validation::Class::Prototype>.
 
     my $prototype = $person->prototype;
 
-    ...
-
 =cut
 
 sub proto { goto &prototype } sub prototype {
@@ -958,8 +952,8 @@ B<If you have simple data validation needs, please review:>
 =back
 
 Additionally you may want to look elsewhere for your data validation needs so
-the following is a list of other validation libraries/frameworks you might do
-well to review.
+the following is a list of other validation libraries/frameworks you might be
+interested in.
 
 =over
 
