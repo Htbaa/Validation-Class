@@ -13,9 +13,7 @@ use utf8;
     package TestClass::CheckParameters;
     use Validation::Class;
 
-    fld name => {
-        required => 1
-    };
+    fld name => {required => 1};
 
     package main;
 
@@ -25,24 +23,24 @@ use utf8;
     ok $class eq ref $self, "$class instantiated";
 
     my @vals = qw(
-        Kathy
-        Joe
-        John
-        O
-        1
-        234
-        Ricky
-        ~
-        '
-        Lady
-        §§
-        ♠♣♥♦♠♣♥♦♠♣♥♦
+      Kathy
+      Joe
+      John
+      O
+      1
+      234
+      Ricky
+      ~
+      '
+      Lady
+      §§
+      ♠♣♥♦♠♣♥♦♠♣♥♦
     );
 
     for my $v (@vals) {
 
         ok $v eq $self->name($v),
-            "$class name accessor set to `$v` with expected return value"
+          "$class name accessor set to `$v` with expected return value"
 
     }
 
@@ -51,7 +49,7 @@ use utf8;
         my $name_param = $self->name($v);
 
         ok $self->params->{name} eq $name_param,
-            "$class name parameter set to `$v` using the name accessor"
+          "$class name parameter set to `$v` using the name accessor"
 
     }
 
@@ -63,12 +61,10 @@ use utf8;
     use Validation::Class;
 
     bld sub {
-        shift->name([1..5])
+        shift->name([1 .. 5]);
     };
 
-    fld name => {
-        required => 1
-    };
+    fld name => {required => 1};
 
     package main;
 
@@ -79,11 +75,12 @@ use utf8;
 
     ok "ARRAY" eq ref $self->name, "$class name accessor returns an array";
 
-    ok ! ref $self->name(''), "$class name accessor returns nothing";
+    ok !ref $self->name(''), "$class name accessor returns nothing";
 
-    ok ! eval { $self->name({1..4}) }, "$class name accessor cant set a hash";
+    ok !eval { $self->name({1 .. 4}) }, "$class name accessor cant set a hash";
 
-    ok "ARRAY" eq ref $self->name([1..5]), "$class name accessor returns an array";
+    ok "ARRAY" eq ref $self->name([1 .. 5]),
+      "$class name accessor returns an array";
 
     ok "ARRAY" eq ref $self->params->{name}, "$class name param is an array";
 
@@ -96,25 +93,15 @@ use utf8;
     package TestClass::FieldAccessors;
     use Validation::Class;
 
-    fld 'name.first' => {
-        required => 1
-    };
+    fld 'name.first' => {required => 1};
 
-    fld 'name.last' => {
-        required => 1
-    };
+    fld 'name.last' => {required => 1};
 
-    fld 'name.phone:0' => {
-        required => 0
-    };
+    fld 'name.phone:0' => {required => 0};
 
-    fld 'name.phone:1' => {
-        required => 0
-    };
+    fld 'name.phone:1' => {required => 0};
 
-    fld 'name.phone:2' => {
-        required => 0
-    };
+    fld 'name.phone:2' => {required => 0};
 
     package main;
 
@@ -130,11 +117,10 @@ use utf8;
         no strict 'refs';
 
         @accessors =
-            sort grep { defined &{"$class\::$_"} && $_ =~ /^name/ }
-                %{"$class\::"};
+          sort grep { defined &{"$class\::$_"} && $_ =~ /^name/ }
+          %{"$class\::"};
 
-        ok 5 == @accessors,
-            "$class has 5 name* accessors";
+        ok 5 == @accessors, "$class has 5 name* accessors";
 
     }
 

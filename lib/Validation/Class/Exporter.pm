@@ -18,7 +18,7 @@ use warnings;
 
     Validation::Class::Exporter->apply_spec(
         routines => ['thing'], # export routines as is
-        settings => [ ... ] # passed to the "load" method, see Validation::Class
+        settings => [ ... ]    # passed to the "set" method, see Validation::Class
     );
 
     has foo => 0;

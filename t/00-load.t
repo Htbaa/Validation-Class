@@ -22,8 +22,7 @@ use Validation::Class::Prototype ();
 
     eval { $class = TestClass->new };
 
-    ok !$class,
-        "TestClass cannot be instantiated wo/definitions or importing";
+    ok !$class, "TestClass cannot be instantiated wo/definitions or importing";
 
 }
 
@@ -34,24 +33,23 @@ use Validation::Class::Prototype ();
     package TestClass::Hack;
     use Validation::Class ();
 
-    Validation::Class->prototype(__PACKAGE__);   # init prototype and cache it
+    Validation::Class->prototype(__PACKAGE__);    # init prototype and cache it
 
     package main;
 
     my $class = TestClass::Hack->new;
 
     ok "TestClass::Hack" eq ref $class,
-        "TestClass::Hack instantiated, via the setup hack";
+      "TestClass::Hack instantiated, via the setup hack";
 
     ok !$class->can($_),
-        "TestClass::Hack has NOT been injected with the $_ method"
-        for @Validation::Class::EXPORT;
+      "TestClass::Hack has NOT been injected with the $_ method"
+      for @Validation::Class::EXPORT;
 
-    ok $class->can($_),
-        "TestClass::Hack has been injected with the $_ method"
-        for qw/new proto prototype/,
-        @Validation::Class::Prototype::proxy_methods,
-        @Validation::Class::Prototype::proxy_methods_wrapped;
+    ok $class->can($_), "TestClass::Hack has been injected with the $_ method"
+      for qw/new proto prototype/,
+      @Validation::Class::Prototype::proxy_methods,
+      @Validation::Class::Prototype::proxy_methods_wrapped;
 
 }
 
@@ -67,17 +65,17 @@ use Validation::Class::Prototype ();
     my $class = TestClass::Traditional->new;
 
     ok "TestClass::Traditional" eq ref $class,
-        "TestClass::Traditional instantiated, via the setup hack";
+      "TestClass::Traditional instantiated, via the setup hack";
 
     ok $class->can($_),
-        "TestClass::Traditional has been injected with the $_ method"
-        for @Validation::Class::EXPORT;
+      "TestClass::Traditional has been injected with the $_ method"
+      for @Validation::Class::EXPORT;
 
     ok $class->can($_),
-        "TestClass::Traditional has been injected with the $_ method"
-        for qw/new proto prototype/,
-        @Validation::Class::Prototype::proxy_methods,
-        @Validation::Class::Prototype::proxy_methods_wrapped;
+      "TestClass::Traditional has been injected with the $_ method"
+      for qw/new proto prototype/,
+      @Validation::Class::Prototype::proxy_methods,
+      @Validation::Class::Prototype::proxy_methods_wrapped;
 
 }
 
@@ -94,7 +92,7 @@ use Validation::Class::Prototype ();
 
     # a mixin template
 
-    mxn 'basic' => { required => 1 };
+    mxn 'basic' => {required => 1};
 
     # a validation rule
 
@@ -105,11 +103,11 @@ use Validation::Class::Prototype ();
 
         validation => sub {
 
-            my ( $self, $this_field, $all_params ) = @_;
+            my ($self, $this_field, $all_params) = @_;
 
             return $this_field->{value} eq 'admin' ? 1 : 0;
 
-            }
+          }
 
     };
 
@@ -128,7 +126,7 @@ use Validation::Class::Prototype ();
 
     pro 'registration' => sub {
 
-        my ( $self, @args ) = @_;
+        my ($self, @args) = @_;
 
         return $self->validate(qw(+login +password))
 
@@ -145,35 +143,37 @@ use Validation::Class::Prototype ();
 
     package main;
 
-    my $class = TestClass::WithKeywords->new( login => 'admin',
-        password => 'pass' );
+    my $class = TestClass::WithKeywords->new(
+        login    => 'admin',
+        password => 'pass'
+    );
 
     ok "TestClass::WithKeywords" eq ref $class,
-        "TestClass::WithKeywords instantiated";
+      "TestClass::WithKeywords instantiated";
 
     ok $class->proto->mixins->{basic}->{required} == 1,
-        'TestClass::WithKeywords has mixin basic, required directive set';
+      'TestClass::WithKeywords has mixin basic, required directive set';
 
     ok defined $class->fields->{$_}->{label}
-        && defined $class->fields->{$_}->{error}
-        && defined $class->fields->{$_}->{mixin}
-        && defined $class->fields->{$_}->{validation},
-        "TestClass::WithKeywords has $_ with label, error, mixin "
-        . "and validation directives set"
-        for ( 'login', 'password' );
+      && defined $class->fields->{$_}->{error}
+      && defined $class->fields->{$_}->{mixin}
+      && defined $class->fields->{$_}->{validation},
+      "TestClass::WithKeywords has $_ with label, error, mixin "
+      . "and validation directives set"
+      for ('login', 'password');
 
     ok defined $class->proto->profiles->{registration},
-        "TestClass::WithKeywords has registration profile";
+      "TestClass::WithKeywords has registration profile";
 
     ok defined $class->proto->methods->{register},
-        "TestClass::WithKeywords has self-validating register method";
+      "TestClass::WithKeywords has self-validating register method";
 
     ok $class->validate_profile('registration'),
-        "TestClass::WithKeywords has successfully executed the registration profile";
+      "TestClass::WithKeywords has successfully executed the registration profile";
 
     ok "happy-test" eq $class->register(),
-        "TestClass::WithKeywords has successfully executed the register method "
-        . "which returned the desired output";
+      "TestClass::WithKeywords has successfully executed the register method "
+      . "which returned the desired output";
 
 }
 
@@ -240,19 +240,19 @@ use Validation::Class::Prototype ();
     my $class = bless {}, 'TestClass::Overrider';
 
     ok "TestClass::Overrider" eq ref $class,
-        "TestClass::Overrider instantiated";
+      "TestClass::Overrider instantiated";
 
     ok 'noop' eq $class->$_,
-        "TestClass::Overrider method $_ method was overriden"
-        for @Validation::Class::EXPORT;
+      "TestClass::Overrider method $_ method was overriden"
+      for @Validation::Class::EXPORT;
 
     ok !do {
         eval { 1 if 'noop' eq $class->$_ };
         $@;
-        }, "TestClass::Overrider method $_ method was overriden"
-        for qw/new proto prototype/,
-        @Validation::Class::Prototype::proxy_methods,
-        @Validation::Class::Prototype::proxy_methods_wrapped;
+      }, "TestClass::Overrider method $_ method was overriden"
+      for qw/new proto prototype/,
+      @Validation::Class::Prototype::proxy_methods,
+      @Validation::Class::Prototype::proxy_methods_wrapped;
 
 }
 

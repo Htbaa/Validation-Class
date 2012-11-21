@@ -1,8 +1,14 @@
 Revision history for the Perl library Validation::Class
 
-7.90  0000-00-00
+7.90  2012-11-18
 
   - Created Validation::Class::Whitepaper as a sounding-board and source for FAQs
+
+  - Created Validation::Class::Simple for ad-hoc validation needs
+
+  - Created various container classes, .e.g. Fields, Params, Directives, etc
+
+  - Created various base classes, .e.g. Core, Mapping, Listing, etc
 
   - Rewrite of all documentation iteratively, under the Validation::Class::Manual namespace
 
