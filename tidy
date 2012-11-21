@@ -5,12 +5,12 @@ use File::Find::Rule;
 print  "\n";
 
 my $find  = File::Find::Rule;
-my @files = $find->file()->name('*.t')->in('.');
+my @files = $find->file()->name('*.t')->in($ARGV[0] || '.');
 
 foreach my $file (sort @files) {
 
     print "tidying $file\n";
-    die if system "perltidy --profile=.perltidyrc $file";
+    die if system "perltidy --profile=tidyrc $file";
 
     if (-f "$file.bak") {
         print "unlinking $file.bak\n"; unlink "$file.bak";
