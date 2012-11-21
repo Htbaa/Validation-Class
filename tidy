@@ -9,15 +9,11 @@ my @files = $find->file()->name('*.t')->in('.');
 
 foreach my $file (sort @files) {
 
-    #print "criticizing $file\n";
-    #die if system "perlcritic --profile=.perlcriticrc $file";
-
     print "tidying $file\n";
     die if system "perltidy --profile=.perltidyrc $file";
 
     if (-f "$file.bak") {
-        print "unlinking $file.bak\n";
-        unlink "$file.bak";
+        print "unlinking $file.bak\n"; unlink "$file.bak";
     }
 
 }
