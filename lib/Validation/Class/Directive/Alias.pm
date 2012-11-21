@@ -2,6 +2,9 @@
 
 package Validation::Class::Directive::Alias;
 
+use strict;
+use warnings;
+
 use base 'Validation::Class::Directive';
 
 use Validation::Class::Core;
@@ -60,6 +63,8 @@ sub before_validation {
         }
 
     }
+
+    return $self;
 
 }
 

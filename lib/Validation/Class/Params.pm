@@ -2,6 +2,9 @@
 
 package Validation::Class::Params;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core '!has';
 use Hash::Flatten ();
 use Carp 'confess';

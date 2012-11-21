@@ -2,6 +2,9 @@
 
 package Validation::Class::Mapping;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core '!has', '!hold';
 use Hash::Merge ();
 
@@ -248,7 +251,7 @@ sub iterator {
 
     return sub {
 
-        return undef unless defined $keys[$i];
+        return unless defined $keys[$i];
 
         return $self->get($keys[$i++]);
 

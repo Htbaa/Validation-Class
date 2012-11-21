@@ -2,6 +2,9 @@
 
 package Validation::Class::Field;
 
+use strict;
+use warnings;
+
 use Validation::Class::Directives;
 use Validation::Class::Errors;
 

@@ -2,6 +2,9 @@
 
 package Validation::Class::Errors;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core '!has', '!hold';
 
 # VERSION

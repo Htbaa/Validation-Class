@@ -2,6 +2,9 @@
 
 package Validation::Class::Directive::Filters;
 
+use strict;
+use warnings;
+
 use base 'Validation::Class::Directive';
 
 use Validation::Class::Core;
@@ -46,14 +49,14 @@ sub registry {
 sub filter_alpha {
 
     $_[0] =~ s/[^A-Za-z]//g;
-    $_[0];
+    return $_[0];
 
 }
 
 sub filter_alphanumeric {
 
     $_[0] =~ s/[^A-Za-z0-9]//g;
-    $_[0];
+    return $_[0];
 
 }
 
@@ -61,27 +64,27 @@ sub filter_capitalize {
 
     $_[0] = ucfirst $_[0];
     $_[0] =~ s/\.\s+([a-z])/\. \U$1/g;
-    $_[0];
+    return $_[0];
 
 }
 
 sub filter_decimal {
 
     $_[0] =~ s/[^0-9\.\,]//g;
-    $_[0];
+    return $_[0];
 
 }
 
 sub filter_lowercase {
 
-    lc $_[0];
+    return lc $_[0];
 
 }
 
 sub filter_numeric {
 
     $_[0] =~ s/\D//g;
-    $_[0];
+    return $_[0];
 
 }
 
@@ -90,13 +93,13 @@ sub filter_strip {
     $_[0] =~ s/\s+/ /g;
     $_[0] =~ s/^\s+//;
     $_[0] =~ s/\s+$//;
-    $_[0];
+    return $_[0];
 
 }
 
 sub filter_titlecase {
 
-    join( " ", map ( ucfirst, split( /\s/, lc $_[0] ) ) );
+    return join( " ", map { ucfirst $_ } (split( /\s/, lc $_[0] )) );
 
 }
 
@@ -104,13 +107,13 @@ sub filter_trim {
 
     $_[0] =~ s/^\s+//g;
     $_[0] =~ s/\s+$//g;
-    $_[0];
+    return $_[0];
 
 }
 
 sub filter_uppercase {
 
-    uc $_[0];
+    return uc $_[0];
 
 }
 

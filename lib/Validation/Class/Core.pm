@@ -122,6 +122,8 @@ sub has {
 
     }
 
+    return;
+
 }
 
 sub hold {
@@ -163,6 +165,8 @@ sub hold {
 
     }
 
+    return;
+
 }
 
 sub import {
@@ -171,6 +175,8 @@ sub import {
     warnings->import;
 
     __PACKAGE__->export_to_level(1, @_);
+
+    return;
 
 }
 

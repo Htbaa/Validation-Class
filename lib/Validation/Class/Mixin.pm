@@ -2,6 +2,9 @@
 
 package Validation::Class::Mixin;
 
+use strict;
+use warnings;
+
 use Validation::Class::Directives;
 use Validation::Class::Errors;
 

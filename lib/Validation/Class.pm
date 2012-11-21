@@ -2,7 +2,8 @@
 
 package Validation::Class;
 
-# VERSION
+use strict;
+use warnings;
 
 use Module::Find;
 
@@ -12,6 +13,8 @@ use Hash::Merge 'merge';
 use Exporter ();
 
 use Validation::Class::Prototype;
+
+# VERSION
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
@@ -39,99 +42,95 @@ our @EXPORT = qw(
 
 );
 
-{
+sub return_class_proto {
 
-    sub return_class_proto {
+    my $class = shift || caller(2);
 
-        my $class = shift || caller(2);
+    return vc_prototypes->get($class) || do {
 
-        return vc_prototypes->get($class) || do {
+        # build new prototype class
 
-            # build new prototype class
-
-            my $proto = Validation::Class::Prototype->new(
-                package => $class
-            );
-
-            no strict 'refs';
-            no warnings 'redefine';
-
-            # respect foreign constructors (such as $class->new) if found
-
-            my $new = $class->can("new") ?
-                "initialize_validator" : "new"
-            ;
-
-            # injected into every derived class (override if necessary)
-
-            *{"$class\::$new"}      = sub { goto \&$new };
-            *{"$class\::proto"}     = sub { goto \&prototype };
-            *{"$class\::prototype"} = sub { goto \&prototype };
-
-            # inject prototype class aliases unless exist
-
-            my @aliases = $proto->proxy_methods;
-
-            foreach my $alias (@aliases) {
-
-                next if $class->can($alias);
-
-                # slight-of-hand
-
-                $proto->set_method($alias, sub {
-
-                    shift @_;
-
-                    $proto->$alias(@_);
-
-                });
-
-            }
-
-            # inject wrapped prototype class aliases unless exist
-
-            my @wrapped_aliases = $proto->proxy_methods_wrapped;
-
-            foreach my $alias (@wrapped_aliases) {
-
-                next if $class->can($alias);
-
-                # slight-of-hand
-
-                $proto->set_method($alias, sub {
-
-                    my $self = shift @_;
-
-                    $proto->$alias($self, @_);
-
-                });
-
-            }
-
-            # cache prototype
-            vc_prototypes->add($class => $proto);
-
-            $proto; # return-once
-
-        };
-
-    }
-
-    sub configure_class_proto {
-
-        my $configuration_routine = pop;
-
-        return unless "CODE" eq ref $configuration_routine;
+        my $proto = Validation::Class::Prototype->new(
+            package => $class
+        );
 
         no strict 'refs';
+        no warnings 'redefine';
 
-        my $proto = return_class_proto shift;
+        # respect foreign constructors (such as $class->new) if found
 
-        $configuration_routine->($proto);
+        my $new = $class->can("new") ?
+            "initialize_validator" : "new"
+        ;
 
-        return $proto;
+        # injected into every derived class (override if necessary)
 
-    }
+        *{"$class\::$new"}      = sub { goto \&$new };
+        *{"$class\::proto"}     = sub { goto \&prototype };
+        *{"$class\::prototype"} = sub { goto \&prototype };
+
+        # inject prototype class aliases unless exist
+
+        my @aliases = $proto->proxy_methods;
+
+        foreach my $alias (@aliases) {
+
+            next if $class->can($alias);
+
+            # slight-of-hand
+
+            $proto->set_method($alias, sub {
+
+                shift @_;
+
+                $proto->$alias(@_);
+
+            });
+
+        }
+
+        # inject wrapped prototype class aliases unless exist
+
+        my @wrapped_aliases = $proto->proxy_methods_wrapped;
+
+        foreach my $alias (@wrapped_aliases) {
+
+            next if $class->can($alias);
+
+            # slight-of-hand
+
+            $proto->set_method($alias, sub {
+
+                my $self = shift @_;
+
+                $proto->$alias($self, @_);
+
+            });
+
+        }
+
+        # cache prototype
+        vc_prototypes->add($class => $proto);
+
+        $proto; # return-once
+
+    };
+
+}
+
+sub configure_class_proto {
+
+    my $configuration_routine = pop;
+
+    return unless "CODE" eq ref $configuration_routine;
+
+    no strict 'refs';
+
+    my $proto = return_class_proto shift;
+
+    $configuration_routine->($proto);
+
+    return $proto;
 
 }
 
@@ -144,7 +143,7 @@ sub import {
 
     __PACKAGE__->export_to_level(1, @_);
 
-    return_class_proto $caller # provision prototype when used
+    return return_class_proto $caller # provision prototype when used
 
 }
 
@@ -186,16 +185,6 @@ sub initialize_validator {
 
     }
 
-    # process plugins
-
-    foreach my $plugin ($proto->plugins->keys) {
-
-        $proto->plugins->add($plugin => $plugin->new($proto))
-            if $plugin->can('new')
-        ;
-
-    }
-
     # process builders
 
     foreach my $builder ($proto->builders->list) {
@@ -207,6 +196,16 @@ sub initialize_validator {
     # initialize prototype
 
     $proto->normalize;
+
+    # process plugins
+
+    foreach my $plugin ($proto->plugins->keys) {
+
+        $proto->plugins->add($plugin => $plugin->new($proto))
+            if $plugin->can('new')
+        ;
+
+    }
 
     # ready-set-go !!!
 
@@ -295,8 +294,7 @@ coderef that will be used as its default value.
 
 =cut
 
-sub has { goto &attribute }
-sub attribute {
+sub has { goto &attribute } sub attribute {
 
     my $package = shift if @_ == 3;
 
@@ -306,19 +304,15 @@ sub attribute {
 
     $attributes = [$attributes] unless ref $attributes eq 'ARRAY';
 
-    for my $attribute (@$attributes) {
+    return configure_class_proto $package => sub {
 
-        return configure_class_proto $package => sub {
+        my ($proto) = @_;
 
-            my ($proto) = @_;
+        $proto->register_attribute($_ => $default) for @$attributes;
 
-            $proto->register_attribute($attribute => $default);
+        return $proto;
 
-            return $proto;
-
-        };
-
-    }
+    };
 
 }
 
@@ -342,8 +336,7 @@ class object.
 
 =cut
 
-sub bld { goto &build }
-sub build {
+sub bld { goto &build } sub build {
 
     my $package = shift if @_ == 2;
 
@@ -405,8 +398,7 @@ you can create a no-op by simply returning true, e.g.:
 
 =cut
 
-sub dir { goto &directive }
-sub directive {
+sub dir { goto &directive } sub directive {
 
     my $package = shift if @_ == 3;
 
@@ -476,8 +468,7 @@ use an object system with type constraints like L<Moose>.
 
 =cut
 
-sub fld { goto &field }
-sub field {
+sub fld { goto &field } sub field {
 
     my $package = shift if @_ == 3;
 
@@ -534,8 +525,7 @@ The coderef should also return the transformed value.
 
 =cut
 
-sub flt { goto &filter }
-sub filter {
+sub flt { goto &filter } sub filter {
 
     my $package = shift if @_ == 3;
 
@@ -666,8 +656,7 @@ executing load/set commands, the syntax is as follows:
 
 =cut
 
-sub set { goto &load }
-sub load {
+sub set { goto &load } sub load {
 
     my $package;
     my $data;
@@ -806,8 +795,7 @@ validation failures are handled.
 
 =cut
 
-sub mth { goto &method }
-sub method {
+sub mth { goto &method } sub method {
 
     my $package = shift if @_ == 3;
 
@@ -855,8 +843,7 @@ pairs known as directives.
 
 =cut
 
-sub mxn { goto &mixin }
-sub mixin {
+sub mxn { goto &mixin } sub mixin {
 
     my $package = shift if @_ == 3;
 
@@ -959,8 +946,7 @@ be used to execute a sequence of actions for validation purposes.
 
 =cut
 
-sub pro { goto &profile }
-sub profile {
+sub pro { goto &profile } sub profile {
 
     my $package = shift if @_ == 3;
 
@@ -1001,12 +987,11 @@ this method directly, see L<Validation::Class/"THE PROTOTYPE CLASS">.
 
 =cut
 
-sub proto { goto &prototype }
-sub prototype {
+sub proto { goto &prototype } sub prototype {
 
     my ($self) = pop @_;
 
-    return_class_proto ref $self || $self;
+    return return_class_proto ref $self || $self;
 
 }
 

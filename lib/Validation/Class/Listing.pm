@@ -2,6 +2,9 @@
 
 package Validation::Class::Listing;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core '!has', '!hold';
 use List::MoreUtils 'uniq';
 
@@ -236,7 +239,7 @@ sub iterator {
 
     return sub {
 
-        return undef unless defined $keys[$i];
+        return unless defined $keys[$i];
 
         return $keys[$i++];
 

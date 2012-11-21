@@ -2,6 +2,9 @@
 
 package Validation::Class::Mixins;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core '!has';
 
 # VERSION

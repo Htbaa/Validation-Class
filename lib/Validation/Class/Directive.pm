@@ -2,6 +2,9 @@
 
 package Validation::Class::Directive;
 
+use strict;
+use warnings;
+
 use Validation::Class::Core;
 
 use Carp 'confess';

@@ -2,6 +2,9 @@
 
 package Validation::Class::Directives;
 
+use strict;
+use warnings;
+
 use base 'Validation::Class::Mapping';
 
 use Validation::Class::Core '!has';
@@ -107,11 +110,11 @@ sub resolve_dependencies {
 
         }
 
-        elsif (grep !exists $found{$_}, @{$dependencies->{$k}}) {
+        elsif (grep { ! exists $found{$_} } @{$dependencies->{$k}}) {
 
             confess sprintf 'Invalid dependency on event %s: %s -> %s',
             $type, $k, join(',', @{$dependencies->{$k}})
-            if grep !exists $dependencies->{$_}, @{$dependencies->{$k}};
+            if grep { ! exists $dependencies->{$_} } @{$dependencies->{$k}};
 
             confess
             sprintf 'Indirect circular dependency on event %s: %s -> %s ',

@@ -2,6 +2,9 @@
 
 package Validation::Class::Prototype;
 
+use strict;
+use warnings;
+
 use Validation::Class::Configuration;
 use Validation::Class::Directives;
 use Validation::Class::Listing;
@@ -1428,6 +1431,8 @@ sub pitch_error {
 
     }
 
+    return $self;
+
 }
 
 =method plugin
@@ -1505,15 +1510,11 @@ sub plugin {
 
             );
 
-            my $matched = 0;
-
             foreach my $rootspace (@rootspaces) {
 
                 $class = join "::", $rootspace, @parts;
 
-                eval '$matched = $class->can("new") ? 1 : 0';
-
-                last if $matched;
+                last if eval { $class->can("new") };
 
             }
 
@@ -2497,7 +2498,7 @@ sub validate {
 
     # include fields from field patterns
 
-    @fields = map { isa_regexp($_) ? (grep $_, ($self->fields->sort)) : ($_) }
+    @fields = map { isa_regexp($_) ? (grep { $_ } ($self->fields->sort)) : ($_) }
     @fields;
 
     # process toggled fields
@@ -2601,201 +2602,6 @@ sub validate {
     }
 
     return $self->is_valid;
-
-}
-
-sub validate_field_routine {
-
-    my ($self, $field, @args) = @_;
-
-    if (defined $field->validation && $field->value) {
-
-        my $count  = $field->errors->count;
-        my $failed = ! $field->validation->(@args)  ? 1 : 0;
-        my $errors = $field->errors->count > $count ? 1 : 0;
-
-        if ($failed || $errors) {
-
-            # did the validation routine fail or set errors?
-
-            if ($failed && ! $errors) {
-
-                if (defined $field->error) {
-
-                    $field->errors->add($field->error);
-
-                }
-
-                else {
-
-                    $field->errors->add(
-                        ($field->{label} || $field->{name}) .
-                        " could not be validated"
-                    )
-
-                }
-
-            }
-
-        }
-
-    }
-
-}
-
-sub validate_fields_discovered {
-
-    my ($self, $context) = @_;
-
-    my @fields = sort $self->fields->keys;
-
-    if (@fields) {
-
-        $self->validate_fields_specified($context, @fields);
-
-    }
-
-    else {
-
-        # if no parameters (or) fields are found ... you're screwed :)
-        # instead of dying, warn and continue, depending on configuration
-
-        my $error = qq{
-            No parameters were submitted and no fields are
-            registered. Fields and parameters are required
-            for validation
-        };
-
-        if ($self->ignore_unknown) {
-
-            if ($self->report_unknown) {
-
-                $self->errors->add($error);
-
-            }
-
-        }
-
-        else {
-
-            $self->throw_error($error);
-
-        }
-
-    }
-
-}
-
-sub validate_fields_specified {
-
-    my ($self, $context, @fields) = @_;
-
-    foreach my $field_name (@fields) {
-
-        if ( !defined $self->fields->{$field_name} ) {
-
-            $self->pitch_error(
-                "Data validation field $field_name does not exist"
-            );
-            next;
-
-        }
-
-        my $field = $self->fields->{$field_name};
-
-        $field->{name}  = $field_name;
-        $field->{value} = $self->get_value($field_name);
-
-        my @args = ($context, $field, $self->params);
-
-        # execute simple validation
-
-        $self->apply_validator($field_name, $field);
-
-        # custom validation
-
-        $self->validate_field_routine($field, @args);
-
-    }
-
-}
-
-sub validate_params_discovered {
-
-    my ($self, $context) = @_;
-
-    # process all params
-
-    my $validate_param = sub {
-
-        my($name, $param) = @_;
-
-        if ( ! $self->fields->has($name) ) {
-
-            $self->pitch_error(
-                "Data validation field $name does not exist"
-            );
-
-        }
-
-        else {
-
-            my $field = $self->fields->{$name};
-
-            $field->{name}  = $name;
-            $field->{value} = $self->get_value($name);
-
-            # create arguments to be passed to the validation directive
-
-            my @args = ($context, $field, $self->params);
-
-            # execute validator directives
-
-            $self->apply_validator($name, $field);
-
-            # custom validation
-
-            $self->validate_field_routine($field, @args);
-
-        }
-
-    };
-
-    $self->params->each($validate_param);
-
-}
-
-sub validate_params_specified {
-
-    my ($self, $context, @fields) = @_;
-
-    foreach my $field_name (@fields) {
-
-        if (!defined $self->fields->{$field_name}) {
-
-            $self->pitch_error(
-                "Data validation field $field_name does not exist"
-            );
-            next;
-
-        }
-
-        my $field = $self->fields->{$field_name};
-
-        $field->{name}  = $field_name;
-        $field->{value} = $self->get_value($field_name);
-
-        my @args = ($context, $field, $self->params);
-
-        # execute simple validation
-
-        $self->apply_validator($field_name, $field);
-
-        # custom validation
-
-        $self->validate_field_routine($field, @args);
-
-    }
 
 }
 

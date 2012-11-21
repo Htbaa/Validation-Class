@@ -2,6 +2,9 @@
 
 package Validation::Class::Directive::Readonly;
 
+use strict;
+use warnings;
+
 use base 'Validation::Class::Directive';
 
 use Validation::Class::Core;
@@ -40,6 +43,8 @@ sub normalize {
         delete $proto->params->{$name} if exists $proto->params->{$name};
 
     }
+
+    return $self;
 
 }
 

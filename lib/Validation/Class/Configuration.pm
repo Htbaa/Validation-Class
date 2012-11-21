@@ -2,6 +2,9 @@
 
 package Validation::Class::Configuration;
 
+use strict;
+use warnings;
+
 use Validation::Class::Directives;
 use Validation::Class::Listing;
 use Validation::Class::Mapping;

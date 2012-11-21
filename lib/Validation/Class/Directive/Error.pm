@@ -2,6 +2,9 @@
 
 package Validation::Class::Directive::Error;
 
+use strict;
+use warnings;
+
 use base 'Validation::Class::Directive';
 
 use Validation::Class::Core;
