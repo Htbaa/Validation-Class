@@ -24,7 +24,7 @@ use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 
-my $_registry = Validation::Class::Mapping->new; # prototype class registry
+my $_registry = Validation::Class::Mapping->new; # prototype registry
 
 =attribute attributes
 
@@ -2237,7 +2237,7 @@ sub snapshot {
     my ($self) = @_;
 
     # clone configuration settings and merge into the prototype
-    # ... which makes the prototype a kind-of snapshot of the configuration
+    # ... which makes the prototype kind've a snapshot of the configuration
 
     if (my $config = $self->configuration->configure_profile) {
 

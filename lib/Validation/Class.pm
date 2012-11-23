@@ -150,8 +150,7 @@ sub import {
 sub initialize_validator {
 
     my $self   = shift;
-
-    my $proto  = return_class_proto ref $self || $self;
+    my $proto  = $self->prototype;
 
     my $arguments = $proto->build_args(@_);
 
@@ -159,7 +158,7 @@ sub initialize_validator {
 
     $proto->snapshot;
 
-    # override prototype attibutes if requested
+    # override prototype attributes if requested
 
     if (defined($arguments->{fields})) {
         my $fields = delete $arguments->{fields};
@@ -219,7 +218,7 @@ sub initialize_validator {
 
     use Validation::Class;
 
-    # a mixin is a data validation template
+    # a data validation template
     mixin basic     => {
         required    => 1,
         max_length  => 255,
@@ -260,9 +259,13 @@ templates, pre and post validation input filtering, class inheritance, automatic
 array handling, as well as extensibility (i.e. override default error messages,
 create custom validators and input filters and much more).
 
+=head1 QUICKSTART
+
 If you are looking for a simple in-line data validation module built using the
 same tenets and principles as Validation::Class, please review
 L<Validation::Class::Simple>.
+
+=head1 RATIONALE
 
 If you are new to Validation::Class, or would like more information on the
 underpinnings of this library and how it views and approaches data validation,
@@ -457,8 +460,8 @@ field's corresponding parameter value(s). Accessors will be created using the
 field's name as a label having any special characters replaced with an
 underscore.
 
-    # accessor will be created as preference_send_reminders
-    field 'preference.send_reminders' => {
+    # accessor will be created as send_reminders
+    field 'send-reminders' => {
         length   => 1
     };
 
@@ -817,7 +820,7 @@ method should never be overridden. Use the build keyword for hooking into the
 instantiation process.
 
 In the event a foreign `new` method is detected, an `initialize_validator`
-method will be injected into the class containing the code (magic) neccessary to
+method will be injected into the class containing the code (magic) necessary to
 normalize your environment.
 
     package MyApp::Person;
