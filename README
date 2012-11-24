@@ -9,7 +9,7 @@ SYNOPSIS
 
         use Validation::Class;
 
-        # a mixin is a data validation template
+        # a data validation template
         mixin basic     => {
             required    => 1,
             max_length  => 255,
@@ -50,14 +50,6 @@ DESCRIPTION
     inheritance, automatic array handling, as well as extensibility (i.e.
     override default error messages, create custom validators and input
     filters and much more).
-
-    If you are looking for a simple in-line data validation module built
-    using the same tenets and principles as Validation::Class, please review
-    Validation::Class::Simple.
-
-    If you are new to Validation::Class, or would like more information on
-    the underpinnings of this library and how it views and approaches data
-    validation, please review Validation::Class::WhitePaper::Validation.
 
 KEYWORDS
   attribute
@@ -177,8 +169,8 @@ KEYWORDS
     using the field's name as a label having any special characters replaced
     with an underscore.
 
-        # accessor will be created as preference_send_reminders
-        field 'preference.send_reminders' => {
+        # accessor will be created as send_reminders
+        field 'send-reminders' => {
             length   => 1
         };
 
@@ -408,7 +400,7 @@ METHODS
 
     In the event a foreign `new` method is detected, an
     `initialize_validator` method will be injected into the class containing
-    the code (magic) neccessary to normalize your environment.
+    the code (magic) necessary to normalize your environment.
 
         package MyApp::Person;
 
@@ -446,6 +438,211 @@ METHODS
         my $person = MyApp::Person->new;
 
         my $prototype = $person->prototype;
+
+PROXY METHODS
+  class
+        $self->class;
+
+    See "class" in Validation::Class::Prototype for full documentation.
+
+  clear_queue
+        $self->clear_queue;
+
+    See "clear_queue" in Validation::Class::Prototype for full
+    documentation.
+
+  error_count
+        $self->error_count;
+
+    See "error_count" in Validation::Class::Prototype for full
+    documentation.
+
+  error_fields
+        $self->error_fields;
+
+    See "error_fields" in Validation::Class::Prototype for full
+    documentation.
+
+  errors
+        $self->errors;
+
+    See "errors" in Validation::Class::Prototype for full documentation.
+
+    head2 errors_to_string
+
+        $self->errors_to_string;
+
+    See "errors_to_string" in Validation::Class::Prototype for full
+    documentation.
+
+  get_errors
+        $self->get_errors;
+
+    See "get_errors" in Validation::Class::Prototype for full documentation.
+
+  get_fields
+        $self->get_fields;
+
+    See "get_fields" in Validation::Class::Prototype for full documentation.
+
+  get_params
+        $self->get_params;
+
+    See "get_params" in Validation::Class::Prototype for full documentation.
+
+  fields
+        $self->fields;
+
+    See "fields" in Validation::Class::Prototype for full documentation.
+
+  filtering
+        $self->filtering;
+
+    See "filtering" in Validation::Class::Prototype for full documentation.
+
+  ignore_failure
+        $self->ignore_failure;
+
+    See "ignore_failure" in Validation::Class::Prototype for full
+    documentation.
+
+  ignore_unknown
+        $self->ignore_unknown;
+
+    See "ignore_unknown" in Validation::Class::Prototype for full
+    documentation.
+
+  param
+        $self->param;
+
+    See "param" in Validation::Class::Prototype for full documentation.
+
+  params
+        $self->params;
+
+    See "params" in Validation::Class::Prototype for full documentation.
+
+  queue
+        $self->queue;
+
+    See "queue" in Validation::Class::Prototype for full documentation.
+
+  report_failure
+        $self->report_failure;
+
+    See "report_failure" in Validation::Class::Prototype for full
+    documentation.
+
+  report_unknown
+        $self->report_unknown;
+
+    See "report_unknown" in Validation::Class::Prototype for full
+    documentation.
+
+  reset_errors
+        $self->reset_errors;
+
+    See "reset_errors" in Validation::Class::Prototype for full
+    documentation.
+
+  reset_fields
+        $self->reset_fields;
+
+    See "reset_fields" in Validation::Class::Prototype for full
+    documentation.
+
+  reset_params
+        $self->reset_params;
+
+    See "reset_params" in Validation::Class::Prototype for full
+    documentation.
+
+  set_errors
+        $self->set_errors;
+
+    See "set_errors" in Validation::Class::Prototype for full documentation.
+
+  set_fields
+        $self->set_fields;
+
+    See "set_fields" in Validation::Class::Prototype for full documentation.
+
+  set_params
+        $self->set_params;
+
+    See "set_params" in Validation::Class::Prototype for full documentation.
+
+  set_method
+        $self->set_method;
+
+    See "set_method" in Validation::Class::Prototype for full documentation.
+
+  stash
+        $self->stash;
+
+    See "stash" in Validation::Class::Prototype for full documentation.
+
+  validate
+        $self->validate;
+
+    See "validate" in Validation::Class::Prototype for full documentation.
+
+  validate_method
+        $self->validate_method;
+
+    See "validate_method" in Validation::Class::Prototype for full
+    documentation.
+
+  validate_profile
+        $self->validate_profile;
+
+    See "validate_profile" in Validation::Class::Prototype for full
+    documentation.
+
+QUICKSTART
+    If you are looking for a simple in-line data validation module built
+    using the same tenets and principles as Validation::Class, please review
+    Validation::Class::Simple.
+
+RATIONALE
+    If you are new to Validation::Class, or would like more information on
+    the underpinnings of this library and how it views and approaches data
+    validation, please review Validation::Class::WhitePaper::Validation.
+
+VALIDATION ENGINE BY PROXY
+    Validation::Class mostly provides sugar functions for modeling your data
+    validation requirements. Each class you create is associated with a
+    *prototype* class which provides the data validation engine and keeps
+    your class namespace free from pollution, please see
+    Validation::Class::Prototype for more information on specific methods,
+    and attributes.
+
+    Validation::Class injects a few proxy methods into your class which are
+    basically aliases to the corresponding prototype class methods, however
+    it is possible to access the prototype directly using the
+    proto/prototype methods.
+
+EXTENDING VALIDATION::CLASS
+    Validation::Class does NOT provide method modifiers but can be easily
+    extended with Class::Method::Modifiers.
+
+  before
+        before foo => sub { ... };
+
+    See "before method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
+
+  around
+        around foo => sub { ... };
+
+    See "around method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
+
+  after
+        after foo => sub { ... };
+
+    See "after method(s) => sub { ... }" in Class::Method::Modifiers for
+    full documentation.
 
 SEE ALSO
     If you have simple data validation needs, please review:
