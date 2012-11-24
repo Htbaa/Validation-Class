@@ -1,0 +1,2 @@
+Validation::Class::Mixins is a container class for [Validation::Class::Mixin](http://search.cpan.org/perldoc?Validation::Class::Mixin)
+objects and is derived from the [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) class.

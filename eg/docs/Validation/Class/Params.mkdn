@@ -1,0 +1,2 @@
+Validation::Class::Params is a container class for input parameters and is
+derived from the [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) class.

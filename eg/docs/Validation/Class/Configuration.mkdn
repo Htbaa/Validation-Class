@@ -1,0 +1,2 @@
+Validation::Class::Configuration provides a default configuration profile used
+by validation classes and many class prototype methods.

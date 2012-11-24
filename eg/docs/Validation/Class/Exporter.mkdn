@@ -1,0 +1,30 @@
+This module (while experimental) encapsulates the exporting of keywords and
+routines. It applies the [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) framework along with any keyword
+routines and/or sub-routines specified with the apply\_spec() method. It does
+this by simply by copying the spec into the calling class.
+
+To simplify writing exporter modules, `Validation::Class::Exporter` also
+imports `strict` and `warnings` into your exporter module, as well as into
+modules that use it.
+
+When you call this method, `Validation::Class::Exporter` builds a custom
+`import` method on the calling class. The `import` method will export the
+functions you specify, and can also automatically export `Validation::Class`
+making the calling class a Validation::Class derived class.
+
+This method accepts the following parameters:
+
+- routines => \[ ... \]
+
+    This list of function _names only_ will be exported into the calling class
+    exactly as is, the functions can be used traditionally or as keywords so their
+    parameter handling should be configured accordingly.
+
+- settings => \[ ... \]
+
+    This list of key/value pair will be passed to the load method imported from
+    `Validation::Class::load` and will be applied on the calling class.
+
+    This approach affords you some trickery in that you can utilize the load method
+    to apply the current class' configuration to the calling class' configuration,
+    etc.

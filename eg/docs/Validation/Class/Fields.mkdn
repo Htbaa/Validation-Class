@@ -1,0 +1,2 @@
+Validation::Class::Fields is a container class for [Validation::Class::Field](http://search.cpan.org/perldoc?Validation::Class::Field)
+objects and is derived from the [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) class.

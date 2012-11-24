@@ -950,7 +950,7 @@ Validation::Class mostly provides sugar functions for modeling your data
 validation requirements. Each class you create is associated with a *prototype*
 class which provides the data validation engine and keeps your class namespace
 free from pollution, please see L<Validation::Class::Prototype> for more
-information on specific methods, and attributes.
+information on specific methods and attributes.
 
 Validation::Class injects a few proxy methods into your class which are
 basically aliases to the corresponding prototype class methods, however it is

@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use File::Find::Rule;
+
+print  "\n";
+
+my $path  = $ARGV[0] || '.';
+my $find  = File::Find::Rule;
+my @files = $find->file()->name('*.pm')->in($path);
+
+foreach my $file (sort @files) {
+
+    next unless   $file =~ /Validation\/Class/;
+    my ($ofile) = $file =~ m/lib\/(.*)\.pm$/;
+
+    $ofile = $path eq '.' ?
+        "$path/eg/docs/$ofile.mkdn" :
+        "$path/../eg/docs/$ofile.mkdn"
+    ;
+
+    print "markingdown $ofile\n";
+    die if system "pod2markdown", "$file", "$ofile";
+
+    unless ((stat($ofile))[7]) {
+        print "unlinking $ofile\n"; unlink $ofile;
+    }
+
+}
