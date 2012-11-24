@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MinSum;
-
-    my $directive = Validation::Class::Directive::MinSum->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MinSum is a core validation class field directive

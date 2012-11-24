@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Alias;
-
-    my $directive = Validation::Class::Directive::Alias->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Alias is a core validation class field directive

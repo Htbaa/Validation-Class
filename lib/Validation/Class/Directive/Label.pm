@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Label;
-
-    my $directive = Validation::Class::Directive::Label->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Label is a core validation class field directive

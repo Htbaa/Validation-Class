@@ -1,4 +1,4 @@
-# ABSTRACT: Validation::Class Core Directives Collection
+# Validation::Class Core Directives Collection
 
 package Validation::Class::Directives;
 
@@ -16,7 +16,7 @@ our $_registry = {map{$_=>$_->new}(usesub 'Validation::Class::Directive')};
 
 # VERSION
 
-=head1 DESCRIPTION
+=pod DESCRIPTION
 
 Validation::Class::Directives provides a collection of core Validation::Class
 direcitves. This class inherits from L<Validation::Class::Mapping>.

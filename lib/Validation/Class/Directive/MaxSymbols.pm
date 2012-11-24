@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MaxSymbols;
-
-    my $directive = Validation::Class::Directive::MaxSymbols->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MaxSymbols is a core validation class field directive

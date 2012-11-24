@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Name;
-
-    my $directive = Validation::Class::Directive::Name->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Name is a core validation class field directive

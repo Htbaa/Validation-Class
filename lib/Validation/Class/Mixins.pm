@@ -1,4 +1,4 @@
-# ABSTRACT: Container Class for Validation::Class::Mixin Objects
+# Container Class for Validation::Class::Mixin Objects
 
 package Validation::Class::Mixins;
 
@@ -13,7 +13,7 @@ use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mixin;
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Mixins is a container class for L<Validation::Class::Mixin>
 objects and is derived from the L<Validation::Class::Mapping> class.
@@ -41,9 +41,5 @@ sub add {
     return $self;
 
 }
-
-#sub clear {
-#    #noop - fields can't be deleted this way
-#}
 
 1;

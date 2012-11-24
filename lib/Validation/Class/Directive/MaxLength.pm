@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MaxLength;
-
-    my $directive = Validation::Class::Directive::MaxLength->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MaxLength is a core validation class field directive

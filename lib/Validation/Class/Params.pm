@@ -1,4 +1,4 @@
-# ABSTRACT: Container Class for Data Input Parameters
+# Container Class for Data Input Parameters
 
 package Validation::Class::Params;
 
@@ -15,7 +15,7 @@ use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mapping;
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Params is a container class for input parameters and is
 derived from the L<Validation::Class::Mapping> class.

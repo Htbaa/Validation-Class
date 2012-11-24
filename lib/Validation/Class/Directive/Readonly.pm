@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Readonly;
-
-    my $directive = Validation::Class::Directive::Readonly->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Readonly is a core validation class field directive

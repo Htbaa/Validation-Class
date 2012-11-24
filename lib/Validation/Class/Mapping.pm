@@ -1,4 +1,4 @@
-# ABSTRACT: Generic Container Class for Hash References
+# ABSTRACT: Generic Container Class for a Hash Reference
 
 package Validation::Class::Mapping;
 
@@ -228,12 +228,11 @@ sub hash {
 
     my $next = $self->iterator();
 
-    # defaults: keys
-    # accepts: sort, rsort, nsort, or rnsort
+    # defaults to iterating by keys but accepts: sort, rsort, nsort, or rnsort
     # e.g. $self->iterator('sort', sub{ (shift) cmp (shift) });
 
     while (my $item = $next->()) {
-        ...
+        # do something with $item (value)
     }
 
 =cut

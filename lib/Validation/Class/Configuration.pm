@@ -1,4 +1,4 @@
-# ABSTRACT: Configuration Class for Validation Classes
+# Configuration Class for Validation Classes
 
 package Validation::Class::Configuration;
 
@@ -16,7 +16,7 @@ use Module::Find 'usesub';
 
 # VERSION
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Configuration provides a default configuration profile used
 by validation classes and many class prototype methods.

@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Error;
-
-    my $directive = Validation::Class::Directive::Error->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Error is a core validation class field directive

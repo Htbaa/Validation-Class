@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Filtering;
-
-    my $directive = Validation::Class::Directive::Filtering->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Filtering is a core validation class field directive

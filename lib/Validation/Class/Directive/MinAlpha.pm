@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MinAlpha;
-
-    my $directive = Validation::Class::Directive::MinAlpha->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MinAlpha is a core validation class field directive

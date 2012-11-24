@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MixinField;
-
-    my $directive = Validation::Class::Directive::MixinField->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MixinField is a core validation class field directive

@@ -1,3 +1,5 @@
+# Utility Functions for Validation Classes
+
 package Validation::Class::Core;
 
 use strict;

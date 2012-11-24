@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Toggle;
-
-    my $directive = Validation::Class::Directive::Toggle->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Toggle is a core validation class field directive

@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Multiples;
-
-    my $directive = Validation::Class::Directive::Multiples->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Multiples is a core validation class field directive

@@ -1,4 +1,4 @@
-# ABSTRACT: Data Validation Engine for Validation Classes
+# ABSTRACT: Data Validation Engine for Validation::Class Classes
 
 package Validation::Class::Prototype;
 
@@ -162,7 +162,7 @@ overridden.
 
 hold 'mixins' => sub { Validation::Class::Mixins->new };
 
-=comment package
+=pod package
 
 The package attribute contains the namespace of the instance object currently
 using this module.
@@ -255,7 +255,7 @@ has passed or failed.
 
 has 'validated' => 0;
 
-=comment stashed
+=pod stashed
 
 The stashed attribute is a general purpose hash object.
 
@@ -263,7 +263,7 @@ The stashed attribute is a general purpose hash object.
 
 has 'stashed' => sub { Validation::Class::Mapping->new };
 
-=comment new
+=pod new
 
 The object constructor
 

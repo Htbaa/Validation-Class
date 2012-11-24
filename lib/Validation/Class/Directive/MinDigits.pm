@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MinDigits;
-
-    my $directive = Validation::Class::Directive::MinDigits->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MinDigits is a core validation class field directive

@@ -1,4 +1,4 @@
-# ABSTRACT: Mixin Object for Validation::Class Classes
+# Mixin Object for Validation::Class Classes
 
 package Validation::Class::Mixin;
 
@@ -45,7 +45,7 @@ foreach my $directive ($directives->values) {
 
 }
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Mixin provides functions for processing for mixin objects
 and provides accessors for mixin directives. This class is derived from the

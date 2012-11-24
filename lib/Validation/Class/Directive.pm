@@ -1,4 +1,4 @@
-# ABSTRACT: Base Class for Validation Class Directives
+# Base Class for Validation Class Directives
 
 package Validation::Class::Directive;
 
@@ -11,7 +11,7 @@ use Carp 'confess';
 
 # VERSION
 
-=head1 SYNOPSIS
+=pod
 
     use Validation::Class::Directive;
 
@@ -28,20 +28,22 @@ use Carp 'confess';
 
 ... written as a package
 
-    package Validation::Class::Directive::FooBar;
+    package Validation::Class::Directive::Example;
 
     use base 'Validation::Class::Directive';
+
     use Validation::Class::Core;
 
-    has 'mixin' => 0;
-    has 'field' => 1;
-    has 'multi' => 0;
-    has 'message' => '%s was not processed successfully';
+    has 'mixin'     => 0;
+    has 'field'     => 1;
+    has 'multi'     => 0;
+    
+    has 'message'   => '%s was not processed successfully';
     has 'validator' => sub {};
 
     1;
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Directive provides a base-class for validation class
 directives.

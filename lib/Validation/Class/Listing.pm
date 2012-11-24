@@ -1,4 +1,4 @@
-# ABSTRACT: Generic Container Class for Array References
+# ABSTRACT: Generic Container Class for an Array Reference
 
 package Validation::Class::Listing;
 
@@ -214,12 +214,11 @@ sub has {
 
     my $next = $self->iterator();
 
-    # defaults: keys
-    # accepts: sort, rsort, nsort, or rnsort
+    # defaults to iterating by keys but accepts sort, rsort, nsort, or rnsort
     # e.g. $self->iterator('sort', sub{ (shift) cmp (shift) });
 
     while (my $item = $next->()) {
-        ...
+        # do something with $item
     }
 
 =cut

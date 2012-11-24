@@ -1,4 +1,4 @@
-# ABSTRACT: Field Object for Validation::Class Classes
+# Field Object for Validation::Class Classes
 
 package Validation::Class::Field;
 
@@ -45,7 +45,7 @@ foreach my $directive ($directives->values) {
 
 }
 
-=head1 DESCRIPTION
+=pod
 
 Validation::Class::Field provides functions for processing for field objects
 and provides accessors for field directives. This class is derived from the

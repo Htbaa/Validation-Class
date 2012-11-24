@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::DependsOn;
-
-    my $specification = Validation::Class::Directive::DependsOn->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::DependsOn is a core validation class field directive

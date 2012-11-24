@@ -11,12 +11,6 @@ use Validation::Class::Core;
 
 # VERSION
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::MinSymbols;
-
-    my $directive = Validation::Class::Directive::MinSymbols->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MinSymbols is a core validation class field directive

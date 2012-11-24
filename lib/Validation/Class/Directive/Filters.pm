@@ -26,12 +26,6 @@ our $_registry = {
 
 };
 
-=head1 SYNOPSIS
-
-    use Validation::Class::Directive::Filters;
-
-    my $directive = Validation::Class::Directive::Filters->new;
-
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Filters is a core validation class field directive
