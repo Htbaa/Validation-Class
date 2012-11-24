@@ -1,0 +1,93 @@
+# NAME
+
+Validation::Class::Whitepaper - Operate with Impunity
+
+# VERSION
+
+version 7.900000
+
+# INTRODUCTION
+
+This whitepaper will serves as a guide to help readers understand the common
+data validation issues as well as the the rationale and various usage scenarios
+for Validation::Class.
+
+Data validation is an important aspect of every application yet it is often
+overlooked or neglected. Data validation should be thought of as your data input
+firewall, a layer that exist between the user of your application and the
+application's business objects.
+
+# DATA VALIDATION PROBLEMS
+
+Typically when designing an application we tend to name input parameters in an
+arbitrarily fashion and validate the same data at various stages during a
+program's execution (duplicating logic and validation routines) in various
+places in the application stack. This approach is inefficient and prone to bugs
+and security problems.
+
+blah, blah, blah
+
+# A DATA VALIDATION SOLUTION
+
+A better approach to data validation is to first consider each parameter hitting
+your application as a transmission fitting a very specific criteria and
+construct a data validation layer that operates with that in mind
+(e.g. exactly like a network firewall). Your data validation rules should act
+as filters which will accept or reject and format the transmission for use
+within your application.
+
+# WHY VALIDATION::CLASS
+
+Validation::Class is a flexible and powerful data validation framework. It
+allows you to model data and construct objects with focus on structure,
+reusability and data validation.
+
+Its main purpose is to properly handle data input errors. Validation::Class
+classes are designed to ensure consistency and promote reuse of data validation
+rules.
+
+Validation classes derived from Validation::Class are typically configured using
+the Validation::Class sugar functions (or keywords). Validation classes are
+typically defined using the following keywords:
+
+    * field     - a data validation rule that matches an input parameter
+    * mixin     - a configuration template which can be merged with a field
+    * directive - a field/mixin rule corresponding to a directive class name
+    * filter    - a custom filtering routine which transforms a field value
+    * method    - a self-validating sub-routine w/ associated validation profile
+
+A data validation framework exists to handle failures, it is its main function
+and purpose, in-fact, the difference between a validation framework and a
+type-constraint system is how it responds to errors.
+
+There are generally two types of errors that occur in an application,
+user-errors which are expected and should be handled and reported so that a user
+can correct the problem, and system-errors which are unexpected and should cause
+the application to terminate and/or handling the exception. Exception handling
+is the process of responding to the occurrence, during computation, of
+exceptions (anomalous or exceptional situations).
+
+User errors and system errors are poplar opposites. It is not always desired
+and/or appropriate to crash from a failure to validate user input.
+
+# TECHNICAL SCREENCAST
+
+The following [screencast](http://youtu.be/YCPViiB5jv0) explains what
+[Validation::Class](http://search.cpan.org/perldoc?Validation::Class) is, why it was created, and what it has to offer.
+
+# GETTING STARTED
+
+If you are looking for a simple way to get started with [Validation::Class](http://search.cpan.org/perldoc?Validation::Class),
+please review [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple). The instructions contained there
+are also relevant for configuring any class derived from [Validation::Class](http://search.cpan.org/perldoc?Validation::Class).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

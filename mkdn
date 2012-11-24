@@ -11,7 +11,7 @@ my @files = $find->file()->name('*.pm')->in($path);
 foreach my $file (sort @files) {
 
     next unless   $file =~ /Validation\/Class/;
-    my ($ofile) = $file =~ m/lib\/(.*)\.pm$/;
+    my ($ofile) = $file =~ m/lib\/(.*)\.p(m|od)$/;
 
     $ofile = $path eq '.' ?
         "$path/eg/docs/$ofile.mkdn" :
