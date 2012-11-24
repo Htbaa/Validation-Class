@@ -65,7 +65,7 @@ ok $v->validate('id'), 'validation succesful';
 ok !$v->error_count, 'no errors';
 
 # ok $v->reset, 'reset ok'; - DEPRECATED
-ok $v->proto->queued([]), 'queue reset ok';
+ok $v->proto->clear_queue, 'queue reset ok';
 ok $v->proto->reset_fields(), 'fields reset ok';
 ok !$v->validate(keys %{$v->fields}), 'validate all (not queued) failed';
 ok $v->error_count == 1, 'error - email_confirm not set';

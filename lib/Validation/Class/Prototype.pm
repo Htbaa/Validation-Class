@@ -24,6 +24,24 @@ use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 
+=head1 SYNOPSIS
+
+    package MyValidator;
+
+    use Validation::Class::Exporter;
+
+    Validation::Class::Exporter->apply_spec;
+
+    # extend Validation::Class
+    # ... and use in your codebase as the validation engine
+
+=head1 DESCRIPTION
+
+Validation::Class::Prototype is the validation engine used by proxy via
+L<Validation::Class> whose methods are aliases to the methods defined here.
+
+=cut
+
 my $_registry = Validation::Class::Mapping->new; # prototype registry
 
 =attribute attributes
@@ -102,8 +120,8 @@ hold 'fields' => sub { Validation::Class::Fields->new };
 The filtering attribute (by default set to 'pre') controls when incoming data
 is filtered. Setting this attribute to 'post' will defer filtering until after
 validation occurs which allows any errors messages to report errors based on the
-unaltered data. Alternatively, setting the filtering attribute to '' or undef
-will bypass all filtering unless explicitly defined at the field-level.
+unaltered data. Alternatively, setting the filtering attribute to 'off' will
+bypass all filtering unless explicitly defined at the field-level.
 
 =cut
 
@@ -154,9 +172,8 @@ hold 'methods' => sub { Validation::Class::Mapping->new };
 
 =attribute mixins
 
-The mixins attribute provides access to field templates.
-This attribute is a L<Validation::Class::Mapping> object and CANNOT be
-overridden.
+The mixins attribute provides access to field templates. This attribute is
+a L<Validation::Class::Mapping> object and CANNOT be overridden.
 
 =cut
 
@@ -183,9 +200,8 @@ hold 'params' => sub { Validation::Class::Params->new };
 
 =attribute plugins
 
-The plugins attribute provides access to loaded plugins.
-This attribute is a L<Validation::Class::Params> object containing
-plugin package names.
+The plugins attribute provides access to loaded plugins. This attribute is a
+L<Validation::Class::Mapping> object containing plugin package names.
 
 =cut
 
@@ -203,14 +219,14 @@ hold 'profiles' => sub { Validation::Class::Mapping->new };
 
 =attribute queued
 
-The queued attribute returns an arrayref of field names for (auto) validation.
-It represents a list of field names stored to be used in validation later. If
-the queued attribute contains a list, you can omit arguments to the validate
-method.
+The queued attribute returns an arrayref of field names for validation and
+CANNOT be overridden. It represents a list of field names stored to be used in
+validation later. If the queued attribute contains a list, you can omit
+arguments to the validate method.
 
 =cut
 
-has 'queued' => sub { Validation::Class::Listing->new };
+hold 'queued' => sub { Validation::Class::Listing->new };
 
 =attribute relatives
 
@@ -255,19 +271,7 @@ has passed or failed.
 
 has 'validated' => 0;
 
-=pod stashed
-
-The stashed attribute is a general purpose hash object.
-
-=cut
-
 has 'stashed' => sub { Validation::Class::Mapping->new };
-
-=pod new
-
-The object constructor
-
-=cut
 
 sub new {
 
@@ -307,18 +311,12 @@ sub apply_filter {
             if (my $value = $self->params->get($name)) {
 
                 if (isa_arrayref($value)) {
-
                     foreach my $el (@{$value}) {
-
                         $el = $filter->($el);
-
                     }
-
                 }
                 else {
-
                     $value = $filter->($value);
-
                 }
 
                 $self->params->add($name, $value);
@@ -335,13 +333,12 @@ sub apply_filter {
 
 =method apply_filters
 
-The apply_filters method (usually called automatically based on the filtering
-attribute) can be used to run the currently defined parameters through the
-filters defined in their matching fields.
+The apply_filters method can be used to run the currently defined parameters
+through the filters defined in their matching fields.
 
     $self = $self->apply_filters;
 
-    # apply filters to fields labeled as "don't filter automatically" (post)
+    # apply filters to fields where filtering is set to 'post' filtering
     $self = $self->apply_filters('post');
 
 =cut
@@ -522,9 +519,9 @@ sub check_field {
         my $directive = $directives->get($key);
 
         unless (defined $directive) {
-            $self->pitch_error(
-                "The $key directive supplied by the ".
-                "$name field is not supported"
+            $self->pitch_error( sprintf
+                "The %s directive supplied by the %s field is not supported",
+                $key, $name
             );
         }
 
@@ -547,9 +544,9 @@ sub check_mixin {
         my $directive = $directives->get($key);
 
         unless (defined $directive) {
-            $self->pitch_error(
-                "The $key directive supplied by the ".
-                "$name mixin is not supported"
+            $self->pitch_error( sprintf
+                "The %s directive supplied by the %s mixin is not supported",
+                $key, $name
             );
         }
 
@@ -565,16 +562,16 @@ The class method returns a new initialize validation class related to the
 namespace of the calling class, the relative class would've been loaded via the
 "load" keyword.
 
-Existing parameters and configuration options are passed to the relative class'
-constructor (including the stash). All attributes can be easily overwritten using
-the attribute's accessors on the relative class.
+Existing parameters and configuration options are passed to the constructor of
+the relative class (including the stash). All attributes can be easily
+overwritten using the accessors on the relative class.
 
 Also, you may prevent/override arguments from being copied to the new class
 object by supplying the them as arguments to this method.
 
 The class method is also quite handy in that it will detect parameters that are
-prefixed with the name of the class being fetched, and adjust the matching rule
-(if any) to allow validation to occur.
+prefixed with the name of the class being fetched, and automatically create
+aliases on the matching rules (if any) to allow validation to occur seemlessly.
 
     package Class;
 
@@ -592,16 +589,9 @@ prefixed with the name of the class being fetched, and adjust the matching rule
     my $child3  = $input->class('child');      # loads Class::Child;
     my $child4  = $input->class('step_child'); # loads Class::StepChild;
 
-    # use any non-alphanumeric character or underscore as the namespace delimiter
+    # please see Class::Forward for namespace shortname conventions
 
-    my $child5  = $input->class('step/child'); # loads Class::Step::Child;
-    my $child5a = $input->class('step:child'); # loads Class::Step::Child;
-    my $child5b = $input->class('step.child'); # loads Class::Step::Child;
-    my $child5c = $input->class('step-child'); # loads Class::Step::Child;
-
-    my $child6  = $input->class('CHILD');      # loads Class::CHILD;
-
-    # intelligently detecting and map params to child class
+    # intelligently detecting and mapping parameters to child class
 
     my $params = {
 
@@ -615,10 +605,6 @@ prefixed with the name of the class being fetched, and adjust the matching rule
     # without copying params from class
 
     my $child = $input->class('child', params => {});
-
-    # alternate syntax
-
-    my $child = $input->class(-name => 'child', params => {});
 
     1;
 
@@ -713,7 +699,7 @@ order queued.
 
     $self->queue(qw(name +email));
 
-    ...
+    # ... additional logic
 
     $self->queue(qw(+login +password));
 
@@ -721,7 +707,7 @@ order queued.
 
         $self->clear_queue(my($name, $email));
 
-        print "Name is $name";
+        print "Name is $name and email is $email";
 
     }
 
@@ -729,18 +715,18 @@ order queued.
 
 sub clear_queue {
 
-    my $self = shift @_;
+    my $self = shift;
 
-    my @names = @{$self->queued};
-
-    $self->queued([]);
+    my @names = $self->queued->list;
 
     for (my $i = 0; $i < @names; $i++) {
 
         $names[$i] =~ s/^[\-\+]{1}//;
-        $_[$i] = $self->param($names[$i]);
+        $_[$i] = $self->params->get($names[$i]);
 
     }
+
+    $self->queued->clear;
 
     return @_;
 
@@ -892,10 +878,13 @@ sub errors_to_string {
 
 The get_errors method returns a list of combined class-and-field-level errors.
 
-    my @errors = $self->get_errors; # returns list
+    # returns all errors
+    my @errors = $self->get_errors;
 
-    my @critical = $self->get_errors(qr/^critical:/i); # filter errors
+    # filter errors by fields whose name starts with critical
+    my @critical = $self->get_errors(qr/^critical/i);
 
+    # return errors for field_a and field_b specifically
     my @specific_field_errors = $self->get_errors('field_a', 'field_b');
 
 =cut
@@ -936,11 +925,11 @@ sub get_errors {
 
 =method get_fields
 
-The get_fields method returns the list of references to the specified fields.
-Returns undef if no arguments are passed. This method is likely to be used more
-internally than externally.
+The get_fields method returns the list of L<Validation::Class::Field> objects
+for specific fields and returns an empty list if no arguments are passed. If a
+field does not match the name specified it will return undefined.
 
-    my ($this, $that) = $self->get_fields('this', 'that');
+    my ($a, $b) = $self->get_fields('field_a', 'field_b');
 
 =cut
 
@@ -948,21 +937,9 @@ sub get_fields {
 
     my ($self, @fields) = @_;
 
-    my $fields = {};
+    return () unless @fields;
 
-    $self->fields->each(sub{ $fields->{$_[0]} = $_[1] || {} });
-
-    if (@fields) {
-
-        return @fields ? (map { $fields->{$_} || undef } @fields) : ();
-
-    }
-
-    else {
-
-        return $fields;
-
-    }
+    return (map { $self->fields->get($_) || undef } @fields);
 
 }
 
@@ -986,17 +963,13 @@ no parameter names are passed.
         if (defined $name) {
 
             if ($name eq '') {
-
                 print 'name parameter was passed but was empty';
-
             }
 
         }
 
         else {
-
             print 'name parameter was never submitted';
-
         }
 
     }
@@ -1017,7 +990,10 @@ sub get_params {
 
     if (@params) {
 
-        return @params ? (map { $params->{$_} || undef } @params) : ();
+        return @params ?
+            (map { defined $params->{$_} ? $params->{$_} : undef } @params) :
+            ()
+        ;
 
     }
 
@@ -1029,46 +1005,45 @@ sub get_params {
 
 }
 
-=method get_value
+=method get_values
 
-The get_value method returns the absolute value (hardcoded, default or
+The get_values method returns the absolute value (hardcoded, default or
 parameter specified) for a given field. This method executes specific logic
 which returns the value a field has based on a set of internal conditions. This
 method otherwise returns undefined.
 
-    my $value = $self->get_value('field_name');
+    my ($value) = $self->get_values('field_name');
+
+    # equilivent to
+
+    my $field = $self->fields->get('field_name');
+    my $value = $field->value;
+
+    # equilivent to
+
+    my $param = $self->params->get('field_name');
+    my $field = $self->fields->get('field_name');
+    my $value;
+
+    if ($field->{readonly} || $field->{default}) {
+        $value = $field->{default} || '';
+    }
+    else {
+        $value = $param;
+    }
 
 =cut
 
-sub get_value {
+sub get_values {
 
-    my ($self, $name) = @_;
+    my ($self, @fields) = @_;
 
-    return 0 unless $self->fields->has($name);
+    return () unless @fields;
 
-    my $field  = $self->fields->{$name};
-
-    my $value = undef;
-
-    if (exists $self->params->{$name}) {
-
-        $value = $self->params->{$name};
-
-    }
-
-    unless (defined $value) {
-
-        if (exists $field->{default}) {
-
-            $value = "CODE" eq ref $field->{default} ?
-                $field->{default}->($self) :
-                $field->{default};
-
-        }
-
-    }
-
-    return $value;
+    return (
+        map { $self->fields->has($_) ? $self->fields->get($_)->value : undef }
+        @fields
+    );
 
 }
 
@@ -1248,11 +1223,12 @@ sub merge_mixin {
 
 =method normalize
 
-The normalize method executes a set of routines that reset the parameter
-environment filtering any parameters present. This method is executed
-automatically at instantiation and again just before each validation event.
+The normalize method executes a set of routines that conditions the environment
+filtering any parameters present whose matching field has its filtering
+directive set to 'pre'. This method is executed automatically at instantiation
+and again just before each validation event.
 
-    $self->normalize();
+    $self->normalize;
 
 =cut
 
@@ -1386,25 +1362,14 @@ sub param {
 
     my  ($self, $name, $value) = @_;
 
-    if ($name && !ref($name)) {
-
-        if (defined $value) {
-
-            $self->set_params($name => $value);
-
-            return $value;
-
-        }
-
-        if ($self->params->has($name)) {
-
-            return $self->params->{$name};
-
-        }
-
+    if (defined $value) {
+        $self->params->add($name, $value);
+        return $value;
     }
-
-    return 0;
+    else {
+        return unless $self->params->has($name);
+        return $self->params->get($name);
+    }
 
 }
 
@@ -1418,17 +1383,13 @@ sub pitch_error {
     if ($self->ignore_unknown) {
 
         if ($self->report_unknown) {
-
             $self->errors->add($error_message);
-
         }
 
     }
 
     else {
-
         $self->throw_error($error_message);
-
     }
 
     return $self;
@@ -1438,39 +1399,23 @@ sub pitch_error {
 =method plugin
 
 The plugin method returns the instantiated plugin object attached to the current
-class.
+class. Note: This functionality is still experimental.
 
     package Class;
 
     use Validation::Class;
 
     load plugin => ['TelephoneFormat'];
-    load plugin => ['+Class::Plugin::Form::Elements'];
 
     package main;
 
     my $input = Class->new(params => $params);
 
     # get object for Validation::Class::Plugin::TelephoneFormat;
+    # see Class::Forward for namespace naming conventions
 
-    my $plugin = $input->plugin('telephone_format');
-
-    # use any non-alphanumeric character or underscore as the namespace delimiter
-    # get object for Class::Plugin::Form::Elements;
-    # note the leading character/delimiter
-
-    # automatically resolves to the first matching namespace for $self
-    # or Validation::Class::Plugin
-
-    my $plugin = $input->plugin('plugin:form:elements');
-
-    # prefix with a special character to denote a fully-qualified namespace
-
-    my $plugin = $input->plugin('+class:plugin:form:elements');
-
-    # same as $input->proto->plugins->{'Class::Plugin::Form::Elements'};
-
-    my $plugin = $input->plugin('Class::Plugin::Form::Elements');
+    # currently the plugin method will always return the same object instance
+    my $formatter = $input->plugin('telephone_format');
 
 =cut
 
@@ -1478,51 +1423,17 @@ sub plugin {
 
     my ($self, $class) = @_;
 
-    return 0 unless $class;
+    return unless $class;
+
+    return $self->plugins->get($class) if $self->plugins->has($class);
+
+    my $plugin_namespace = 'Validation::Class::Plugin';
 
     # transform what looks like a shortname
 
-    if ($class !~ /::/) {
+    $class = Class::Forward->new(namespace=>$plugin_namespace)->forward($class);
 
-        my @parts = split /[^0-9A-Za-z_]/, $class;
-
-        foreach my $part (@parts) {
-
-            $part = ucfirst $part;
-            $part =~ s/([a-z])_([a-z])/$1\u$2/g;
-
-        }
-
-        if (!$parts[0]) {
-
-            shift @parts;
-
-            $class = join "::", @parts;
-
-        }
-
-        else {
-
-            my @rootspaces = (
-
-                $self->{package},
-                'Validation::Class::Plugin'
-
-            );
-
-            foreach my $rootspace (@rootspaces) {
-
-                $class = join "::", $rootspace, @parts;
-
-                last if eval { $class->can("new") };
-
-            }
-
-        }
-
-    }
-
-    return $self->plugins->{$class};
+    return $self->plugins->get($class);
 
 }
 
@@ -1581,8 +1492,8 @@ queued attribute allowing you to *queue* fields to be validated. This method
 also allows you to set fields that must always be validated.
 
     $self->queue(qw/name login/);
-    $self->queue(qw/email_confirm/) if $input->param('chg_email');
-    $self->queue(qw/password_confirm/) if $input->param('chg_pass');
+    $self->queue(qw/email email2/) if $input->param('change_email');
+    $self->queue(qw/login login2/) if $input->param('change_login');
 
 =cut
 
@@ -2002,7 +1913,7 @@ sub reset {
 
     my  $self = shift;
 
-        $self->queued([]);
+        $self->queued->clear;
 
         $self->reset_fields;
 
@@ -2040,9 +1951,9 @@ sub reset_errors {
 
 =method reset_fields
 
-The reset_fields method clears all errors and field values, both at the class
-and individual field levels. This method is executed automatically at
-instantiation.
+The reset_fields method set special default directives and clears all errors and
+field values, both at the class and individual field levels. This method is
+executed automatically at instantiation.
 
     $self->reset_fields();
 
@@ -2072,7 +1983,7 @@ The reset_params method is responsible for completely removing any existing
 parameters and adding those specified. This method returns the class object.
 This method takes a list of key/value pairs or a single hashref.
 
-    $self = $self->reset_params($new_params); # accepts list also
+    $self->reset_params($new_params);
 
 =cut
 
@@ -2095,7 +2006,7 @@ sub reset_params {
 The set_errors method pushes its arguments (error messages) onto the class-level
 error stack and returns a count of class-level errors.
 
-    my $count = $self->set_errors(..., ...);
+    my $count = $self->set_errors('...', '...');
 
 =cut
 
@@ -2116,7 +2027,7 @@ This method returns the class object. This method takes a list of key/value
 pairs or a single hashref whose key should be a valid field name and whose
 value should be a hashref that is a valid field configuration object.
 
-    $self = $self->set_fields($name => $config); # accepts hashref also
+    $self->set_fields($name => $config); # accepts hashref also
 
 =cut
 
@@ -2124,26 +2035,13 @@ sub set_fields {
 
     my $self = shift;
 
-    my $fields = @_ % 2 ? $_[0] : { @_ };
+    my $fields = $self->build_args(@_);
 
     $self->fields->add($fields);
 
     return $self;
 
 }
-
-=method set_method
-
-The set_method method conveniently creates a method on the calling class, this
-method is primarily intended to be used during instantiation of a plugin during
-instantiation of the validation class.
-
-    my $sub = $self->set_method(do_something => sub { ... });
-
-Additionally, method names are flattened, e.g. ThisFunction will be converted to
-this_function for convenience and consistency.
-
-=cut
 
 sub set_method {
 
@@ -2170,7 +2068,7 @@ sub set_method {
 The set_params method is responsible for setting/replacing parameters. This
 method returns the class object. This method takes a list of key/value pairs or
 a single hashref whose keys should match field names and whose value should
-be a scalar or arrayref.
+be a scalar or arrayref of scalars.
 
     $self->set_params($name => $value); # accepts a hashref also
 
@@ -2180,13 +2078,7 @@ sub set_params {
 
     my $self = shift;
 
-    my $args = @_ % 2 ? $_[0] : { @_ };
-
-    while (my($k,$v) = each(%{$args})) {
-
-        $self->params->add($k => $v); # add new/overwrite existing
-
-    }
+    $self->params->add(@_);
 
     return $self;
 
@@ -2195,36 +2087,28 @@ sub set_params {
 =method set_value
 
 The set_value method assigns a value to the specified field's parameter
-unless the field is readonly.
+unless the field is readonly. This method returns the class object.
 
-    $self = $self->set_value($name => $value);
+    $self->set_values($name => $value);
 
 =cut
 
-sub set_value {
+sub set_values {
 
-    my ($self, $name, $value) = @_;
+    my $self = shift;
 
-    if (! $self->fields->has($name)) {
+    my $values = $self->build_args(@_);
 
-        $self->pitch_error("Field $name does not exist");
+    while (my($name, $value) = each(%{$values})) {
 
-    }
+        my $param = $self->params->get($name);
+        my $field = $self->fields->get($name);
 
-    else {
+        next if $field->{readonly} || $field->{default};
 
-        my $error = qq{
-            "Field value for $name must be a scalar value or arrayref"
-        };
+        $self->params->add($name, $value);
 
-        $self->throw_error($error)
-            if ref($value) && "ARRAY" ne ref $value;
-
-        unless (defined $self->fields->{$name}->{readonly}) {
-
-            $self->params->add($name => $value);
-
-        }
+        $field->value($value);
 
     }
 
@@ -2275,11 +2159,11 @@ The stash method provides a container for context/instance specific information.
 The stash is particularly useful when custom validation routines require insight
 into context/instance specific operations.
 
-    package MyApp::Validation;
+    package MyApp::Person;
 
     use Validation::Class;
 
-    fld 'email' => {
+    field 'email' => {
 
         validation => sub {
 
@@ -2287,6 +2171,7 @@ into context/instance specific operations.
 
             my $db = $self->stash('database');
 
+            return 0 unless $db;
             return $db->find(...) ? 0 : 1 ; # email exists
 
         }
@@ -2295,10 +2180,8 @@ into context/instance specific operations.
 
     package main;
 
-    $self->stash( { database => $dbix_object } );
-    $self->stash( database => $dbix_object );
-
-    ...
+    #  store the database object for use in email validation
+    $self->stash(database => $database_object);
 
 =cut
 
@@ -2394,56 +2277,57 @@ sub unflatten_params {
 The validate method returns true/false depending on whether all specified fields
 passed validation checks.
 
-    use MyApp::Validation;
+    use MyApp::Person;
 
-    my $input = MyApp::Validation->new(params => $params);
+    my $input = MyApp::Person->new(params => $params);
 
     # validate specific fields
-    unless ($input->validate('field1','field2')){
+    unless ($input->validate('login','password')){
         return $input->errors_to_string;
     }
 
     # validate fields based on a regex pattern
-    unless ($input->validate(qr/^field(\d+)?/)){
+    unless ($input->validate(qr/^setting(\d+)?/)){
         return $input->errors_to_string;
     }
 
-    # validate existing parameters, if no parameters exist,
-    # validate all fields ... which will return true unless field(s) exist
+    # validate existing parameters
+    # however, if no parameters exist, ...
+    # validate all fields, which will return true unless a field exists
     # with a required directive
-    unless ($input->validate()){
+    unless ($input->validate){
         return $input->errors_to_string;
     }
 
     # validate all fields period, obviously
-    unless ($input->validate(keys %{$input->fields})){
+    unless ($input->validate($input->fields->keys)){
         return $input->errors_to_string;
     }
 
-    # validate specific parameters (by name) after mapping them to other fields
+    # implicity validate parameters which don't explicitly match a field
     my $parameter_map = {
-        user => 'hey_im_not_named_login',
-        pass => 'password_is_that_really_you'
+        user => 'login',
+        pass => 'password'
     };
     unless ($input->validate($parameter_map)){
         return $input->errors_to_string;
     }
 
-Another cool trick the validate() method can perform is the ability to temporarily
-alter whether a field is required or not during run-time. This functionality is
-often referred to as the *toggle* function.
+Another cool trick the validate() method can perform is the ability to
+temporarily alter whether a field is required or not during validation. This
+functionality is often referred to as the *toggle* function.
 
-This method is important when you define a field (or two or three) as required
-or non and want to change that per validation. This is done by calling the
-validate() method with a list of fields to be validated and prefixing the
-target fields with a plus or minus as follows:
+This method is important when you define a field as required or non and want to
+change that per validation. This is done by calling the validate() method with
+a list of fields to be validated and prefixing the target fields with a plus or
+minus respectively as follows:
 
-    use MyApp::Validation;
+    use MyApp::Person;
 
-    my $input = MyApp::Validation->new(params => $params);
+    my $input = MyApp::Person->new(params => $params);
 
     # validate specific fields, force name, email and phone to be required
-    # regardless of the field definitions directives ... and force the age, sex
+    # regardless of the field directives ... and force the age, sex
     # and birthday to be optional
 
     my @spec = qw(+name +email +phone -age -sex -birthday);
@@ -2610,14 +2494,15 @@ sub validate {
 The validate_method method is used to determine whether a self-validating method
 will be successful. It does so by validating the methods input specification.
 This is useful in circumstances where it is advantageous to know in-advance
-whether a self-validating method will pass or fail.
+whether a self-validating method will pass or fail. It effectively allows you
+to use the methods input specification as a validation profile.
 
     if ($self->validate_method('password_change')) {
 
+        # password_change will pass validation
+
         if ($self->password_change) {
-
-            # ....
-
+            # password_change executed
         }
 
     }
