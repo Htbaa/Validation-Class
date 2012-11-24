@@ -1,0 +1,431 @@
+# PODNAME: Validation::Class::Cookbook
+# ABSTRACT: Recipes for Validation::Class Classes
+
+# VERSION
+
+=head1 BUILDING CLASSES
+
+    package MyApp::User;
+
+    use Validation::Class;
+
+    # a validation rule template
+
+    mixin 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+
+    # a validation rule
+
+    field 'login'  => {
+        mixin      => 'basic',
+        label      => 'user login',
+        error      => 'login invalid',
+        validation => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'admin' ? 1 : 0;
+
+        }
+    };
+
+    # a validation rule
+
+    field 'password'  => {
+        mixin         => 'basic',
+        label         => 'user login',
+        error         => 'login invalid',
+        validation    => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'pass' ? 1 : 0;
+
+        }
+    };
+
+    1;
+
+Your validation class can be thought of as your data-model/input-firewall. The
+benefits this approach provides might require you to change your perspective
+on parameter handling and workflow. Typically when designing an application we
+tend to name parameters arbitrarily and validate the same data at various stages
+during a program's execution in various places in the application stack. This
+approach is inefficient and prone to bugs and security problems.
+
+To get the most out of Validation::Class you should consider each parameter
+hitting your application (individually) as a transmission fitting a very specific
+criteria, yes, like a field in a data model.
+
+Your validation rules will act as filters which will reject or accept and
+format the transmission for use within your application, yes, almost exactly
+like a firewall.
+
+A validation class is defined as follows:
+
+    package MyApp::User;
+
+    use Validation::Class;
+
+    # a mixin template
+
+    mixin 'basic'  => {
+        required   => 1
+    };
+
+    # a validation rule
+
+    field 'login'  => {
+        label      => 'User Login',
+        error      => 'Login invalid.',
+        mixin      => 'basic',
+
+        validation => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'admin' ? 1 : 0;
+
+        }
+
+    };
+
+    # a validation rule
+
+    field 'password'  => {
+        label         => 'User Password',
+        error         => 'Password invalid.',
+        mixin         => 'basic',
+
+        validation    => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'pass' ? 1 : 0;
+
+        }
+
+    };
+
+    # a validation profile
+
+    profile 'registration'  => sub {
+
+        my ($self, @args) = @_;
+
+        return $self->validate(qw(+name +email -login +password))
+
+    };
+
+    # an auto-validating method
+
+    method 'register'  => {
+
+        input => 'registration',
+        using => sub {
+
+            my ($self, @args) = shift;
+
+            # ... do something
+
+        }
+
+    };
+
+    1;
+
+The fields defined will be used to validate the specified input parameters.
+You specify the input parameters at/after instantiation, parameters should take
+the form of a hashref of key/value pairs passed to the params attribute, or
+attribute/value pairs. The following is an example on using your validate class
+to validate input in various scenarios:
+
+    # web app
+    package MyApp;
+
+    use MyApp::User;
+    use Misc::WebAppFramework;
+
+    get '/auth' => sub {
+
+        # get user input parameters
+        my $params = shift;
+
+        # initialize validation class and set input parameters
+        my $user = MyApp::User->new(params => $params);
+
+        unless ($user->validate('login', 'password')) {
+
+            # print errors to browser unless validation is successful
+            return $user->errors_to_string;
+
+        }
+
+        return 'you have authenticated';
+
+    };
+
+A field can have aliases, parameter names that if detected will be mapped to
+the parameter name matching the field definition. Multiple fields cannot have
+the same alias defined, such a configuration would result in a runtime error.
+
+    use MyApp::User;
+
+    my $user = MyApp::User->new(params => $params);
+
+    unless ($user->validate) {
+
+        return $input->errors_to_string;
+
+    }
+
+    package MyApp::User;
+
+    field 'email' => {
+        ...,
+        alias => [
+            'emails',
+            'email_address',
+            'email_addresses'
+        ]
+
+    };
+
+    package main;
+
+    use MyApp::User;
+
+    my  $user = MyApp::User->new(params => { email_address => '...' });
+
+    unless ($user->validate('email'){
+
+        return $user->errors_to_string;
+
+    }
+
+    # valid because email_address is an alias on the email field
+
+=head1 FILTERING INCOMING DATA
+
+Validation::Class supports pre/post filtering but is configured to pre-filter
+incoming data. This means that based upon the filtering options supplied within
+the individual fields, filtering will happen before validation (technically at
+instantiation and again just before validation). As expected, this is configurable
+via the filtering attribute.
+
+A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
+which boosts application security and is best used with passive filtering
+(e.g. converting character case - filtering which only alters the input in
+predictable ways), versus aggressive filtering (e.g. formatting a telephone
+number) which completely and permanently changes the incoming data ... so much
+so that if the validation still fails ... errors that are reported may not
+match the data that was submitted.
+
+If you're sure you'd rather employ aggressive filtering, I suggest setting
+the filtering attribute to 'post' for post-filtering or setting it to null
+and applying the filters manually by calling the apply_filters() method.
+
+=head1 SEPARATION OF CONCERNS
+
+For larger applications where a single validation class might become cluttered
+and inefficient, Validation::Class comes equipped to help you separate your
+validation rules into separate classes.
+
+The idea is that you'll end up with a main validation class (most likely empty)
+that will simply serve as your point of entry into your relative (child)
+classes. The following is an example of this:
+
+    package MyVal::User;
+
+    use Validation::Class;
+
+    field name => { ... };
+    field email => { ... };
+    field login => { ... };
+    field password => { ... };
+
+    package MyVal::Profile;
+
+    use Validation::Class;
+
+    field age => { ... };
+    field sex => { ... };
+    field birthday => { ... };
+
+    package MyVal;
+
+    use Validation::Class;
+
+    set classes => [__PACKAGE__];
+
+    package main;
+
+    my $input = MyVal->new(params => $params);
+
+    my $user = $input->class('user');
+
+    my $profile = $input->class('profile');
+
+    ...
+
+    1;
+
+=head1 INTROSPECT AND EXTEND
+
+Most users will never venture beyond the public API, but powerful abilities
+await the more adventureous developer and this section was written specifically
+for you. To assist you on along your journey, let me explain exactly what
+happens when you define and instantiate a validation class.
+
+Classes are defined using keywords (field, mixin, filter, etc) which register
+rule definitions on a cached class profile (of-sorts) associated with the class
+which is being constructed. On instantiation, the cached class profile is cloned
+then merged with any arguments provided to the constructor, this means that even
+in a persistent environment the original class profile is never altered.
+
+To begin introspection, simply look into the attributes attached to the class
+prototype, e.g. fields, mixins, filters, etc., the following examples will give
+you an idea of how to use introspection to extend your application code using
+Validation::Class.
+
+Please keep in mind that Validation::Class is likely to have most of the
+functionalty you would need to introspect your codebase. The following is an
+introspect design template that will work in most cases:
+
+    package MyApp::Introspect;
+
+    use Validation::Class;
+
+    set classes => ['MyApp']; # load MyApp and all MyApp::* child classes
+
+    sub per_class {
+
+        my ($self, $code) = @_;
+
+        $self->proto->relatives->each(sub {
+
+            my ($alias, $namespace) = @_;
+
+            # do something with each class
+            $code->($namespace);
+
+        });
+
+    }
+
+    sub per_field_per_class {
+
+        my ($self, $code) = @_;
+
+        $self->per_class(sub {
+
+            my $namespace = shift;
+
+            my $class = $namespace->new;
+
+            foreach my $field (sort $class->fields->keys) {
+
+                # do something with each field
+                $code->($class, $class->fields->{$field});
+
+            }
+
+        });
+
+    }
+
+=head2 CLIENT-SIDE VALIDATION
+
+In the context of a web-application, it is often best to perform the initial
+input validation on the client (web-browser) before submitting data to the
+server for further validation and processing. In the following code we will
+generate javascript objects that match our Validation::Class data models which
+we will then use with jQuery to validate form data, etc.
+
+... in bin/generate_jsapi
+
+    # usage: ./generate_jsapi > app.api.js
+
+    use MyApp::Introspect;
+
+    use JSON;
+
+    my $classes = {};
+
+    my $json = JSON->new->allow_blessed->convert_blessed->pretty([1]);
+
+    my $introspection = MyApp::Introspect->new;
+
+    $introspection->per_field_per_class(sub{
+
+        my ($class, $field) = @_;
+
+        my $namespace = ref $class;
+
+        # attributes we want in the js api
+        my $attributes = { map { $_ => $field->{$_} } qw(
+            name label filters required length min_length max_length
+        ) };
+
+        my $fieldspace = $classes->{$namespace}->{$field->{name}} = $attributes;
+
+    });
+
+    # generate the JS API
+
+    print "\n";
+
+    print "var MyApp = MyApp || {};\n\n";
+
+    while (my($namespace, $fields) = each(%{$classes})) {
+
+        $namespace =~ s/::/./;
+
+        my $objects = $json->encode($fields);
+
+        chomp $objects;
+
+        print "$namespace = $objects;\n\n";
+
+    }
+
+The output of the following script should generate a file which looks similar
+to the following:
+
+    var MyApp = MyApp || {};
+
+    MyApp.Test = {
+       "email" : {
+          "name" : "email",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 3,
+          "length" : null,
+          "required" : 1,
+          "label" : null,
+          "max_length" : 255
+       },
+       "password" : {
+          "name" : "password",
+          "filters" : [
+             "strip",
+             "trim"
+          ],
+          "min_length" : 5,
+          "length" : null,
+          "required" : 1,
+          "label" : null,
+          "max_length" : 255
+       }
+    };
+
+If its not obvious yet, we can easily use this generated javascript API with
+jQuery (or other client-side library) to validate forms, etc.
+
+=cut

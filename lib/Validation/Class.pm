@@ -269,7 +269,7 @@ L<Validation::Class::Simple>.
 
 If you are new to Validation::Class, or would like more information on the
 underpinnings of this library and how it views and approaches data validation,
-please review L<Validation::Class::WhitePaper::Validation>.
+please review L<Validation::Class::Whitepaper>.
 
 =cut
 
