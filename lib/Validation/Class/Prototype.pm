@@ -32,8 +32,7 @@ use Carp 'confess';
 
     Validation::Class::Exporter->apply_spec;
 
-    # extend Validation::Class
-    # ... and use in your codebase as the validation engine
+    # extend Validation::Class and use in your codebase as the validation engine
 
 =head1 DESCRIPTION
 
@@ -571,7 +570,7 @@ object by supplying the them as arguments to this method.
 
 The class method is also quite handy in that it will detect parameters that are
 prefixed with the name of the class being fetched, and automatically create
-aliases on the matching rules (if any) to allow validation to occur seemlessly.
+aliases on the matching rules (if any) to allow validation to occur seamlessly.
 
     package Class;
 
@@ -862,7 +861,7 @@ sub errors_to_string {
 
     my $self = shift;
 
-    # combine class anf field errors
+    # combine class and field errors
 
     my $errors = Validation::Class::Errors->new([]);
 
@@ -1014,12 +1013,12 @@ method otherwise returns undefined.
 
     my ($value) = $self->get_values('field_name');
 
-    # equilivent to
+    # equivalent to
 
     my $field = $self->fields->get('field_name');
     my $value = $field->value;
 
-    # equilivent to
+    # equivalent to
 
     my $param = $self->params->get('field_name');
     my $field = $self->fields->get('field_name');
@@ -2047,7 +2046,7 @@ sub set_method {
 
     my ($self, $name, $code) = @_;
 
-    # proto and prototype methods cannnot be overriden
+    # proto and prototype methods cannot be overridden
 
     confess "Error creating method $name, method already exists"
         if ($name eq 'proto' || $name eq 'prototype')
@@ -2304,7 +2303,7 @@ passed validation checks.
         return $input->errors_to_string;
     }
 
-    # implicity validate parameters which don't explicitly match a field
+    # implicitly validate parameters which don't explicitly match a field
     my $parameter_map = {
         user => 'login',
         pass => 'password'

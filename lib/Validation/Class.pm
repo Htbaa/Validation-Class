@@ -249,15 +249,15 @@ sub initialize_validator {
 
 =head1 DESCRIPTION
 
-Validation::Class is a robust data validation framework which aims to provide
-the building blocks for easily definable self-validating classes.
+Validation::Class is a robust data validation framework which aims provide an
+extensible framework for developing clean yet sophisticated data validation
+objects.
 
-Validation::Class provides an extensible framework for developing clean yet
-sophisticated data validation objects. The core feature-set consist of
-self-validating methods, validation profiles, reusable validation rules and
-templates, pre and post validation input filtering, class inheritance, automatic
-array handling, as well as extensibility (i.e. override default error messages,
-create custom validators and input filters and much more).
+The core feature-set consist of self-validating methods, validation profiles,
+reusable validation rules and templates, pre and post input filtering, class
+inheritance, automatic array handling, and extensibility (e.g. overriding
+default error messages, creating custom validators, creating custom input
+filters and much more).
 
 =head1 QUICKSTART
 

@@ -1,4 +1,4 @@
-# ABSTRACT: Simple Class for Ad-Hoc Validation
+# ABSTRACT: Simple Ad-Hoc Data Validation
 
 package Validation::Class::Simple;
 
@@ -36,14 +36,16 @@ use Validation::Class::Prototype;
 
 =head1 DESCRIPTION
 
-Validation::Class::Simple is simple validation module built around the powerful
+Validation::Class::Simple is a simple validation module built around the powerful
 L<Validation::Class> data validation framework.
 
-This module is nothing more than a blank canvas; a clean validation class,
-derived from L<Validation::Class>, which has not been pre-configured
-(e.g. configured via keywords, etc). It can be useful in an environment where
-you wouldn't care to create a validation class and instead would simply like to
-pass rules to a validation engine in an ad-hoc fashion.
+This module is merely a blank canvas, a clean validation class derived from
+L<Validation::Class> which has not been pre-configured (e.g. configured via
+keywords, etc).
+
+It can be useful in an environment where you wouldn't care to create a
+validation class and instead would simply like to pass rules to a validation
+engine in an ad-hoc fashion.
 
 =head1 RATIONALE
 
