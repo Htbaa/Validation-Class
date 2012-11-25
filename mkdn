@@ -6,7 +6,7 @@ print  "\n";
 
 my $path  = $ARGV[0] || '.';
 my $find  = File::Find::Rule;
-my @files = $find->file()->name('*.pm')->in($path);
+my @files = $find->file()->name('*.pm', '*.pod')->in($path);
 
 foreach my $file (sort @files) {
 

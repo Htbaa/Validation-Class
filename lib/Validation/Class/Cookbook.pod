@@ -5,7 +5,38 @@
 
 =head1 BUILDING CLASSES
 
-    package MyApp::User;
+This recipe displays the usage of keywords to configure a validation class.
+
+=head2 Problem
+
+You want to know how to use the L<Validation::Class> keywords to define a
+validation class.
+
+=head2 Solution
+
+Use the keywords exported by L<Validation::Class> to register validation rules,
+templates, profiles, methods and filters.
+
+=head2 Discussion
+
+Your validation class can be thought of as your data-model/input-firewall. The
+benefits this approach provides might require you to change your perspective
+on parameter handling and workflow. Typically when designing an application we
+tend to name parameters arbitrarily and validate the same data at various stages
+during a program's execution in various places in the application stack. This
+approach is inefficient and prone to bugs and security problems.
+
+To get the most out of Validation::Class you should consider each parameter
+hitting your application (individually) as a transmission fitting a very specific
+criteria, yes, like a field in a data model.
+
+Your validation rules will act as filters which will reject or accept and
+format the transmission for use within your application, yes, almost exactly
+like a firewall.
+
+A validation class is defined as follows:
+
+    package MyApp::Person;
 
     use Validation::Class;
 
@@ -48,76 +79,13 @@
         }
     };
 
-    1;
-
-Your validation class can be thought of as your data-model/input-firewall. The
-benefits this approach provides might require you to change your perspective
-on parameter handling and workflow. Typically when designing an application we
-tend to name parameters arbitrarily and validate the same data at various stages
-during a program's execution in various places in the application stack. This
-approach is inefficient and prone to bugs and security problems.
-
-To get the most out of Validation::Class you should consider each parameter
-hitting your application (individually) as a transmission fitting a very specific
-criteria, yes, like a field in a data model.
-
-Your validation rules will act as filters which will reject or accept and
-format the transmission for use within your application, yes, almost exactly
-like a firewall.
-
-A validation class is defined as follows:
-
-    package MyApp::User;
-
-    use Validation::Class;
-
-    # a mixin template
-
-    mixin 'basic'  => {
-        required   => 1
-    };
-
-    # a validation rule
-
-    field 'login'  => {
-        label      => 'User Login',
-        error      => 'Login invalid.',
-        mixin      => 'basic',
-
-        validation => sub {
-
-            my ($self, $field, $params) = @_;
-
-            return $field->value eq 'admin' ? 1 : 0;
-
-        }
-
-    };
-
-    # a validation rule
-
-    field 'password'  => {
-        label         => 'User Password',
-        error         => 'Password invalid.',
-        mixin         => 'basic',
-
-        validation    => sub {
-
-            my ($self, $field, $params) = @_;
-
-            return $field->value eq 'pass' ? 1 : 0;
-
-        }
-
-    };
-
     # a validation profile
 
     profile 'registration'  => sub {
 
         my ($self, @args) = @_;
 
-        return $self->validate(qw(+name +email -login +password))
+        return $self->validate(qw(login password));
 
     };
 
@@ -209,13 +177,27 @@ the same alias defined, such a configuration would result in a runtime error.
 
     # valid because email_address is an alias on the email field
 
-=head1 FILTERING INCOMING DATA
+=head1 FILTERING DATA
+
+This recipe describes how to define filtering in your validation class rules.
+
+=head2 Problem
+
+You want to know how to define filters to sanatize and transform your data
+although some transformations may need to occur after a successful validation.
+
+=head2 Solution
+
+Data validation rules can be configured to apply filtering as both pre-and-post
+processing operations.
+
+=head2 Discussion
 
 Validation::Class supports pre/post filtering but is configured to pre-filter
-incoming data. This means that based upon the filtering options supplied within
-the individual fields, filtering will happen before validation (technically at
-instantiation and again just before validation). As expected, this is configurable
-via the filtering attribute.
+incoming data by default. This means that based upon the filtering options
+supplied within the individual fields, filtering will happen before validation
+(technically at instantiation and again just before validation). As expected,
+this is configurable via the filtering attribute.
 
 A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
 which boosts application security and is best used with passive filtering
@@ -229,7 +211,23 @@ If you're sure you'd rather employ aggressive filtering, I suggest setting
 the filtering attribute to 'post' for post-filtering or setting it to null
 and applying the filters manually by calling the apply_filters() method.
 
-=head1 SEPARATION OF CONCERNS
+=head1 DELEGATING VALIDATION
+
+This recipe describes how to separate validation logic between multiple related
+classes.
+
+=head2 Problem
+
+You want to know how to define multiple validation classes and pass input
+data and input parameters between them.
+
+=head2 Solution
+
+Use classes as validation domains, as a space to logically group related
+validation rules, then use built-in methods to have multiple validation classes
+validate in-concert.
+
+=head2 Discussion
 
 For larger applications where a single validation class might become cluttered
 and inefficient, Validation::Class comes equipped to help you separate your
@@ -243,18 +241,18 @@ classes. The following is an example of this:
 
     use Validation::Class;
 
-    field name => { ... };
-    field email => { ... };
-    field login => { ... };
-    field password => { ... };
+    field name      => { ... };
+    field email     => { ... };
+    field login     => { ... };
+    field password  => { ... };
 
     package MyVal::Profile;
 
     use Validation::Class;
 
-    field age => { ... };
-    field sex => { ... };
-    field birthday => { ... };
+    field age       => { ... };
+    field sex       => { ... };
+    field birthday  => { ... };
 
     package MyVal;
 
@@ -270,11 +268,24 @@ classes. The following is an example of this:
 
     my $profile = $input->class('profile');
 
-    ...
-
     1;
 
 =head1 INTROSPECT AND EXTEND
+
+This recipe describes how to peek under the curtain and leverage the framework
+for other purposes.
+
+=head2 Problem
+
+You want to know how to use your data validation classes to perform other tasks
+programatically (e.g. generate documentation, etc).
+
+=head2 Solution
+
+By using the prototype class associated with your validation class you can
+introspect it's configuration and perform additional tasks programatically.
+
+=head2 Discussion
 
 Most users will never venture beyond the public API, but powerful abilities
 await the more adventureous developer and this section was written specifically
@@ -292,9 +303,9 @@ prototype, e.g. fields, mixins, filters, etc., the following examples will give
 you an idea of how to use introspection to extend your application code using
 Validation::Class.
 
-Please keep in mind that Validation::Class is likely to have most of the
+Please keep in mind that Validation::Class is likely to already have most of the
 functionalty you would need to introspect your codebase. The following is an
-introspect design template that will work in most cases:
+introspection design template that will work in most cases:
 
     package MyApp::Introspect;
 
@@ -339,6 +350,22 @@ introspect design template that will work in most cases:
     }
 
 =head2 CLIENT-SIDE VALIDATION
+
+This recipe describes how to generate JSON objects which can be used to validate
+user input in the web-browser (client-side).
+
+=head2 Problem
+
+You want to know how to make the most out of your data validation rules by
+making your configuration available as JSON objects in the browser.
+
+=head2 Solution
+
+Using introspection, you can leverage the prototype class associated with your
+validation class to generate JSON objects based on your validation class
+configuration.
+
+=head2 Discussion
 
 In the context of a web-application, it is often best to perform the initial
 input validation on the client (web-browser) before submitting data to the

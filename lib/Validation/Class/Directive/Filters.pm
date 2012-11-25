@@ -123,7 +123,9 @@ sub after_validation {
 
     my ($self, $proto, $field, $param) = @_;
 
-    $self->execute_filtering($proto, $field, $param, 'post');
+    if ($proto->validated == 2) {
+        $self->execute_filtering($proto, $field, $param, 'post');
+    }
 
     return $self;
 

@@ -155,10 +155,11 @@ unknown fields will NOT be registered as class-level variables.
 
 ## validated
 
-The validated boolean simply denotes whether the validation routine has been
+The validated attribute simply denotes whether the validation routine has been
 executed since the last normalization process (which occurs at instantiation
-and before validation). Note, this is NOT an indicator of whether validation
-has passed or failed.
+and before validation). It's values will either be 0 (not validated),
+1 (validated with errors), or 2 (validated without errors). You can simply check
+this attribute for truth when you need to know if validation has occurred.
 
 # METHODS
 

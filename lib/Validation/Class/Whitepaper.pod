@@ -16,13 +16,47 @@ application's business objects.
 
 =head1 DATA VALIDATION PROBLEMS
 
+The most common application security weakness is the failure to properly
+validate input from the client or environment. Data validation is important
+because it provides security, it allows you to ensure user supplied data is
+formatted properly, is within length boudaries, contains permitted characters
+and adheres to business rules.
+
+To understand the problem domain we need to first understand:
+
+    * what is meant by data validation
+    * what the standard validation types are
+    * what the common use-cases were validation applies
+
+First, data validation is the process of auditing a piece of data to ensure it
+fits a specific criteria. Common data validation checks are:
+
+    * existence checking
+    * range checking
+    * type checking
+    * list-lookup checking
+    * dependency checking
+    * pattern checking
+    * custom validation checking
+
 Typically when designing an application we tend to name input parameters in an
 arbitrarily fashion and validate the same data at various stages during a
 program's execution (duplicating logic and validation routines) in various
 places in the application stack. This approach is inefficient and prone to bugs
 and security problems.
 
-blah, blah, blah
+Data can be submitted to an application in various formats and it is not always
+ideal, and the option to pre-format the data is not always ideal or even
+possible. A few common use-cases were validation is required and often fails
+(in a big big way) are as follows:
+
+    * handling arbitrarily and/or dynamically-named parameters
+    * handling input for batch-processing
+    * handling multi-type parameters (array or scalar depending on context)
+    * handling complex conditional validation logic
+    * handling multi-variant parameter names (aliases)
+    * handling parameter dependencies
+    * handling errors (reporting messages, localization, etc)
 
 =head1 A DATA VALIDATION SOLUTION
 
@@ -33,15 +67,18 @@ construct a data validation layer that operates with that in mind
 as filters which will accept or reject and format the transmission for use
 within your application.
 
+A proper validation framework should allow you to model data and construct
+validation objects with a focus on structuring rules, reusing common declarations,
+defining input filters and validating data. Its main purpose should be to
+properly handle data input errors. It's ulterior motive is to ensure consistency
+and promote reuse of data validation rules.
+
 =head1 WHY VALIDATION::CLASS
 
-Validation::Class is a flexible and powerful data validation framework. It
-allows you to model data and construct objects with focus on structure,
-reusability and data validation.
-
-Its main purpose is to properly handle data input errors. Validation::Class
-classes are designed to ensure consistency and promote reuse of data validation
-rules.
+Validation::Class was built around the concept of compartmentalization and
+re-use. That premise gave birth to the ideal of persistent-rules which exist in
+a class configuration which is associated with a class which acts as a
+validation domain for related validation rules.
 
 Validation classes derived from Validation::Class are typically configured using
 the Validation::Class sugar functions (or keywords). Validation classes are
@@ -66,6 +103,79 @@ exceptions (anomalous or exceptional situations).
 
 User errors and system errors are poplar opposites. It is not always desired
 and/or appropriate to crash from a failure to validate user input.
+
+The following examples will clearly display how Validation::Class handles a few
+common use-cases were validation is usually quite painful:
+
+=head2 Dynamic Parameters
+
+    # handling arbitrary and/or dynamically-named parameters
+
+    package Example;
+
+    use Validation::Class;
+
+    field email     => {
+        required    => 1,
+        pattern     => qr/\@localhost$/
+    };
+
+    field login     => {
+        required    => 1,
+        min_length  => 5,
+        alias       => ['user']
+    };
+
+    field password  => {
+        required    => 1,
+        min_length  => 5,
+        min_digits  => 1,
+        alias       => ['pass']
+    };
+
+    package main;
+
+    my $params = {
+        user    => 'admin',             # arbitrary
+        pass    => 's3cret',            # arbitrary
+        email_1 => 'admin@localhost',   # dynamic created
+        email_2 => 'root@localhost',    # dynamic created
+        email_3 => 'sa@localhost',      # dynamic created
+    };
+
+    my $eg = Example->new(params => $params);
+
+    $eg->proto->clone_field('email', $_)
+        for $eg->params->grep(qr/^email/)->keys
+    ;
+
+    print $eg->validate ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Batch-Processing
+
+    * TODO: handling input for batch-processing
+
+=head2 Multi-Type Parameters
+
+    * TODO: handling multi-type parameters (array or scalar depending on context)
+
+=head2 Complex Conditions
+
+    * TODO: handling complex conditional validation logic
+
+=head2 Multi-Variant Parameters
+
+    * TODO: handling multi-variant parameter names (aliases)
+
+=head2 Parameter Dependencies
+
+    * TODO: handling parameter dependencies
+
+=head2 Error Handling
+
+    * TODO: handling errors (reporting messages, localization, etc)
 
 =head1 TECHNICAL SCREENCAST
 

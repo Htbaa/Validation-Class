@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+package Example;
+
+use Validation::Class;
+
+field email     => {
+    required    => 1,
+    pattern     => qr/\@localhost$/
+};
+
+field login     => {
+    required    => 1,
+    min_length  => 5,
+    alias       => ['user']
+};
+
+field password  => {
+    required    => 1,
+    min_length  => 5,
+    min_digits  => 1,
+    alias       => ['pass']
+};
+
+package main;
+
+my $params = {
+    user    => 'admin',             # arbitrary
+    pass    => 's3cret',            # arbitrary
+    email_1 => 'admin@localhost',   # dynamic created
+    email_2 => 'root@localhost',    # dynamic created
+    email_3 => 'sa@localhost',      # dynamic created
+};
+
+my $eg = Example->new(params => $params);
+
+$eg->proto->clone_field('email', $_)
+    for $eg->params->grep(qr/^email/)->keys
+;
+
+print $eg->validate ? "OK" : "NOT OK";
+
+1;

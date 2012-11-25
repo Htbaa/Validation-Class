@@ -261,10 +261,11 @@ has 'report_unknown' => 0;
 
 =attribute validated
 
-The validated boolean simply denotes whether the validation routine has been
+The validated attribute simply denotes whether the validation routine has been
 executed since the last normalization process (which occurs at instantiation
-and before validation). Note, this is NOT an indicator of whether validation
-has passed or failed.
+and before validation). It's values will either be 0 (not validated),
+1 (validated with errors), or 2 (validated without errors). You can simply check
+this attribute for truth when you need to know if validation has occurred.
 
 =cut
 
@@ -1060,11 +1061,7 @@ sub is_valid {
 
     my ($self) = @_;
 
-    my $i = $self->errors->count;
-
-    $i += $_->errors->count for $self->fields->values;
-
-    return $i ? 0 : 1;
+    return $self->error_count ? 0 : 1;
 
 }
 
@@ -2461,6 +2458,8 @@ sub validate {
         $self->trigger_event('on_validate', $_)
             for @{$self->stash->{'validation.fields'}}
         ;
+        $self->validated(1);
+        $self->validated(2) if $self->is_valid;
     }
 
     # execute on_after_validation events
@@ -2484,7 +2483,7 @@ sub validate {
 
     }
 
-    return $self->is_valid;
+    return $self->validated == 2 ? 1 : 0;
 
 }
 
