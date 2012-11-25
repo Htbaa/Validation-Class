@@ -22,14 +22,14 @@ application's business objects.
 The most common application security weakness is the failure to properly
 validate input from the client or environment. Data validation is important
 because it provides security, it allows you to ensure user supplied data is
-formatted properly, is within length boudaries, contains permitted characters
+formatted properly, is within length boundaries, contains permitted characters
 and adheres to business rules.
 
 To understand the problem domain we need to first understand:
 
     * what is meant by data validation
     * what the standard validation types are
-    * what the common use-cases were validation applies
+    * what the common use-cases are were validation applies
 
 First, data validation is the process of auditing a piece of data to ensure it
 fits a specific criteria. Common data validation checks are:
@@ -45,8 +45,8 @@ fits a specific criteria. Common data validation checks are:
 Typically when designing an application we tend to name input parameters in an
 arbitrarily fashion and validate the same data at various stages during a
 program's execution (duplicating logic and validation routines) in various
-places in the application stack. This approach is inefficient and prone to bugs
-and security problems.
+places in the application stack. This approach is inefficient and prone to bugs,
+inconsistencies and security problems.
 
 Data can be submitted to an application in various formats and it is not always
 ideal, and the option to pre-format the data is not always ideal or even
@@ -73,15 +73,15 @@ within your application.
 A proper validation framework should allow you to model data and construct
 validation objects with a focus on structuring rules, reusing common declarations,
 defining input filters and validating data. Its main purpose should be to
-properly handle data input errors. It's ulterior motive is to ensure consistency
-and promote reuse of data validation rules.
+properly handle data input errors. It's ulterior motive should be to ensure
+consistency and promote reuse of data validation rules.
 
 # WHY VALIDATION::CLASS
 
 Validation::Class was built around the concept of compartmentalization and
-re-use. That premise gave birth to the ideal of persistent-rules which exist in
-a class configuration which is associated with a class which acts as a
-validation domain for related validation rules.
+re-use. That premise gave birth to the idea of persistent data validation rules
+which exist in a class configuration which is associated with a class which acts
+as a validation domain for related validation rules.
 
 Validation classes derived from Validation::Class are typically configured using
 the Validation::Class sugar functions (or keywords). Validation classes are
@@ -105,10 +105,9 @@ is the process of responding to the occurrence, during computation, of
 exceptions (anomalous or exceptional situations).
 
 User errors and system errors are poplar opposites. It is not always desired
-and/or appropriate to crash from a failure to validate user input.
-
-The following examples will clearly display how Validation::Class handles a few
-common use-cases were validation is usually quite painful:
+and/or appropriate to crash from a failure to validate user input. The following
+examples should clearly display how Validation::Class addresses key pain-points
+and handles common use-cases were validation is usually quite arduous.
 
 ## Dynamic Parameters
 
