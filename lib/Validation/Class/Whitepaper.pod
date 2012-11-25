@@ -19,7 +19,7 @@ application's business objects.
 The most common application security weakness is the failure to properly
 validate input from the client or environment. Data validation is important
 because it provides security, it allows you to ensure user supplied data is
-formatted properly, is within length boudaries, contains permitted characters
+formatted properly, is within length boundaries, contains permitted characters
 and adheres to business rules.
 
 To understand the problem domain we need to first understand:
