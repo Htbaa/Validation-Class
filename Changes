@@ -1,8 +1,32 @@
 Revision history for the Perl library Validation::Class
 
-7.90  2012-11-18
+7.900000  2012-11-18
 
-  - Created Validation::Class::Whitepaper as a sounding-board and source for FAQs
+  - Created Validation::Class::Directive::City
+
+  - Created Validation::Class::Directive::State
+
+  - Created Validation::Class::Directive::Zipcode
+
+  - Created Validation::Class::Directive::Creditcard
+
+  - Created Validation::Class::Directive::Date
+
+  - Created Validation::Class::Directive::Time
+
+  - Created Validation::Class::Directive::Decimal
+
+  - Created Validation::Class::Directive::Email
+
+  - Created Validation::Class::Directive::Hostname
+
+  - Created Validation::Class::Directive::SSN
+
+  - Created Validation::Class::Directive::Telephone
+
+  - Created Validation::Class::Directive::UUID
+
+  - Created Validation::Class::Whitepaper
 
   - Changed the version number scheme (again) to slow down incrementing of the major number
 
