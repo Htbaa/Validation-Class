@@ -96,7 +96,9 @@ sub clear {
 
 sub count {
 
-    return scalar(shift->keys);
+    my ($self) = @_;
+
+    return scalar($self->keys);
 
 }
 
@@ -220,7 +222,9 @@ sub has {
 
 sub hash {
 
-    return {shift->list};
+    my ($self) = @_;
+
+    return {$self->list};
 
 }
 
@@ -266,7 +270,9 @@ sub iterator {
 
 sub keys {
 
-    return (keys(shift->hash));
+    my ($self) = @_;
+
+    return (keys($self->hash));
 
 }
 
@@ -278,7 +284,9 @@ sub keys {
 
 sub list {
 
-    return (%{$_[0]});
+    my ($self) = @_;
+
+    return (%{$self});
 
 }
 
@@ -418,7 +426,9 @@ sub sort {
 
 sub values {
 
-    return (values(shift->hash));
+    my ($self) = @_;
+
+    return (values($self->hash));
 
 }
 

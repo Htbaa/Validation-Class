@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+# handling multi-variant parameter names (aliases)
+
+package MultiName;
+
+use Validation::Class;
+
+field login => {
+
+    required    => 1,
+    min_length  => 5, # must be 5 or more chars
+    min_alpha   => 1, # must have at-least 1 alpha char
+    min_digits  => 1, # must have at-least 1 digit char
+    min_symbols => 1, # must have at-least 1 non-alphanumeric char
+    alias       => [
+        'signin',
+        'username',
+        'email',
+        'email_address'
+    ]
+
+};
+
+package main;
+
+my $ok = 0;
+
+# fail
+$ok++ if ! MultiName->new(login => 'miso')->validate;
+
+# nice
+$ok++ if MultiName->new(login => 'm!s0_soup')->validate;
+
+# no signin field exists, however, the alias directive pre-processing DWIM
+$ok++ if MultiName->new(signin => 'm!s0_soup')->validate;
+
+# process aliases
+$ok++ if MultiName->new(params => {signin        => 'm!s0_soup'})->validate;
+$ok++ if MultiName->new(params => {username      => 'm!s0_soup'})->validate;
+$ok++ if MultiName->new(params => {email         => 'm!s0_soup'})->validate;
+$ok++ if MultiName->new(params => {email_address => 'm!s0_soup'})->validate;
+
+print $ok == 7 ? "OK" : "NOT OK";
+print "\n";
+
+1;

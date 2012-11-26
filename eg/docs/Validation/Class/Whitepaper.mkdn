@@ -113,7 +113,7 @@ and handles common use-cases were validation is usually quite arduous.
 
     # handling arbitrary and/or dynamically-named parameters
 
-    package Example;
+    package DynamicParameters;
 
     use Validation::Class;
 
@@ -145,13 +145,13 @@ and handles common use-cases were validation is usually quite arduous.
         email_3 => 'sa@localhost',      # dynamic created
     };
 
-    my $eg = Example->new(params => $params);
+    my $dp = DynamicParameters->new(params => $params);
 
-    $eg->proto->clone_field('email', $_)
-        for $eg->params->grep(qr/^email/)->keys
+    $dp->proto->clone_field('email', $_)
+        for $dp->params->grep(qr/^email/)->keys
     ;
 
-    print $eg->validate ? "OK" : "NOT OK";
+    print $dp->validate ? "OK" : "NOT OK";
 
     1;
 

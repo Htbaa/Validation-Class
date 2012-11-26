@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+# handling multi-type parameters (array or scalar depending on context)
+
+package MultiType;
+
+use Validation::Class;
+
+field letter_type => {
+
+    required  => 1,
+    options   => [ 'A' .. 'Z' ],
+    multiples => 1 # turn on multi-type processing
+
+};
+
+package main;
+
+my $mt = MultiType->new;
+my $ok = 0;
+
+$mt->params->add(letter_type => 'A');
+
+$ok++ if $mt->validate;
+
+$mt->params->clear->add(letter_type => ['A', 'B', 'C']);
+
+$ok++ if $mt->validate;
+
+print $ok == 2 ? "OK" : "NOT OK";
+print "\n";
+
+1;

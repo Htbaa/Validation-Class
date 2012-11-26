@@ -33,7 +33,7 @@ sub after_validation {
 
     # override parameter value if default exists
 
-    if (defined $field->{default}) {
+    if (defined $field->{default} && ! defined $param) {
 
         my $name = $field->name;
 
@@ -51,7 +51,7 @@ sub before_validation {
 
     # override parameter value if default exists
 
-    if (defined $field->{default}) {
+    if (defined $field->{default} && ! defined $param) {
 
         my $name = $field->name;
 
@@ -69,7 +69,7 @@ sub normalize {
 
     # override parameter value if default exists
 
-    if (defined $field->{default}) {
+    if (defined $field->{default} && ! defined $param) {
 
         my $name = $field->name;
 

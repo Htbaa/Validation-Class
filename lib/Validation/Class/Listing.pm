@@ -94,7 +94,9 @@ sub clear {
 
 sub count {
 
-    return scalar(shift->list);
+    my ($self) = @_;
+
+    return scalar($self->list);
 
 }
 
@@ -162,7 +164,9 @@ sub each {
 
 sub first {
 
-    return shift->[0];
+    my ($self) = @_;
+
+    return $self->[0];
 
 }
 
@@ -260,6 +264,20 @@ sub join {
 
 }
 
+=method last
+
+    my $value = $self->last;
+
+=cut
+
+sub last {
+
+    my ($self) = @_;
+
+    return $self->[-1];
+
+}
+
 =method list
 
     my @list = $self->list;
@@ -268,7 +286,9 @@ sub join {
 
 sub list {
 
-    return (@{(shift)});
+    my ($self) = @_;
+
+    return (@{$self});
 
 }
 

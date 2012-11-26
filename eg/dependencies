@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+# handling parameter dependencies
+
+package ParamDependencies;
+
+use Validation::Class;
+
+mixin scrub      => {
+    required     => 1,
+    filters      => ['trim', 'strip']
+};
+
+mixin flag       => {
+    length       => 1,
+    options      => [0, 1]
+};
+
+field billing_address => {
+    mixin        => 'scrub',
+    required     => 1,
+    depends_on   => ['billing_city', 'billing_state', 'billing_zip']
+};
+
+field billing_city => {
+    mixin        => 'scrub',
+    required     => 0,
+    depends_on   => 'billing_address'
+};
+
+field billing_state => {
+    mixin        => 'scrub',
+    required     => 0,
+    length       => '2',
+    pattern      => 'XX',
+    depends_on   => 'billing_address'
+};
+
+field billing_zip => {
+    mixin        => 'scrub',
+    required     => 0,
+    length       => '5',
+    pattern      => '#####',
+    depends_on   => 'billing_address'
+};
+
+field shipping_address => {
+    mixin_field  => 'billing_address',
+    depends_on   => ['shipping_city', 'shipping_state', 'shipping_zip']
+};
+
+field shipping_city => {
+    mixin_field  => 'billing_city',
+    depends_on   => 'shipping_address'
+};
+
+field shipping_state => {
+    mixin_field  => 'billing_state',
+    depends_on   => 'shipping_address'
+};
+
+field shipping_zip => {
+    mixin_field  => 'billing_zip',
+    depends_on   => 'shipping_address'
+};
+
+field same_billing_shipping => {
+    mixin        => 'flag'
+};
+
+profile 'addresses' => sub {
+
+    my ($self) = @_;
+
+    return unless $self->validate('same_billing_shipping');
+
+    # billing and shipping address always required
+    $self->validate(qw/+billing_address +shipping_address/);
+
+    # address must match if option is selected
+    if ($self->param('same_billing_shipping')) {
+
+        foreach my $param ($self->params->grep(qr/^shipping_/)->keys) {
+
+            my ($suffix) = $param =~ /^shipping_(.*)/;
+
+            my $billing  = $self->param("billing_$suffix");
+            my $shipping = $self->param("shipping_$suffix");
+
+            # shipping_* must match billing_*
+            unless ($billing eq $shipping) {
+                $self->errors->add(
+                    "Billing and shipping addresses do not match"
+                );
+                last;
+            }
+
+        }
+
+    }
+
+    return $self->error_count ? 0 : 1;
+
+};
+
+package main;
+
+my $ok = 0;
+my $pd;
+
+$pd = ParamDependencies->new(
+    billing_address => '10 liberty boulevard',
+    billing_city    => 'malvern',
+    billing_state   => 'pa',
+    billing_zip     => '19355'
+);
+
+# missing shipping address info
+$ok++ if ! $pd->validate_profile('addresses');
+
+$pd = ParamDependencies->new(
+    billing_address  => '10 liberty boulevard',
+    billing_city     => 'malvern',
+    billing_state    => 'pa',
+    billing_zip      => '19355',
+
+    shipping_address => '301 cherry street',
+    shipping_city    => 'pottstown',
+    shipping_state   => 'pa',
+    shipping_zip     => '19464'
+);
+
+$ok++ if $pd->validate_profile('addresses');
+
+$pd = ParamDependencies->new(
+    billing_address  => '10 liberty boulevard',
+    billing_city     => 'malvern',
+    billing_state    => 'pa',
+    billing_zip      => '19355',
+
+    same_billing_shipping => 1,
+
+    shipping_address => '301 cherry street',
+    shipping_city    => 'pottstown',
+    shipping_state   => 'pa',
+    shipping_zip     => '19464'
+);
+
+# billing and shipping don't match
+$ok++ if ! $pd->validate_profile('addresses');
+
+$pd = ParamDependencies->new(
+    billing_address  => '10 liberty boulevard',
+    billing_city     => 'malvern',
+    billing_state    => 'pa',
+    billing_zip      => '19355',
+
+    same_billing_shipping => 1,
+
+    shipping_address => '10 liberty boulevard',
+    shipping_city    => 'malvern',
+    shipping_state   => 'pa',
+    shipping_zip     => '19355'
+);
+
+$ok++ if $pd->validate_profile('addresses');
+
+print $ok == 4 ? "OK" : "NOT OK";
+print "\n";
+
+1;

@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+# handling complex conditional validation logic
+
+package ComplexCondition;
+
+use Validation::Class;
+
+mixin scrub      => {
+    required     => 1,
+    filters      => ['trim', 'strip']
+};
+
+mixin flag       => {
+    required     => 1,
+    length       => 1,
+    options      => [0, 1]
+};
+
+field first_name => {
+    mixin        => 'scrub',
+    filters      => ['titlecase']
+};
+
+field last_name  => {
+    mixin        => 'scrub',
+    filters      => ['titlecase']
+};
+
+field role       => {
+    mixin        => 'scrub',
+    filters      => ['titlecase'],
+    options      => ['Client', 'Employee', 'Administrator'],
+    default      => 'Client'
+};
+
+field address    => {
+    mixin        => 'scrub',
+    required     => 0,
+    depends_on   => ['city', 'state', 'zip']
+};
+
+field city       => {
+    mixin        => 'scrub',
+    required     => 0,
+    depends_on   => 'address'
+};
+
+field state      => {
+    mixin        => 'scrub',
+    required     => 0,
+    length       => '2',
+    pattern      => 'XX',
+    depends_on   => 'address'
+};
+
+field zip        => {
+    mixin        => 'scrub',
+    required     => 0,
+    length       => '5',
+    pattern      => '#####',
+    depends_on   => 'address'
+};
+
+field has_mail   => {
+    mixin        => 'flag',
+    required     => 0
+};
+
+profile 'registration' => sub {
+
+    my ($self) = @_;
+
+    # address info not required unless role is client or has_mail is true
+
+    return unless $self->validate('has_mail');
+
+    $self->queue(qw/first_name last_name/);
+
+    if ($self->param('has_mail') || $self->param('role') eq 'Client') {
+
+        # depends_on directive kinda makes city, state and zip required too
+        $self->queue(qw/+address/);
+
+    }
+
+    my $ok = $self->validate;
+
+    $self->clear_queue;
+
+    return $ok;
+
+};
+
+package main;
+
+my $ok = 0;
+my $mt;
+
+$mt = ComplexCondition->new(
+    first_name => 'Rachel',
+    last_name  => 'Green'
+);
+
+# defaults to client, missing address info
+$ok++ if ! $mt->validate_profile('registration');
+
+$mt = ComplexCondition->new(
+    first_name => 'monica',
+    last_name  => 'geller',
+    role       => 'employee'
+);
+
+# filters (pre-process) role and titlecase, as employee no address needed
+$ok++ if $mt->validate_profile('registration');
+
+$mt = ComplexCondition->new(
+    first_name => 'monica',
+    last_name  => 'geller',
+    address    => '123 street road',
+    city       => 'bumfuck',
+    state      => 'zz',
+    zip        => '54321'
+);
+
+$ok++ if $mt->validate_profile('registration');
+
+print $ok == 3 ? "OK" : "NOT OK";
+
+1;
