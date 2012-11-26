@@ -87,6 +87,10 @@ functionality for arrayref objects. All methods are chainable.
 
     my $string = $self->join($delimiter);
 
+## last
+
+    my $value = $self->last;
+
 ## list
 
     my @list = $self->list;
