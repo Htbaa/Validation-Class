@@ -200,22 +200,22 @@ and handles common use-cases were validation is usually quite arduous.
     package main;
 
     my $params = {
-        pasted_data => <<'PASTE',
-name	email	contact	dob	country
-john	john@zuzu.com	9849688899	12/05/98	UK
-jim kathy	kjim@zuz.com	8788888888	05/07/99	India
-Federar	fed@zuzu.com	4484848989	11/21/80	USA
-Micheal	micheal@zuzu.com	6665551212	06/10/87	USA
-Kwang Kit	kwang@zuzu.com	7775551212	07/09/91	India
-Martin	jmartin@zuzu.com	2159995959	02/06/85	India
-Roheeth	roheeth@zuzu.com	9596012020	01/10/89	USA
-PASTE
+        pasted_data => q{
+            name	email	contact	dob	country
+            john	john@zuzu.com	9849688899	12/05/98	UK
+            jim kathy	kjim@zuz.com	8788888888	05/07/99	India
+            Federar	fed@zuzu.com	4484848989	11/21/80	USA
+            Micheal	micheal@zuzu.com	6665551212	06/10/87	USA
+            Kwang Kit	kwang@zuzu.com	7775551212	07/09/91	India
+            Martin	jmartin@zuzu.com	2159995959	02/06/85	India
+            Roheeth	roheeth@zuzu.com	9596012020	01/10/89	USA
+        }
     };
 
     # ... there are many ways this could be parsed and validated
     # ... but this is simple
 
-    my $bpi = my @pasted_lines = split /\n/, $params->{pasted_data};
+    my $bpi = my @pasted_lines = map { s/^\s+//; $_ } split /\n/, $params->{pasted_data};
     my @headers = split /\t/, shift @pasted_lines;
 
     my $bp  = BatchProcessing->new(params => { header => [@headers] });
