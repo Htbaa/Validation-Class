@@ -33,7 +33,6 @@ sub validate {
         if (defined $param) {
 
             my $zcre = qr/\A\b[0-9]{5}(?:-[0-9]{4})?\b\z/i;
-
             $self->error($proto, $field) unless $param =~ $zcre;
 
         }
