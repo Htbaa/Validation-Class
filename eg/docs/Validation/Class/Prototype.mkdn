@@ -95,6 +95,11 @@ die upon encountering unregistered field directives during validation. This is
 off (0) by default, attempts to validate unknown fields WILL cause the program
 to die.
 
+## messages
+
+The messages attribute provides access to class-level error message overrides.
+This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing scalar values.
+
 ## methods
 
 The methods attribute provides access to self-validating code references.

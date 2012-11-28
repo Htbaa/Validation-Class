@@ -37,7 +37,7 @@ use Carp 'confess';
     has 'mixin'     => 0;
     has 'field'     => 1;
     has 'multi'     => 0;
-    
+
     has 'message'   => '%s was not processed successfully';
     has 'validator' => sub {};
 
@@ -108,12 +108,24 @@ sub error {
 
     unshift @tokens, $name;
 
-    # use custom or default error message
-
+    # use custom field-level error message
     if ($field->error) {
         $field->errors->add($field->error);
     }
 
+    # use field-level error message override
+    elsif (defined $field->{messages} && $field->{messages}->{$self->name}) {
+        my $message = $field->{messages}->{$self->name};
+        $field->errors->add(sprintf($message, @tokens));
+    }
+
+    # use class-level error message override
+    elsif ($proto->messages->has($self->name)) {
+        my $message = $proto->messages->get($self->name);
+        $field->errors->add(sprintf($message, @tokens));
+    }
+
+    # use directive error message
     else {
         $field->errors->add(sprintf($self->message, @tokens));
     }

@@ -159,6 +159,15 @@ to die.
 
 has 'ignore_unknown' => '0';
 
+=attribute messages
+
+The messages attribute provides access to class-level error message overrides.
+This attribute is a L<Validation::Class::Mapping> object containing scalar values.
+
+=cut
+
+hold 'messages' => sub { Validation::Class::Mapping->new };
+
 =attribute methods
 
 The methods attribute provides access to self-validating code references.
@@ -1627,6 +1636,16 @@ sub register_filter {
     my ($self, $name, $code) = @_;
 
     $self->configuration->filter->add($name, $code);
+
+    return $self;
+
+}
+
+sub register_message {
+
+    my ($self, $name, $template) = @_;
+
+    $self->messages->add($name, $template);
 
     return $self;
 

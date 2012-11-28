@@ -30,6 +30,8 @@ our @EXPORT = qw(
     filter
     has
     load
+    msg
+    message
     mth
     method
     mxn
@@ -674,6 +676,60 @@ sub set { goto &load } sub load {
         my ($proto) = @_;
 
         $proto->register_settings($data);
+
+        return $proto;
+
+    };
+
+}
+
+=keyword message
+
+The message keyword (or msg) registers a class-level error message template that
+will be used in place of the error message defined in the corresponding directive
+class if defined. Error messages can also be overriden at the individual
+field-level as well. See the
+L<Validation::Class::Directive::Messages|"messages directive"> for instructions
+on how to override error messages at the field-level.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field email_address => {
+        required   => 1,
+        min_length => 3,
+        messages   => {
+            # field-level error message override
+            min_length => '%s is not even close to being a valid email address'
+        }
+    };
+
+    # class-level error message overrides
+    message required   => '%s is needed to proceed';
+    message min_length => '%s needs more characters';
+
+    1;
+
+The message keyword takes two arguments, the name of the directive whose error
+message you wish to override and a string which will be used to as a template
+which is feed to `sprintf` to format the message.
+
+=cut
+
+sub msg { goto &message } sub message {
+
+    my $package = shift if @_ == 3;
+
+    my ($name, $template) = @_;
+
+    return unless ($name && $template);
+
+    return configure_class_proto $package => sub {
+
+        my ($proto) = @_;
+
+        $proto->register_message($name, $template);
 
         return $proto;
 

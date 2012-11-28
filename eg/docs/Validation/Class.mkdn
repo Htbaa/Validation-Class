@@ -283,6 +283,38 @@ accepts a constant or an arrayref of constants.
 
     1;
 
+## message
+
+The message keyword (or msg) registers a class-level error message template that
+will be used in place of the error message defined in the corresponding directive
+class if defined. Error messages can also be overriden at the individual
+field-level as well. See the
+[Validation::Class::Directive::Messages](#messages directive) for instructions
+on how to override error messages at the field-level.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field email_address => {
+        required   => 1,
+        min_length => 3,
+        messages   => {
+            # field-level error message override
+            min_length => '%s is not even close to being a valid email address'
+        }
+    };
+
+    # class-level error message overrides
+    message required   => '%s is needed to proceed';
+    message min_length => '%s needs more characters';
+
+    1;
+
+The message keyword takes two arguments, the name of the directive whose error
+message you wish to override and a string which will be used to as a template
+which is feed to \`sprintf\` to format the message.
+
 ## method
 
 The method keyword (or mth) is used to register an auto-validating method.

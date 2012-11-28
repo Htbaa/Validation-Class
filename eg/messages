@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+package MyApp::Basic;
+
+use Validation::Class;
+
+field name => {
+
+    required   => 1,
+    min_length => 5,
+    messages   => {
+        min_length => "that's not enough characters",
+    }
+
+};
+
+field name2 => {
+
+    required   => 1,
+    min_length => 5,
+    messages   => {
+        required   => "please tell us your real name"
+    }
+
+};
+
+msg required => "%s is clearly required";
+
+package main;
+
+my $basic = MyApp::Basic->new(@ARGV);
+
+print $basic->validate(qw/name name2/)
+    ? "valid\n"
+    : $basic->errors_to_string . "\n";
+
+1;
