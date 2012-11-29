@@ -37,3 +37,13 @@ print $fields->select('first_name');
 print "\n";
 
 1;
+
+__END__
+
+# jquery inspired streaming html form element renderer
+
+my $form = $data->plugin('form_fields');
+
+$form->as_text('username');
+$form->as_password('password');
+$form->as_select('city')->options($list_of_cities);
