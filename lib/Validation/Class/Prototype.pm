@@ -1410,16 +1410,15 @@ class. Note: This functionality is still experimental.
 
     use Validation::Class;
 
-    load plugin => ['TelephoneFormat'];
+    set plugin => 'telephone_format';
 
     package main;
 
     my $input = Class->new(params => $params);
 
-    # get object for Validation::Class::Plugin::TelephoneFormat;
-    # see Class::Forward for namespace naming conventions
-
     # currently the plugin method will always return the same object instance
+    # ... for Validation::Class::Plugin::TelephoneFormat;
+
     my $formatter = $input->plugin('telephone_format');
 
 =cut
@@ -1432,11 +1431,13 @@ sub plugin {
 
     return $self->plugins->get($class) if $self->plugins->has($class);
 
-    my $plugin_namespace = 'Validation::Class::Plugin';
-
     # transform what looks like a shortname
 
-    $class = Class::Forward->new(namespace=>$plugin_namespace)->forward($class);
+    my $lookup = Class::Forward->new;
+
+    $lookup->namespace('Validation::Class::Plugin');
+
+    $class = $lookup->forward($class);
 
     return $self->plugins->get($class);
 
@@ -1787,11 +1788,15 @@ sub register_settings {
 
     my $name = $self->package;
 
-    if ($data->{classes}) {
+    # attach classes
+
+    if (grep { $data->{$_} } qw/class classes/) {
 
         my @parents;
 
-        if (! ref $data->{classes} && $data->{classes} == 1) {
+        my $alias = $data->{class} || $data->{classes};
+
+        if (! ref $alias && $alias == 1) {
 
             push @parents, $name;
 
@@ -1799,8 +1804,7 @@ sub register_settings {
 
         else {
 
-            push @parents, isa_arrayref($data->{classes}) ?
-                @{$data->{classes}} : $data->{classes};
+            push @parents, isa_arrayref($alias) ? @{$alias} : $alias;
 
         }
 
@@ -1821,18 +1825,26 @@ sub register_settings {
 
     }
 
-    if ($data->{plugins}) {
+    # attach plugins
+
+    if (grep { $data->{$_} } qw/plug plugs plugin plugins/) {
 
         my @plugins;
 
-        push @plugins, isa_arrayref($data->{plugins}) ?
-            @{$data->{plugins}} : $data->{plugins};
+        my $alias =
+            $data->{plug}   || $data->{plugs} ||
+            $data->{plugin} || $data->{plugins};
+
+        push @plugins, isa_arrayref($alias) ? @{$alias} : $alias;
 
         foreach my $plugin (@plugins) {
 
             if ($plugin !~ /^\+/) {
 
-                $plugin = "Validation::Class::Plugin::$plugin";
+                my $lookup = Class::Forward->new;
+                $lookup->namespace('Validation::Class::Plugin');
+
+                $plugin = $lookup->forward($plugin);
 
             }
 

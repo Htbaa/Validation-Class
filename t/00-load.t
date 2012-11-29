@@ -197,6 +197,8 @@ use Validation::Class::Prototype ();
     sub filter    {'noop'}
     sub has       {'noop'}
     sub load      {'noop'}
+    sub msg       {'noop'}
+    sub message   {'noop'}
     sub mth       {'noop'}
     sub method    {'noop'}
     sub mxn       {'noop'}
