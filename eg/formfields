@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+package MyApp::Form;
+
+use Validation::Class;
+
+set plugin => 'form_fields';
+
+field first_name => {
+    label      => 'first name',
+    required   => 1,
+    min_length => 5
+};
+
+field last_name => {
+    label      => 'last name',
+    required   => 1,
+    min_length => 5
+};
+
+package main;
+
+use Data::Dumper;
+
+my $form = MyApp::Form->new(@ARGV);
+
+my $fields = $form->plugin('form_fields');
+
+print $fields->select('first_name');
+print "\n";
+
+1;
