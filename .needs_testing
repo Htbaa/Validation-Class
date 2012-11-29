@@ -3,9 +3,6 @@
 #   (use "git add <file>..." to include in what will be committed)
 #
 #	.needs_testing
-#	lib/Validation/Class/Directive/City.pm
-#	lib/Validation/Class/Directive/Creditcard.pm
-#	lib/Validation/Class/Directive/Date.pm
 #	lib/Validation/Class/Directive/Decimal.pm
 #	lib/Validation/Class/Directive/Email.pm
 #	lib/Validation/Class/Directive/Hostname.pm

@@ -45,7 +45,7 @@ sub validate {
             'visa'       => qr/^4\d{12}(\d{3})?$/,
             'voyager'    => qr/^8699[0-9]{11}$/,
             # or do a simple catch-all match
-            '@'          => qr/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/
+            'any'        => qr/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/
         };
 
         my $type = $field->{creditcard};
@@ -54,7 +54,7 @@ sub validate {
 
             my $is_valid = 0;
 
-            $type = isa_arrayref($type) ? $type : $type == 1 ? ['@'] : [$type];
+            $type = isa_arrayref($type) ? $type : $type eq '1' ? ['any'] : [$type];
 
             for (@{$type}) {
 
