@@ -38,7 +38,7 @@ directive that provides validation of floating point integers.
 
 =over 8
 
-=item * argument: a-single-variable-value
+=item * alternative argument: a-single-variable-value
 
 =item * option: 0 e.g. Any number of decimal places, including none
 

@@ -34,7 +34,7 @@ parameter value.
 
 - argument: single-alias or array-of-aliases
 
-    This directive can be passed a single value or and array of values:
+    This directive can be passed a single value or an array of values:
 
         fields => {
             login  => {

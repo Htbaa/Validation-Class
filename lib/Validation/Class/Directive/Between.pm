@@ -39,9 +39,9 @@ parameters.
 
 =over 8
 
-=item * argument: a-single-delimited-string or two-element-array-of-numbers
+=item * alternative argument: an-array-of-numbers
 
-This directive can be passed a single value or and array of values:
+This directive can be passed a single value or an array of values:
 
     fields => {
         person_age  => {

@@ -39,16 +39,13 @@ parameter value.
 
 =over 8
 
-=item * argument: single-alias or array-of-aliases
+=item * alternative argument: an-array-of-aliases
 
-This directive can be passed a single value or and array of values:
+This directive can be passed a single value or an array of values:
 
     fields => {
         login  => {
-            alias => [
-                'username',
-                'email_address'
-            ]
+            alias => ['username', 'email_address']
         }
     }
 

@@ -48,7 +48,7 @@ and voyager credit cards.
 - option: visa
 - option: voyager
 
-    This directive can be passed a single value or and array of values:
+    This directive can be passed a single value or an array of values:
 
         fields => {
             person_cc  => {

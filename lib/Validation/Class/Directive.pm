@@ -13,7 +13,7 @@ use Carp 'confess';
 
 =head1 SYNOPSIS
 
-    package Validation::Class::Plugin::Blacklist;
+    package Validation::Class::Plugin::CheckBlacklist;
 
     use base 'Validation::Class::Directive';
     use Validation::Class::Util;
@@ -29,7 +29,7 @@ use Carp 'confess';
 
         my ($proto, $field, $param) = @_;
 
-        if (defined $field->{blacklist} && $param) {
+        if (defined $field->{check_blacklist} && $param) {
 
             # is the parameter value blacklisted?
             my @blacklist = read_file('/blacklist.txt');

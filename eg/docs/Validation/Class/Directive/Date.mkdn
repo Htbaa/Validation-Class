@@ -40,7 +40,7 @@ directive that provides validation of simple date formats.
 - option: My e.g. December 2006 or Dec 2006
 - option: my e.g. 12/2006
 
-    This directive can be passed a single value or and array of values:
+    This directive can be passed a single value or an array of values:
 
         fields => {
             creation_date  => {

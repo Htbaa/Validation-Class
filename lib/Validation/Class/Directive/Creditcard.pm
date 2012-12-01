@@ -40,7 +40,7 @@ and voyager credit cards.
 
 =over 8
 
-=item * argument: a-single-true-value or an-array-of-options
+=item * alternative argument: an-array-of-options
 
 =item * option: amex
 
@@ -68,11 +68,11 @@ and voyager credit cards.
 
 =item * option: voyager
 
-This directive can be passed a single value or and array of values:
+This directive can be passed a single value or an array of values:
 
     fields => {
         person_cc  => {
-            creditcard => [visa, mastercard]
+            creditcard => ['visa', 'mastercard']
         }
     }
 

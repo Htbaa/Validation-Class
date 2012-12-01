@@ -38,7 +38,7 @@ directive that provides validation of simple date formats.
 
 =over 8
 
-=item * argument: a-single-true-value or an-array-of-options
+=item * alternative argument: an-array-of-options
 
 =item * option: dmy e.g. 27-12-2006 or 27-12-06
 
@@ -54,11 +54,11 @@ directive that provides validation of simple date formats.
 
 =item * option: my e.g. 12/2006
 
-This directive can be passed a single value or and array of values:
+This directive can be passed a single value or an array of values:
 
     fields => {
         creation_date  => {
-            date => [dmy, mdy]
+            date => ['dmy', 'mdy']
         }
     }
 
