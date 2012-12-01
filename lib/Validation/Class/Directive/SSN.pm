@@ -32,7 +32,7 @@ sub validate {
 
         if (defined $param) {
 
-            my $ssnre = qr/\A\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b\z/i;
+            my $ssnre = qr/\A\b(?!000)[0-9]{3}-[0-9]{2}-[0-9]{4}\b\z/i;
             $self->error($proto, $field) unless $param =~ $ssnre;
 
         }

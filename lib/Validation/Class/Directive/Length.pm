@@ -22,7 +22,7 @@ documented it just yet.
 has 'mixin'   => 1;
 has 'field'   => 1;
 has 'multi'   => 0;
-has 'message' => '%s does not contain the correct number of characters';
+has 'message' => '%s should be exactly %s characters';
 
 sub validate {
 
@@ -38,7 +38,7 @@ sub validate {
 
             unless (length($param) == $length) {
 
-                $self->error(@_);
+                $self->error(@_, $length);
 
             }
 

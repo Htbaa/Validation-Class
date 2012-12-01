@@ -22,7 +22,7 @@ documented it just yet.
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'message'   => '%s must be %s or less characters';
+has 'message'   => '%s must not contain more than %s characters';
 
 sub validate {
 

@@ -41,24 +41,24 @@ sub validate {
             my $type = $field->{decimal};
 
             my $lnum = '[0-9]+';
-            my $dnum = "[0-9]*[\.]{$lnum}";
+                my $dnum = "[0-9]*[\.]${lnum}";
             my $sign = '[+-]?';
-            my $exp  = "(?:[eE]{$sign}{$lnum})?";
+            my $exp  = "(?:[eE]${sign}${lnum})?";
 
             my $dre;
 
             if ($type == 0) {
-                $dre = qr/^{$sign}(?:{$lnum}|{$dnum}){$exp}$/;
+                $dre = qr/^${sign}(?:${lnum}|${dnum})${exp}$/;
             }
 
             elsif ($type == 1) {
-                $dre = qr/^{$sign}{$dnum}{$exp}$/;
+                $dre = qr/^${sign}${dnum}${exp}$/;
             }
 
             else {
-                $type = "[0-9]\{$type}";
-                $dnum = "(?:[0-9]*[\.]{$type}|{$lnum}[\.]{$type})";
-                $dre = qr/^{$sign}{$dnum}{$exp}$/;
+                $type = "[0-9]\{${type}}";
+                $dnum = "(?:[0-9]*[\.]${type}|${lnum}[\.]${type})";
+                $dre  = qr/^${sign}${dnum}${exp}$/;
             }
 
             $self->error($proto, $field) unless $param =~ $dre;

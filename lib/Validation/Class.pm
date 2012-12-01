@@ -1228,7 +1228,8 @@ B<If you have simple data validation needs, please review:>
 
 Additionally you may want to look elsewhere for your data validation needs so
 the following is a list of other validation libraries/frameworks you might be
-interested in.
+interested in. If I've missed a really cool new validation library please let
+me know.
 
 =over
 

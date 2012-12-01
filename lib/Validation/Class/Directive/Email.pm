@@ -28,7 +28,7 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{time}) {
+    if (defined $field->{email}) {
 
         if (defined $param) {
 

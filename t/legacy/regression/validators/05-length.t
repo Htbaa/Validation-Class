@@ -15,7 +15,7 @@ $r->params->{foobar} = 'abc';
 
 ok !$r->validate(), 'foobar doesnt validate';
 ok $r->errors_to_string()
-  =~ /does not contain the correct number of characters/,
+  =~ /should be exactly 1 characters/,
   'displays proper error message';
 
 $r->params->{foobar} = 'a';
@@ -23,7 +23,7 @@ $r->fields->{foobar}->{length} = 2;
 
 ok !$r->validate(), 'foobar doesnt validate';
 ok $r->errors_to_string()
-  =~ /does not contain the correct number of characters/,
+  =~ /should be exactly 2 characters/,
   'displays proper error message';
 
 #warn $r->errors_to_string();

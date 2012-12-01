@@ -45,7 +45,7 @@ my $v3 = MyVal->new(
 ok !$v3->validate('foobar.barbaz:0'), 'validation does not pass';
 ok $v3->error_count == 1,
   '1 errors set, 1 wrong element of the param array value';
-ok $v3->errors_to_string =~ /5 or more/,
+ok $v3->errors_to_string =~ /less than 5/,
   'error message identifies the problem param array element';
 
 my $v4 = MyVal->new(
