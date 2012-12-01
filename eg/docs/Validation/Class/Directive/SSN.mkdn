@@ -1,24 +1,5 @@
-# NAME
-
-Validation::Class::Directive::SSN - SSN Directive for Validation Class Field Definitions
-
-# VERSION
-
-version 7.900000
-
 # DESCRIPTION
 
 Validation::Class::Directive::SSN is a core validation class
 field directive that provides the ability to do some really cool stuff only we
 haven't documented it just yet.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

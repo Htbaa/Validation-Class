@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Directive::Creditcard - Creditcard Directive for Validation Class Field Definitions
-
-# VERSION
-
-version 7.900000
-
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -33,7 +25,7 @@ directive that provides validation for american express, bankcard, diners card,
 discover card, electron,  enroute, jcb, maestro, mastercard, solo, switch, visa
 and voyager credit cards.
 
-- argument: a-single-true-value or an-array-of-options
+- alternative argument: an-array-of-options
 - option: amex
 - option: bankcard
 - option: diners
@@ -52,17 +44,6 @@ and voyager credit cards.
 
         fields => {
             person_cc  => {
-                creditcard => [visa, mastercard]
+                creditcard => ['visa', 'mastercard']
             }
         }
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

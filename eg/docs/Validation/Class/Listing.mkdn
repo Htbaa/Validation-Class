@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Listing - Generic Container Class for an Array Reference
-
-# VERSION
-
-version 7.900000
-
 # SYNOPSIS
 
     use Validation::Class::Listing;
@@ -22,33 +14,17 @@ version 7.900000
 Validation::Class::Listing is a container class that provides general-purpose
 functionality for arrayref objects.
 
-# METHODS
-
-## new
-
     my $self = Validation::Class::Listing->new;
-
-## add
 
     $self = $self->add('foo', 'bar');
 
-## clear
-
     $self = $self->clear;
-
-## count
 
     my $count = $self->count;
 
-## delete
-
     $value = $self->delete($index);
 
-## defined
-
     $true if $self->defined($name) # defined
-
-## each
 
     $self = $self->each(sub{
 
@@ -56,23 +32,13 @@ functionality for arrayref objects.
 
     });
 
-## first
-
     my $value = $self->first;
-
-## get
 
     my $value = $self->get($index); # i.e. $self->[$index]
 
-## grep
-
     $new_list = $self->grep(qr/update_/);
 
-## has
-
     $true if $self->has($name) # defined
-
-## iterator
 
     my $next = $self->iterator();
 
@@ -83,23 +49,13 @@ functionality for arrayref objects.
         # do something with $item
     }
 
-## join
-
     my $string = $self->join($delimiter);
-
-## last
 
     my $value = $self->last;
 
-## list
-
     my @list = $self->list;
 
-## nsort
-
     my @list = $self->nsort;
-
-## pairs
 
     my @pairs = $self->pairs;
     # or filter using $self->pairs('grep', $regexp);
@@ -108,29 +64,10 @@ functionality for arrayref objects.
         # $pair->{index} is $pair->{value};
     }
 
-## rnsort
-
     my @list = $self->rnsort;
-
-## rsort
 
     my @list = $self->rsort;
 
-## sort
-
     my @list = $self->sort(sub{...});
 
-## unique
-
     my @list = $self->unique();
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
