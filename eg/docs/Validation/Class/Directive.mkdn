@@ -1,32 +1,62 @@
-    use Validation::Class::Directive;
+# SYNOPSIS
 
-    my $validator = Validation::Class::Directive->new(
-        mixin     => 0,
-        field     => 1,
-        multi     => 0,
-        validator => sub {
-
-            my ($self, $proto, $field, $param) = @_;
-
-        }
-    );
-
-... written as a package
-
-    package Validation::Class::Directive::Example;
+    package Validation::Class::Plugin::Blacklist;
 
     use base 'Validation::Class::Directive';
-
-    use Validation::Class::Core;
+    use Validation::Class::Util;
 
     has 'mixin'     => 0;
     has 'field'     => 1;
     has 'multi'     => 0;
+    has 'message'   => '%s has been blacklisted';
 
-    has 'message'   => '%s was not processed successfully';
-    has 'validator' => sub {};
+    sub validate {
+
+        my $self = shift;
+
+        my ($proto, $field, $param) = @_;
+
+        if (defined $field->{blacklist} && $param) {
+
+            # is the parameter value blacklisted?
+            my @blacklist = read_file('/blacklist.txt');
+
+            $self->error if grep { $param =~ /^$_$/ } @blacklist;
+
+        }
+
+    }
 
     1;
 
-Validation::Class::Directive provides a base-class for validation class
-directives.
+... in your validation class:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field ip_address => {
+        required        => 1,
+        check_blacklist => 1
+    };
+
+    1;
+
+... in your application:
+
+    package main;
+
+    use MyApp::Person;
+
+    my $person = MyApp::Person->new(ip_address => '0.0.0.0');
+
+    unless ($person->validates('ip_address')) {
+        # handle validation error
+    }
+
+# DESCRIPTION
+
+You can extend Validation::Class by creating your own validation rules
+(directives). Validation::Class::Directive provides a base-class for you to use
+when creating new directive classes. Please see [Validation::Class::Directives](http://search.cpan.org/perldoc?Validation::Class::Directives)
+for a complete list of core directives.

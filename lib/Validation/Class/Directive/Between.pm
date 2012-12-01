@@ -7,15 +7,49 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
+
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            person_age  => {
+                between => '18-95'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Between is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that provides the ability to validate the numeric range of the associated
+parameters.
+
+=over 8
+
+=item * argument: a-single-delimited-string or two-element-array-of-numbers
+
+This directive can be passed a single value or and array of values:
+
+    fields => {
+        person_age  => {
+            between => [18, 95]
+        }
+    }
+
+=back
 
 =cut
 

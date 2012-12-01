@@ -20,7 +20,7 @@ version 7.900000
 # DESCRIPTION
 
 Validation::Class::Listing is a container class that provides general-purpose
-functionality for arrayref objects. All methods are chainable.
+functionality for arrayref objects.
 
 # METHODS
 

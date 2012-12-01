@@ -5,7 +5,7 @@ package Validation::Class::Mapping;
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has', '!hold';
+use Validation::Class::Util '!has', '!hold';
 use Hash::Merge ();
 
 # VERSION

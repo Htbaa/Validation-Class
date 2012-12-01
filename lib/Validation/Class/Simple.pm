@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Validation::Class ();
-use Validation::Class::Core ('vc_prototypes');
+use Validation::Class::Util ('prototype_registry');
 use Validation::Class::Prototype;
 
 # VERSION
@@ -366,7 +366,7 @@ sub new {
 
     my $self = bless {}, $class;
 
-    vc_prototypes->add(
+    prototype_registry->add(
         "$self" => Validation::Class::Prototype->new(
             package => $class # inside-out prototype
         )
@@ -419,13 +419,13 @@ sub new {
 
 sub proto { goto &prototype } sub prototype {
 
-    return vc_prototypes->get(shift);
+    return prototype_registry->get(shift);
 
 }
 
 sub DESTROY {
 
-    return vc_prototypes->delete(shift);
+    return prototype_registry->delete(shift);
 
 }
 

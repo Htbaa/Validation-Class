@@ -7,15 +7,54 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            amount_paid  => {
+                decimal => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::Decimal is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Decimal is a core validation class field
+directive that provides validation of floating point integers.
+
+=over 8
+
+=item * argument: a-single-variable-value
+
+=item * option: 0 e.g. Any number of decimal places, including none
+
+=item * option: 1 e.g. Any number of decimal places greater than 0, or a float|double
+
+=item * option: $n e.g. Exactly that many number of decimal places
+
+This directive can be passed a single value only:
+
+    fields => {
+        amount_paid  => {
+            decimal => 2 # 2 decimal places
+        }
+    }
+
+=back
 
 =cut
 

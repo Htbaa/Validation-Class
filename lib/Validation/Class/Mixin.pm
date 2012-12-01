@@ -1,5 +1,9 @@
 # Mixin Object for Validation::Class Classes
 
+# Validation::Class::Mixin provides functions for processing for mixin objects
+# and provides accessors for mixin directives. This class is derived from the
+# L<Validation::Class::Mapping> class.
+
 package Validation::Class::Mixin;
 
 use strict;
@@ -8,7 +12,7 @@ use warnings;
 use Validation::Class::Directives;
 use Validation::Class::Errors;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 use Carp 'confess';
 
 # VERSION
@@ -31,27 +35,19 @@ foreach my $directive ($directives->values) {
         if ($name eq 'errors') {
             my %spec =
                 ($name => sub { Validation::Class::Errors->new });
-                Validation::Class::Core::has(%spec);
+                Validation::Class::Util::has(%spec);
         }
 
         # everything else
         else {
             my %spec =
                 ($name => sub { undef });
-                Validation::Class::Core::has(%spec);
+                Validation::Class::Util::has(%spec);
         }
 
     }
 
 }
-
-=pod
-
-Validation::Class::Mixin provides functions for processing for mixin objects
-and provides accessors for mixin directives. This class is derived from the
-L<Validation::Class::Mapping> class.
-
-=cut
 
 sub new {
 

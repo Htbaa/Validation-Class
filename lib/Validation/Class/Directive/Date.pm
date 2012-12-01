@@ -7,15 +7,62 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            creation_date  => {
+                date => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::Date is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Date is a core validation class field
+directive that provides validation of simple date formats.
+
+=over 8
+
+=item * argument: a-single-true-value or an-array-of-options
+
+=item * option: dmy e.g. 27-12-2006 or 27-12-06
+
+=item * option: mdy e.g. 12-27-2006 or 12-27-06
+
+=item * option: ymd e.g. 2006-12-27 or 06-12-27
+
+=item * option: dMy e.g. 27 December 2006 or 27 Dec 2006
+
+=item * option: Mdy e.g. December 27, 2006 or Dec 27, 2006 (comma optional)
+
+=item * option: My e.g. December 2006 or Dec 2006
+
+=item * option: my e.g. 12/2006
+
+This directive can be passed a single value or and array of values:
+
+    fields => {
+        creation_date  => {
+            date => [dmy, mdy]
+        }
+    }
+
+=back
 
 =cut
 

@@ -1,24 +1,20 @@
 # Container Class for Validation::Class::Mixin Objects
 
+# Validation::Class::Mixins is a container class for L<Validation::Class::Mixin>
+# objects and is derived from the L<Validation::Class::Mapping> class.
+
 package Validation::Class::Mixins;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 
 # VERSION
 
 use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mixin;
-
-=pod
-
-Validation::Class::Mixins is a container class for L<Validation::Class::Mixin>
-objects and is derived from the L<Validation::Class::Mapping> class.
-
-=cut
 
 sub add {
 

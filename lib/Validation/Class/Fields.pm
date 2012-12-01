@@ -1,11 +1,14 @@
 # Container Class for Validation::Class::Field Objects
 
+# Validation::Class::Fields is a container class for L<Validation::Class::Field>
+# objects and is derived from the L<Validation::Class::Mapping> class.
+
 package Validation::Class::Fields;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 use Hash::Flatten ();
 use Carp 'confess';
 
@@ -15,13 +18,6 @@ use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mapping;
 use Validation::Class::Field;
-
-=pod
-
-Validation::Class::Fields is a container class for L<Validation::Class::Field>
-objects and is derived from the L<Validation::Class::Mapping> class.
-
-=cut
 
 sub add {
 

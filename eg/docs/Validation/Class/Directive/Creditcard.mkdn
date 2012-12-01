@@ -6,11 +6,55 @@ Validation::Class::Directive::Creditcard - Creditcard Directive for Validation C
 
 version 7.900000
 
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            person_cc  => {
+                creditcard => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 # DESCRIPTION
 
-Validation::Class::Directive::Creditcard is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Creditcard is a core validation class field
+directive that provides validation for american express, bankcard, diners card,
+discover card, electron,  enroute, jcb, maestro, mastercard, solo, switch, visa
+and voyager credit cards.
+
+- argument: a-single-true-value or an-array-of-options
+- option: amex
+- option: bankcard
+- option: diners
+- option: disc
+- option: electron
+- option: enroute
+- option: jcb
+- option: maestro
+- option: mastercard
+- option: solo
+- option: switch
+- option: visa
+- option: voyager
+
+    This directive can be passed a single value or and array of values:
+
+        fields => {
+            person_cc  => {
+                creditcard => [visa, mastercard]
+            }
+        }
 
 # AUTHOR
 

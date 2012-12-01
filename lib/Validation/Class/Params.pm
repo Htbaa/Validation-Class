@@ -1,11 +1,14 @@
 # Container Class for Data Input Parameters
 
+# Validation::Class::Params is a container class for input parameters and is
+# derived from the L<Validation::Class::Mapping> class.
+
 package Validation::Class::Params;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 use Hash::Flatten ();
 use Carp 'confess';
 
@@ -14,13 +17,6 @@ use Carp 'confess';
 use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mapping;
-
-=pod
-
-Validation::Class::Params is a container class for input parameters and is
-derived from the L<Validation::Class::Mapping> class.
-
-=cut
 
 sub add {
 

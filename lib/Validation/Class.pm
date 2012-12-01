@@ -7,7 +7,7 @@ use warnings;
 
 use Module::Find;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 use Module::Runtime 'use_module';
 use Hash::Merge 'merge';
 use Exporter ();
@@ -48,7 +48,7 @@ sub return_class_proto {
 
     my $class = shift || caller(2);
 
-    return vc_prototypes->get($class) || do {
+    return prototype_registry->get($class) || do {
 
         # build new prototype class
 
@@ -112,7 +112,7 @@ sub return_class_proto {
         }
 
         # cache prototype
-        vc_prototypes->add($class => $proto);
+        prototype_registry->add($class => $proto);
 
         $proto; # return-once
 

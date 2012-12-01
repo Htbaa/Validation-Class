@@ -1,23 +1,19 @@
 # Error Handling Object for Fields and Classes
 
+# Validation::Class::Errors is responsible for error handling in
+# Validation::Class derived classes on both the class and field levels
+# respectively and is derived from the L<Validation::Class::Listing> class.
+
 package Validation::Class::Errors;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has', '!hold';
+use Validation::Class::Util '!has', '!hold';
 
 # VERSION
 
 use base 'Validation::Class::Listing';
-
-=pod
-
-Validation::Class::Errors is responsible for error handling in Validation::Class
-derived classes on both the class and field levels respectively and is derived
-from the L<Validation::Class::Listing> class.
-
-=cut
 
 sub add {
 

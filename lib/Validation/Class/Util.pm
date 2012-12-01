@@ -1,6 +1,6 @@
 # Utility Functions for Validation Classes
 
-package Validation::Class::Core;
+package Validation::Class::Util;
 
 use strict;
 use warnings;
@@ -25,8 +25,9 @@ our @EXPORT = qw(
     isa_hashref
     isa_listing
     isa_mapping
+    isa_prototype
     isa_regexp
-    vc_prototypes
+    prototype_registry
 
 );
 
@@ -220,13 +221,19 @@ sub isa_mapping {
 
 }
 
+sub isa_prototype {
+
+    return prototype_registry->has(shift) ? 1 : 0;
+
+}
+
 sub isa_regexp {
 
     return "REGEXP" eq uc(ref(shift)) ? 1 : 0;
 
 }
 
-sub vc_prototypes {
+sub prototype_registry {
 
     # Validation::Class::Prototype should be already loaded
     return Validation::Class::Prototype->registry;

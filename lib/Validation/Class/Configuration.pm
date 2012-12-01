@@ -13,7 +13,7 @@ use Validation::Class::Listing;
 use Validation::Class::Mapping;
 use Validation::Class::Fields;
 use Validation::Class::Mixins;
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 use Module::Find 'usesub';
 

@@ -680,7 +680,8 @@ SEE ALSO
 
     Additionally you may want to look elsewhere for your data validation
     needs so the following is a list of other validation
-    libraries/frameworks you might be interested in.
+    libraries/frameworks you might be interested in. If I've missed a really
+    cool new validation library please let me know.
 
     HTML::FormHandler
         This library seems to be the defacto standard for designing Moose

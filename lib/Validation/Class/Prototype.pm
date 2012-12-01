@@ -12,7 +12,7 @@ use Validation::Class::Mapping;
 use Validation::Class::Params;
 use Validation::Class::Fields;
 use Validation::Class::Errors;
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
@@ -24,20 +24,12 @@ use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 
-=head1 SYNOPSIS
-
-    package MyValidator;
-
-    use Validation::Class::Exporter;
-
-    Validation::Class::Exporter->apply_spec;
-
-    # extend Validation::Class and use in your codebase as the validation engine
-
 =head1 DESCRIPTION
 
 Validation::Class::Prototype is the validation engine used by proxy via
 L<Validation::Class> whose methods are aliases to the methods defined here.
+Please see L<Validation::Class::Simple> for a quick introduction on how to get
+started.
 
 =cut
 

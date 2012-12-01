@@ -5,7 +5,7 @@ package Validation::Class::Directive;
 use strict;
 use warnings;
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 use Carp 'confess';
 
@@ -16,7 +16,7 @@ use Carp 'confess';
     package Validation::Class::Plugin::Blacklist;
 
     use base 'Validation::Class::Directive';
-    use Validation::Class::Core;
+    use Validation::Class::Util;
 
     has 'mixin'     => 0;
     has 'field'     => 1;
@@ -48,10 +48,9 @@ use Carp 'confess';
 
     use Validation::Class;
 
-    field user_ip => {
-        label => 'User IP Address',
-        required  => 1,
-        blacklist => 1
+    field ip_address => {
+        required        => 1,
+        check_blacklist => 1
     };
 
     1;
@@ -64,14 +63,16 @@ use Carp 'confess';
 
     my $person = MyApp::Person->new(ip_address => '0.0.0.0');
 
-    unless ($person->validates) {
+    unless ($person->validates('ip_address')) {
         # handle validation error
     }
 
 =head1 DESCRIPTION
 
-Validation::Class::Directive provides a base-class for validation class
-directives.
+You can extend Validation::Class by creating your own validation rules
+(directives). Validation::Class::Directive provides a base-class for you to use
+when creating new directive classes. Please see L<Validation::Class::Directives>
+for a complete list of core directives.
 
 =cut
 
@@ -80,7 +81,7 @@ directives.
 has 'mixin'         => 0;
 has 'field'         => 0;
 has 'multi'         => 0;
-has 'message'       => '%s was not processed successfully';
+has 'message'       => '%s could not be validated';
 has 'validator'     => sub { sub{1} };
 has 'dependencies'  => sub {{ normalization => [], validation => [] }};
 has 'name'          => sub {
