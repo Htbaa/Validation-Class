@@ -1484,8 +1484,11 @@ sub proxy_methods_wrapped {
     return qw{
 
         validate
+        validates
         validate_method
+        method_validates
         validate_profile
+        profile_validates
 
     }
 
@@ -2365,7 +2368,7 @@ minus respectively as follows:
 
 =cut
 
-sub validate {
+sub validates { goto &validate } sub validate {
 
     my ($self, $context, @fields) = @_;
 
@@ -2538,7 +2541,7 @@ to use the methods input specification as a validation profile.
 
 =cut
 
-sub validate_method {
+sub method_validates { goto &validate_method } sub validate_method {
 
     my  ($self, $context, $name, @args) = @_;
 
@@ -2577,9 +2580,9 @@ sub validate_method {
 
 =method validate_profile
 
-The validate_profile method executes a stored validation profile, it requires a
-profile name and can be passed additional parameters which get forwarded into the
-profile routine in the order received.
+The validate_profile method (or profile_validates) executes a stored validation
+profile, it requires a profile name and can be passed additional parameters
+which get forwarded into the profile routine in the order received.
 
     unless ($self->validate_profile('password_change')) {
 
@@ -2595,7 +2598,7 @@ profile routine in the order received.
 
 =cut
 
-sub validate_profile {
+sub profile_validates { goto &validate_profile } sub validate_profile {
 
     my  ($self, $context, $name, @args) = @_;
 

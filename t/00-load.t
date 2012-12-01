@@ -238,6 +238,11 @@ use warnings;
 
     sub validate         {'noop'}
     sub validate_profile {'noop'}
+    sub validate_method  {'noop'}
+
+    sub validates         {'noop'}
+    sub profile_validates {'noop'}
+    sub method_validates  {'noop'}
 
     package main;
 

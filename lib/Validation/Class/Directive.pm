@@ -11,39 +11,64 @@ use Carp 'confess';
 
 # VERSION
 
-=pod
+=head1 SYNOPSIS
 
-    use Validation::Class::Directive;
-
-    my $validator = Validation::Class::Directive->new(
-        mixin     => 0,
-        field     => 1,
-        multi     => 0,
-        validator => sub {
-
-            my ($self, $proto, $field, $param) = @_;
-
-        }
-    );
-
-... written as a package
-
-    package Validation::Class::Directive::Example;
+    package Validation::Class::Plugin::Blacklist;
 
     use base 'Validation::Class::Directive';
-
     use Validation::Class::Core;
 
     has 'mixin'     => 0;
     has 'field'     => 1;
     has 'multi'     => 0;
+    has 'message'   => '%s has been blacklisted';
 
-    has 'message'   => '%s was not processed successfully';
-    has 'validator' => sub {};
+    sub validate {
+
+        my $self = shift;
+
+        my ($proto, $field, $param) = @_;
+
+        if (defined $field->{blacklist} && $param) {
+
+            # is the parameter value blacklisted?
+            my @blacklist = read_file('/blacklist.txt');
+
+            $self->error if grep { $param =~ /^$_$/ } @blacklist;
+
+        }
+
+    }
 
     1;
 
-=pod
+... in your validation class:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field user_ip => {
+        label => 'User IP Address',
+        required  => 1,
+        blacklist => 1
+    };
+
+    1;
+
+... in your application:
+
+    package main;
+
+    use MyApp::Person;
+
+    my $person = MyApp::Person->new(ip_address => '0.0.0.0');
+
+    unless ($person->validates) {
+        # handle validation error
+    }
+
+=head1 DESCRIPTION
 
 Validation::Class::Directive provides a base-class for validation class
 directives.
