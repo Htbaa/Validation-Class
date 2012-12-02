@@ -11,11 +11,45 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            password => {
+                matches => 'password2'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Matches is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that validates whether the value of the dependent parameters matches that of
+the associated field.
+
+=over 8
+
+=item * alternative argument: an-array-of-parameter-names
+
+This directive can be passed a single value or an array of values:
+
+    fields => {
+        password => {
+            matches => ['password2', 'password3']
+        }
+    }
+
+=back
 
 =cut
 

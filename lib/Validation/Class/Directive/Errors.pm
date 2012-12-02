@@ -14,8 +14,8 @@ use Validation::Class::Util;
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Errors is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that holds error message registered at the field-level for the associated field.
+This directive is used internally.
 
 =cut
 

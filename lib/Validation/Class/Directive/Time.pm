@@ -11,11 +11,32 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            creation_time => {
+                time => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Time is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that handles validation for standard time formats. This directive respects the
+following time formats, 24hr (HH:MM) or am/pm ([H]H:MM[a|p]m) and does not
+validate seconds.
 
 =cut
 

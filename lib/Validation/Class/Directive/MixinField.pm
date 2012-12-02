@@ -11,11 +11,35 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            first_name => {
+                required => 1,
+                filters  => ['trim', 'strip']
+            },
+            last_name => {
+                mixin_field => 'first_name'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::MixinField is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::MixinField is a core validation class field
+directive that determines what fields will be used as templates and merged with
+the associated field.
 
 =cut
 

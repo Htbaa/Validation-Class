@@ -36,13 +36,7 @@ use Validation::Class::Util;
 
 Validation::Class::Directive::Between is a core validation class field directive
 that provides the ability to perform city/area validations for cities in the USA.
-Cities can be submitted without regard for case.
-
-=over 8
-
-=item * argument: a-single-true-value
-
-=back
+Cities will be validated without regard for case.
 
 =cut
 

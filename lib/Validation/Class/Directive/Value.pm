@@ -14,8 +14,7 @@ use Validation::Class::Util;
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Value is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that holds the absolute value of the associated field.
 
 =cut
 

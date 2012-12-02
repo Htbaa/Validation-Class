@@ -11,11 +11,30 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            address_zipcode => {
+                zipcode => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Zipcode is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that handles postal-code validation for areas in the USA and North America.
 
 =cut
 

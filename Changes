@@ -2,6 +2,8 @@ Revision history for the Perl library Validation::Class
 
 7.900000  2012-11-18
 
+  - Added more documentation
+
   - Added the ability to override messages at the field and class-level
 
   - Created Validation::Class::Directive::Messages

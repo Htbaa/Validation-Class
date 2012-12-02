@@ -19,13 +19,20 @@ our $_registry = {map{$_=>$_->new}(usesub 'Validation::Class::Directive')};
 =head1 DESCRIPTION
 
 Validation::Class::Directives provides a collection of installed
-Validation::Class direcitves. This class inherits from
+Validation::Class directives. This class inherits from
 L<Validation::Class::Mapping>.
 
 =head1 DIRECTIVES
 
 The following is a list of core directives that get installed automatically with
 Validation::Class.
+
+Please note that the purpose of the core directives is to provide a reasonable
+layer of protection against bad/malformed data and are not very sophisticated
+(e.g. the email directive does not perform a hot lookup, etc).
+
+Please look at L<Validation::Class::Directive> for information of developing
+your own directives.
 
 =directive alias
 

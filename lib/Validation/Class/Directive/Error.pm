@@ -11,11 +11,31 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            username => {
+                error => 'This is not a valid username'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Error is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that holds the error message that will supersede any other error messages that
+attempt to register errors at the field-level for the associated field.
 
 =cut
 

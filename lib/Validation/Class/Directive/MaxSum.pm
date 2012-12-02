@@ -11,11 +11,30 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            invoice_total => {
+                max_sum => 10000
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
 Validation::Class::Directive::MaxSum is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that validates the numeric value of the associated parameters.
 
 =cut
 

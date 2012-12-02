@@ -14,8 +14,8 @@ use Validation::Class::Util;
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Name is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that merely holds the name of the associated field. This directive is used
+internally and the value is populated automatically.
 
 =cut
 

@@ -11,11 +11,33 @@ use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            address_state => {
+                state => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::State is a core validation class
-field directive that provides the ability to do some really cool stuff only we
-haven't documented it just yet.
+Validation::Class::Directive::State is a core validation class field directive
+that handles state validation for states in the USA. States will be validated
+against a list of state (case-insensitive abbreviated and long) names.
+
+For example: ny, NY, New York, and new york will validate.
 
 =cut
 
