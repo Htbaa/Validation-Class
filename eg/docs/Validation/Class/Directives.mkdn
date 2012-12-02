@@ -1,7 +1,7 @@
 # DESCRIPTION
 
 Validation::Class::Directives provides a collection of installed
-Validation::Class direcitves. This class inherits from
+Validation::Class directives. This class inherits from
 [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping).
 
 # DIRECTIVES
@@ -9,148 +9,245 @@ Validation::Class direcitves. This class inherits from
 The following is a list of core directives that get installed automatically with
 Validation::Class.
 
+Please note that the purpose of the core directives is to provide a reasonable
+layer of protection against bad/malformed data and are not very sophisticated
+(e.g. the email directive does not perform a hot lookup, etc).
+
+Please look at [Validation::Class::Directive](http://search.cpan.org/perldoc?Validation::Class::Directive) for information of developing
+your own directives.
+
+## alias
+
 The alias directive is provided by [Validation::Class::Directive::Alias](http://search.cpan.org/perldoc?Validation::Class::Directive::Alias) and
 handles parameter aliases.
+
+## between
 
 The between directive is provided by [Validation::Class::Directive::Between](http://search.cpan.org/perldoc?Validation::Class::Directive::Between)
 and handles numeric range validation.
 
+## city
+
 The city directive is provided by [Validation::Class::Directive::City](http://search.cpan.org/perldoc?Validation::Class::Directive::City) and
 handles city/area validation for cities in the USA.
+
+## creditcard
 
 The creditcard directive is provided by [Validation::Class::Directive::Creditcard](http://search.cpan.org/perldoc?Validation::Class::Directive::Creditcard)
 and handles validation for american express, bankcard, diners card,
 discover card, electron,  enroute, jcb, maestro, mastercard, solo, switch, visa
 and voyager credit cards.
 
+## date
+
 The date directive is provided by [Validation::Class::Directive::Date](http://search.cpan.org/perldoc?Validation::Class::Directive::Date) and
 handles validation of simple date formats.
+
+## decimal
 
 The decimal directive is provided by [Validation::Class::Directive::Decimal](http://search.cpan.org/perldoc?Validation::Class::Directive::Decimal)
 and handles validation of floating point integers.
 
+## default
+
 The default directive is provided by [Validation::Class::Directive::Default](http://search.cpan.org/perldoc?Validation::Class::Directive::Default)
 and hold the value which should be used if no parameter is supplied.
+
+## depends\_on
 
 The depends\_on directive is provided by [Validation::Class::Directive::DependsOn](http://search.cpan.org/perldoc?Validation::Class::Directive::DependsOn)
 and validates the existence of dependent parameters.
 
+## email
+
 The email directive is provided by [Validation::Class::Directive::Email](http://search.cpan.org/perldoc?Validation::Class::Directive::Email)
 and checks the validity of email address specified by the associated parameters.
+
+## error
 
 The error directive is provided by [Validation::Class::Directive::Error](http://search.cpan.org/perldoc?Validation::Class::Directive::Error)
 and holds the error message that will supersede any other error messages that
 attempt to register errors at the field-level for the associated field.
 
+## errors
+
 The errors directive is provided by [Validation::Class::Directive::Errors](http://search.cpan.org/perldoc?Validation::Class::Directive::Errors)
 and is a container (object) which holds error message registered at the field-level
 for the associated field.
+
+## filtering
 
 The filtering directive is provided by [Validation::Class::Directive::Filtering](http://search.cpan.org/perldoc?Validation::Class::Directive::Filtering)
 and specifies whether filtering and sanitation should occur as a pre-process or
 post-process.
 
+## filters
+
 The filters directive is provided by [Validation::Class::Directive::Filters](http://search.cpan.org/perldoc?Validation::Class::Directive::Filters)
 and specifies which filter should be executed on the associated field.
+
+## hostname
 
 The hostname directive is provided by [Validation::Class::Directive::Hostname](http://search.cpan.org/perldoc?Validation::Class::Directive::Hostname)
 and handles validatation of server hostnames.
 
+## label
+
 The label directive is provided by [Validation::Class::Directive::Label](http://search.cpan.org/perldoc?Validation::Class::Directive::Label)
 and holds a user-friendly string (name) representing the associated field.
 
+## length
+
 The length directive is provided by [Validation::Class::Directive::Length](http://search.cpan.org/perldoc?Validation::Class::Directive::Length)
 and validates the exact length of the associated parameters.
+
+## matches
 
 The matches directive is provided by [Validation::Class::Directive::Matches](http://search.cpan.org/perldoc?Validation::Class::Directive::Matches)
 and validates whether the value of the dependent parameters matches that of the
 associated field.
 
+## max\_alpha
+
 The max\_alpha directive is provided by [Validation::Class::Directive::MaxAlpha](http://search.cpan.org/perldoc?Validation::Class::Directive::MaxAlpha)
 and validates the length of alphabetic characters in the associated parameters.
+
+## max\_digits
 
 The max\_digits directive is provided by [Validation::Class::Directive::MaxDigits](http://search.cpan.org/perldoc?Validation::Class::Directive::MaxDigits)
 and validates the length of numeric characters in the associated parameters.
 
+## max\_length
+
 The max\_length directive is provided by [Validation::Class::Directive::MaxLength](http://search.cpan.org/perldoc?Validation::Class::Directive::MaxLength)
 and validates the length of all characters in the associated parameters.
+
+## max\_sum
 
 The max\_sum directive is provided by [Validation::Class::Directive::MaxSum](http://search.cpan.org/perldoc?Validation::Class::Directive::MaxSum)
 and validates the numeric value of the associated parameters.
 
+## max\_symbols
+
 The max\_symbols directive is provided by [Validation::Class::Directive::MaxSymbols](http://search.cpan.org/perldoc?Validation::Class::Directive::MaxSymbols)
 and validates the length of non-alphanumeric characters in the associated parameters.
+
+## messages
 
 The messages directive is provided by [Validation::Class::Directive::Messages](http://search.cpan.org/perldoc?Validation::Class::Directive::Messages)
 and is a container (object) which holds error message which will supersede the
 default error messages of the associated directives.
 
+## min\_alpha
+
 The min\_alpha directive is provided by [Validation::Class::Directive::MinAlpha](http://search.cpan.org/perldoc?Validation::Class::Directive::MinAlpha)
 and validates the length of alphabetic characters in the associated parameters.
+
+## min\_digits
 
 The min\_digits directive is provided by [Validation::Class::Directive::MinDigits](http://search.cpan.org/perldoc?Validation::Class::Directive::MinDigits)
 and validates the length of numeric characters in the associated parameters.
 
+## min\_length
+
 The min\_length directive is provided by [Validation::Class::Directive::MinLength](http://search.cpan.org/perldoc?Validation::Class::Directive::MinLength)
 and validates the length of all characters in the associated parameters.
+
+## min\_sum
 
 The min\_sum directive is provided by [Validation::Class::Directive::MinSum](http://search.cpan.org/perldoc?Validation::Class::Directive::MinSum)
 and validates the numeric value of the associated parameters.
 
+## min\_symbols
+
 The min\_symbols directive is provided by [Validation::Class::Directive::MinSymbols](http://search.cpan.org/perldoc?Validation::Class::Directive::MinSymbols)
 and validates the length of non-alphanumeric characters in the associated parameters.
 
+## mixin
+
 The mixin directive is provided by [Validation::Class::Directive::Mixin](http://search.cpan.org/perldoc?Validation::Class::Directive::Mixin)
 and determines what directive templates will be merged with the associated field.
+
+## mixin\_field
 
 The mixin\_field directive is provided by [Validation::Class::Directive::MixinField](http://search.cpan.org/perldoc?Validation::Class::Directive::MixinField)
 and determines what fields will be used as templates and merged with the associated
 field.
 
+## multiples
+
 The multiples directive is provided by [Validation::Class::Directive::Multiples](http://search.cpan.org/perldoc?Validation::Class::Directive::Multiples)
 and validates whether the associated parameters may contain a multi-value
 (an array of strings).
+
+## name
 
 The name directive is provided by [Validation::Class::Directive::Name](http://search.cpan.org/perldoc?Validation::Class::Directive::Name)
 and merely holds the name of the associated field. This value is populated
 automatically.
 
+## options
+
 The options directive is provided by [Validation::Class::Directive::Options](http://search.cpan.org/perldoc?Validation::Class::Directive::Options) and
 holds an enumerated list of values to be validated against the associated
 parameters.
 
+## pattern
+
 The pattern directive is provided by [Validation::Class::Directive::Pattern](http://search.cpan.org/perldoc?Validation::Class::Directive::Pattern) and
 handles validation of simple patterns and complex regular expressions.
+
+## readonly
 
 The readonly directive is provided by [Validation::Class::Directive::Readonly](http://search.cpan.org/perldoc?Validation::Class::Directive::Readonly)
 and determines whether the associated parameters should be ignored.
 
+## required
+
 The required directive is provided by [Validation::Class::Directive::Required](http://search.cpan.org/perldoc?Validation::Class::Directive::Required)
 and handles validation of supply and demand.
+
+## ssn
 
 The ssn directive is provided by [Validation::Class::Directive::SSN](http://search.cpan.org/perldoc?Validation::Class::Directive::SSN) and
 handles validation of social security numbers in the USA.
 
+## state
+
 The state directive is provided by [Validation::Class::Directive::State](http://search.cpan.org/perldoc?Validation::Class::Directive::State) and
 handles state validation for states in the USA.
+
+## telephone
 
 The telephone directive is provided by [Validation::Class::Directive::Telephone](http://search.cpan.org/perldoc?Validation::Class::Directive::Telephone)
 and handles telephone number validation for the USA and North America.
 
+## time
+
 The time directive is provided by [Validation::Class::Directive::Time](http://search.cpan.org/perldoc?Validation::Class::Directive::Time)
 and handles validation for standard time formats.
+
+## toggle
 
 The toggle directive is provided by [Validation::Class::Directive::Toggle](http://search.cpan.org/perldoc?Validation::Class::Directive::Toggle)
 and used internally to handle validation of per-validation-event requirements.
 
+## uuid
+
 The uuid directive is provided by [Validation::Class::Directive::UUID](http://search.cpan.org/perldoc?Validation::Class::Directive::UUID)
 and handles validation of Globally/Universally Unique Identifiers.
+
+## validation
 
 The validation directive is provided by [Validation::Class::Directive::Validation](http://search.cpan.org/perldoc?Validation::Class::Directive::Validation)
 and used to execute user-defined validation routines.
 
+## value
+
 The value directive is provided by [Validation::Class::Directive::value](http://search.cpan.org/perldoc?Validation::Class::Directive::value)
 and hold the absolute value of the associated field.
+
+## zipcode
 
 The zipcode directive is provided by [Validation::Class::Directive::Zipcode](http://search.cpan.org/perldoc?Validation::Class::Directive::Zipcode)
 and handles postal-code validation for areas in the USA and North America.

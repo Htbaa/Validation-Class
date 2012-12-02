@@ -1,5 +1,43 @@
+# NAME
+
+Validation::Class::Directive::Hostname - Hostname Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900000
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            company_domain => {
+                hostname => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 # DESCRIPTION
 
-Validation::Class::Directive::Hostname is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Hostname is a core validation class field
+directive that handles validatation of server hostnames.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

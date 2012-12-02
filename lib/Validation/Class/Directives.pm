@@ -34,238 +34,238 @@ layer of protection against bad/malformed data and are not very sophisticated
 Please look at L<Validation::Class::Directive> for information of developing
 your own directives.
 
-=directive alias
+=head2 alias
 
 The alias directive is provided by L<Validation::Class::Directive::Alias> and
 handles parameter aliases.
 
-=directive between
+=head2 between
 
 The between directive is provided by L<Validation::Class::Directive::Between>
 and handles numeric range validation.
 
-=directive city
+=head2 city
 
 The city directive is provided by L<Validation::Class::Directive::City> and
 handles city/area validation for cities in the USA.
 
-=directive creditcard
+=head2 creditcard
 
 The creditcard directive is provided by L<Validation::Class::Directive::Creditcard>
 and handles validation for american express, bankcard, diners card,
 discover card, electron,  enroute, jcb, maestro, mastercard, solo, switch, visa
 and voyager credit cards.
 
-=directive date
+=head2 date
 
 The date directive is provided by L<Validation::Class::Directive::Date> and
 handles validation of simple date formats.
 
-=directive decimal
+=head2 decimal
 
 The decimal directive is provided by L<Validation::Class::Directive::Decimal>
 and handles validation of floating point integers.
 
-=directive default
+=head2 default
 
 The default directive is provided by L<Validation::Class::Directive::Default>
 and hold the value which should be used if no parameter is supplied.
 
-=directive depends_on
+=head2 depends_on
 
 The depends_on directive is provided by L<Validation::Class::Directive::DependsOn>
 and validates the existence of dependent parameters.
 
-=directive email
+=head2 email
 
 The email directive is provided by L<Validation::Class::Directive::Email>
 and checks the validity of email address specified by the associated parameters.
 
-=directive error
+=head2 error
 
 The error directive is provided by L<Validation::Class::Directive::Error>
 and holds the error message that will supersede any other error messages that
 attempt to register errors at the field-level for the associated field.
 
-=directive errors
+=head2 errors
 
 The errors directive is provided by L<Validation::Class::Directive::Errors>
 and is a container (object) which holds error message registered at the field-level
 for the associated field.
 
-=directive filtering
+=head2 filtering
 
 The filtering directive is provided by L<Validation::Class::Directive::Filtering>
 and specifies whether filtering and sanitation should occur as a pre-process or
 post-process.
 
-=directive filters
+=head2 filters
 
 The filters directive is provided by L<Validation::Class::Directive::Filters>
 and specifies which filter should be executed on the associated field.
 
-=directive hostname
+=head2 hostname
 
 The hostname directive is provided by L<Validation::Class::Directive::Hostname>
 and handles validatation of server hostnames.
 
-=directive label
+=head2 label
 
 The label directive is provided by L<Validation::Class::Directive::Label>
 and holds a user-friendly string (name) representing the associated field.
 
-=directive length
+=head2 length
 
 The length directive is provided by L<Validation::Class::Directive::Length>
 and validates the exact length of the associated parameters.
 
-=directive matches
+=head2 matches
 
 The matches directive is provided by L<Validation::Class::Directive::Matches>
 and validates whether the value of the dependent parameters matches that of the
 associated field.
 
-=directive max_alpha
+=head2 max_alpha
 
 The max_alpha directive is provided by L<Validation::Class::Directive::MaxAlpha>
 and validates the length of alphabetic characters in the associated parameters.
 
-=directive max_digits
+=head2 max_digits
 
 The max_digits directive is provided by L<Validation::Class::Directive::MaxDigits>
 and validates the length of numeric characters in the associated parameters.
 
-=directive max_length
+=head2 max_length
 
 The max_length directive is provided by L<Validation::Class::Directive::MaxLength>
 and validates the length of all characters in the associated parameters.
 
-=directive max_sum
+=head2 max_sum
 
 The max_sum directive is provided by L<Validation::Class::Directive::MaxSum>
 and validates the numeric value of the associated parameters.
 
-=directive max_symbols
+=head2 max_symbols
 
 The max_symbols directive is provided by L<Validation::Class::Directive::MaxSymbols>
 and validates the length of non-alphanumeric characters in the associated parameters.
 
-=directive messages
+=head2 messages
 
 The messages directive is provided by L<Validation::Class::Directive::Messages>
 and is a container (object) which holds error message which will supersede the
 default error messages of the associated directives.
 
-=directive min_alpha
+=head2 min_alpha
 
 The min_alpha directive is provided by L<Validation::Class::Directive::MinAlpha>
 and validates the length of alphabetic characters in the associated parameters.
 
-=directive min_digits
+=head2 min_digits
 
 The min_digits directive is provided by L<Validation::Class::Directive::MinDigits>
 and validates the length of numeric characters in the associated parameters.
 
-=directive min_length
+=head2 min_length
 
 The min_length directive is provided by L<Validation::Class::Directive::MinLength>
 and validates the length of all characters in the associated parameters.
 
-=directive min_sum
+=head2 min_sum
 
 The min_sum directive is provided by L<Validation::Class::Directive::MinSum>
 and validates the numeric value of the associated parameters.
 
-=directive min_symbols
+=head2 min_symbols
 
 The min_symbols directive is provided by L<Validation::Class::Directive::MinSymbols>
 and validates the length of non-alphanumeric characters in the associated parameters.
 
-=directive mixin
+=head2 mixin
 
 The mixin directive is provided by L<Validation::Class::Directive::Mixin>
 and determines what directive templates will be merged with the associated field.
 
-=directive mixin_field
+=head2 mixin_field
 
 The mixin_field directive is provided by L<Validation::Class::Directive::MixinField>
 and determines what fields will be used as templates and merged with the associated
 field.
 
-=directive multiples
+=head2 multiples
 
 The multiples directive is provided by L<Validation::Class::Directive::Multiples>
 and validates whether the associated parameters may contain a multi-value
 (an array of strings).
 
-=directive name
+=head2 name
 
 The name directive is provided by L<Validation::Class::Directive::Name>
 and merely holds the name of the associated field. This value is populated
 automatically.
 
-=directive options
+=head2 options
 
 The options directive is provided by L<Validation::Class::Directive::Options> and
 holds an enumerated list of values to be validated against the associated
 parameters.
 
-=directive pattern
+=head2 pattern
 
 The pattern directive is provided by L<Validation::Class::Directive::Pattern> and
 handles validation of simple patterns and complex regular expressions.
 
-=directive readonly
+=head2 readonly
 
 The readonly directive is provided by L<Validation::Class::Directive::Readonly>
 and determines whether the associated parameters should be ignored.
 
-=directive required
+=head2 required
 
 The required directive is provided by L<Validation::Class::Directive::Required>
 and handles validation of supply and demand.
 
-=directive ssn
+=head2 ssn
 
 The ssn directive is provided by L<Validation::Class::Directive::SSN> and
 handles validation of social security numbers in the USA.
 
-=directive state
+=head2 state
 
 The state directive is provided by L<Validation::Class::Directive::State> and
 handles state validation for states in the USA.
 
-=directive telephone
+=head2 telephone
 
 The telephone directive is provided by L<Validation::Class::Directive::Telephone>
 and handles telephone number validation for the USA and North America.
 
-=directive time
+=head2 time
 
 The time directive is provided by L<Validation::Class::Directive::Time>
 and handles validation for standard time formats.
 
-=directive toggle
+=head2 toggle
 
 The toggle directive is provided by L<Validation::Class::Directive::Toggle>
 and used internally to handle validation of per-validation-event requirements.
 
-=directive uuid
+=head2 uuid
 
 The uuid directive is provided by L<Validation::Class::Directive::UUID>
 and handles validation of Globally/Universally Unique Identifiers.
 
-=directive validation
+=head2 validation
 
 The validation directive is provided by L<Validation::Class::Directive::Validation>
 and used to execute user-defined validation routines.
 
-=directive value
+=head2 value
 
 The value directive is provided by L<Validation::Class::Directive::value>
 and hold the absolute value of the associated field.
 
-=directive zipcode
+=head2 zipcode
 
 The zipcode directive is provided by L<Validation::Class::Directive::Zipcode>
 and handles postal-code validation for areas in the USA and North America.

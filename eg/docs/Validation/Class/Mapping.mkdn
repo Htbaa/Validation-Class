@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Mapping - Generic Container Class for a Hash Reference
+
+# VERSION
+
+version 7.900000
+
 # SYNOPSIS
 
     use Validation::Class::Mapping;
@@ -14,17 +22,33 @@
 Validation::Class::Mapping is a container class that provides general-purpose
 functionality for hashref objects.
 
+# METHODS
+
+## new
+
     my $self = Validation::Class::Mapping->new;
+
+## add
 
     $self = $self->add(foo => 1, bar => 2);
 
+## clear
+
     $self = $self->clear;
+
+## count
 
     my $count = $self->count;
 
+## delete
+
     $value = $self->delete($name);
 
+## defined
+
     $true if $self->defined($name) # defined
+
+## each
 
     $self = $self->each(sub{
 
@@ -32,15 +56,27 @@ functionality for hashref objects.
 
     });
 
+## exists
+
     $true if $self->exists($name) # exists
+
+## get
 
     my $value = $self->get($name); # i.e. $self->{$name}
 
+## grep
+
     $new_list = $self->grep(qr/update_/);
+
+## has
 
     $true if $self->has($name) # defined or exists
 
+## hash
+
     my $hash = $self->hash;
+
+## iterator
 
     my $next = $self->iterator();
 
@@ -51,13 +87,23 @@ functionality for hashref objects.
         # do something with $item (value)
     }
 
+## keys
+
     my @keys = $self->keys;
+
+## list
 
     my %hash = $self->list;
 
+## merge
+
     $self->merge($hashref);
 
+## nsort
+
     my @keys = $self->nsort;
+
+## pairs
 
     my @pairs = $self->pairs;
     # or filter using $self->pairs('grep', $regexp);
@@ -66,12 +112,33 @@ functionality for hashref objects.
         # $pair->{key} is $pair->{value};
     }
 
+## rmerge
+
     $self->rmerge($hashref);
+
+## rnsort
 
     my @keys = $self->rnsort;
 
+## rsort
+
     my @keys = $self->rsort;
+
+## sort
 
     my @keys = $self->sort(sub{...});
 
+## values
+
     my @values = $self->values;
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

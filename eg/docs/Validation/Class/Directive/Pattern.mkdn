@@ -1,5 +1,58 @@
+# NAME
+
+Validation::Class::Directive::Pattern - Pattern Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900000
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            company_email => {
+                pattern => qr/\@company\.com$/
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 # DESCRIPTION
 
 Validation::Class::Directive::Pattern is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that validates simple patterns and complex regular expressions.
+
+- alternative argument: an-array-of-something
+
+    This directive can be passed a regexp object or a simple pattern. A simple
+    pattern is a string where the \`\#\` character matches digits and the \`X\` character
+    matches alphabetic characters.
+
+        fields => {
+            task_date => {
+                pattern => '##-##-####'
+            },
+            task_time => {
+                pattern => '##:##:##'
+            }
+        }
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

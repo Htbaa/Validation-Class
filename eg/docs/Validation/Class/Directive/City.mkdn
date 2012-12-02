@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directive::City - City Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900000
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -22,6 +30,15 @@
 
 Validation::Class::Directive::Between is a core validation class field directive
 that provides the ability to perform city/area validations for cities in the USA.
-Cities can be submitted without regard for case.
+Cities will be validated without regard for case.
 
-- argument: a-single-true-value
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
