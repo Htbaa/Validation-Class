@@ -27,9 +27,9 @@ L<Validation::Class::Mapping>.
 The following is a list of core directives that get installed automatically with
 Validation::Class.
 
-Please note that the purpose of the core directives is to provide a reasonable
-layer of protection against bad/malformed data and are not very sophisticated
-(e.g. the email directive does not perform a hot lookup, etc).
+Please note that the purpose of the core directives is merely to provide a
+reasonable layer of protection against bad/malformed data, the validators are
+not very sophisticated (e.g. the email directive does not perform a host lookup).
 
 Please look at L<Validation::Class::Directive> for information of developing
 your own directives.
