@@ -1,4 +1,4 @@
-# Base Class for Validation Class Directives
+# ABSTRACT: Base Class for Validation Class Directives
 
 package Validation::Class::Directive;
 

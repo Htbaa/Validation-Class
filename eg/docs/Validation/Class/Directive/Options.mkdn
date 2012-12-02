@@ -4,7 +4,7 @@ Validation::Class::Directive::Options - Options Directive for Validation Class F
 
 # VERSION
 
-version 7.900000
+version 7.900001
 
 # SYNOPSIS
 

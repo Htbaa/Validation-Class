@@ -1,4 +1,4 @@
-# Validation::Class Core Directives Registry
+# ABSTRACT: Validation::Class Core Directives Registry
 
 package Validation::Class::Directives;
 

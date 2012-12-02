@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900000
+    version 7.900001
 
 SYNOPSIS
         package MyApp::Person;
@@ -32,7 +32,7 @@ SYNOPSIS
         # ... elsewhere in your application
         my $person = MyApp::Person->new(login => 'admin', password => 'secr3t');
 
-        unless ($person->validate) {
+        unless ($person->validates) {
             # handle the failures
         }
 
@@ -41,13 +41,12 @@ SYNOPSIS
 DESCRIPTION
     Validation::Class is a robust data validation framework which aims
     provide an extensible framework for developing clean yet sophisticated
-    data validation objects.
-
-    The core feature-set consist of self-validating methods, validation
-    profiles, reusable validation rules and templates, pre and post input
-    filtering, class inheritance, automatic array handling, and
-    extensibility (e.g. overriding default error messages, creating custom
-    validators, creating custom input filters and much more).
+    data validation objects. The core feature-set consist of self-validating
+    methods, validation profiles, reusable validation rules and templates,
+    pre and post input filtering, class inheritance, automatic array
+    handling, and extensibility (e.g. overriding default error messages,
+    creating custom validators, creating custom input filters and much
+    more).
 
 QUICKSTART
     If you are looking for a simple in-line data validation module built
@@ -71,10 +70,10 @@ KEYWORDS
 
         attribute 'first_name' => 'Peter';
         attribute 'last_name'  => 'Venkman';
-
         attribute 'full_name'  => sub {
 
             my ($self) = @_;
+
             return join ', ', $self->last_name, $self->first_name;
 
         };
@@ -107,7 +106,9 @@ KEYWORDS
   directive
     The directive keyword (or dir) registers custom validator directives to
     be used in your field definitions. It is a means of extending the core
-    field directives before instantiation.
+    field directives before instantiation. Please see
+    Validation::Class::Directive for insight into creating your own
+    installable directives.
 
         package MyApp::Directives;
 
@@ -117,7 +118,7 @@ KEYWORDS
 
         directive 'isa_email_address' => sub {
 
-            my ($self, $prototype, $field, $param) = @_;
+            my ($self, $proto, $field, $param) = @_;
 
             my $validator = Data::Validate::Email->new;
 
@@ -273,7 +274,7 @@ KEYWORDS
 
         use Validation::Class;
 
-        load roles => ['MyApp::User', MyApp::Visitor'];
+        load roles => ['MyApp::User', 'MyApp::Visitor'];
 
         1;
 
@@ -306,7 +307,7 @@ KEYWORDS
 
     The message keyword takes two arguments, the name of the directive whose
     error message you wish to override and a string which will be used to as
-    a template which is feed to `sprintf` to format the message.
+    a template which is feed to sprintf to format the message.
 
   method
     The method keyword (or mth) is used to register an auto-validating
@@ -478,19 +479,6 @@ METHODS
 
         my $prototype = $person->prototype;
 
-VALIDATION ENGINE BY PROXY
-    Validation::Class mostly provides sugar functions for modeling your data
-    validation requirements. Each class you create is associated with a
-    *prototype* class which provides the data validation engine and keeps
-    your class namespace free from pollution, please see
-    Validation::Class::Prototype for more information on specific methods
-    and attributes.
-
-    Validation::Class injects a few proxy methods into your class which are
-    basically aliases to the corresponding prototype class methods, however
-    it is possible to access the prototype directly using the
-    proto/prototype methods.
-
 PROXY METHODS
   class
         $self->class;
@@ -650,6 +638,19 @@ PROXY METHODS
 
     See "validate_profile" in Validation::Class::Prototype for full
     documentation.
+
+VALIDATE BY PROXY
+    Validation::Class mostly provides sugar functions for modeling your data
+    validation requirements. Each class you create is associated with a
+    *prototype* class which provides the data validation engine and keeps
+    your class namespace free from pollution, please see
+    Validation::Class::Prototype for more information on specific methods
+    and attributes.
+
+    Validation::Class injects a few proxy methods into your class which are
+    basically aliases to the corresponding prototype class methods, however
+    it is possible to access the prototype directly using the
+    proto/prototype methods.
 
 EXTENDING VALIDATION::CLASS
     Validation::Class does NOT provide method modifiers but can be easily
