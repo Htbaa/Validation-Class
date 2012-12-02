@@ -1,13 +1,11 @@
 use Test::More;
 
-package MyVal;
-use Validation::Class;
-
 package main;
 
 use utf8;
+use Validation::Class::Simple;
 
-my $r = MyVal->new(fields => {visa_number => {creditcard => 1}});
+my $r = Validation::Class::Simple->new(fields => {visa_number => {creditcard => 1}});
 
 sub should_fail {
     my ($name, @numbers) = @_;

@@ -6,8 +6,9 @@ use strict;
 use warnings;
 
 use Validation::Class ();
-use Validation::Class::Util ('prototype_registry');
 use Validation::Class::Prototype;
+
+use Validation::Class::Util ('prototype_registry');
 
 # VERSION
 
