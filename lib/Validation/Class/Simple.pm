@@ -426,7 +426,11 @@ sub proto { goto &prototype } sub prototype {
 
 sub DESTROY {
 
-    return prototype_registry->delete(shift);
+    my ($self) = @_;
+
+    prototype_registry->delete($self) if $self && prototype_registry;
+
+    return;
 
 }
 

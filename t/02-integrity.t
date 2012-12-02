@@ -1,5 +1,6 @@
 use FindBin;
 use Test::More;
+
 use utf8;
 use strict;
 use warnings;
@@ -12,7 +13,7 @@ SKIP: {
 
     plan skip_all => 'Perl::Critic is not installed.' if $@;
 
-    my $lib     = $FindBin::Bin . "/../lib/";
+    my $lib     = $FindBin::RealBin . "/../lib/";
     my @profile = qw(
         -5
         --severity 4
