@@ -74,8 +74,7 @@ sub validate {
 
             unless ( isa_regexp($pattern) ) {
 
-                $pattern = quotemeta $pattern;
-                #$pattern =~ s/([^#X ])/\\$1/g;
+                $pattern =~ s/([^#X ])/\\$1/g;
                 $pattern =~ s/#/\\d/g;
                 $pattern =~ s/X/[a-zA-Z]/g;
                 $pattern = qr/$pattern/;
