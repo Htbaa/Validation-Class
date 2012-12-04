@@ -17,6 +17,7 @@ use Carp 'confess';
 
     use base 'Validation::Class::Directive';
     use Validation::Class::Util;
+    use File::Slurp;
 
     has 'mixin'     => 0;
     has 'field'     => 1;
