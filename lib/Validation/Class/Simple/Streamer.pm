@@ -265,9 +265,13 @@ sub AUTOLOAD {
 
     my ($self) = @_;
 
-    $self->{action} = $routine;
+    if ($routine) {
 
-    goto &declare;
+        $self->{action} = $routine;
+
+        goto &declare;
+
+    }
 
     exit carp sprintf q(Can't locate object method "%s" via package "%s"),
         $routine, ((ref $_[0] || $_[0]) || 'main')
