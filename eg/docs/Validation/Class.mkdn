@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class - Powerful Data Validation Framework
-
-# VERSION
-
-version 7.900002
-
 # SYNOPSIS
 
     package MyApp::Person;
@@ -63,10 +55,6 @@ If you are new to Validation::Class, or would like more information on the
 underpinnings of this library and how it views and approaches data validation,
 please review [Validation::Class::Whitepaper](http://search.cpan.org/perldoc?Validation::Class::Whitepaper).
 
-# KEYWORDS
-
-## attribute
-
 The attribute keyword (or has) registers a class attribute. This is only a
 minimalistic variant of what you may have encountered in other object systems.
 
@@ -89,8 +77,6 @@ minimalistic variant of what you may have encountered in other object systems.
 The attribute keyword takes two arguments, the attribute name and a constant or
 coderef that will be used as its default value.
 
-## build
-
 The build keyword (or bld) registers a coderef to be run at instantiation much
 in the same way the common BUILD routine is used in modern OO frameworks.
 
@@ -108,8 +94,6 @@ in the same way the common BUILD routine is used in modern OO frameworks.
 
 The build keyword takes one argument, a coderef which is passed the instantiated
 class object.
-
-## directive
 
 The directive keyword (or dir) registers custom validator directives to be used
 in your field definitions. It is a means of extending the core field directives
@@ -161,8 +145,6 @@ the current field object, and the matching parameter's value. The validator
 (coderef) is evaluated by its return value as well as whether it altered any
 error containers.
 
-## field
-
 The field keyword (or fld) registers a data validation rule for reuse and
 validation in code. The field name should correspond with the parameter name
 expected to be passed to your validation class.
@@ -193,8 +175,6 @@ underscore.
 Protip: Field directives are used to validate scalar and array data. Don't use
 fields to store and validate objects. Please see the \*has\* keyword instead or
 use an object system with type constraints like [Moose](http://search.cpan.org/perldoc?Moose).
-
-## filter
 
 The filter keyword (or flt) registers custom filters to be used in your field
 definitions. It is a means of extending the pre-existing filters declared by
@@ -228,8 +208,6 @@ The filter keyword takes two arguments, the name of the filter and a
 coderef which will be used to filter the value the associated field. The coderef
 is passed the value of the field and that value MUST be operated on directly.
 The coderef should also return the transformed value.
-
-## load
 
 The load keyword (or set), which can also be used as a class method, provides
 options for extending the current class by declaring roles, plugins, etc.
@@ -282,8 +260,6 @@ accepts a constant or an arrayref of constants.
 
     1;
 
-## message
-
 The message keyword (or msg) registers a class-level error message template that
 will be used in place of the error message defined in the corresponding directive
 class if defined. Error messages can also be overriden at the individual
@@ -312,8 +288,6 @@ instructions on how to override error messages at the field-level.
 The message keyword takes two arguments, the name of the directive whose error
 message you wish to override and a string which will be used to as a template
 which is feed to sprintf to format the message.
-
-## method
 
 The method keyword (or mth) is used to register an auto-validating method.
 Similar to method signatures, an auto-validating method can leverage pre-existing
@@ -374,8 +348,6 @@ error occurs it is most-likely a program error as opposed to a user error.
 See the ignore\_failure and report\_failure switch to control how method input
 validation failures are handled.
 
-## mixin
-
 The mixin keyword (or mxn) registers a validation rule template that can be
 applied (or "mixed-in") to any field by specifying the mixin directive. Mixin
 directives are processed first so existing field directives will override any
@@ -400,7 +372,35 @@ directives created by the mixin directive.
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values
 pairs known as directives.
 
-## profile
+The new method instantiates a new class object, it performs a series of actions
+(magic) required for the class function properly, and for that reason, this
+method should never be overridden. Use the build keyword for hooking into the
+instantiation process.
+
+In the event a foreign \`new\` method is detected, an \`initialize\_validator\`
+method will be injected into the class containing the code (magic) necessary to
+normalize your environment.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # hook
+    build sub {
+
+        my ($self, @args) = @_; # on instantiation
+
+    };
+
+    sub new {
+
+        # rolled my own
+        my $self = bless {}, shift;
+
+        # execute magic
+        $self->initialize_validator;
+
+    }
 
 The profile keyword (or pro) registers a validation profile (coderef) which as
 in the traditional use of the term is a sequence of validation routines that
@@ -435,42 +435,6 @@ validates data relevant to a specific action.
 The profile keyword takes two arguments, a profile name and coderef which will
 be used to execute a sequence of actions for validation purposes.
 
-# METHODS
-
-## new
-
-The new method instantiates a new class object, it performs a series of actions
-(magic) required for the class function properly, and for that reason, this
-method should never be overridden. Use the build keyword for hooking into the
-instantiation process.
-
-In the event a foreign \`new\` method is detected, an \`initialize\_validator\`
-method will be injected into the class containing the code (magic) necessary to
-normalize your environment.
-
-    package MyApp::Person;
-
-    use Validation::Class;
-
-    # hook
-    build sub {
-
-        my ($self, @args) = @_; # on instantiation
-
-    };
-
-    sub new {
-
-        # rolled my own
-        my $self = bless {}, shift;
-
-        # execute magic
-        $self->initialize_validator;
-
-    }
-
-## prototype
-
 The prototype method (or proto) returns an instance of the associated class
 prototype. The class prototype is responsible for manipulating and validating
 the data model (the class). It is not likely that you'll need to access
@@ -486,33 +450,33 @@ this method directly, see [Validation::Class::Prototype](http://search.cpan.org/
 
     my $prototype = $person->prototype;
 
-# PROXY METHODS
+# VALIDATE BY PROXY
 
-## class
+Validation::Class mostly provides sugar functions for modeling your data
+validation requirements. Each class you create is associated with a \*prototype\*
+class which provides the data validation engine and keeps your class namespace
+free from pollution, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype) for more
+information on specific methods and attributes.
+
+Validation::Class injects a few proxy methods into your class which are
+basically aliases to the corresponding prototype class methods, however it is
+possible to access the prototype directly using the proto/prototype methods.
 
     $self->class;
 
 See ["class" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#class) for full documentation.
 
-## clear\_queue
-
     $self->clear_queue;
 
 See ["clear\_queue" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#clear\_queue) for full documentation.
-
-## error\_count
 
     $self->error_count;
 
 See ["error\_count" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#error\_count) for full documentation.
 
-## error\_fields
-
     $self->error_fields;
 
 See ["error\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#error\_fields) for full documentation.
-
-## errors
 
     $self->errors;
 
@@ -525,158 +489,100 @@ head2 errors\_to\_string
 See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full
 documentation.
 
-## get\_errors
-
     $self->get_errors;
 
 See ["get\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_errors) for full documentation.
-
-## get\_fields
 
     $self->get_fields;
 
 See ["get\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_fields) for full documentation.
 
-## get\_params
-
     $self->get_params;
 
 See ["get\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_params) for full documentation.
-
-## fields
 
     $self->fields;
 
 See ["fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#fields) for full documentation.
 
-## filtering
-
     $self->filtering;
 
 See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#filtering) for full documentation.
-
-## ignore\_failure
 
     $self->ignore_failure;
 
 See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full
 documentation.
 
-## ignore\_unknown
-
     $self->ignore_unknown;
 
 See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full
 documentation.
 
-## param
-
     $self->param;
 
 See ["param" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#param) for full documentation.
-
-## params
 
     $self->params;
 
 See ["params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#params) for full documentation.
 
-## queue
-
     $self->queue;
 
 See ["queue" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#queue) for full documentation.
-
-## report\_failure
 
     $self->report_failure;
 
 See ["report\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report\_failure) for full
 documentation.
 
-## report\_unknown
-
     $self->report_unknown;
 
 See ["report\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report\_unknown) for full documentation.
-
-## reset\_errors
 
     $self->reset_errors;
 
 See ["reset\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_errors) for full documentation.
 
-## reset\_fields
-
     $self->reset_fields;
 
 See ["reset\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_fields) for full documentation.
-
-## reset\_params
 
     $self->reset_params;
 
 See ["reset\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_params) for full documentation.
 
-## set\_errors
-
     $self->set_errors;
 
 See ["set\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_errors) for full documentation.
-
-## set\_fields
 
     $self->set_fields;
 
 See ["set\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_fields) for full documentation.
 
-## set\_params
-
     $self->set_params;
 
 See ["set\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_params) for full documentation.
-
-## set\_method
 
     $self->set_method;
 
 See ["set\_method" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_method) for full documentation.
 
-## stash
-
     $self->stash;
 
 See ["stash" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#stash) for full documentation.
-
-## validate
 
     $self->validate;
 
 See ["validate" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate) for full documentation.
 
-## validate\_method
-
     $self->validate_method;
 
 See ["validate\_method" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_method) for full documentation.
 
-## validate\_profile
-
     $self->validate_profile;
 
 See ["validate\_profile" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_profile) for full documentation.
-
-# VALIDATE BY PROXY
-
-Validation::Class mostly provides sugar functions for modeling your data
-validation requirements. Each class you create is associated with a \*prototype\*
-class which provides the data validation engine and keeps your class namespace
-free from pollution, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype) for more
-information on specific methods and attributes.
-
-Validation::Class injects a few proxy methods into your class which are
-basically aliases to the corresponding prototype class methods, however it is
-possible to access the prototype directly using the proto/prototype methods.
 
 # EXTENDING VALIDATION::CLASS
 
@@ -729,14 +635,3 @@ me know.
 
     This library is nice for simple use-cases, it has virtually no dependencies
     and solid test coverage.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
