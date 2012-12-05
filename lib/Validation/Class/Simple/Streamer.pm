@@ -238,7 +238,11 @@ sub validate {
 
     my ($self) = @_;
 
-    return $self->{validator}->validate;
+    my $true = $self->{validator}->validate;
+
+    $self->{validator}->clear_queue if $true; # reduces validation overhead
+
+    return $true;
 
 }
 
