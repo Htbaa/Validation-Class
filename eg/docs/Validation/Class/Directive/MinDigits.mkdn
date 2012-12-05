@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directive::MinDigits - MinDigits Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -23,3 +31,14 @@
 Validation::Class::Directive::MinDigits is a core validation class field
 directive that validates the length of numeric characters in the associated
 parameters.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

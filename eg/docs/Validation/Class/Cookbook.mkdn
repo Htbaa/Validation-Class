@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Cookbook - Recipes for Validation::Class
+
+# VERSION
+
+version 7.900003
+
 # BUILDING CLASSES
 
 This recipe displays the usage of keywords to configure a validation class.
@@ -437,3 +445,14 @@ to the following:
 
 If its not obvious yet, we can easily use this generated javascript API with
 jQuery (or other client-side library) to validate form data, etc.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

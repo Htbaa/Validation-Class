@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Whitepaper - Operate with Impunity
+
+# VERSION
+
+version 7.900003
+
 # INTRODUCTION
 
 This whitepaper will serves as a guide to help readers understand the common
@@ -642,3 +650,14 @@ The following [screencast](http://youtu.be/YCPViiB5jv0) and/or
 what [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) is, why it was created, and what it has to offer.
 Please note that this screencast and slideshow was created many moons ago and
 some of its content may be a bit outdated.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directives - Validation::Class Core Directives Registry
+
+# VERSION
+
+version 7.900003
+
 # DESCRIPTION
 
 Validation::Class::Directives provides a collection of installed
@@ -251,3 +259,14 @@ and hold the absolute value of the associated field.
 
 The zipcode directive is provided by [Validation::Class::Directive::Zipcode](http://search.cpan.org/perldoc?Validation::Class::Directive::Zipcode)
 and handles postal-code validation for areas in the USA and North America.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

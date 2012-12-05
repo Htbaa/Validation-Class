@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directive::State - State Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -25,3 +33,14 @@ that handles state validation for states in the USA. States will be validated
 against a list of state (case-insensitive abbreviated and long) names.
 
 For example: ny, NY, New York, and new york will validate.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

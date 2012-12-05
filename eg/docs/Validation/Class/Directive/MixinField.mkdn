@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directive::MixinField - MixinField Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -27,3 +35,14 @@
 Validation::Class::Directive::MixinField is a core validation class field
 directive that determines what fields will be used as templates and merged with
 the associated field.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

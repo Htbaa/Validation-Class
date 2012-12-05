@@ -1,5 +1,24 @@
+# NAME
+
+Validation::Class::Directive::Name - Name Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900003
+
 # DESCRIPTION
 
 Validation::Class::Directive::Name is a core validation class field directive
 that merely holds the name of the associated field. This directive is used
 internally and the value is populated automatically.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Simple::Streamer - Simple Streaming Data Validation
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple::Streamer;
@@ -43,15 +51,23 @@ of the ever-awesome Validation::Class framework, which is designed to be modular
 and extensible, i.e. whatever custom directives you create and install will
 become methods on this class which you can then use to enforce policies.
 
+# METHODS
+
+## check
+
 The check method specifies the parameter to be used in the following series of
 commands.
 
     $self = $self->check('email_address');
 
+## clear
+
 The clear method resets the validation queue and declared fields but leaves the
 declared parameters in-tact, almost like the object state post-instantiation.
 
     $self->clear;
+
+## messages
 
 The messages method returns any registered errors as a concatenated string using
 the ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) method and accepts the same
@@ -59,10 +75,14 @@ parameters.
 
     print $self->messages("\n");
 
+## params
+
 The params method gives you access to the validator's params list which is a
 [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object.
 
     $params = $self->params($parameters);
+
+## validate
 
 The validate method uses the validator to perform data validation based on
 the series and sequence of commands issued previously. This method is called
@@ -70,7 +90,20 @@ implicitly whenever the object is used in boolean context, e.g. in a conditional
 
     $true = $self->validate;
 
+## validator
+
 The validator method gives you access to the object's validation class which is
 a [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) object.
 
     $validator = $self->validator;
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

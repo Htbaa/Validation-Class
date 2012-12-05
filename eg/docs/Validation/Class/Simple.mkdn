@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Simple - Simple Ad-Hoc Data Validation
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -349,3 +357,14 @@ Here are a few examples and explanations of using the validate method:
         # map user and pass parameters to the appropriate fields as aliases
         # and validate login and password fields using the aliases
     }
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

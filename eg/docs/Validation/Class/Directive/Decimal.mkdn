@@ -1,3 +1,11 @@
+# NAME
+
+Validation::Class::Directive::Decimal - Decimal Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900003
+
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -35,3 +43,14 @@ directive that provides validation of floating point integers.
                 decimal => 2 # 2 decimal places
             }
         }
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
