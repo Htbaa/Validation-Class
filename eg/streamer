@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+use Validation::Class::Simple::Streamer;
+use Data::Dumper;
+
+my $param = Validation::Class::Simple::Streamer->new({password => 's3cret'});
+
+$param->check('trim')->filters('trim')->filters(['strip', 'numeric']);
+$param->required(1);
+
+$param->check('password')->min_length(11)->max_length(255);
+$param->check('trim')->multiples(1);
+
+unless ($param->required) {
+    print "attention: $param\n";
+}
