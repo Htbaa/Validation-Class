@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900004  2012-12-09
+
+  - Minor maintenance and POD updates
+
 7.900003  2012-12-05
 
   - Introduced Validation::Class::Simple::Streamer

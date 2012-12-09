@@ -4,7 +4,7 @@ Validation::Class::Cookbook - Recipes for Validation::Class
 
 # VERSION
 
-version 7.900003
+version 7.900004
 
 # BUILDING CLASSES
 
@@ -373,78 +373,112 @@ server for further validation and processing. In the following code we will
 generate javascript objects that match our Validation::Class data models which
 we will then use with some js library to validate form data, etc.
 
-... in bin/generate\_jsapi
+... example validation class
 
-    # usage: ./generate_jsapi > app.api.js
+    package model;
 
-    use MyApp::Rules;
+    use Validation::Class;
 
-    use JSON;
+    mxn scrub => {
+        filters => ['trim', 'strip']
+    };
 
-    my $json      = JSON->new->allow_blessed->convert_blessed->pretty([1]);
-    my $rules     = MyApp::Rules->new;
-    my $namespace = ref $rules;
+    fld login => {
+        mixin    => 'scrub'
+        email    => 1,
+        required => 1,
+        alias    => 'user',
+    };
 
-    my $root = {};
-    my $next = $root;
+    fld password    => {
+        mixin       => 'scrub',
+        required    => 1,
+        alias       => 'pass',
+        min_length  => 5,
+        min_symbols => 1,
+        min_alpha   => 1,
+        min_digits  => 1
+    };
 
-    $next = $next->{$_} = {} for split /::/, $namespace;
+... in your webapp controller
 
-    # introspect the configured fields
-    foreach my $field ($rules->fields->keys) {
+    get '/js/model'   => sub {
 
-        # attributes we want in the js api
-        my $attributes = { map { $_ => $field->{$_} } qw(
-            name label filters required length min_length max_length
-        ) };
+        my $model     = model->new;
+        my $namespace = ref $model;
 
-        # build hash
-        $next->{$field->{name}} = $attributes;
+        my $next = my $root = {};
 
-    }
+        $next = $next->{$_} = {} for split /::/, $namespace;
 
-    # generate the JS object
+        foreach my $field ($model->fields->values) {
 
-    my $objects = $json->encode($root);
+            my $node = $next->{$field->{name}} ||= {};
 
-    chomp $objects;
+            # what to include for https://github.com/jzaefferer/jquery-validation
+            $node->{required}  = $field->{required} ? 1 : 0;
+            $node->{email}     = $field->{email}        if $field->{email};
+            $node->{minlength} = $field->{min_length}   if $field->{min_length};
+            $node->{maxlength} = $field->{max_length}   if $field->{max_length};
 
-    print "\n$objects;\n";
+        }
 
-The output of the following script should generate a file which looks similar
-to the following:
+        # generate the JS object
+        my $json = Mojo::JSON->new;
+        my $data = sprintf "var validate = %s;", $json->encode($root);
 
-    MyApp = {
-        "Rules" : {
+        return print $data;
+
+    };
+
+The output of the /js/model route should generate a javascript object which
+looks similar to the following:
+
+    var validate = {
+        "model" : {
             "email" : {
-               "name" : "email",
-               "filters" : [
-                  "strip",
-                  "trim"
-               ],
-               "min_length" : 3,
-               "length" : null,
+               "minlength" : 3,
                "required" : 1,
-               "label" : null,
-               "max_length" : 255
+               "maxlength" : 255
             },
             "password" : {
-               "name" : "password",
-               "filters" : [
-                  "strip",
-                  "trim"
-               ],
-               "min_length" : 5,
-               "length" : null,
+               "minlength" : 5,
                "required" : 1,
-               "label" : null,
-               "max_length" : 255
+               "maxlength" : 255
             }
         }
     };
 
-If its not obvious yet, we can easily use this generated javascript API with
+If its not obvious yet, we can now easily use this generated javascript API with
 jQuery (or other client-side library) to validate form data, etc.
+
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>AUTH REQUIRED</title>
+            <script type="text/javascript" src="/js/jquery.js"></script>
+            <script type="text/javascript" src="/js/jquery.validate.js"></script>
+            <script type="text/javascript" src="/js/model"></script>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $("#form").validate({rules:validate.models});
+                });
+            </script>
+        </head>
+        <body>
+            <div>[% input.errors_to_string %]</div>
+            <form id="form" autocomplete="off" method="post" action="/">
+            <fieldset>
+                <legend><h2><strong>Halt</strong>, who goes there?</h2></legend>
+                <label for="email">Email</label><br/>
+                <input id="email" name="email" value="" /><br/>
+                <label for="password">Password</label><br/>
+                <input id="password" name="password" type="password" /><br/>
+                <br/><input type="submit" value="Submit" />
+            </fieldset>
+            </form>
+        </body>
+    </html>
 
 # AUTHOR
 

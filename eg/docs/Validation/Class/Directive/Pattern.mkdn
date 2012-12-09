@@ -4,7 +4,7 @@ Validation::Class::Directive::Pattern - Pattern Directive for Validation Class F
 
 # VERSION
 
-version 7.900003
+version 7.900004
 
 # SYNOPSIS
 

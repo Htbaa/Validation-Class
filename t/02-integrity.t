@@ -11,7 +11,9 @@ SKIP: {
         require 'Perl/Critic.pm';
     };
 
-    plan skip_all => 'Perl::Critic is not installed.' if $@;
+    plan skip_all => 'Perl::Critic is not installed.'
+        if $@ || ! $ENV{'DEVELOPMENT_TESTS'}
+    ;
 
     my $lib     = $FindBin::RealBin . "/../lib/";
     my @profile = qw(
