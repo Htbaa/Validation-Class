@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900005  2012-12-10
+
+  - Fixed quirk with keys/values functions in V::C::Mapping breaking tests
+
 7.900004  2012-12-09
 
   - Minor maintenance and POD updates

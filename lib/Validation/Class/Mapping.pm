@@ -272,7 +272,7 @@ sub keys {
 
     my ($self) = @_;
 
-    return (keys($self->hash));
+    return (keys(%{$self->hash}));
 
 }
 
@@ -428,7 +428,7 @@ sub values {
 
     my ($self) = @_;
 
-    return (values($self->hash));
+    return (values(%{$self->hash}));
 
 }
 
