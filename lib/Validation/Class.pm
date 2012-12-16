@@ -221,11 +221,11 @@ sub initialize_validator {
 
     my $input = Validation::Class::Simple::Streamer->new($params);
 
-    $input->check('username')->min_length(5);
-    $input->check('password')->min_length(5)->min_symbols(1);
-    $input->check($_)->required->max_length(255)->filters([qw/trim strip/])
+    $input->check($_)->required->length('5-255')->filters([qw/trim strip/])
         for qw/username password/
     ;
+
+    $input->check('password')->min_symbols(1);
 
     unless ($input) {
         # handle the failures
