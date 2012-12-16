@@ -10,6 +10,7 @@ use Module::Find;
 use Validation::Class::Util '!has';
 use Module::Runtime 'use_module';
 use Hash::Merge 'merge';
+use Clone 'clone';
 use Exporter ();
 
 use Validation::Class::Prototype;
@@ -169,7 +170,7 @@ sub initialize_validator {
 
     if (defined($arguments->{params})) {
         my $params = delete $arguments->{params};
-        $proto->params->clear->add($params);
+        $proto->params->clear->add(clone $params);
     }
 
     # process attribute assignments
@@ -216,6 +217,42 @@ sub initialize_validator {
 
 =head1 SYNOPSIS
 
+    use Validation::Class::Simple::Streamer;
+
+    my $rules = Validation::Class::Simple::Streamer->new($input);
+
+    $rules->check('login')->min_length(5);
+    $rules->check('password')->min_length(5)->min_symbols(1);
+
+    unless ($rules) {
+        # handle the failures
+    }
+
+=head1 DESCRIPTION
+
+Validation::Class is a scalable data validation library with interfaces for
+applications of all sizes. L<Validation::Class::Simple::Streamer> is a great way
+to leverage this library for ad-hoc use-cases, L<Validation::Class::Simple>
+is very well suited for applications of moderate sophistication where it makes
+sense to pre-declared validation rules, and Validation::Class is designed to
+transform class namespaces into data validation domains where consistency and
+reuse are primary concerns.
+
+Validation::Class provides an extensible framework for defining reusable data
+validation rules. It ships with a complete set of pre-defined validations and
+filters referred to as <Validation::Class::Directives/DIRECTIVES|"directives">.
+
+The core feature-set consist of self-validating methods, validation profiles,
+reusable validation rules and templates, pre and post input filtering, class
+inheritance, automatic array handling, and extensibility (e.g. overriding
+default error messages, creating custom validators, creating custom input
+filters and much more).
+
+Validation::Class promotes DRY (don't repeat yourself) code. The main benefit in
+using Validation::Class is that the architecture is designed to increase the
+consistency of data input handling. The following is a more traditional usage
+of Validation::Class:
+
     package MyApp::Person;
 
     use Validation::Class;
@@ -249,30 +286,6 @@ sub initialize_validator {
     }
 
     1;
-
-=head1 DESCRIPTION
-
-Validation::Class is a scalable data validation library with interfaces for
-applications of all sizes. L<Validation::Class::Simple::Streamer> is a great way
-to leverage this library for ad-hoc use-cases, L<Validation::Class::Simple>
-is very well suited for applications of moderate sophistication where it makes
-sense to pre-declared validation rules, and Validation::Class is designed to
-transform class namespaces into data validation domains where consistency and
-reuse are primary concerns.
-
-Validation::Class provides an extensible framework for defining reusable data
-validation rules. It ships with a complete set of pre-defined validations and
-filters referred to as <Validation::Class::Directives/DIRECTIVES|"directives">.
-
-The core feature-set consist of self-validating methods, validation profiles,
-reusable validation rules and templates, pre and post input filtering, class
-inheritance, automatic array handling, and extensibility (e.g. overriding
-default error messages, creating custom validators, creating custom input
-filters and much more).
-
-Validation::Class promote DRY (don't repeat yourself) code. The main benefit in
-using Validation::Class is that the architecture is designed to increase the
-consistency of data input handling.
 
 =head1 QUICKSTART
 

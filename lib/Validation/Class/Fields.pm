@@ -54,14 +54,4 @@ sub add {
 
 }
 
-sub flatten {
-
-    my ($self) = @_;
-
-    return Validation::Class::Mapping->new(
-        Hash::Flatten::flatten($self->hash)
-    );
-
-}
-
 1;

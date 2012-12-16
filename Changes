@@ -1,8 +1,18 @@
 Revision history for the Perl library Validation::Class
 
-7.900006  2012-12-11
+7.900006  2012-12-16
 
   - Fixed missing version numbers
+
+  - Updated main module POD (more directional)
+
+  - Incoming parameters (via params argument) are always cloned
+
+  - Added prototype utility functions for un/flattening parameters
+
+  - Removed unnecessary flattening function from V::C::Fields
+
+  - Fixed 03-streaming test (me thinks)
 
 7.900005  2012-12-10
 

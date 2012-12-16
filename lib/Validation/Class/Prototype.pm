@@ -875,6 +875,22 @@ sub errors_to_string {
 
 }
 
+sub flatten_params {
+
+    my ($self, $hash) = @_;
+
+    if ($hash) {
+
+        $hash = Hash::Flatten::flatten($hash);
+
+        $self->params->add($hash);
+
+    }
+
+    return $self->params->flatten->hash || {};
+
+}
+
 =method get_errors
 
 The get_errors method returns a list of combined class-and-field-level errors.
@@ -2286,11 +2302,9 @@ sub trigger_event {
 
 sub unflatten_params {
 
-    my ($self, $hash) = @_;
+    my ($self) = @_;
 
-    $hash ||= $self->params->hash;
-
-    return unflatten($hash) || {};
+    return $self->params->unflatten->hash || {};
 
 }
 
