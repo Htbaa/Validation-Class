@@ -4,7 +4,7 @@ Validation::Class::Directive::Default - Default Directive for Validation Class F
 
 # VERSION
 
-version 7.900006
+version 7.900007
 
 # SYNOPSIS
 

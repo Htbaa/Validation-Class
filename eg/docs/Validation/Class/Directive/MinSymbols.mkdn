@@ -4,7 +4,7 @@ Validation::Class::Directive::MinSymbols - MinSymbols Directive for Validation C
 
 # VERSION
 
-version 7.900006
+version 7.900007
 
 # SYNOPSIS
 

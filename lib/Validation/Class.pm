@@ -224,6 +224,11 @@ sub initialize_validator {
     $rules->check('login')->min_length(5);
     $rules->check('password')->min_length(5)->min_symbols(1);
 
+    $rules->check($_)
+        ->required->max_length(255)->filters([qw/trim strip/])
+        for qw/login password/
+    ;
+
     unless ($rules) {
         # handle the failures
     }
@@ -240,7 +245,7 @@ reuse are primary concerns.
 
 Validation::Class provides an extensible framework for defining reusable data
 validation rules. It ships with a complete set of pre-defined validations and
-filters referred to as <Validation::Class::Directives/DIRECTIVES|"directives">.
+filters referred to as L<Validation::Class::Directives/DIRECTIVES|"directives">.
 
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
