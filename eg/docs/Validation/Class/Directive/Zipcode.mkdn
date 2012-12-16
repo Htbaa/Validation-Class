@@ -4,7 +4,7 @@ Validation::Class::Directive::Zipcode - Zipcode Directive for Validation Class F
 
 # VERSION
 
-version 7.900008
+version 7.900009
 
 # SYNOPSIS
 
