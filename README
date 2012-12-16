@@ -2,22 +2,21 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900007
+    version 7.900008
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
 
-        my $rules = Validation::Class::Simple::Streamer->new($input);
+        my $input = Validation::Class::Simple::Streamer->new($params);
 
-        $rules->check('login')->min_length(5);
-        $rules->check('password')->min_length(5)->min_symbols(1);
+        $input->check('login')->min_length(5);
+        $input->check('password')->min_length(5)->min_symbols(1);
 
-        $rules->check($_)
-            ->required->max_length(255)->filters([qw/trim strip/])
+        $input->check($_)->required->max_length(255)->filters([qw/trim strip/])
             for qw/login password/
         ;
 
-        unless ($rules) {
+        unless ($input) {
             # handle the failures
         }
 
@@ -33,8 +32,7 @@ DESCRIPTION
 
     Validation::Class provides an extensible framework for defining reusable
     data validation rules. It ships with a complete set of pre-defined
-    validations and filters referred to as
-    Validation::Class::Directives/DIRECTIVES.
+    validations and filters referred to as "directives".
 
     The core feature-set consist of self-validating methods, validation
     profiles, reusable validation rules and templates, pre and post input
@@ -205,9 +203,8 @@ KEYWORDS
         };
 
     The field keyword takes two arguments, the field name and a hashref of
-    key/values pairs known as directives. For more information on the list
-    of core directives that can be used, please see
-    Validation::Class::Directives.
+    key/values pairs known as directives. For more information on
+    pre-defined directives, please review the "list of core directives".
 
     The field keyword also creates accessors which provide easy access to
     the field's corresponding parameter value(s). Accessors will be created

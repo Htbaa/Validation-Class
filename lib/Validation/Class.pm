@@ -219,17 +219,16 @@ sub initialize_validator {
 
     use Validation::Class::Simple::Streamer;
 
-    my $rules = Validation::Class::Simple::Streamer->new($input);
+    my $input = Validation::Class::Simple::Streamer->new($params);
 
-    $rules->check('login')->min_length(5);
-    $rules->check('password')->min_length(5)->min_symbols(1);
+    $input->check('login')->min_length(5);
+    $input->check('password')->min_length(5)->min_symbols(1);
 
-    $rules->check($_)
-        ->required->max_length(255)->filters([qw/trim strip/])
+    $input->check($_)->required->max_length(255)->filters([qw/trim strip/])
         for qw/login password/
     ;
 
-    unless ($rules) {
+    unless ($input) {
         # handle the failures
     }
 
@@ -245,7 +244,7 @@ reuse are primary concerns.
 
 Validation::Class provides an extensible framework for defining reusable data
 validation rules. It ships with a complete set of pre-defined validations and
-filters referred to as L<Validation::Class::Directives/DIRECTIVES|"directives">.
+filters referred to as L<"directives"|Validation::Class::Directives/DIRECTIVES>.
 
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
@@ -487,9 +486,9 @@ expected to be passed to your validation class or validated against.
         max_length => 255
     };
 
-The field keyword takes two arguments, the field name and a hashref of
-key/values pairs known as directives. For more information on the list of core
-directives that can be used, please see L<Validation::Class::Directives>.
+The field keyword takes two arguments, the field name and a hashref of key/values
+pairs known as directives. For more information on pre-defined directives, please
+review the L<"list of core directives"|Validation::Class::Directives/DIRECTIVES>.
 
 The field keyword also creates accessors which provide easy access to the
 field's corresponding parameter value(s). Accessors will be created using the
