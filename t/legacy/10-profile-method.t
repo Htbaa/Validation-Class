@@ -7,28 +7,35 @@ BEGIN {
 
 use utf8;
 use Test::More;
+use Data::Dumper;
 
 {
-
-    # testing the profile method
-    # this method is designed to ....
 
     package MyApp;
 
     use Validation::Class;
 
     fld name => {
-
         required => 1
+    };
 
+    pro is_name_ok => sub {
+        return shift->validate('name')
     };
 
     package main;
 
     my $class = "MyApp";
-    my $self = $class->new(name => "...");
+    my $self = $class->new(name => 'Rob Blahblah');
 
     ok $class eq ref $self, "$class instantiated";
+    ok $self->validate_profile('is_name_ok'), 'is_name_ok profile returned true';
+
+    $self->name(undef);
+
+    #die Data::Dumper::Dumper($self->params);
+
+    ok !$self->validate_profile('is_name_ok'), 'is_name_ok profile returned false';
 
 }
 

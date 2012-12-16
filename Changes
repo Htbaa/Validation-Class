@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900009  2012-12-16
+
+  - Fixed setting param as undefined via the acccessor
+
+  - Method input/output specification accepts other method names also
+
+  - Method `using` specification will fallback to _method_name if missing
+
 7.900006  2012-12-16
 
   - Fixed missing version numbers

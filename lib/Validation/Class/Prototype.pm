@@ -1617,27 +1617,23 @@ sub register_field {
 
     $self->configuration->fields->add($name, $data);
 
-    my $subname = $name;
+    my $method_name = $name;
 
-    $subname =~ s/\W/_/g;
+    $method_name =~ s/\W/_/g;
 
-    my $routine = sub {
+    my $method_routine = sub {
 
-        my ($self, $data) = @_;
+        my $self = shift @_;
 
         my $proto  = $self->proto;
 
-        if (defined $data) {
-
-            $proto->params->add($name, $data);
-
-        }
+        $proto->params->add($name, $_[0]) if @_ == 1;
 
         return $proto->params->get($name);
 
     };
 
-    $self->set_method($subname, $routine);
+    $self->set_method($method_name, $method_routine);
 
     return $self;
 
@@ -1669,18 +1665,24 @@ sub register_method {
 
     my $package = $self->package;
 
-    confess "Error creating method $name on $package: collides with attribute $name"
-        if $self->attributes->has($name);
+    confess
+        "Error creating method $name on $package: collides with attribute $name"
+        if $self->attributes->has($name)
+    ;
 
-    confess "Error creating method $name on $package: collides with method $name"
-        if $package->can($name);
+    confess
+        "Error creating method $name on $package: collides with method $name"
+        if $package->can($name)
+    ;
 
-    # create method
-
-    confess "Error creating method $name, requires 'input' and 'using' options"
-        unless $data->{input} && $data->{using};
+    confess
+        "Error creating method $name, requires 'input' and 'using' options"
+        unless $data->{input} && ($data->{using} || $package->can("_$name"))
+    ;
 
     $self->configuration->methods->add($name, $data);
+
+    # create method
 
     no strict 'refs';
 
@@ -1692,29 +1694,37 @@ sub register_method {
         my $validator;
 
         my $input  = $data->{'input'};
-        my $using  = $data->{'using'};
         my $output = $data->{'output'};
+        my $using  = $data->{'using'} || $self->can("_$name");
 
         if ($input) {
 
-            $validator = "ARRAY" eq ref $input ?
+            if (isa_arrayref($input)) {
+                $validator = sub {$self->validate(@{$input})};
+            }
 
-                # validate fields
-                sub { $self->validate(@{$input}) } :
+            elsif ($self->proto->profiles->get($input)) {
+                $validator = sub {$self->validate_profile($input, @args)};
+            }
 
-                # validate profile
-                sub { $self->validate_profile($input, @args) } ;
+            elsif ($self->proto->methods->get($input)) {
+                $validator = sub {$self->validate_method($input, @args)};
+            }
+
+            else {
+                confess "Method $name has an invalid input specification";
+            }
 
         }
 
         if ($using) {
 
-            if ("CODE" eq ref $using) {
+            if (isa_coderef($using)) {
 
                 my $error = "Method $name failed to validate";
 
                 # run input validation
-                if ("CODE" eq ref $validator) {
+                if (isa_coderef($validator)) {
 
                     unless ($validator->(@args)) {
 
@@ -1731,21 +1741,30 @@ sub register_method {
                 }
 
                 # execute routine
-                my $return = $data->{using}->($self, @args);
+                my $return = $using->($self, @args);
 
                 # run output validation
                 if ($output) {
 
-                    $validator = "ARRAY" eq ref $output ?
+                    if (isa_arrayref($output)) {
+                        $validator = sub {$self->validate(@{$output})};
+                    }
 
-                        # validate fields
-                        sub { $self->validate(@{$output}) } :
+                    elsif ($self->proto->profiles->get($output)) {
+                        $validator = sub {$self->validate_profile($output, @args)};
+                    }
 
-                        # validate profile
-                        sub { $self->validate_profile($output, @args) } ;
+                    elsif ($self->proto->methods->get($output)) {
+                        $validator = sub {$self->validate_method($output, @args)};
+                    }
+
+                    else {
+                        confess "Method $name has an invalid output specification";
+                    }
 
                     confess $error. " output, ". $self->errors_to_string
-                        unless $validator->(@args);
+                        unless $validator->(@args)
+                    ;
 
                 }
 
@@ -1755,7 +1774,7 @@ sub register_method {
 
             else {
 
-                confess "Error executing $name, no associated coderef";
+                confess "Error executing $name, no associated method or coderef";
 
             }
 
