@@ -6,9 +6,9 @@ use utf8;
 use strict;
 use warnings;
 
-use_ok 'Validation::Class::Simple::Streamer';
-
 {
+
+    use_ok 'Validation::Class::Simple::Streamer';
 
     # passable
 
@@ -61,6 +61,5 @@ use_ok 'Validation::Class::Simple::Streamer';
     ok $p1->validate, "all email addresses valid";
 
 }
-
 
 done_testing;

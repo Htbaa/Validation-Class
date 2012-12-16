@@ -11,7 +11,8 @@ SKIP: {
         require 'Perl/Critic.pm';
     };
 
-    plan skip_all => 'Perl::Critic is not installed.'
+    plan skip_all =>
+        'Perl::Critic is not installed and/or DEVELOPMENT_TESTS is not set.'
         if $@ || ! $ENV{'DEVELOPMENT_TESTS'}
     ;
 

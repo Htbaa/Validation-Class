@@ -220,29 +220,30 @@ sub initialize_validator {
 
     use Validation::Class;
 
-    # a data validation template
+    # data validation template
     mixin basic     => {
         required    => 1,
         max_length  => 255,
         filters     => [qw/trim strip/]
     };
 
-    # data validation rules for the login parameter
+    # data validation rule for the login parameter
     field login     => {
         mixin       => 'basic',
         min_length  => 5
     };
 
-    # data validation rules for the password parameter
+    # data validation rule for the password parameter
     field password  => {
         mixin       => 'basic',
         min_length  => 5,
         min_symbols => 1
     };
 
-    # ... elsewhere in your application
+    # elsewhere in your application
     my $person = MyApp::Person->new(login => 'admin', password => 'secr3t');
 
+    # validate rules on the person object
     unless ($person->validates) {
         # handle the failures
     }
@@ -251,13 +252,27 @@ sub initialize_validator {
 
 =head1 DESCRIPTION
 
-Validation::Class is a robust data validation framework which aims provide an
-extensible framework for developing clean yet sophisticated data validation
-objects. The core feature-set consist of self-validating methods, validation
-profiles, reusable validation rules and templates, pre and post input filtering,
-class inheritance, automatic array handling, and extensibility (e.g. overriding
+Validation::Class is a scalable data validation library with interfaces for
+applications of all sizes. L<Validation::Class::Simple::Streamer> is a great way
+to leverage this library for ad-hoc use-cases, L<Validation::Class::Simple>
+is very well suited for applications of moderate sophistication where it makes
+sense to pre-declared validation rules, and Validation::Class is designed to
+transform class namespaces into data validation domains where consistency and
+reuse are primary concerns.
+
+Validation::Class provides an extensible framework for defining reusable data
+validation rules. It ships with a complete set of pre-defined validations and
+filters referred to as <Validation::Class::Directives/DIRECTIVES|"directives">.
+
+The core feature-set consist of self-validating methods, validation profiles,
+reusable validation rules and templates, pre and post input filtering, class
+inheritance, automatic array handling, and extensibility (e.g. overriding
 default error messages, creating custom validators, creating custom input
 filters and much more).
+
+Validation::Class promote DRY (don't repeat yourself) code. The main benefit in
+using Validation::Class is that the architecture is designed to increase the
+consistency of data input handling.
 
 =head1 QUICKSTART
 
@@ -366,9 +381,10 @@ sub bld { goto &build } sub build {
 =keyword directive
 
 The directive keyword (or dir) registers custom validator directives to be used
-in your field definitions. It is a means of extending the core field directives
-before instantiation. Please see L<Validation::Class::Directive> for insight into
-creating your own installable directives.
+in your field definitions. This is a means of extending the list of directives
+per instance. See the list of core directives, L<Validation::Class::Directives>,
+or review L<Validation::Class::Directive> for insight into creating your own
+CPAN installable directives.
 
     package MyApp::Directives;
 
@@ -441,7 +457,7 @@ sub dir { goto &directive } sub directive {
 
 The field keyword (or fld) registers a data validation rule for reuse and
 validation in code. The field name should correspond with the parameter name
-expected to be passed to your validation class.
+expected to be passed to your validation class or validated against.
 
     package MyApp::Person;
 
@@ -454,15 +470,15 @@ expected to be passed to your validation class.
     };
 
 The field keyword takes two arguments, the field name and a hashref of
-key/values pairs known as directives.
+key/values pairs known as directives. For more information on the list of core
+directives that can be used, please see L<Validation::Class::Directives>.
 
 The field keyword also creates accessors which provide easy access to the
 field's corresponding parameter value(s). Accessors will be created using the
 field's name as a label having any special characters replaced with an
 underscore.
 
-    # accessor will be created as send_reminders
-    field 'send-reminders' => {
+    field 'send-reminders' => { # accessor will be created as send_reminders
         length   => 1
     };
 
@@ -496,7 +512,7 @@ sub fld { goto &field } sub field {
 
 The filter keyword (or flt) registers custom filters to be used in your field
 definitions. It is a means of extending the pre-existing filters declared by
-the L<Validation::Class::Directive::Filters|"filters directive"> before
+the L<"filters directive"|Validation::Class::Directive::Filters> before
 instantiation.
 
     package MyApp::Directives;
@@ -686,7 +702,7 @@ sub set { goto &load } sub load {
 
 The message keyword (or msg) registers a class-level error message template that
 will be used in place of the error message defined in the corresponding directive
-class if defined. Error messages can also be overriden at the individual
+class if defined. Error messages can also be overridden at the individual
 field-level as well. See the L<Validation::Class::Directive::Messages> for
 instructions on how to override error messages at the field-level.
 
@@ -998,7 +1014,7 @@ sub proto { goto &prototype } sub prototype {
 
 }
 
-=head1 VALIDATE BY PROXY
+=head1 PROXY METHODS
 
 Validation::Class mostly provides sugar functions for modeling your data
 validation requirements. Each class you create is associated with a *prototype*
@@ -1188,7 +1204,7 @@ See L<Validation::Class::Prototype/validate_method> for full documentation.
 
 See L<Validation::Class::Prototype/validate_profile> for full documentation.
 
-=head1 EXTENDING VALIDATION::CLASS
+=head1 EXTENSIBILITY
 
 Validation::Class does NOT provide method modifiers but can be easily extended
 with L<Class::Method::Modifiers>.
@@ -1224,10 +1240,14 @@ B<If you have simple data validation needs, please review:>
 
 =back
 
-Additionally you may want to look elsewhere for your data validation needs so
-the following is a list of other validation libraries/frameworks you might be
-interested in. If I've missed a really cool new validation library please let
-me know.
+Validation::Class validates strings, not structures. If you need a means for
+validating object types you should be using a modern object system like L<Mo>,
+L<Moo>, L<Mouse>, or L<Moose>. Alternatively you could use L<Params::Validate>.
+
+In the event that you would like to look elsewhere for your data validation
+needs, the following is a list of other validation libraries/frameworks you
+might be interested in. If I've missed a really cool new validation library
+please let me know.
 
 =over
 

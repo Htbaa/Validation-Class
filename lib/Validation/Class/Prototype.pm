@@ -1587,7 +1587,7 @@ sub register_field {
 
     my $package = $self->package;
 
-    confess "Error creating field $name, name is using unconventional naming"
+    confess "Error creating field $name, name is not properly formatted"
         unless $name =~ /^[a-zA-Z_](([\w\.]+)?\w)$/
         xor    $name =~ /^[a-zA-Z_](([\w\.]+)?\w)\:\d+$/;
 
