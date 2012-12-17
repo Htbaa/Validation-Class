@@ -244,17 +244,14 @@ reuse are primary concerns.
 Validation::Class provides an extensible framework for defining reusable data
 validation rules. It ships with a complete set of pre-defined validations and
 filters referred to as L<"directives"|Validation::Class::Directives/DIRECTIVES>.
-
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
 inheritance, automatic array handling, and extensibility (e.g. overriding
 default error messages, creating custom validators, creating custom input
-filters and much more).
-
-Validation::Class promotes DRY (don't repeat yourself) code. The main benefit in
-using Validation::Class is that the architecture is designed to increase the
-consistency of data input handling. The following is a more traditional usage
-of Validation::Class:
+filters and much more). Validation::Class promotes DRY (don't repeat yourself)
+code. The main benefit in using Validation::Class is that the architecture is
+designed to increase the consistency of data input handling. The following is
+a more traditional usage of Validation::Class:
 
     package MyApp::Person;
 
