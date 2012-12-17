@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "utf8" => 0
   },
-  "VERSION" => "7.900009",
+  "VERSION" => "7.900010",
   "test" => {
     "TESTS" => "t/*.t t/legacy/*.t t/legacy/regression/*.t t/legacy/regression/filters/*.t t/legacy/regression/validators/*.t"
   }
