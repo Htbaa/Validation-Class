@@ -275,12 +275,12 @@ sub AUTOLOAD {
 
     }
 
-    exit carp sprintf q(Can't locate object method "%s" via package "%s"),
+    croak sprintf q(Can't locate object method "%s" via package "%s"),
         $routine, ((ref $_[0] || $_[0]) || 'main')
     ;
 
 }
 
-sub DESTROY;
+sub DESTROY {}
 
 1;

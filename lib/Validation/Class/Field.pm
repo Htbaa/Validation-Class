@@ -24,6 +24,7 @@ my $directives = Validation::Class::Directives->new;
 foreach my $directive ($directives->values) {
 
     # create accessors from default configuration (once)
+    # ugly hack but it works so it stay .. for now
 
     if ($directive->field) {
 

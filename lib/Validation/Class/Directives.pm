@@ -306,7 +306,7 @@ sub add {
             # is it a directive sub-class
             elsif (isa_classref($value)) {
                 if ($value->isa("Validation::Class::Directive")) {
-                    $self->{$key} = $value;
+                    $self->{$value->name} = $value;
                 }
             }
             # is it a hashref
