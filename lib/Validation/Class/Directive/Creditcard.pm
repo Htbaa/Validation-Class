@@ -89,7 +89,7 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{creditcard}) {
+    if (defined $field->{creditcard} && defined $param) {
 
         my $ccre = {
             'amex'       => qr/^3[4|7]\d{13}$/,
@@ -111,7 +111,7 @@ sub validate {
 
         my $type = $field->{creditcard};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $is_valid = 0;
 

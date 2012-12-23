@@ -47,9 +47,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{hostname}) {
+    if (defined $field->{hostname} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $hnre = qr/^(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)$/;
 

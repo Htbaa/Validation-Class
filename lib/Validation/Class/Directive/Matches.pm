@@ -64,11 +64,11 @@ sub validate {
 
     my ($proto, $field, $param) = @_;
 
-    if (defined $field->{matches}) {
+    if (defined $field->{matches} && defined $param) {
 
         my $specification = $field->{matches};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $dependents = isa_arrayref($specification) ?
                 $specification : [$specification]

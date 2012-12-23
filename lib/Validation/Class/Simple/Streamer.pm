@@ -44,8 +44,8 @@ use Validation::Class::Util;
         # access to explicit content approved
     }
 
-    # print any errors
-    print "$params\n";
+    # print errors if any
+    print "$params\n" unless $params->validate;
 
     # validate like a boss
     # THE END

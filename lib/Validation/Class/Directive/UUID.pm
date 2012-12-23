@@ -47,9 +47,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{uuid}) {
+    if (defined $field->{uuid} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $ure = qr/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 

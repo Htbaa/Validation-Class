@@ -48,9 +48,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{email}) {
+    if (defined $field->{email} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $ere = qr/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)$/;
 

@@ -47,9 +47,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{ssn}) {
+    if (defined $field->{ssn} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $ssnre = qr/\A\b(?!000)[0-9]{3}-[0-9]{2}-[0-9]{4}\b\z/i;
             $self->error($proto, $field) unless $param =~ $ssnre;

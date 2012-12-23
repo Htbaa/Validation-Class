@@ -49,9 +49,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{time}) {
+    if (defined $field->{time} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             # determines if the param is a valid time
             # validates time as 24hr (HH:MM) or am/pm ([H]H:MM[a|p]m)

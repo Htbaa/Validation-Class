@@ -66,11 +66,11 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{pattern}) {
+    if (defined $field->{pattern} && defined $param) {
 
         my $pattern = $field->{pattern};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             unless ( isa_regexp($pattern) ) {
 

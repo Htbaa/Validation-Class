@@ -47,9 +47,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{zipcode}) {
+    if (defined $field->{zipcode} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $zcre = qr/\A\b[0-9]{5}(?:-[0-9]{4})?\b\z/i;
             $self->error($proto, $field) unless $param =~ $zcre;

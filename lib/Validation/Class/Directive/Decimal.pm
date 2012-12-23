@@ -67,7 +67,7 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{decimal}) {
+    if (defined $field->{decimal} && defined $param) {
 
     # checks for a valid decimal. Both the sign and exponent are optional
 
@@ -75,7 +75,7 @@ sub validate {
     # 1 => Any number of decimal places greater than 0, or a float|double
     # 2 => Exactly that many number of decimal places
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $type = $field->{decimal};
 

@@ -16999,9 +16999,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{city}) {
+    if (defined $field->{city} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $cre = $self->regexp;
             $self->error($proto, $field) unless $param =~ /$cre/i;

@@ -75,7 +75,7 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{date}) {
+    if (defined $field->{date} && defined $param) {
 
         my $dtre = {
             # options:
@@ -97,7 +97,7 @@ sub validate {
 
         my $type = $field->{date};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $is_valid = 0;
 

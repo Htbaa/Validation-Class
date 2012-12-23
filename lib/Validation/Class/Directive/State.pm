@@ -109,9 +109,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{state}) {
+    if (defined $field->{state} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $type = $field->{state};
             my $lre  = $self->regexp;
