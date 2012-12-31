@@ -7,22 +7,42 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            password => {
+                min_alpha => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::MinAlpha is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::MinAlpha is a core validation class field
+directive that validates the length of alphabetic characters in the associated
+parameters.
 
 =cut
 
 has 'mixin'     => 1;
 has 'field'     => 1;
 has 'multi'     => 0;
-has 'message'   => '%s must contain %s or more alphabetic characters';
+has 'message'   => '%s must not contain less than %s alphabetic characters';
 
 sub validate {
 

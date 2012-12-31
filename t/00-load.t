@@ -1,13 +1,15 @@
-BEGIN {
+use FindBin;
+use Test::More;
+use utf8;
+use strict;
+use warnings;
 
-    use FindBin;
-    use lib $FindBin::Bin . "/myapp/lib";
+{
+
+    use_ok 'Validation::Class';
+    use_ok 'Validation::Class::Prototype';
 
 }
-
-use Test::More;
-use Validation::Class            ();
-use Validation::Class::Prototype ();
 
 {
 
@@ -236,6 +238,11 @@ use Validation::Class::Prototype ();
 
     sub validate         {'noop'}
     sub validate_profile {'noop'}
+    sub validate_method  {'noop'}
+
+    sub validates         {'noop'}
+    sub profile_validates {'noop'}
+    sub method_validates  {'noop'}
 
     package main;
 

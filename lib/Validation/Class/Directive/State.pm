@@ -7,15 +7,37 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            address_state => {
+                state => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::State is a core validation class
-field directive that provides the ability to do some really cool stuff only we
-haven't documented it just yet.
+Validation::Class::Directive::State is a core validation class field directive
+that handles state validation for states in the USA. States will be validated
+against a list of state (case-insensitive abbreviated and long) names.
+
+For example: ny, NY, New York, and new york will validate.
 
 =cut
 
@@ -87,16 +109,16 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{state}) {
+    if (defined $field->{state} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $type = $field->{state};
             my $lre  = $self->regexp;
 
             my $sre = {
-                'abbr' => qr/^(?-i:A[LKSZRAEP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$/,
-                'long' => qr/$lre/,
+                'abbr' => qr/^(A[LKSZRAEP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$/i,
+                'long' => qr/$lre/i,
             };
 
             my $is_valid = 0;

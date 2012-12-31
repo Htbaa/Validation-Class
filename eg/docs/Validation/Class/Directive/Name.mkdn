@@ -4,13 +4,13 @@ Validation::Class::Directive::Name - Name Directive for Validation Class Field D
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # DESCRIPTION
 
 Validation::Class::Directive::Name is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that merely holds the name of the associated field. This directive is used
+internally and the value is populated automatically.
 
 # AUTHOR
 

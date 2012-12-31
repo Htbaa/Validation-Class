@@ -8,15 +8,35 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            address_city  => {
+                city => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::City is a core validation class
-field directive that provides the ability to do some really cool stuff only we
-haven't documented it just yet.
+Validation::Class::Directive::Between is a core validation class field directive
+that provides the ability to perform city/area validations for cities in the USA.
+Cities will be validated without regard for case.
 
 =cut
 
@@ -16979,9 +16999,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{city}) {
+    if (defined $field->{city} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $cre = $self->regexp;
             $self->error($proto, $field) unless $param =~ /$cre/i;

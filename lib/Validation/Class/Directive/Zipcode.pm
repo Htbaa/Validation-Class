@@ -7,15 +7,34 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
+
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            address_zipcode => {
+                zipcode => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Zipcode is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that handles postal-code validation for areas in the USA and North America.
 
 =cut
 
@@ -28,9 +47,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{zipcode}) {
+    if (defined $field->{zipcode} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $zcre = qr/\A\b[0-9]{5}(?:-[0-9]{4})?\b\z/i;
             $self->error($proto, $field) unless $param =~ $zcre;

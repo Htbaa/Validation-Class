@@ -4,22 +4,14 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900000
-
-# SYNOPSIS
-
-    package MyValidator;
-
-    use Validation::Class::Exporter;
-
-    Validation::Class::Exporter->apply_spec;
-
-    # extend Validation::Class and use in your codebase as the validation engine
+version 7.900010
 
 # DESCRIPTION
 
 Validation::Class::Prototype is the validation engine used by proxy via
 [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) whose methods are aliases to the methods defined here.
+Please see [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) for a quick introduction on how to get
+started.
 
 # ATTRIBUTES
 
@@ -436,16 +428,15 @@ class. Note: This functionality is still experimental.
 
     use Validation::Class;
 
-    load plugin => ['TelephoneFormat'];
+    set plugin => 'telephone_format';
 
     package main;
 
     my $input = Class->new(params => $params);
 
-    # get object for Validation::Class::Plugin::TelephoneFormat;
-    # see Class::Forward for namespace naming conventions
-
     # currently the plugin method will always return the same object instance
+    # ... for Validation::Class::Plugin::TelephoneFormat;
+
     my $formatter = $input->plugin('telephone_format');
 
 ## queue
@@ -635,9 +626,9 @@ to use the methods input specification as a validation profile.
 
 ## validate\_profile
 
-The validate\_profile method executes a stored validation profile, it requires a
-profile name and can be passed additional parameters which get forwarded into the
-profile routine in the order received.
+The validate\_profile method (or profile\_validates) executes a stored validation
+profile, it requires a profile name and can be passed additional parameters
+which get forwarded into the profile routine in the order received.
 
     unless ($self->validate_profile('password_change')) {
 

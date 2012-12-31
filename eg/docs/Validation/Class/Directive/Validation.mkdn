@@ -4,13 +4,38 @@ Validation::Class::Directive::Validation - Validation Directive for Validation C
 
 # VERSION
 
-version 7.900000
+version 7.900010
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            example_data => {
+                validation => sub {
+
+                    my ($self, $proto, $field, $params) = @_;
+                    # user-defined validation should return true/false
+
+                }
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 # DESCRIPTION
 
-Validation::Class::Directive::Validation is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Validation is a core validation class field
+directive that is used to execute user-defined validation routines. This
+directive always takes a sub-routine and should return true or false.
 
 # AUTHOR
 

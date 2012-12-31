@@ -4,13 +4,12 @@ Validation::Class::Directive::Value - Value Directive for Validation Class Field
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # DESCRIPTION
 
 Validation::Class::Directive::Value is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that holds the absolute value of the associated field.
 
 # AUTHOR
 

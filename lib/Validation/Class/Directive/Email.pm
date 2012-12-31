@@ -7,15 +7,35 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
+
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            user_email => {
+                email => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Email is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that checks the validity of email addresses specified by the associated
+parameters.
 
 =cut
 
@@ -28,9 +48,9 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{time}) {
+    if (defined $field->{email} && defined $param) {
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $ere = qr/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)$/;
 

@@ -4,13 +4,42 @@ Validation::Class::Directive::DependsOn - DependsOn Directive for Validation Cla
 
 # VERSION
 
-version 7.900000
+version 7.900010
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            password_confirmation  => {
+                depends_on => 'password'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 # DESCRIPTION
 
-Validation::Class::Directive::DependsOn is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::DependsOn is a core validation class field
+directive that validates the existence of dependent parameters.
+
+- alternative argument: an-array-of-parameter-names
+
+    This directive can be passed a single value or an array of values:
+
+        fields => {
+            password2_confirmation => {
+                depends_on => ['password', 'password2']
+            }
+        }
 
 # AUTHOR
 

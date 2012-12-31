@@ -14,7 +14,7 @@ ok $r->validate(), 'foobar validates';
 $r->fields->{foobar}->{min_length} = 6;
 
 ok !$r->validate(), 'foobar doesnt validate';
-ok $r->errors_to_string() =~ /must be 6 or more characters/,
+ok $r->errors_to_string() =~ /must not contain less than 6/,
   'displays proper error message';
 
 #warn $r->errors_to_string();

@@ -4,13 +4,52 @@ Validation::Class::Directive::Filters - Filters Directive for Validation Class F
 
 # VERSION
 
-version 7.900000
+version 7.900010
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            user_ident => {
+                filters => 'trim'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 # DESCRIPTION
 
 Validation::Class::Directive::Filters is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that specifies which filter should be executed on the associated field.
+
+- alternative argument: an-array-of-options
+- option: trim e.g. remove leading/trailing spaces
+- option: strip e.g. replace multiple spaces with one space
+- option: lowercase e.g. convert to lowercase
+- option: uppercase e.g. convert to uppercase
+- option: titlecase e.g. uppercase first letter of each word
+- option: capitalize e.g. uppercase the first letter
+- option: alphanumeric e.g. remove non-any alphanumeric characters
+- option: numeric e.g. remove any non-numeric characters
+- option: alpha e.g. remove any non-alpha characters
+- option: decimal e.g. preserve only numeric, dot and comma characters
+
+    This directive can be passed a single value or an array of values:
+
+        fields => {
+            user_ident => {
+                filters => ['trim', 'strip']
+            }
+        }
 
 # AUTHOR
 

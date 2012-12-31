@@ -4,13 +4,13 @@ Validation::Class::Directive::Errors - Errors Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # DESCRIPTION
 
 Validation::Class::Directive::Errors is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that holds error message registered at the field-level for the associated field.
+This directive is used internally.
 
 # AUTHOR
 

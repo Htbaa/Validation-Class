@@ -6,8 +6,9 @@ use strict;
 use warnings;
 
 use Validation::Class ();
-use Validation::Class::Core ('vc_prototypes');
 use Validation::Class::Prototype;
+
+use Validation::Class::Util ('prototype_registry');
 
 # VERSION
 
@@ -46,6 +47,13 @@ keywords, etc).
 It can be useful in an environment where you wouldn't care to create a
 validation class and instead would simply like to pass rules to a validation
 engine in an ad-hoc fashion.
+
+=head1 QUICKSTART
+
+If you are looking for a data validation module with an even lower learning curve
+built using the same tenets and principles as Validation::Class which is as
+simple and even lazier than this module, please review the tested but
+experimental L<Validation::Class::Simple::Streamer>.
 
 =head1 RATIONALE
 
@@ -366,7 +374,7 @@ sub new {
 
     my $self = bless {}, $class;
 
-    vc_prototypes->add(
+    prototype_registry->add(
         "$self" => Validation::Class::Prototype->new(
             package => $class # inside-out prototype
         )
@@ -419,13 +427,17 @@ sub new {
 
 sub proto { goto &prototype } sub prototype {
 
-    return vc_prototypes->get(shift);
+    return prototype_registry->get(shift);
 
 }
 
 sub DESTROY {
 
-    return vc_prototypes->delete(shift);
+    my ($self) = @_;
+
+    prototype_registry->delete($self) if $self && prototype_registry;
+
+    return;
 
 }
 

@@ -5,7 +5,7 @@ package Validation::Class::Listing;
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has', '!hold';
+use Validation::Class::Util '!has', '!hold';
 use List::MoreUtils 'uniq';
 
 # VERSION
@@ -24,7 +24,7 @@ use List::MoreUtils 'uniq';
 =head1 DESCRIPTION
 
 Validation::Class::Listing is a container class that provides general-purpose
-functionality for arrayref objects. All methods are chainable.
+functionality for arrayref objects.
 
 =cut
 

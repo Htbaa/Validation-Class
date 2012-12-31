@@ -1,52 +1,79 @@
-# Base Class for Validation Class Directives
+# ABSTRACT: Base Class for Validation Class Directives
 
 package Validation::Class::Directive;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 use Carp 'confess';
 
 # VERSION
 
-=pod
+=head1 SYNOPSIS
 
-    use Validation::Class::Directive;
-
-    my $validator = Validation::Class::Directive->new(
-        mixin     => 0,
-        field     => 1,
-        multi     => 0,
-        validator => sub {
-
-            my ($self, $proto, $field, $param) = @_;
-
-        }
-    );
-
-... written as a package
-
-    package Validation::Class::Directive::Example;
+    package Validation::Class::Plugin::CheckBlacklist;
 
     use base 'Validation::Class::Directive';
-
-    use Validation::Class::Core;
+    use Validation::Class::Util;
+    use File::Slurp;
 
     has 'mixin'     => 0;
     has 'field'     => 1;
     has 'multi'     => 0;
+    has 'message'   => '%s has been blacklisted';
 
-    has 'message'   => '%s was not processed successfully';
-    has 'validator' => sub {};
+    sub validate {
+
+        my $self = shift;
+
+        my ($proto, $field, $param) = @_;
+
+        if (defined $field->{check_blacklist} && $param) {
+
+            # is the parameter value blacklisted?
+            my @blacklist = read_file('/blacklist.txt');
+
+            $self->error if grep { $param =~ /^$_$/ } @blacklist;
+
+        }
+
+    }
 
     1;
 
-=pod
+... in your validation class:
 
-Validation::Class::Directive provides a base-class for validation class
-directives.
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field ip_address => {
+        required        => 1,
+        check_blacklist => 1
+    };
+
+    1;
+
+... in your application:
+
+    package main;
+
+    use MyApp::Person;
+
+    my $person = MyApp::Person->new(ip_address => '0.0.0.0');
+
+    unless ($person->validates('ip_address')) {
+        # handle validation error
+    }
+
+=head1 DESCRIPTION
+
+You can extend Validation::Class by creating your own validation rules
+(directives). Validation::Class::Directive provides a base-class for you to use
+when creating new directive classes. Please see L<Validation::Class::Directives>
+for a complete list of core directives.
 
 =cut
 
@@ -55,7 +82,7 @@ directives.
 has 'mixin'         => 0;
 has 'field'         => 0;
 has 'multi'         => 0;
-has 'message'       => '%s was not processed successfully';
+has 'message'       => '%s could not be validated';
 has 'validator'     => sub { sub{1} };
 has 'dependencies'  => sub {{ normalization => [], validation => [] }};
 has 'name'          => sub {

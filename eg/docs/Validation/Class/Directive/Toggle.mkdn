@@ -4,12 +4,13 @@ Validation::Class::Directive::Toggle - Toggle Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # DESCRIPTION
 
 Validation::Class::Directive::Toggle is a core validation class field directive
-that provides the ability to toggle a field's \`required\` directive.
+that is used internally to handle validation of per-validation-event
+requirements.
 
 # AUTHOR
 

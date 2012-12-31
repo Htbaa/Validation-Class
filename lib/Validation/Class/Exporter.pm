@@ -1,4 +1,4 @@
-# Simple Exporter for Validation::Class Classes
+# ABSTRACT: Simple Exporter for Validation::Class Classes
 
 package Validation::Class::Exporter;
 
@@ -9,7 +9,50 @@ use warnings;
 
 # VERSION
 
-=pod
+=head1 SYNOPSIS
+
+    package MyApp::Validator;
+
+    use Validation::Class;
+    use Validation::Class::Exporter;
+
+    my @plugins = qw(
+        Validation::Class::Plugin::FormFields
+        Validation::Class::Plugin::Objectify
+    );
+
+    Validation::Class::Exporter->apply_spec(
+        routines => ['thing'], # export additional routines as is
+        settings => [@plugins] # passed to the `set` method in Validation::Class
+    );
+
+    sub thing {
+
+        my $args = pop;
+
+        my $class = shift || caller;
+
+        # routine as a keyword
+
+        # ... do some thing
+
+    };
+
+... in your application class:
+
+    package MyApp;
+
+    use MyApp::Validator;
+
+    thing ['a', 'b'];
+
+... in your application:
+
+    package main;
+
+    my $app = MyApp->new;
+
+=head1 DESCRIPTION
 
 This module (while experimental) encapsulates the exporting of keywords and
 routines. It applies the L<Validation::Class> framework along with any keyword
@@ -20,7 +63,7 @@ To simplify writing exporter modules, C<Validation::Class::Exporter> also
 imports C<strict> and C<warnings> into your exporter module, as well as into
 modules that use it.
 
-=pod apply_spec
+=method apply_spec
 
 When you call this method, C<Validation::Class::Exporter> builds a custom
 C<import> method on the calling class. The C<import> method will export the

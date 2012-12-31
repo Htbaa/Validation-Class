@@ -1,13 +1,11 @@
 use Test::More;
 
-package MyVal;
-use Validation::Class;
-
 package main;
 
 use utf8;
+use Validation::Class::Simple;
 
-my $r = MyVal->new(fields => {city => {city => 1}});
+my $r = Validation::Class::Simple->new(fields => {city => {city => 1}});
 
 # failures
 

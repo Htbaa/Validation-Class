@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+package input;
+
+use Validation::Class; # DRY: don't repeat yourself
+
+mxn scrub => {
+    filters => ['trim', 'strip']
+};
+
+fld login => {
+    email    => 1,
+    required => 1,
+    alias    => 'user',
+    mixin    => 'scrub'
+};
+
+fld password    => {
+    required    => 1,
+    alias       => 'pass',
+    mixin       => 'scrub',
+    min_length  => 5,
+    min_symbols => 1,
+    min_alpha   => 1,
+    min_digits  => 1
+    # fwiw, I personally hate this kinda security
+};
+
+package main;
+
+use Mojolicious::Lite;
+use Mojo::JSON;
+
+get '/js'   => sub {
+
+    my ($self) = @_;
+
+    my $rules     = input->new;
+    my $namespace = ref $rules;
+
+    my $next = my $root = {};
+
+    $next = $next->{$_} = {} for split /::/, $namespace;
+
+    # taken from Validation::Class::Cookbook
+    foreach my $field ($rules->fields->values) {
+
+        my $node = $next->{$field->{name}} ||= {};
+
+        # what to include for https://github.com/jzaefferer/jquery-validation
+        $node->{required}  = $field->{required} ? 1 : 0;
+        $node->{email}     = $field->{email}        if $field->{email};
+        $node->{minlength} = $field->{min_length}   if $field->{min_length};
+        $node->{maxlength} = $field->{max_length}   if $field->{max_length};
+
+    }
+
+    # generate the JS object
+    my $json = Mojo::JSON->new;
+    my $data = sprintf "var validate = %s;", $json->encode($root);
+
+    return $self->render(text => $data);
+
+};
+
+any '/' => sub {
+
+    my $self = shift;
+    my $input = input->new(params => $self->req->params->to_hash);
+
+    if ($self->req->method eq 'POST') {
+        $self->stash(success => "You're some kinda awesome!")
+            if $input->validate('login', 'password')
+        ;
+    }
+
+    $self->stash(input => $input);
+    $self->render;
+
+}   => 'index';
+
+app->start;
+
+__DATA__
+
+@@ index.html.ep
+
+% my $input   = stash 'input';
+% my $success = stash 'success';
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>auth required</title>
+        %= javascript "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"
+        %= javascript "http://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"
+        %= javascript "/js"
+        %= javascript begin
+            $(document).ready(function() {
+                $("#form").validate({rules:validate.input});
+            });
+        % end
+    </head>
+    <body>
+        <div style="padding:10px;color:green"><%== $success if $success; %></div>
+        <div style="padding:10px;color:red"><%== $input->errors_to_string('<br/>') if $input; %></div>
+        <form id="form" autocomplete="off" method="post" action="/">
+        <fieldset>
+            <legend><h2><strong>Halt</strong>, who goes there?</h2></legend>
+            <label for="login">Login</label><br/><input id="login" name="login" value="<%= param 'login' %>" /><br/>
+            <label for="password">Password</label><br/><input id="password" name="password" type="password" value="" /><br/>
+            <br/><input type="submit" value="Submit" />
+        </fieldset>
+        </form>
+    </body>
+</html>

@@ -22,14 +22,14 @@ because it provides security, it allows you to ensure user supplied data is
 formatted properly, is within length boundaries, contains permitted characters
 and adheres to business rules.
 
-To understand the problem domain we need to first understand:
+To understand the problem domain we need to first ask ourselves:
 
-    * what is meant by data validation
-    * what the standard validation types are
-    * what the common use-cases are were validation applies
+    * what is data validation? and ... is that what I've been doing?
+    * what are the common data validation requirements?
+    * what are the common use-cases where validation becomes tricky?
 
-First, data validation is the process of auditing a piece of data to ensure it
-fits a specific criteria. Common data validation checks are:
+Data validation is the process of auditing a piece of data to ensure it fits a
+specific criteria. Standard data validation requirements are:
 
     * existence checking
     * range checking
@@ -37,7 +37,7 @@ fits a specific criteria. Common data validation checks are:
     * list-lookup checking
     * dependency checking
     * pattern checking
-    * custom validation checking
+    * custom validation checking (business logic)
 
 Typically when designing an application we tend to name input parameters in an
 arbitrarily fashion and validate the same data at various stages during a
@@ -634,10 +634,6 @@ and handles common use-cases were validation is usually quite arduous.
 
     1;
 
-=head2 Error Handling
-
-    * TODO: handling errors (reporting messages, localization, etc)
-
 =head1 GETTING STARTED
 
 If you are looking for a simple way to get started with L<Validation::Class>,
@@ -646,9 +642,10 @@ are also relevant for configuring any class derived from L<Validation::Class>.
 
 =head1 ADDITIONAL INSIGHT
 
-The following L<screencast|http://youtu.be/YCPViiB5jv0> explains what
-L<Validation::Class> is, why it was created, and what it has to offer. Please
-note that this screencast was created many moons ago and some of its content
-may be a bit outdated.
+The following L<screencast|http://youtu.be/YCPViiB5jv0> and/or
+L<slideshow|http://www.slideshare.net/slideshow/embed_code/9632123> explains
+what L<Validation::Class> is, why it was created, and what it has to offer.
+Please note that this screencast and slideshow was created many moons ago and
+some of its content may be a bit outdated.
 
 =cut

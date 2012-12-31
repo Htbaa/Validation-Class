@@ -7,15 +7,40 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            username => {
+                required   => 1,
+                min_length => 5,
+                messages => {
+                    required   => '%s is mandatory',
+                    min_length => '%s is not the correct length'
+                }
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::Messages is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Messages is a core validation class field
+directive that holds error message which will supersede the default error
+messages of the associated directives.
 
 =cut
 

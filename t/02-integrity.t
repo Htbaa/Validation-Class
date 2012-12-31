@@ -1,6 +1,7 @@
 use FindBin;
 use Test::More;
 
+use utf8;
 use strict;
 use warnings;
 
@@ -10,9 +11,12 @@ SKIP: {
         require 'Perl/Critic.pm';
     };
 
-    plan skip_all => 'Perl::Critic is not installed.' if $@;
+    plan skip_all =>
+        'Perl::Critic is not installed and/or DEVELOPMENT_TESTS is not set.'
+        if $@ || ! $ENV{'DEVELOPMENT_TESTS'}
+    ;
 
-    my $lib     = $FindBin::Bin . "/../lib/";
+    my $lib     = $FindBin::RealBin . "/../lib/";
     my @profile = qw(
         -5
         --severity 4

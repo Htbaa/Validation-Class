@@ -7,14 +7,15 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Toggle is a core validation class field directive
-that provides the ability to toggle a field's `required` directive.
+that is used internally to handle validation of per-validation-event
+requirements.
 
 =cut
 

@@ -7,15 +7,49 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
+
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            login  => {
+                alias => 'username'
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Alias is a core validation class field directive
 that provides the ability to map arbitrary parameter names with a field's
 parameter value.
+
+=over 8
+
+=item * alternative argument: an-array-of-aliases
+
+This directive can be passed a single value or an array of values:
+
+    fields => {
+        login  => {
+            alias => ['username', 'email_address']
+        }
+    }
+
+=back
 
 =cut
 

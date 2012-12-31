@@ -1,5 +1,8 @@
 # Configuration Class for Validation Classes
 
+# Validation::Class::Configuration provides a default configuration profile used
+# by validation classes and many class prototype methods.
+
 package Validation::Class::Configuration;
 
 use strict;
@@ -10,18 +13,11 @@ use Validation::Class::Listing;
 use Validation::Class::Mapping;
 use Validation::Class::Fields;
 use Validation::Class::Mixins;
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 use Module::Find 'usesub';
 
 # VERSION
-
-=pod
-
-Validation::Class::Configuration provides a default configuration profile used
-by validation classes and many class prototype methods.
-
-=cut
 
 sub attributes {
 

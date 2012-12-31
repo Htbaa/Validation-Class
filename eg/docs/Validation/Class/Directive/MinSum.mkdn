@@ -4,13 +4,32 @@ Validation::Class::Directive::MinSum - MinSum Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900000
+version 7.900010
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            invoice_total => {
+                min_sum => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 # DESCRIPTION
 
 Validation::Class::Directive::MinSum is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that validates the numeric value of the associated parameters.
 
 # AUTHOR
 

@@ -4,7 +4,7 @@ Validation::Class::Simple - Simple Ad-Hoc Data Validation
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # SYNOPSIS
 
@@ -41,6 +41,13 @@ keywords, etc).
 It can be useful in an environment where you wouldn't care to create a
 validation class and instead would simply like to pass rules to a validation
 engine in an ad-hoc fashion.
+
+# QUICKSTART
+
+If you are looking for a data validation module with an even lower learning curve
+built using the same tenets and principles as Validation::Class which is as
+simple and even lazier than this module, please review the tested but
+experimental [Validation::Class::Simple::Streamer](http://search.cpan.org/perldoc?Validation::Class::Simple::Streamer).
 
 # RATIONALE
 

@@ -7,15 +7,76 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            person_cc  => {
+                creditcard => 1
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
+
 =head1 DESCRIPTION
 
-Validation::Class::Directive::Creditcard is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+Validation::Class::Directive::Creditcard is a core validation class field
+directive that provides validation for american express, bankcard, diners card,
+discover card, electron,  enroute, jcb, maestro, mastercard, solo, switch, visa
+and voyager credit cards.
+
+=over 8
+
+=item * alternative argument: an-array-of-options
+
+=item * option: amex
+
+=item * option: bankcard
+
+=item * option: diners
+
+=item * option: disc
+
+=item * option: electron
+
+=item * option: enroute
+
+=item * option: jcb
+
+=item * option: maestro
+
+=item * option: mastercard
+
+=item * option: solo
+
+=item * option: switch
+
+=item * option: visa
+
+=item * option: voyager
+
+This directive can be passed a single value or an array of values:
+
+    fields => {
+        person_cc  => {
+            creditcard => ['visa', 'mastercard']
+        }
+    }
+
+=back
 
 =cut
 
@@ -28,7 +89,7 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{creditcard}) {
+    if (defined $field->{creditcard} && defined $param) {
 
         my $ccre = {
             'amex'       => qr/^3[4|7]\d{13}$/,
@@ -45,16 +106,16 @@ sub validate {
             'visa'       => qr/^4\d{12}(\d{3})?$/,
             'voyager'    => qr/^8699[0-9]{11}$/,
             # or do a simple catch-all match
-            '@'          => qr/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/
+            'any'        => qr/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/
         };
 
         my $type = $field->{creditcard};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             my $is_valid = 0;
 
-            $type = isa_arrayref($type) ? $type : $type == 1 ? ['@'] : [$type];
+            $type = isa_arrayref($type) ? $type : $type eq '1' ? ['any'] : [$type];
 
             for (@{$type}) {
 

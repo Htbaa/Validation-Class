@@ -7,15 +7,53 @@ use warnings;
 
 use base 'Validation::Class::Directive';
 
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
+
+=head1 SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            company_email => {
+                pattern => qr/\@company\.com$/
+            }
+        }
+    );
+
+    # set parameters to be validated
+    $rules->params->add($parameters);
+
+    # validate
+    unless ($rules->validate) {
+        # handle the failures
+    }
 
 =head1 DESCRIPTION
 
 Validation::Class::Directive::Pattern is a core validation class field directive
-that provides the ability to do some really cool stuff only we haven't
-documented it just yet.
+that validates simple patterns and complex regular expressions.
+
+=over 8
+
+=item * alternative argument: an-array-of-something
+
+This directive can be passed a regexp object or a simple pattern. A simple
+pattern is a string where the `#` character matches digits and the `X` character
+matches alphabetic characters.
+
+    fields => {
+        task_date => {
+            pattern => '##-##-####'
+        },
+        task_time => {
+            pattern => '##:##:##'
+        }
+    }
+
+=back
 
 =cut
 
@@ -28,11 +66,11 @@ sub validate {
 
     my ($self, $proto, $field, $param) = @_;
 
-    if (defined $field->{pattern}) {
+    if (defined $field->{pattern} && defined $param) {
 
         my $pattern = $field->{pattern};
 
-        if (defined $param) {
+        if ($field->{required} || $param) {
 
             unless ( isa_regexp($pattern) ) {
 

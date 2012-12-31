@@ -12,7 +12,7 @@ use Validation::Class::Mapping;
 use Validation::Class::Params;
 use Validation::Class::Fields;
 use Validation::Class::Errors;
-use Validation::Class::Core;
+use Validation::Class::Util;
 
 # VERSION
 
@@ -24,20 +24,12 @@ use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 
-=head1 SYNOPSIS
-
-    package MyValidator;
-
-    use Validation::Class::Exporter;
-
-    Validation::Class::Exporter->apply_spec;
-
-    # extend Validation::Class and use in your codebase as the validation engine
-
 =head1 DESCRIPTION
 
 Validation::Class::Prototype is the validation engine used by proxy via
 L<Validation::Class> whose methods are aliases to the methods defined here.
+Please see L<Validation::Class::Simple> for a quick introduction on how to get
+started.
 
 =cut
 
@@ -883,6 +875,22 @@ sub errors_to_string {
 
 }
 
+sub flatten_params {
+
+    my ($self, $hash) = @_;
+
+    if ($hash) {
+
+        $hash = Hash::Flatten::flatten($hash);
+
+        $self->params->add($hash);
+
+    }
+
+    return $self->params->flatten->hash || {};
+
+}
+
 =method get_errors
 
 The get_errors method returns a list of combined class-and-field-level errors.
@@ -1484,8 +1492,11 @@ sub proxy_methods_wrapped {
     return qw{
 
         validate
+        validates
         validate_method
+        method_validates
         validate_profile
+        profile_validates
 
     }
 
@@ -1592,7 +1603,7 @@ sub register_field {
 
     my $package = $self->package;
 
-    confess "Error creating field $name, name is using unconventional naming"
+    confess "Error creating field $name, name is not properly formatted"
         unless $name =~ /^[a-zA-Z_](([\w\.]+)?\w)$/
         xor    $name =~ /^[a-zA-Z_](([\w\.]+)?\w)\:\d+$/;
 
@@ -1606,27 +1617,23 @@ sub register_field {
 
     $self->configuration->fields->add($name, $data);
 
-    my $subname = $name;
+    my $method_name = $name;
 
-    $subname =~ s/\W/_/g;
+    $method_name =~ s/\W/_/g;
 
-    my $routine = sub {
+    my $method_routine = sub {
 
-        my ($self, $data) = @_;
+        my $self = shift @_;
 
         my $proto  = $self->proto;
 
-        if (defined $data) {
-
-            $proto->params->add($name, $data);
-
-        }
+        $proto->params->add($name, $_[0]) if @_ == 1;
 
         return $proto->params->get($name);
 
     };
 
-    $self->set_method($subname, $routine);
+    $self->set_method($method_name, $method_routine);
 
     return $self;
 
@@ -1658,18 +1665,24 @@ sub register_method {
 
     my $package = $self->package;
 
-    confess "Error creating method $name on $package: collides with attribute $name"
-        if $self->attributes->has($name);
+    confess
+        "Error creating method $name on $package: collides with attribute $name"
+        if $self->attributes->has($name)
+    ;
 
-    confess "Error creating method $name on $package: collides with method $name"
-        if $package->can($name);
+    confess
+        "Error creating method $name on $package: collides with method $name"
+        if $package->can($name)
+    ;
 
-    # create method
-
-    confess "Error creating method $name, requires 'input' and 'using' options"
-        unless $data->{input} && $data->{using};
+    confess
+        "Error creating method $name, requires 'input' and 'using' options"
+        unless $data->{input} && ($data->{using} || $package->can("_$name"))
+    ;
 
     $self->configuration->methods->add($name, $data);
+
+    # create method
 
     no strict 'refs';
 
@@ -1681,29 +1694,37 @@ sub register_method {
         my $validator;
 
         my $input  = $data->{'input'};
-        my $using  = $data->{'using'};
         my $output = $data->{'output'};
+        my $using  = $data->{'using'} || $self->can("_$name");
 
         if ($input) {
 
-            $validator = "ARRAY" eq ref $input ?
+            if (isa_arrayref($input)) {
+                $validator = sub {$self->validate(@{$input})};
+            }
 
-                # validate fields
-                sub { $self->validate(@{$input}) } :
+            elsif ($self->proto->profiles->get($input)) {
+                $validator = sub {$self->validate_profile($input, @args)};
+            }
 
-                # validate profile
-                sub { $self->validate_profile($input, @args) } ;
+            elsif ($self->proto->methods->get($input)) {
+                $validator = sub {$self->validate_method($input, @args)};
+            }
+
+            else {
+                confess "Method $name has an invalid input specification";
+            }
 
         }
 
         if ($using) {
 
-            if ("CODE" eq ref $using) {
+            if (isa_coderef($using)) {
 
                 my $error = "Method $name failed to validate";
 
                 # run input validation
-                if ("CODE" eq ref $validator) {
+                if (isa_coderef($validator)) {
 
                     unless ($validator->(@args)) {
 
@@ -1720,21 +1741,30 @@ sub register_method {
                 }
 
                 # execute routine
-                my $return = $data->{using}->($self, @args);
+                my $return = $using->($self, @args);
 
                 # run output validation
                 if ($output) {
 
-                    $validator = "ARRAY" eq ref $output ?
+                    if (isa_arrayref($output)) {
+                        $validator = sub {$self->validate(@{$output})};
+                    }
 
-                        # validate fields
-                        sub { $self->validate(@{$output}) } :
+                    elsif ($self->proto->profiles->get($output)) {
+                        $validator = sub {$self->validate_profile($output, @args)};
+                    }
 
-                        # validate profile
-                        sub { $self->validate_profile($output, @args) } ;
+                    elsif ($self->proto->methods->get($output)) {
+                        $validator = sub {$self->validate_method($output, @args)};
+                    }
+
+                    else {
+                        confess "Method $name has an invalid output specification";
+                    }
 
                     confess $error. " output, ". $self->errors_to_string
-                        unless $validator->(@args);
+                        unless $validator->(@args)
+                    ;
 
                 }
 
@@ -1744,7 +1774,7 @@ sub register_method {
 
             else {
 
-                confess "Error executing $name, no associated coderef";
+                confess "Error executing $name, no associated method or coderef";
 
             }
 
@@ -2291,11 +2321,9 @@ sub trigger_event {
 
 sub unflatten_params {
 
-    my ($self, $hash) = @_;
+    my ($self) = @_;
 
-    $hash ||= $self->params->hash;
-
-    return unflatten($hash) || {};
+    return $self->params->unflatten->hash || {};
 
 }
 
@@ -2365,7 +2393,7 @@ minus respectively as follows:
 
 =cut
 
-sub validate {
+sub validates { goto &validate } sub validate {
 
     my ($self, $context, @fields) = @_;
 
@@ -2538,7 +2566,7 @@ to use the methods input specification as a validation profile.
 
 =cut
 
-sub validate_method {
+sub method_validates { goto &validate_method } sub validate_method {
 
     my  ($self, $context, $name, @args) = @_;
 
@@ -2577,9 +2605,9 @@ sub validate_method {
 
 =method validate_profile
 
-The validate_profile method executes a stored validation profile, it requires a
-profile name and can be passed additional parameters which get forwarded into the
-profile routine in the order received.
+The validate_profile method (or profile_validates) executes a stored validation
+profile, it requires a profile name and can be passed additional parameters
+which get forwarded into the profile routine in the order received.
 
     unless ($self->validate_profile('password_change')) {
 
@@ -2595,7 +2623,7 @@ profile routine in the order received.
 
 =cut
 
-sub validate_profile {
+sub profile_validates { goto &validate_profile } sub validate_profile {
 
     my  ($self, $context, $name, @args) = @_;
 

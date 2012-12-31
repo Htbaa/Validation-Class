@@ -1,13 +1,16 @@
 # Container Class for Validation::Class::Field Objects
 
+# Validation::Class::Fields is a container class for L<Validation::Class::Field>
+# objects and is derived from the L<Validation::Class::Mapping> class.
+
 package Validation::Class::Fields;
 
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has';
+use Validation::Class::Util '!has';
 use Hash::Flatten ();
-use Carp 'confess';
+use Carp;
 
 # VERSION
 
@@ -15,13 +18,6 @@ use base 'Validation::Class::Mapping';
 
 use Validation::Class::Mapping;
 use Validation::Class::Field;
-
-=pod
-
-Validation::Class::Fields is a container class for L<Validation::Class::Field>
-objects and is derived from the L<Validation::Class::Mapping> class.
-
-=cut
 
 sub add {
 
@@ -58,14 +54,26 @@ sub add {
 
 }
 
-sub flatten {
+sub AUTOLOAD {
+
+    (my $routine = $Validation::Class::Fields::AUTOLOAD) =~ s/.*:://;
 
     my ($self) = @_;
 
-    return Validation::Class::Mapping->new(
-        Hash::Flatten::flatten($self->hash)
-    );
+    if ($routine) {
+
+        if ($self->has($routine)) {
+            return $self->get($routine);
+        }
+
+    }
+
+    croak sprintf q(Can't locate object method "%s" via package "%s"),
+        $routine, ((ref $_[0] || $_[0]) || 'main')
+    ;
 
 }
+
+sub DESTROY {}
 
 1;

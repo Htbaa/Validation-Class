@@ -5,7 +5,7 @@ package Validation::Class::Mapping;
 use strict;
 use warnings;
 
-use Validation::Class::Core '!has', '!hold';
+use Validation::Class::Util '!has', '!hold';
 use Hash::Merge ();
 
 # VERSION
@@ -272,7 +272,7 @@ sub keys {
 
     my ($self) = @_;
 
-    return (keys($self->hash));
+    return (keys(%{$self->hash}));
 
 }
 
@@ -428,7 +428,7 @@ sub values {
 
     my ($self) = @_;
 
-    return (values($self->hash));
+    return (values(%{$self->hash}));
 
 }
 

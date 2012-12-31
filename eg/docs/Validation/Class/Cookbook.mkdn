@@ -1,10 +1,10 @@
 # NAME
 
-Validation::Class::Cookbook - Recipes for Validation::Class Classes
+Validation::Class::Cookbook - Recipes for Validation::Class
 
 # VERSION
 
-version 7.900000
+version 7.900010
 
 # BUILDING CLASSES
 
@@ -94,7 +94,7 @@ A validation class is defined as follows:
 
     # an auto-validating method
 
-    method 'register'  => {
+    method 'registers'  => {
 
         input => 'registration',
         using => sub {
@@ -129,7 +129,7 @@ to validate input in various scenarios:
         # initialize validation class and set input parameters
         my $user = MyApp::User->new(params => $params);
 
-        unless ($user->validate('login', 'password')) {
+        unless ($user->registers) {
 
             # print errors to browser unless validation is successful
             return $user->errors_to_string;
@@ -261,7 +261,7 @@ classes. The following is an example of this:
 
     use Validation::Class;
 
-    set classes => [__PACKAGE__];
+    set classes => 1;
 
     package main;
 
@@ -314,7 +314,7 @@ introspection design template that will work in most cases:
 
     use Validation::Class;
 
-    set classes => ['MyApp']; # load MyApp and all MyApp::* child classes
+    set classes => 'MyApp'; # load MyApp and all MyApp::* child classes
 
     sub per_class {
 
@@ -322,10 +322,7 @@ introspection design template that will work in most cases:
 
         $self->proto->relatives->each(sub {
 
-            my ($alias, $namespace) = @_;
-
-            # do something with each class
-            $code->($namespace);
+            $code->($_[1]);
 
         });
 
@@ -341,9 +338,9 @@ introspection design template that will work in most cases:
 
             my $class = $namespace->new;
 
-            foreach my $field (sort $class->fields->keys) {
+            foreach my $field ($class->fields->values) {
 
-                # do something with each field
+                # do something with each field in each class
                 $code->($class, $class->fields->{$field});
 
             }
@@ -352,7 +349,7 @@ introspection design template that will work in most cases:
 
     }
 
-## CLIENT-SIDE VALIDATION
+# CLIENT-SIDE VALIDATION
 
 This recipe describes how to generate JSON objects which can be used to validate
 user input in the web-browser (client-side).
@@ -374,89 +371,114 @@ In the context of a web-application, it is often best to perform the initial
 input validation on the client (web-browser) before submitting data to the
 server for further validation and processing. In the following code we will
 generate javascript objects that match our Validation::Class data models which
-we will then use with jQuery to validate form data, etc.
+we will then use with some js library to validate form data, etc.
 
-... in bin/generate\_jsapi
+... example validation class
 
-    # usage: ./generate_jsapi > app.api.js
+    package model;
 
-    use MyApp::Introspect;
+    use Validation::Class;
 
-    use JSON;
-
-    my $classes = {};
-
-    my $json = JSON->new->allow_blessed->convert_blessed->pretty([1]);
-
-    my $introspection = MyApp::Introspect->new;
-
-    $introspection->per_field_per_class(sub{
-
-        my ($class, $field) = @_;
-
-        my $namespace = ref $class;
-
-        # attributes we want in the js api
-        my $attributes = { map { $_ => $field->{$_} } qw(
-            name label filters required length min_length max_length
-        ) };
-
-        my $fieldspace = $classes->{$namespace}->{$field->{name}} = $attributes;
-
-    });
-
-    # generate the JS API
-
-    print "\n";
-
-    print "var MyApp = MyApp || {};\n\n";
-
-    while (my($namespace, $fields) = each(%{$classes})) {
-
-        $namespace =~ s/::/./;
-
-        my $objects = $json->encode($fields);
-
-        chomp $objects;
-
-        print "$namespace = $objects;\n\n";
-
-    }
-
-The output of the following script should generate a file which looks similar
-to the following:
-
-    var MyApp = MyApp || {};
-
-    MyApp.Test = {
-       "email" : {
-          "name" : "email",
-          "filters" : [
-             "strip",
-             "trim"
-          ],
-          "min_length" : 3,
-          "length" : null,
-          "required" : 1,
-          "label" : null,
-          "max_length" : 255
-       },
-       "password" : {
-          "name" : "password",
-          "filters" : [
-             "strip",
-             "trim"
-          ],
-          "min_length" : 5,
-          "length" : null,
-          "required" : 1,
-          "label" : null,
-          "max_length" : 255
-       }
+    mxn scrub => {
+        filters => ['trim', 'strip']
     };
 
-If its not obvious yet, we can easily use this generated javascript API with
-jQuery (or other client-side library) to validate forms, etc.
+    fld login => {
+        mixin    => 'scrub'
+        email    => 1,
+        required => 1,
+        alias    => 'user',
+    };
+
+    fld password    => {
+        mixin       => 'scrub',
+        required    => 1,
+        alias       => 'pass',
+        min_length  => 5,
+        min_symbols => 1,
+        min_alpha   => 1,
+        min_digits  => 1
+    };
+
+... in your webapp controller
+
+    get '/js/model'   => sub {
+
+        my $model     = model->new;
+        my $namespace = ref $model;
+
+        my $next = my $root = {};
+
+        $next = $next->{$_} = {} for split /::/, $namespace;
+
+        foreach my $field ($model->fields->values) {
+
+            my $node = $next->{$field->{name}} ||= {};
+
+            # what to include for https://github.com/jzaefferer/jquery-validation
+            $node->{required}  = $field->{required} ? 1 : 0;
+            $node->{email}     = $field->{email}        if $field->{email};
+            $node->{minlength} = $field->{min_length}   if $field->{min_length};
+            $node->{maxlength} = $field->{max_length}   if $field->{max_length};
+
+        }
+
+        # generate the JS object
+        my $json = Mojo::JSON->new;
+        my $data = sprintf "var validate = %s;", $json->encode($root);
+
+        return print $data;
+
+    };
+
+The output of the /js/model route should generate a javascript object which
+looks similar to the following:
+
+    var validate = {
+        "model" : {
+            "email" : {
+               "minlength" : 3,
+               "required" : 1,
+               "maxlength" : 255
+            },
+            "password" : {
+               "minlength" : 5,
+               "required" : 1,
+               "maxlength" : 255
+            }
+        }
+    };
+
+If its not obvious yet, we can now easily use this generated javascript API with
+jQuery (or other client-side library) to validate form data, etc.
+
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>AUTH REQUIRED</title>
+            <script type="text/javascript" src="/js/jquery.js"></script>
+            <script type="text/javascript" src="/js/jquery.validate.js"></script>
+            <script type="text/javascript" src="/js/model"></script>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $("#form").validate({rules:validate.models});
+                });
+            </script>
+        </head>
+        <body>
+            <div>[% input.errors_to_string %]</div>
+            <form id="form" autocomplete="off" method="post" action="/">
+            <fieldset>
+                <legend><h2><strong>Halt</strong>, who goes there?</h2></legend>
+                <label for="email">Email</label><br/>
+                <input id="email" name="email" value="" /><br/>
+                <label for="password">Password</label><br/>
+                <input id="password" name="password" type="password" /><br/>
+                <br/><input type="submit" value="Submit" />
+            </fieldset>
+            </form>
+        </body>
+    </html>
 
 # AUTHOR
 

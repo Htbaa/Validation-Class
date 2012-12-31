@@ -1,12 +1,9 @@
-BEGIN {
-
-    use FindBin;
-    use lib $FindBin::Bin . "/myapp/lib";
-
-}
-
+use FindBin;
 use Test::More;
+
 use utf8;
+use strict;
+use warnings;
 
 {
 
