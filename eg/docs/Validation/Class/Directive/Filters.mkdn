@@ -4,7 +4,7 @@ Validation::Class::Directive::Filters - Filters Directive for Validation Class F
 
 # VERSION
 
-version 7.900012
+version 7.900013
 
 # SYNOPSIS
 

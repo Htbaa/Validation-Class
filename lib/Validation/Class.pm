@@ -222,21 +222,17 @@ sub initialize_validator {
     my $input = Validation::Class::Simple::Streamer->new($parameters);
 
     # data validation rules for the username parameter
-    $input->check('username');
-        $input->required;
-        $input->between('5-255');
+    $input->check('username')->required->between('5-255');
         $input->filters([qw/trim strip/]);
 
     # data validation rule for the password parameter
-    $input->check('password');
-        $input->required;
-        $input->min_symbols(1);
-        $input->between('5-255');
+    $input->check('password')->required->between('5-255')->min_symbols(1);
         $input->filters([qw/trim strip/]);
 
     # perform validation
     unless ($input) {
         # handle the failures
+        die $input->messages;
     }
 
 =head1 DESCRIPTION

@@ -4,7 +4,7 @@ Validation::Class::Directive::MixinField - MixinField Directive for Validation C
 
 # VERSION
 
-version 7.900012
+version 7.900013
 
 # SYNOPSIS
 
