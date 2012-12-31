@@ -37,6 +37,8 @@ use warnings;
 
     ok "$p1" eq "arbitrary is required", "p1 error message is accurate";
 
+    $p1->validator->fields->delete('user');
+
     $p1->alias(['user'])->validate;
 
     ok "$p1" eq "", "p1 has no error messages";

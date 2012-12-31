@@ -4,20 +4,28 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900011
+version 7.900012
 
 # SYNOPSIS
 
     use Validation::Class::Simple::Streamer;
 
-    my $input = Validation::Class::Simple::Streamer->new($params);
+    my $input = Validation::Class::Simple::Streamer->new($parameters);
 
-    $input->check($_)->required->length('5-255')->filters([qw/trim strip/])
-        for qw/username password/
-    ;
+    # data validation rules for the username parameter
+    $input->check('username');
+        $input->required;
+        $input->between('5-255');
+        $input->filters([qw/trim strip/]);
 
-    $input->check('password')->min_symbols(1);
+    # data validation rule for the password parameter
+    $input->check('password');
+        $input->required;
+        $input->min_symbols(1);
+        $input->between('5-255');
+        $input->filters([qw/trim strip/]);
 
+    # perform validation
     unless ($input) {
         # handle the failures
     }
@@ -55,13 +63,13 @@ a more traditional usage of Validation::Class:
         filters     => [qw/trim strip/]
     };
 
-    # data validation rule for the username parameter
+    # data validation rules for the username parameter
     field username  => {
         mixin       => 'basic',
         min_length  => 5
     };
 
-    # data validation rule for the password parameter
+    # data validation rules for the password parameter
     field password  => {
         mixin       => 'basic',
         min_length  => 5,

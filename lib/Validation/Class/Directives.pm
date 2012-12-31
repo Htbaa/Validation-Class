@@ -9,8 +9,11 @@ use base 'Validation::Class::Mapping';
 
 use Validation::Class::Util '!has';
 
+use List::MoreUtils 'first_index';
 use Module::Find 'usesub';
 use Carp 'confess';
+
+use List::MoreUtils;
 
 our $_registry = {map{$_=>$_->new}(usesub 'Validation::Class::Directive')};
 
@@ -383,16 +386,20 @@ sub resolve_dependencies {
 
     }
 
-    my $charmap = join '', reverse @ordered;
+    my @list = reverse @ordered;
 
-    foreach my $el (keys %$dependencies) {
+    foreach my $x (keys %$dependencies) {
 
-        for (@{$dependencies->{$el}}) {
+        foreach my $y (@{$dependencies->{$x}}) {
+
+            my $a = first_index { $_ eq $x } @list;
+            my $b = first_index { $_ eq $y } @list;
 
             confess sprintf
-            'Broken dependency chain; Faulty ordering on event %s: %s before %s',
-            $type, $el, $_
-            if index($charmap,$el) > index($charmap, $_);
+                'Broken dependency chain; Faulty ordering on '.
+                'event %s: %s before %s', $type, $x, $y
+                if $a > $b
+            ;
 
         }
 

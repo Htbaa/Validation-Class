@@ -4,7 +4,7 @@ Validation::Class::Directive::MaxAlpha - MaxAlpha Directive for Validation Class
 
 # VERSION
 
-version 7.900010
+version 7.900012
 
 # SYNOPSIS
 

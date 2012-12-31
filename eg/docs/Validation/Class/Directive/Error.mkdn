@@ -4,7 +4,7 @@ Validation::Class::Directive::Error - Error Directive for Validation Class Field
 
 # VERSION
 
-version 7.900010
+version 7.900012
 
 # SYNOPSIS
 
