@@ -4,7 +4,7 @@ Validation::Class::Directive::MinAlpha - MinAlpha Directive for Validation Class
 
 # VERSION
 
-version 7.900010
+version 7.900013
 
 # SYNOPSIS
 

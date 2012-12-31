@@ -458,7 +458,7 @@ jQuery (or other client-side library) to validate form data, etc.
             <script type="text/javascript" src="/js/model"></script>
             <script type="text/javascript">
                 $(document).ready(function() {
-                    $("#form").validate({rules:validate.models});
+                    $("#form").validate({rules:validate.model});
                 });
             </script>
         </head>

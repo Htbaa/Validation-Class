@@ -1300,14 +1300,12 @@ sub normalize {
 
     # alias checking, ... for duplicate aliases, etc
 
-    my $fieldtree = {};
-    my $aliastree = {};
+    my $mapper = {};
+    my @fields = $self->fields->keys;
 
-    foreach my $pair ($self->fields->pairs) {
+    foreach my $name (@fields) {
 
-        my($name, $field)  = @{$pair}{'key', 'value'};
-
-        $fieldtree->{$name} = $name; # just a counter
+        my $field = $self->fields->get($name);
 
         if (defined $field->{alias}) {
 
@@ -1316,31 +1314,29 @@ sub normalize {
 
             foreach my $alias (@{$aliases}) {
 
-                if ($aliastree->{$alias}) {
+                if ($mapper->{$alias}) {
 
-                    my $error = qq(
-                        The field $field contains the alias $alias which is
-                        also defined in the field $aliastree->{$alias}
-                    );
-
-                    $self->throw_error($error);
-
-                }
-                elsif ($fieldtree->{$alias}) {
-
-                    my $error = qq(
-                        The field $field contains the alias $alias which is
-                        the name of an existing field
-                    );
+                    my $error =
+                        qq(The field $name contains the alias $alias which is
+                        also an alias on the field $mapper->{$alias})
+                    ;
 
                     $self->throw_error($error);
 
                 }
-                else {
 
-                    $aliastree->{$alias} = $field;
+                if ($self->fields->has($alias)) {
+
+                    my $error =
+                        qq(The field $name contains the alias $alias which is
+                        the name of an existing field)
+                    ;
+
+                    $self->throw_error($error);
 
                 }
+
+                $mapper->{$alias} = $name;
 
             }
 

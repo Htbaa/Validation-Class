@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900012  2012-12-31
+
+  - Fixed major logic flaw in dependency verification logic
+
+  - Fixed major logic flaw in alias checking during normalization
+
+  - Addressed test failure under Perl 5.8.1
+
 7.900011  2012-12-23
 
   - Fixed major logic flaw in newer directives dealing with null parameters

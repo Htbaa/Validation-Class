@@ -4,7 +4,7 @@ Validation::Class::Simple::Streamer - Simple Streaming Data Validation
 
 # VERSION
 
-version 7.900010
+version 7.900013
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ version 7.900010
     # the point here is expressiveness
 
     unless ($params->check('user_cc')->creditcard(['visa', 'mastercard'])) {
-        # credit card is valid
+        # credit card is a valid visa/mastercard
     }
 
     unless ($params->check('email_address')->min_length(3)->email) {
@@ -33,8 +33,11 @@ version 7.900010
         # access to explicit content approved
     }
 
-    # print any errors
-    print "$params\n";
+    # get all fields with errors
+    my $fields = $params->validator->error_fields;
+
+    # print errors if any
+    print $params->messages unless $params->validate;
 
     # validate like a boss
     # THE END
@@ -93,7 +96,7 @@ implicitly whenever the object is used in boolean context, e.g. in a conditional
 ## validator
 
 The validator method gives you access to the object's validation class which is
-a [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) object.
+a [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) object by default.
 
     $validator = $self->validator;
 
