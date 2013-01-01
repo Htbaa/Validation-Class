@@ -4,13 +4,9 @@ package Validation::Class::Simple::Streamer;
 
 use strict;
 use warnings;
-use Carp;
+use overload bool => \&validate, '""' => \&messages, fallback => 1;
 
-use overload
-    bool     => \&validate,
-    '""'     => \&messages,
-    fallback => 1
-;
+use Carp;
 
 use Validation::Class::Simple;
 use Validation::Class::Util;
@@ -21,34 +17,34 @@ use Validation::Class::Util;
 
     use Validation::Class::Simple::Streamer;
 
-    my $params = Validation::Class::Simple::Streamer->new($parameters);
+    my $rules = Validation::Class::Simple::Streamer->new($parameters);
 
     # the point here is expressiveness
 
-    unless ($params->check('user_cc')->creditcard(['visa', 'mastercard'])) {
+    unless ($rules->check('user_cc')->creditcard(['visa', 'mastercard'])) {
         # credit card is a valid visa/mastercard
     }
 
-    unless ($params->check('email_address')->min_length(3)->email) {
+    unless ($rules->check('email_address')->min_length(3)->email) {
         # email address is valid
     }
 
     # prepare password for validation
-    $params->check('password');
+    $rules->check('password');
 
     die "Password is not valid"
-        unless $params->min_symbols(1) && $params->matches('password2');
+        unless $rules->min_symbols(1) && $rules->matches('password2');
 
     # are you of legal age?
-    if ($params->check('user_age')->between('18-75')) {
+    if ($rules->check('user_age')->between('18-75')) {
         # access to explicit content approved
     }
 
     # get all fields with errors
-    my $fields = $params->validator->error_fields;
+    my $fields = $rules->validator->error_fields;
 
     # print errors if any
-    print $params->messages unless $params->validate;
+    print $rules->messages unless $params->validate;
 
     # validate like a boss
     # THE END
