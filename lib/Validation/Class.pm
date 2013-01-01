@@ -222,7 +222,6 @@ sub initialize_validator {
     # perform validation
     unless ($input) {
         # handle the failures
-        die $input->messages;
     }
 
 =head1 DESCRIPTION

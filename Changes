@@ -1,5 +1,17 @@
 Revision history for the Perl library Validation::Class
 
+7.900013  2013-01-01
+
+  - Added untested but fully-functional form-fields plugin
+
+  - Miscellaneous POD changes, especially around the set/load keywords
+
+  - Pruned some POD and updated the class method to only work with validation classes
+
+  - Modified the Options directive to support keyed-options
+
+  - Added new help directive to associate help statements with fields
+
 7.900012  2012-12-31
 
   - Fixed major logic flaw in dependency verification logic

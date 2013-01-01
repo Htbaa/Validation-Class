@@ -421,22 +421,18 @@ value assigned or undefined if the parameter does not exist.
 
 ## plugin
 
-The plugin method returns the instantiated plugin object attached to the current
-class. Note: This functionality is still experimental.
+The plugin method returns an instantiated plugin object which is passed the
+current prototype object. Note: This functionality is somewhat experimental.
 
     package Class;
 
     use Validation::Class;
 
-    set plugin => 'telephone_format';
-
     package main;
 
     my $input = Class->new(params => $params);
 
-    # currently the plugin method will always return the same object instance
-    # ... for Validation::Class::Plugin::TelephoneFormat;
-
+    # returns a Validation::Class::Plugin::TelephoneFormat object
     my $formatter = $input->plugin('telephone_format');
 
 ## queue

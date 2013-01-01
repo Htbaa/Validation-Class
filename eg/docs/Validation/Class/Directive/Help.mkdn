@@ -1,0 +1,39 @@
+# NAME
+
+Validation::Class::Directive::Help - Help Directive for Validation Class Field Definitions
+
+# VERSION
+
+version 7.900013
+
+# SYNOPSIS
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        fields => {
+            username => {
+                help => 'A username was automatically generated for you
+                at the time you registered your account. Check your email
+                client for additional instructions.'
+            }
+        }
+    );
+
+# DESCRIPTION
+
+Validation::Class::Directive::Help is a core validation class field
+directive that holds the help-text statement(s) to be associated with specific
+fields which are useful when rendering form fields or when developing RESTful
+API resources.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

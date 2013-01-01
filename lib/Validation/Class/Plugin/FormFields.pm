@@ -15,7 +15,7 @@ use HTML::Element;
 
 =head1 SYNOPSIS
 
-    # THIS PLUGIN IS UNTESTED !!!
+    # THIS PLUGIN IS UNTESTED AND MAY BE SUBJECT TO DESIGN CHANGES!!!
 
     use Validation::Class::Simple;
 

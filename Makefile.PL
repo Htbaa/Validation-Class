@@ -22,11 +22,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Forward" => 0,
+    "HTML::Element" => 0,
     "Hash::Flatten" => 0,
     "Hash::Merge" => 0,
     "List::MoreUtils" => 0,
     "Module::Find" => 0,
     "Module::Runtime" => 0,
+    "Regex::Common" => 0,
     "Scalar::Util" => 0,
     "utf8" => 0
   },

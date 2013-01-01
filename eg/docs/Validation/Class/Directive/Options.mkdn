@@ -42,6 +42,33 @@ parameters.
             }
         }
 
+        # the following examples are useful for plugins (and other code)
+        # that may want to otherwise identify option values
+
+        fields => {
+            user_role => {
+                options => [
+                    '1|Client',
+                    '2|Employee',
+                    '3|Administrator'
+                ]
+            }
+        }
+
+        # please note:
+        # declaring options as "keyed-options" will cause the validation of
+        # the option's key and NOT the option's value
+
+        fields => {
+            user_role => {
+                options => [
+                    [ 1 => 'Client' ],
+                    [ 2 => 'Employee' ],
+                    [ 3 => 'Administrator' ]
+                ]
+            }
+        }
+
 # AUTHOR
 
 Al Newkirk <anewkirk@ana.io>
