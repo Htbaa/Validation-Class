@@ -619,7 +619,7 @@ sub class {
 
     return unless $name;
 
-    my $class = Class::Forward->new(namespace=>$self->{package})->forward($name);
+    my $class=Class::Forward->new(namespace=>$self->{package})->forward($name);
 
     return unless $class;
 
@@ -648,6 +648,7 @@ sub class {
     }
 
     return unless $class->can('new');
+    return unless $self->registry->has($class); # isa validation class
 
     my $child = $class->new(%settings);
 
@@ -1407,22 +1408,18 @@ sub pitch_error {
 
 =method plugin
 
-The plugin method returns the instantiated plugin object attached to the current
-class. Note: This functionality is still experimental.
+The plugin method returns an instantiated plugin object which is passed the
+current prototype object. Note: This functionality is somewhat experimental.
 
     package Class;
 
     use Validation::Class;
 
-    set plugin => 'telephone_format';
-
     package main;
 
     my $input = Class->new(params => $params);
 
-    # currently the plugin method will always return the same object instance
-    # ... for Validation::Class::Plugin::TelephoneFormat;
-
+    # returns a Validation::Class::Plugin::TelephoneFormat object
     my $formatter = $input->plugin('telephone_format');
 
 =cut
@@ -1443,7 +1440,9 @@ sub plugin {
 
     $class = $lookup->forward($class);
 
-    return $self->plugins->get($class);
+    eval { use_module $class };
+
+    return $class->new($self);
 
 }
 
