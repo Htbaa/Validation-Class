@@ -7,43 +7,19 @@ BEGIN {
 
 }
 
-package MyApp::Form;
+use Validation::Class::Simple;
 
-use Validation::Class;
+my $rules = Validation::Class::Simple->new(
+    fields => {
+        username    => { required => 1 },
+        password    => { required => 1 },
+        remember_me => { required => 1, options => ['1|Remember Me?'] }
+    }
+);
 
-set plugin => 'form_fields';
+my $fields = $rules->plugin('form_fields');
 
-field first_name => {
-    label      => 'first name',
-    required   => 1,
-    min_length => 5
-};
-
-field last_name => {
-    label      => 'last name',
-    required   => 1,
-    min_length => 5
-};
-
-package main;
-
-use Data::Dumper;
-
-my $form = MyApp::Form->new(@ARGV);
-
-my $fields = $form->plugin('form_fields');
-
-print $fields->select('first_name');
-print "\n";
-
-1;
-
-__END__
-
-# jquery inspired streaming html form element renderer
-
-my $form = $data->plugin('form_fields');
-
-$form->as_text('username');
-$form->as_password('password');
-$form->as_select('city')->options($list_of_cities);
+print "\n"   . $fields->textbox('username');
+print "\n"   . $fields->textbox('password', type => 'password');
+print "\n"   . $fields->checkgroup('remember_me');
+print "\n\n" ;
