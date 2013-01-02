@@ -181,7 +181,7 @@ sub _declare_checkgroup {
 
     my $name = $field->name;
 
-    my @elements;
+    my @elements = ();
 
     # set value attribute
     $value = isa_arrayref($value) ? $value->[0] : $value;
@@ -221,7 +221,7 @@ sub _declare_checkgroup {
 
     }
 
-    return $self->{elements}->{$name} = \@elements if @elements;
+    return $self->{elements}->{$name} = \@elements;
 
 }
 
@@ -251,8 +251,6 @@ sub _declare_selectbox {
     my ($self, $field, $value, %attributes) = @_;
 
     my $name = $field->name;
-
-    my @elements;
 
     my $element = HTML::Element->new('select');
 
@@ -304,7 +302,7 @@ sub _declare_radiogroup {
 
     my $name = $field->name;
 
-    my @elements;
+    my @elements = ();
 
     # set value attribute
     $value = isa_arrayref($value) ? $value->[0] : $value;
@@ -344,7 +342,7 @@ sub _declare_radiogroup {
 
     }
 
-    return $self->{elements}->{$name} = \@elements if @elements;
+    return $self->{elements}->{$name} = \@elements;
 
 }
 
