@@ -837,9 +837,31 @@ directives created by the mixin directive.
     };
 
     field 'username' => {
-        # min_length, max_length, but not required
+        # min_length, max_length, .. required will be overridden
         mixin    => 'boilerplate',
         required => 0
+    };
+
+Since version 7.900015, all classes are automatically configured with the following
+default mixins for the sake of convenience:
+
+    mixin ':flg' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip numeric/],
+        between    => [0, 1]
+    };
+
+    mixin ':num' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip numeric/]
+    };
+
+    mixin ':str' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip/]
     };
 
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values

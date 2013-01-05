@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900015  2013-01-04
+
+  - Added default mixins (:str, :num, and :flg)
+
+  - Updated the POD in the Cookbook and Prototype
+
+  - Added a has_valid method in prototype as an alias to validate
+
 7.900013  2013-01-01
 
   - Added untested but fully-functional form-fields plugin

@@ -375,6 +375,7 @@ we will then use with some js library to validate form data, etc.
     package model;
 
     use Validation::Class;
+    use Validation::Class::Plugin::JavascriptObjects;
 
     mxn scrub => {
         filters => ['trim', 'strip']
@@ -402,27 +403,13 @@ we will then use with some js library to validate form data, etc.
     get '/js/model'   => sub {
 
         my $model     = model->new;
-        my $namespace = ref $model;
-
-        my $next = my $root = {};
-
-        $next = $next->{$_} = {} for split /::/, $namespace;
-
-        foreach my $field ($model->fields->values) {
-
-            my $node = $next->{$field->{name}} ||= {};
-
-            # what to include for https://github.com/jzaefferer/jquery-validation
-            $node->{required}  = $field->{required} ? 1 : 0;
-            $node->{email}     = $field->{email}        if $field->{email};
-            $node->{minlength} = $field->{min_length}   if $field->{min_length};
-            $node->{maxlength} = $field->{max_length}   if $field->{max_length};
-
-        }
 
         # generate the JS object
-        my $json = Mojo::JSON->new;
-        my $data = sprintf "var validate = %s;", $json->encode($root);
+        my $data = $model->plugin('javascript_objects')->render(
+            namespace => 'validate.model',
+            fields    => [qw/email password/],
+            include   => [qw/required email minlength maxlength/]
+        )
 
         return print $data;
 

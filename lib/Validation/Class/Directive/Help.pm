@@ -18,9 +18,9 @@ use Validation::Class::Util;
     my $rules = Validation::Class::Simple->new(
         fields => {
             username => {
-                help => 'A username was automatically generated for you
+                help => q/A username was automatically generated for you
                 at the time you registered your account. Check your email
-                client for additional instructions.'
+                client for additional instructions./
             }
         }
     );

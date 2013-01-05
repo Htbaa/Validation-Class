@@ -124,6 +124,32 @@ sub configure_profile_register_events {
 
 sub default_profile {
 
+    my %default_mixins = (
+
+        ':flg' => Validation::Class::Mixin->new(
+            required    => 1,
+            min_length  => 1,
+            filters     => [qw/trim strip numeric/],
+            between     => [0, 1],
+            name        => ':flg',
+        ),
+
+        ':num' => Validation::Class::Mixin->new(
+            required    => 1,
+            min_length  => 1,
+            filters     => [qw/trim strip numeric/],
+            name        => ':num',
+        ),
+
+        ':str'  => Validation::Class::Mixin->new(
+            required    => 1,
+            min_length  => 1,
+            filters     => [qw/trim strip/],
+            name        => ':str',
+        )
+
+    );
+
     return Validation::Class::Mapping->new({
 
         ATTRIBUTES  => Validation::Class::Mapping->new,
@@ -140,7 +166,7 @@ sub default_profile {
 
         METHODS    => Validation::Class::Mapping->new,
 
-        MIXINS     => Validation::Class::Mixins->new,
+        MIXINS     => Validation::Class::Mixins->new(%default_mixins),
 
         PLUGINS    => Validation::Class::Mapping->new,
 
