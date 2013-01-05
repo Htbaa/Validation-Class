@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900014
+version 7.900015
 
 # DESCRIPTION
 
@@ -540,8 +540,8 @@ into context/instance specific operations.
 
 ## validate
 
-The validate method returns true/false depending on whether all specified fields
-passed validation checks.
+The validate method (or has\_valid, or validates) returns true/false depending on
+whether all specified fields passed validation checks.
 
     use MyApp::Person;
 
@@ -604,11 +604,12 @@ minus respectively as follows:
 
 ## validate\_method
 
-The validate\_method method is used to determine whether a self-validating method
-will be successful. It does so by validating the methods input specification.
-This is useful in circumstances where it is advantageous to know in-advance
-whether a self-validating method will pass or fail. It effectively allows you
-to use the methods input specification as a validation profile.
+The validate\_method method (or method\_validates) is used to determine whether a
+self-validating method will be successful. It does so by validating the methods
+input specification. This is useful in circumstances where it is advantageous to
+know in-advance whether a self-validating method will pass or fail. It
+effectively allows you to use the methods input specification as a validation
+profile.
 
     if ($self->validate_method('password_change')) {
 

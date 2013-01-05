@@ -4,7 +4,7 @@ Validation::Class::Directive::Help - Help Directive for Validation Class Field D
 
 # VERSION
 
-version 7.900014
+version 7.900015
 
 # SYNOPSIS
 
@@ -13,9 +13,9 @@ version 7.900014
     my $rules = Validation::Class::Simple->new(
         fields => {
             username => {
-                help => 'A username was automatically generated for you
+                help => q/A username was automatically generated for you
                 at the time you registered your account. Check your email
-                client for additional instructions.'
+                client for additional instructions./
             }
         }
     );
