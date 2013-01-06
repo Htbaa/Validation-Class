@@ -975,7 +975,7 @@ sub get_hash {
 
     my ($self) = @_;
 
-    return { map { $_ => $self->get_value($_) } $self->fields->keys };
+    return { map { $_ => $self->get_values($_) } $self->fields->keys };
 
 }
 

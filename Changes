@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900017  2013-01-06
+
+  - Fixed oversight in get_hash method during release 7.900016
+
 7.900016  2013-01-06
 
   - Fixed strange bug where attributes weren't being included in the snapshot process
