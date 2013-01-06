@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900015
+version 7.900016
 
 # DESCRIPTION
 
@@ -329,6 +329,14 @@ field does not match the name specified it will return undefined.
 
     my ($a, $b) = $self->get_fields('field_a', 'field_b');
 
+## get\_hash
+
+The get\_hash method returns a hashref consisting of all fields with their
+absolute values (i.e. default value or matching parameter value). If a
+field does not have an absolute value its value will be undefined.
+
+    my $hash = $self->get_hash;
+
 ## get\_params
 
 The get\_params method returns the values of the parameters specified (as a list,
@@ -387,7 +395,7 @@ method otherwise returns undefined.
     my $value;
 
     if ($field->{readonly} || $field->{default}) {
-        $value = $field->{default} || '';
+        $value = $field->{default} || undef;
     }
     else {
         $value = $param;

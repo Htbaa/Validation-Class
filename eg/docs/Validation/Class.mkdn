@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900015
+version 7.900016
 
 # SYNOPSIS
 
@@ -579,11 +579,23 @@ See ["get\_errors" in Validation::Class::Prototype](http://search.cpan.org/perld
 
 See ["get\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_fields) for full documentation.
 
+## get\_hash
+
+    $self->get_hash;
+
+See ["get\_hash" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_hash) for full documentation.
+
 ## get\_params
 
     $self->get_params;
 
 See ["get\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_params) for full documentation.
+
+## get\_values
+
+    $self->get_values;
+
+See ["get\_values" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_values) for full documentation.
 
 ## fields
 

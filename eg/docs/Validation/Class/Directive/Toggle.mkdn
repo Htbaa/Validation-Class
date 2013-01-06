@@ -4,7 +4,7 @@ Validation::Class::Directive::Toggle - Toggle Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900015
+version 7.900016
 
 # DESCRIPTION
 

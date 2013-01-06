@@ -961,6 +961,24 @@ sub get_fields {
 
 }
 
+=method get_hash
+
+The get_hash method returns a hashref consisting of all fields with their
+absolute values (i.e. default value or matching parameter value). If a
+field does not have an absolute value its value will be undefined.
+
+    my $hash = $self->get_hash;
+
+=cut
+
+sub get_hash {
+
+    my ($self) = @_;
+
+    return { map { $_ => $self->get_value($_) } $self->fields->keys };
+
+}
+
 =method get_params
 
 The get_params method returns the values of the parameters specified (as a list,
@@ -1044,7 +1062,7 @@ method otherwise returns undefined.
     my $value;
 
     if ($field->{readonly} || $field->{default}) {
-        $value = $field->{default} || '';
+        $value = $field->{default} || undef;
     }
     else {
         $value = $param;
@@ -1459,7 +1477,9 @@ sub proxy_methods {
         errors_to_string
         get_errors
         get_fields
+        get_hash
         get_params
+        get_values
         fields
         filtering
         ignore_failure
@@ -2178,6 +2198,7 @@ sub snapshot {
     if (my $config = $self->configuration->configure_profile) {
 
         my @clonable_configuration_settings = qw(
+            attributes
             directives
             events
             fields

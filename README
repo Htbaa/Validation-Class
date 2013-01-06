@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900015
+    version 7.900016
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -567,10 +567,20 @@ PROXY METHODS
 
     See "get_fields" in Validation::Class::Prototype for full documentation.
 
+  get_hash
+        $self->get_hash;
+
+    See "get_hash" in Validation::Class::Prototype for full documentation.
+
   get_params
         $self->get_params;
 
     See "get_params" in Validation::Class::Prototype for full documentation.
+
+  get_values
+        $self->get_values;
+
+    See "get_values" in Validation::Class::Prototype for full documentation.
 
   fields
         $self->fields;

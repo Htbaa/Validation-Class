@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900016  2013-01-06
+
+  - Fixed strange bug where attributes weren't being included in the snapshot process
+
+  - Added the get_values method to the list of auto-exported proxy methods
+
+  - Added the get_hash method to the auto-exported list which returns k/v pairs for all fields
+
 7.900015  2013-01-04
 
   - Added default mixins (:str, :num, and :flg)

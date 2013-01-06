@@ -175,15 +175,17 @@ sub initialize_validator {
 
     # process attribute assignments
 
+    my $proxy_methods = { map { $_ => 1 } ($proto->proxy_methods) } ;
+
     while (my($name, $value) = each (%{$arguments})) {
 
-        my $ok = 0;
+        $self->$name($value) if
 
-        $ok++ if $proto->fields->has($name);
-        $ok++ if $proto->attributes->has($name);
-        $ok++ if grep { $name eq $_ } ($proto->proxy_methods);
+            $self->can($name)              &&
+            $proto->fields->has($name)     ||
+            $proto->attributes->has($name) || $proxy_methods->{$name}
 
-        $self->$name($value) if $self->can($name) && $ok;
+        ;
 
     }
 
@@ -328,13 +330,13 @@ sub has { goto &attribute } sub attribute {
 
     return unless $attributes;
 
-    $attributes = [$attributes] unless ref $attributes eq 'ARRAY';
+    $attributes = [$attributes] unless isa_arrayref $attributes;
 
     return configure_class_proto $package => sub {
 
         my ($proto) = @_;
 
-        $proto->register_attribute($_ => $default) for @$attributes;
+        $proto->register_attribute($_ => $default) for @{$attributes};
 
         return $proto;
 
@@ -1082,11 +1084,23 @@ See L<Validation::Class::Prototype/get_errors> for full documentation.
 
 See L<Validation::Class::Prototype/get_fields> for full documentation.
 
+=proxy_method get_hash
+
+    $self->get_hash;
+
+See L<Validation::Class::Prototype/get_hash> for full documentation.
+
 =proxy_method get_params
 
     $self->get_params;
 
 See L<Validation::Class::Prototype/get_params> for full documentation.
+
+=proxy_method get_values
+
+    $self->get_values;
+
+See L<Validation::Class::Prototype/get_values> for full documentation.
 
 =proxy_method fields
 
