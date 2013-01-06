@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900016
+    version 7.900017
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
