@@ -1641,8 +1641,12 @@ sub register_field {
         my $self = shift @_;
 
         my $proto  = $self->proto;
+        my $field  = $proto->fields->get($name);
 
-        $proto->params->add($name, $_[0]) if @_ == 1;
+        if (@_ == 1) {
+            $proto->params->add($name, $_[0]);
+            $field->value($_[0]);
+        }
 
         return $proto->params->get($name);
 

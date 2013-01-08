@@ -1,5 +1,11 @@
 Revision history for the Perl library Validation::Class
 
+7.900018  2013-01-07
+
+  - Fixed major logic flaw, attribute accessor now setting param and field value
+
+  - Added new (autocase) filter to filters directives
+
 7.900017  2013-01-06
 
   - Fixed oversight in get_hash method during release 7.900016

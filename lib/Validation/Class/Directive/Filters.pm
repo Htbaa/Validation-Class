@@ -15,6 +15,7 @@ our $_registry = {
 
     alpha        => \&filter_alpha,
     alphanumeric => \&filter_alphanumeric,
+    autocase     => \&filter_autocase,
     capitalize   => \&filter_capitalize,
     decimal      => \&filter_decimal,
     lowercase    => \&filter_lowercase,
@@ -63,7 +64,9 @@ that specifies which filter should be executed on the associated field.
 
 =item * option: uppercase e.g. convert to uppercase
 
-=item * option: titlecase e.g. uppercase first letter of each word
+=item * option: titlecase e.g. uppercase first letter of each word; all else lowercase
+
+=item * option: autocase e.g. uppercase first letter of each word
 
 =item * option: capitalize e.g. uppercase the first letter
 
@@ -103,6 +106,13 @@ sub filter_alpha {
 sub filter_alphanumeric {
 
     $_[0] =~ s/[^A-Za-z0-9]//g;
+    return $_[0];
+
+}
+
+sub filter_autocase {
+
+    $_[0] =~ s/(^[a-z]|\b[a-z])/\u$1/g;
     return $_[0];
 
 }

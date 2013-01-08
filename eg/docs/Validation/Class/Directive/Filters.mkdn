@@ -4,7 +4,7 @@ Validation::Class::Directive::Filters - Filters Directive for Validation Class F
 
 # VERSION
 
-version 7.900016
+version 7.900018
 
 # SYNOPSIS
 
@@ -36,7 +36,8 @@ that specifies which filter should be executed on the associated field.
 - option: strip e.g. replace multiple spaces with one space
 - option: lowercase e.g. convert to lowercase
 - option: uppercase e.g. convert to uppercase
-- option: titlecase e.g. uppercase first letter of each word
+- option: titlecase e.g. uppercase first letter of each word; all else lowercase
+- option: autocase e.g. uppercase first letter of each word
 - option: capitalize e.g. uppercase the first letter
 - option: alphanumeric e.g. remove non-any alphanumeric characters
 - option: numeric e.g. remove any non-numeric characters

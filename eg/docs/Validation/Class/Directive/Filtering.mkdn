@@ -4,7 +4,7 @@ Validation::Class::Directive::Filtering - Filtering Directive for Validation Cla
 
 # VERSION
 
-version 7.900016
+version 7.900018
 
 # SYNOPSIS
 
