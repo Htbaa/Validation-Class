@@ -1043,17 +1043,12 @@ sub get_params {
 
 =method get_values
 
-The get_values method returns the absolute value (hardcoded, default or
-parameter specified) for a given field. This method executes specific logic
-which returns the value a field has based on a set of internal conditions. This
-method otherwise returns undefined.
+The get_values method returns the absolute value for a given field. This method
+executes specific logic which returns the value a field has based on a set of
+internal conditions. This method always returns a list, field names that do not
+exist are returned as undefined.
 
     my ($value) = $self->get_values('field_name');
-
-    # equivalent to
-
-    my $field = $self->fields->get('field_name');
-    my $value = $field->value;
 
     # equivalent to
 
@@ -1061,11 +1056,11 @@ method otherwise returns undefined.
     my $field = $self->fields->get('field_name');
     my $value;
 
-    if ($field->{readonly} || $field->{default}) {
+    if ($field->{readonly}) {
         $value = $field->{default} || undef;
     }
     else {
-        $value = $param;
+        $value = $field->{value} || $param;
     }
 
 =cut
@@ -1075,10 +1070,15 @@ sub get_values {
     my ($self, @fields) = @_;
 
     return () unless @fields;
-
     return (
-        map { $self->fields->has($_) ? $self->fields->get($_)->value : undef }
-        @fields
+        map {
+            my $field = $self->fields->get($_);
+            my $param = $self->params->get($_);
+                $field->readonly ?
+                    $field->default || undef :
+                    $field->value   || $param
+                ;
+        }   @fields
     );
 
 }
@@ -2180,9 +2180,11 @@ sub set_values {
         my $param = $self->params->get($name);
         my $field = $self->fields->get($name);
 
-        next if $field->{readonly} || $field->{default};
+        next if $field->{readonly};
 
-        $self->params->add($name, $value);
+        $value ||= $field->{default};
+
+        $self->params->add($name => $value);
 
         $field->value($value);
 
