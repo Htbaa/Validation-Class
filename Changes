@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900020  2013-01-09
+
+  - Fixed major logic flaw in register_settings method, role merging not handling blessed objects properly
+
 7.900018  2013-01-07
 
   - Fixed major logic flaw, attribute accessor now setting param and field value
