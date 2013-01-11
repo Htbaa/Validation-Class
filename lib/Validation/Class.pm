@@ -37,8 +37,6 @@ our @EXPORT = qw(
     method
     mxn
     mixin
-    obj
-    object
     pro
     profile
     set
@@ -576,10 +574,13 @@ sub flt { goto &filter } sub filter {
 =keyword load
 
 The load keyword (or set), which can also be used as a class method, provides
-options for extending the current class by declaring roles, plugins, etc.
+options for extending the current class by declaring roles, requirements, etc.
 
-The process of applying roles to the current class mainly involves copying the
-subject's methods and prototype configuration.
+The process of applying roles, requirement, and other settings to the current
+class mainly involves introspecting the namespace's methods and merging relevant
+parts of the prototype configuration.
+
+=head2 keyword:roles
 
     package MyApp::Person;
 

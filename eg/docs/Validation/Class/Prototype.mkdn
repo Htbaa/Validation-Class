@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900018
+version 7.900021
 
 # DESCRIPTION
 
@@ -112,11 +112,6 @@ The params attribute provides access to input parameters.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and CANNOT be
 overridden.
 
-## plugins
-
-The plugins attribute provides access to loaded plugins. This attribute is a
-[Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing plugin package names.
-
 ## profiles
 
 The profiles attribute provides access to validation profile.
@@ -129,12 +124,6 @@ The queued attribute returns an arrayref of field names for validation and
 CANNOT be overridden. It represents a list of field names stored to be used in
 validation later. If the queued attribute contains a list, you can omit
 arguments to the validate method.
-
-## relatives
-
-The relatives attribute provides access to loaded class relatives (child-classes).
-This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
-package names and CANNOT be overridden.
 
 ## report\_failure
 
@@ -149,6 +138,13 @@ The report\_unknown boolean determines whether your application will report
 unregistered fields as class-level errors upon encountering unregistered field
 directives during validation. This is off (0) by default, attempts to validate
 unknown fields will NOT be registered as class-level variables.
+
+## settings
+
+The settings attribute provides access to settings specific to the associated
+class, not to be confused with settings which exist in the prototype's
+configuration. This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and
+CANNOT be overridden.
 
 ## validated
 
@@ -172,16 +168,14 @@ through the filters defined in their matching fields.
 
 ## class
 
-The class method returns a new initialize validation class related to the
-namespace of the calling class, the relative class would've been loaded via the
-"load" keyword.
+The class method accepts any arguments which can be passed to the foward method
+of a [Class::Forward](http://search.cpan.org/perldoc?Class::Forward) object which should return a valid class namespace.
 
-Existing parameters and configuration options are passed to the constructor of
-the relative class (including the stash). All attributes can be easily
-overwritten using the accessors on the relative class.
-
-Also, you may prevent/override arguments from being copied to the new class
-object by supplying the them as arguments to this method.
+This method instantiated and returns the validation class specified , existing
+parameters and configuration options are passed to the constructor of the
+validation class (including the stash object). You can prevent/override
+arguments from being copied to the new class object by supplying the them as
+arguments to this method.
 
 The class method is also quite handy in that it will detect parameters that are
 prefixed with the name of the class being fetched, and automatically create
@@ -376,17 +370,12 @@ no parameter names are passed.
 
 ## get\_values
 
-The get\_values method returns the absolute value (hardcoded, default or
-parameter specified) for a given field. This method executes specific logic
-which returns the value a field has based on a set of internal conditions. This
-method otherwise returns undefined.
+The get\_values method returns the absolute value for a given field. This method
+executes specific logic which returns the value a field has based on a set of
+internal conditions. This method always returns a list, field names that do not
+exist are returned as undefined.
 
     my ($value) = $self->get_values('field_name');
-
-    # equivalent to
-
-    my $field = $self->fields->get('field_name');
-    my $value = $field->value;
 
     # equivalent to
 
@@ -394,11 +383,11 @@ method otherwise returns undefined.
     my $field = $self->fields->get('field_name');
     my $value;
 
-    if ($field->{readonly} || $field->{default}) {
+    if ($field->{readonly}) {
         $value = $field->{default} || undef;
     }
     else {
-        $value = $param;
+        $value = $field->{value} || $param;
     }
 
 ## is\_valid
@@ -440,8 +429,8 @@ current prototype object. Note: This functionality is somewhat experimental.
 
     my $input = Class->new(params => $params);
 
-    # returns a Validation::Class::Plugin::TelephoneFormat object
     my $formatter = $input->plugin('telephone_format');
+    # ... returns a Validation::Class::Plugin::TelephoneFormat object
 
 ## queue
 

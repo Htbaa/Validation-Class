@@ -19,7 +19,7 @@ use Validation::Class::Util;
 use Hash::Flatten 'flatten', 'unflatten';
 use Module::Runtime 'use_module';
 use Module::Find 'findallmod';
-use List::MoreUtils 'uniq';
+use List::MoreUtils 'uniq', 'firstval';
 use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
@@ -198,15 +198,6 @@ overridden.
 
 hold 'params' => sub { Validation::Class::Params->new };
 
-=attribute plugins
-
-The plugins attribute provides access to loaded plugins. This attribute is a
-L<Validation::Class::Mapping> object containing plugin package names.
-
-=cut
-
-has plugins => sub { Validation::Class::Mapping->new };
-
 =attribute profiles
 
 The profiles attribute provides access to validation profile.
@@ -227,16 +218,6 @@ arguments to the validate method.
 =cut
 
 hold 'queued' => sub { Validation::Class::Listing->new };
-
-=attribute relatives
-
-The relatives attribute provides access to loaded class relatives (child-classes).
-This attribute is a L<Validation::Class::Mapping> object containing
-package names and CANNOT be overridden.
-
-=cut
-
-hold 'relatives' => sub { Validation::Class::Mapping->new };
 
 =attribute report_failure
 
@@ -259,6 +240,17 @@ unknown fields will NOT be registered as class-level variables.
 =cut
 
 has 'report_unknown' => 0;
+
+=attribute settings
+
+The settings attribute provides access to settings specific to the associated
+class, not to be confused with settings which exist in the prototype's
+configuration. This attribute is a L<Validation::Class::Mapping> object and
+CANNOT be overridden.
+
+=cut
+
+hold 'settings' => sub { Validation::Class::Mapping->new };
 
 =attribute validated
 
@@ -559,16 +551,14 @@ sub check_mixin {
 
 =method class
 
-The class method returns a new initialize validation class related to the
-namespace of the calling class, the relative class would've been loaded via the
-"load" keyword.
+The class method accepts any arguments which can be passed to the foward method
+of a L<Class::Forward> object which should return a valid class namespace.
 
-Existing parameters and configuration options are passed to the constructor of
-the relative class (including the stash). All attributes can be easily
-overwritten using the accessors on the relative class.
-
-Also, you may prevent/override arguments from being copied to the new class
-object by supplying the them as arguments to this method.
+This method instantiated and returns the validation class specified , existing
+parameters and configuration options are passed to the constructor of the
+validation class (including the stash object). You can prevent/override
+arguments from being copied to the new class object by supplying the them as
+arguments to this method.
 
 The class method is also quite handy in that it will detect parameters that are
 prefixed with the name of the class being fetched, and automatically create
@@ -1437,18 +1427,16 @@ current prototype object. Note: This functionality is somewhat experimental.
 
     my $input = Class->new(params => $params);
 
-    # returns a Validation::Class::Plugin::TelephoneFormat object
     my $formatter = $input->plugin('telephone_format');
+    # ... returns a Validation::Class::Plugin::TelephoneFormat object
 
 =cut
 
 sub plugin {
 
-    my ($self, $class) = @_;
+    my ($self, $name) = @_;
 
-    return unless $class;
-
-    return $self->plugins->get($class) if $self->plugins->has($class);
+    return unless $name;
 
     # transform what looks like a shortname
 
@@ -1456,7 +1444,7 @@ sub plugin {
 
     $lookup->namespace('Validation::Class::Plugin');
 
-    $class = $lookup->forward($class);
+    my $class = $lookup->forward($name);
 
     eval { use_module $class };
 
@@ -1837,15 +1825,17 @@ sub register_settings {
 
     my $name = $self->package;
 
+    my $settings = $self->configuration->settings;
+
     # attach classes
 
-    if (grep { $data->{$_} } qw/class classes/) {
+    if (my $alias = firstval { exists $data->{$_} } qw(class classes)) {
+
+        $alias = $data->{$alias};
 
         my @parents;
 
-        my $alias = $data->{class} || $data->{classes};
-
-        if (! ref $alias && $alias == 1) {
+        if (!ref $alias && $alias eq 1) {
 
             push @parents, $name;
 
@@ -1859,6 +1849,8 @@ sub register_settings {
 
         foreach my $parent (@parents) {
 
+            my $relatives = $settings->{relatives}->{$parent} ||= {};
+
             # load class children and create relationship map (hash)
 
             foreach my $child (findallmod $parent) {
@@ -1866,61 +1858,25 @@ sub register_settings {
                 my $name  = $child;
                    $name  =~ s/^$parent\:://;
 
-                $self->configuration->relatives->add($name, $child);
+                $relatives->{$name} = $child;
 
             }
 
         }
-
-    }
-
-    # attach plugins
-
-    if (grep { $data->{$_} } qw/plug plugs plugin plugins/) {
-
-        my @plugins;
-
-        my $alias =
-            $data->{plug}   || $data->{plugs} ||
-            $data->{plugin} || $data->{plugins};
-
-        push @plugins, isa_arrayref($alias) ? @{$alias} : $alias;
-
-        foreach my $plugin (@plugins) {
-
-            if ($plugin !~ /^\+/) {
-
-                my $lookup = Class::Forward->new;
-                $lookup->namespace('Validation::Class::Plugin');
-
-                $plugin = $lookup->forward($plugin);
-
-            }
-
-            $plugin =~ s/^\+//;
-
-            eval { use_module $plugin };
-
-        }
-
-        $self->configuration->plugins->add($_, undef) for @plugins;
 
     }
 
     # attach roles
 
-    if (grep { $data->{$_} } qw/base bases role roles/) {
+    if (my $alias = firstval { exists $data->{$_} } qw(base role roles bases)) {
 
-        my @roles ;
+        $alias = $data->{$alias};
 
-        my $alias =
-            $data->{base}  || $data->{role} ||
-            $data->{roles} || $data->{bases}; # backwards compat
+        my @roles;
 
         if ($alias) {
 
-            push @roles, isa_arrayref($alias) ?
-                @{$alias} : $alias;
+            push @roles, isa_arrayref($alias) ? @{$alias} : $alias;
 
         }
 
@@ -1932,9 +1888,10 @@ sub register_settings {
 
                 eval { use_module $role };
 
+                push @{$settings->{roles}}, $role;
+
                 my @routines =
-                    grep { defined &{"$role\::$_"} }
-                    keys %{"$role\::"};
+                    grep { defined &{"$role\::$_"} } keys %{"$role\::"};
 
                 if (@routines) {
 
@@ -1957,13 +1914,7 @@ sub register_settings {
                     my $spro = $self->configuration->profile;
                     my $rpro = $role_proto->configuration->profile;
 
-                    # to be removed
-                    #$self->configuration->profile->merge(
-                    #    $role_proto->configuration->profile->hash
-                    #);
-
                     # manually merge configuration profiles
-                    # ... because hash-based objects don't merge, duh, obviously
                     foreach my $attr ($spro->keys) {
 
                         my $lst = 'Validation::Class::Listing';
@@ -2239,9 +2190,8 @@ sub snapshot {
             filters
             methods
             mixins
-            plugins
             profiles
-            relatives
+            settings
         );
 
         foreach my $name (@clonable_configuration_settings) {

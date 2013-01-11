@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900020
+    version 7.900021
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -256,31 +256,11 @@ KEYWORDS
   load
     The load keyword (or set), which can also be used as a class method,
     provides options for extending the current class by declaring roles,
-    plugins, etc.
+    requirements, etc.
 
-    The process of applying roles to the current class mainly involves
-    copying the subject's methods and prototype configuration.
-
-        package MyApp::Person;
-
-        use Validation::Class;
-
-        load role => 'MyApp::User';
-
-        1;
-
-    The `roles` (or role) option is used to load and inherit functionality
-    from other validation classes. These classes should be used and
-    thought-of as roles although they can also be fully-functioning
-    validation classes. This option accepts an arrayref or single argument.
-
-        package MyApp::Person;
-
-        use Validation::Class;
-
-        load roles => ['MyApp::User', 'MyApp::Visitor'];
-
-        1;
+    The process of applying roles, requirement, and other settings to the
+    current class mainly involves introspecting the namespace's methods and
+    merging relevant parts of the prototype configuration.
 
   message
     The message keyword (or msg) registers a class-level error message
@@ -690,6 +670,28 @@ PROXY METHODS
 
     See "validate_profile" in Validation::Class::Prototype for full
     documentation.
+
+  keyword:roles
+        package MyApp::Person;
+
+        use Validation::Class;
+
+        load role => 'MyApp::User';
+
+        1;
+
+    The `roles` (or role) option is used to load and inherit functionality
+    from other validation classes. These classes should be used and
+    thought-of as roles although they can also be fully-functioning
+    validation classes. This option accepts an arrayref or single argument.
+
+        package MyApp::Person;
+
+        use Validation::Class;
+
+        load roles => ['MyApp::User', 'MyApp::Visitor'];
+
+        1;
 
 EXTENSIBILITY
     Validation::Class does NOT provide method modifiers but can be easily

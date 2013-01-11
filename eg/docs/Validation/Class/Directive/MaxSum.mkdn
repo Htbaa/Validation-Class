@@ -4,7 +4,7 @@ Validation::Class::Directive::MaxSum - MaxSum Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900018
+version 7.900021
 
 # SYNOPSIS
 

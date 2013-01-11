@@ -4,7 +4,7 @@ Validation::Class::Cookbook - Recipes for Validation::Class
 
 # VERSION
 
-version 7.900018
+version 7.900021
 
 # BUILDING CLASSES
 
@@ -240,7 +240,7 @@ The idea is that you'll end up with a main validation class (most likely empty)
 that will simply serve as your point of entry into your relative (child)
 classes. The following is an example of this:
 
-    package MyVal::User;
+    package MyApp::User;
 
     use Validation::Class;
 
@@ -249,7 +249,7 @@ classes. The following is an example of this:
     field login     => { ... };
     field password  => { ... };
 
-    package MyVal::Profile;
+    package MyApp::Profile;
 
     use Validation::Class;
 
@@ -257,7 +257,7 @@ classes. The following is an example of this:
     field sex       => { ... };
     field birthday  => { ... };
 
-    package MyVal;
+    package MyApp;
 
     use Validation::Class;
 
@@ -265,7 +265,7 @@ classes. The following is an example of this:
 
     package main;
 
-    my $input = MyVal->new(params => $params);
+    my $input = MyApp->new(params => $params);
 
     my $user = $input->class('user');
 
@@ -314,17 +314,22 @@ introspection design template that will work in most cases:
 
     use Validation::Class;
 
-    set classes => 'MyApp'; # load MyApp and all MyApp::* child classes
+    load classes => 'MyApp'; # load MyApp and all child classes
 
     sub per_class {
 
         my ($self, $code) = @_;
 
-        $self->proto->relatives->each(sub {
+        while (my($parent, $children) =  each(%{$self->proto->{relatives}})) {
 
-            $code->($_[1]);
+            while (my($nickname, $namespace) = each(%{$children})) {
 
-        });
+                # do something with each class
+                $code->($namespace);
+
+            }
+
+        }
 
     }
 
@@ -332,7 +337,7 @@ introspection design template that will work in most cases:
 
         my ($self, $code) = @_;
 
-        $self->per_class(sub {
+        $self->per_class(sub{
 
             my $namespace = shift;
 
@@ -375,7 +380,7 @@ we will then use with some js library to validate form data, etc.
 
 ... example validation class
 
-    package model;
+    package MyApp::Model;
 
     use Validation::Class;
     use Validation::Class::Plugin::JavascriptObjects;
@@ -405,7 +410,7 @@ we will then use with some js library to validate form data, etc.
 
     get '/js/model'   => sub {
 
-        my $model     = model->new;
+        my $model     = MyApp::Model->new;
 
         # generate the JS object
         my $data = $model->plugin('javascript_objects')->render(

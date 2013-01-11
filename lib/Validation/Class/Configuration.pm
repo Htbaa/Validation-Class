@@ -168,11 +168,9 @@ sub default_profile {
 
         MIXINS     => Validation::Class::Mixins->new(%default_mixins),
 
-        PLUGINS    => Validation::Class::Mapping->new,
-
         PROFILES   => Validation::Class::Mapping->new,
 
-        RELATIVES  => Validation::Class::Mapping->new,
+        SETTINGS   => Validation::Class::Mapping->new,
 
     });
 
@@ -236,14 +234,6 @@ sub new {
 
 }
 
-sub plugins {
-
-    my ($self) = @_;
-
-    return $self->profile->{PLUGINS};
-
-}
-
 sub profile {
 
     my ($self) = @_;
@@ -260,11 +250,11 @@ sub profiles {
 
 }
 
-sub relatives {
+sub settings {
 
     my ($self) = @_;
 
-    return $self->profile->{RELATIVES};
+    return $self->profile->{SETTINGS};
 
 }
 

@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900021  2013-01-10
+
+  - Miscellaneous POD changes, fixed typos, re-worded method descriptions
+
+  - Removed phased-out plugin code
+
+  - Refactored settings loading functionality
+
 7.900020  2013-01-09
 
   - Fixed major logic flaw in register_settings method, role merging not handling blessed objects properly

@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900020
+version 7.900021
 
 # SYNOPSIS
 
@@ -263,31 +263,11 @@ The coderef should also return the transformed value.
 ## load
 
 The load keyword (or set), which can also be used as a class method, provides
-options for extending the current class by declaring roles, plugins, etc.
+options for extending the current class by declaring roles, requirements, etc.
 
-The process of applying roles to the current class mainly involves copying the
-subject's methods and prototype configuration.
-
-    package MyApp::Person;
-
-    use Validation::Class;
-
-    load role => 'MyApp::User';
-
-    1;
-
-The \`roles\` (or role) option is used to load and inherit functionality from
-other validation classes. These classes should be used and thought-of as roles
-although they can also be fully-functioning validation classes. This option
-accepts an arrayref or single argument.
-
-    package MyApp::Person;
-
-    use Validation::Class;
-
-    load roles => ['MyApp::User', 'MyApp::Visitor'];
-
-    1;
+The process of applying roles, requirement, and other settings to the current
+class mainly involves introspecting the namespace's methods and merging relevant
+parts of the prototype configuration.
 
 ## message
 
@@ -719,6 +699,29 @@ See ["validate\_method" in Validation::Class::Prototype](http://search.cpan.org/
     $self->validate_profile;
 
 See ["validate\_profile" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_profile) for full documentation.
+
+## keyword:roles
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load role => 'MyApp::User';
+
+    1;
+
+The \`roles\` (or role) option is used to load and inherit functionality from
+other validation classes. These classes should be used and thought-of as roles
+although they can also be fully-functioning validation classes. This option
+accepts an arrayref or single argument.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load roles => ['MyApp::User', 'MyApp::Visitor'];
+
+    1;
 
 # EXTENSIBILITY
 
