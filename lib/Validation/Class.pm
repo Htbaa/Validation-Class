@@ -895,13 +895,13 @@ sub mxn { goto &mixin } sub mixin {
 =method new
 
 The new method instantiates a new class object, it performs a series of actions
-(magic) required for the class function properly, and for that reason, this
+(magic) required for the class to function properly, and for that reason, this
 method should never be overridden. Use the build keyword for hooking into the
 instantiation process.
 
-In the event a foreign `new` method is detected, an `initialize_validator`
-method will be injected into the class containing the code (magic) necessary to
-normalize your environment.
+In the event a foreign (pre-existing) `new` method is detected, an
+`initialize_validator` method will be injected into the class containing the
+code (magic) necessary to normalize your environment.
 
     package MyApp::Person;
 
