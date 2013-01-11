@@ -580,7 +580,7 @@ The process of applying roles, requirement, and other settings to the current
 class mainly involves introspecting the namespace's methods and merging relevant
 parts of the prototype configuration.
 
-=head2 keyword:roles
+=keyword load:roles
 
     package MyApp::Person;
 
