@@ -30,6 +30,45 @@ use warnings;
 
 {
 
+    # importing nothing - #hack
+
+    package TestClass::Alt;
+    use Validation::Class qw(//);
+
+    package main;
+
+    my $class;
+
+    $class = TestClass::Alt->new;
+
+    ok ref $class, "TestClass::Alt instantiated";
+    ok !$class->can('attribute'), "TestClass::Alt wo/ attribute keyword";
+    ok !$class->can('bld'), "TestClass::Alt wo/ bld keyword";
+    ok !$class->can('build'), "TestClass::Alt wo/ build keyword";
+    ok !$class->can('dir'), "TestClass::Alt wo/ dir keyword";
+    ok !$class->can('directive'), "TestClass::Alt wo/ directive keyword";
+    ok !$class->can('fld'), "TestClass::Alt wo/ fld keyword";
+    ok !$class->can('field'), "TestClass::Alt wo/ field keyword";
+    ok !$class->can('flt'), "TestClass::Alt wo/ flt keyword";
+    ok !$class->can('filter'), "TestClass::Alt wo/ filter keyword";
+    ok !$class->can('has'), "TestClass::Alt wo/ has keyword";
+    ok !$class->can('load'), "TestClass::Alt wo/ load keyword";
+    ok !$class->can('msg'), "TestClass::Alt wo/ msg keyword";
+    ok !$class->can('message'), "TestClass::Alt wo/ message keyword";
+    ok !$class->can('mth'), "TestClass::Alt wo/ mth keyword";
+    ok !$class->can('method'), "TestClass::Alt wo/ method keyword";
+    ok !$class->can('mxn'), "TestClass::Alt wo/ mxn keyword";
+    ok !$class->can('mixin'), "TestClass::Alt wo/ mixin keyword";
+    ok !$class->can('obj'), "TestClass::Alt wo/ obj keyword";
+    ok !$class->can('object'), "TestClass::Alt wo/ object keyword";
+    ok !$class->can('pro'), "TestClass::Alt wo/ pro keyword";
+    ok !$class->can('profile'), "TestClass::Alt wo/ profile keyword";
+    ok !$class->can('set'), "TestClass::Alt wo/ set keyword";
+
+}
+
+{
+
     # no importing - #hack
 
     package TestClass::Hack;

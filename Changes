@@ -1,5 +1,11 @@
 Revision history for the Perl library Validation::Class
 
+7.900022  2013-01-11
+
+  - Added/Update POD in the main module and cookbook
+
+  - Added role-requirements (methods required by subclass) settings fom the load keyword
+
 7.900021  2013-01-10
 
   - Miscellaneous POD changes, fixed typos, re-worded method descriptions

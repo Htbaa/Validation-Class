@@ -296,27 +296,24 @@ please review L<Validation::Class::Whitepaper>.
 
 =keyword attribute
 
-The attribute keyword (or has) registers a class attribute. This is only a
-minimalistic variant of what you may have encountered in other object systems.
+The attribute keyword (or has) registers a class attribute, i.e. it creates an
+accessor (getter and setter) on the class. Attribute declaration is flexible and
+only requires an attribute name to be configured. Additionally, the attribute
+keyword can takes two arguments, the attribute's name and a scalar or coderef to
+be used as it's default value.
 
     package MyApp::Person;
 
     use Validate::Class;
 
-    attribute 'first_name' => 'Peter';
-    attribute 'last_name'  => 'Venkman';
-    attribute 'full_name'  => sub {
+    has 'first_name' => 'Peter';
+    has 'last_name'  => 'Venkman';
 
-        my ($self) = @_;
+    has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
 
-        return join ', ', $self->last_name, $self->first_name;
-
-    };
+    has 'email_address';
 
     1;
-
-The attribute keyword takes two arguments, the attribute name and a constant or
-coderef that will be used as its default value.
 
 =cut
 
@@ -579,6 +576,57 @@ options for extending the current class by declaring roles, requirements, etc.
 The process of applying roles, requirement, and other settings to the current
 class mainly involves introspecting the namespace's methods and merging relevant
 parts of the prototype configuration.
+
+=keyword load:classes
+
+The `classes` (or class) option uses L<Module::Find> to load all child classes
+(in-all-subdirectories) for convenient access through the
+L<Validation::Class::Prototype/class> method, and when introspecting a larger
+application. This option accepts an arrayref or single argument.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    load classes => 1;
+
+    package main;
+
+    my $app = MyApp->new;
+
+    my $person = $app->class('person'); # return a new MyApp::Person object
+
+    1;
+
+=keyword load:requirements
+
+    package MyApp::User;
+
+    use Validate::Class;
+
+    load required => 'activate';
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load role => 'MyApp::User';
+
+    sub activate {}
+
+    1;
+
+The `requirements` (or required) option is used to ensure that if/when the class
+is used as a role the calling class has specific pre-existing methods. This
+option accepts an arrayref or single argument.
+
+    package MyApp::User;
+
+    use Validate::Class;
+
+    load required => ['activate', 'deactivate'];
+
+    1;
 
 =keyword load:roles
 
@@ -929,6 +977,8 @@ code (magic) necessary to normalize your environment.
 sub new {
 
     my $class = shift;
+
+    $class = ref $class || $class;
 
     my $proto = return_class_proto $class;
 

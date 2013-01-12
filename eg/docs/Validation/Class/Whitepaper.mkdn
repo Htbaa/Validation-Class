@@ -4,7 +4,7 @@ Validation::Class::Whitepaper - Operate with Impunity
 
 # VERSION
 
-version 7.900021
+version 7.900022
 
 # INTRODUCTION
 

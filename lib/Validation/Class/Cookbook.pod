@@ -68,8 +68,8 @@ A validation class is defined as follows:
 
     field 'password'  => {
         mixin         => 'basic',
-        label         => 'user login',
-        error         => 'login invalid',
+        label         => 'user password',
+        error         => 'password invalid',
         validation    => sub {
 
             my ($self, $field, $params) = @_;
@@ -176,6 +176,74 @@ the same alias defined, such a configuration would result in a runtime error.
     }
 
     # valid because email_address is an alias on the email field
+
+=head1 INTEGRATING CLASSES AND FRAMEWORKS
+
+This recipe displays methods of configuring your validation class to cooperate
+with your pre-existing classes and object-system.
+
+=head2 Problem
+
+You want to know how to configure L<Validation::Class> to cooperate with
+pre-existing classes or object systems like L<Mo>, L<Moo>, L<Mouse>, and L<Moose>.
+
+=head2 Solution
+
+Use a combination of techniques such as excluding keywords exported by
+L<Validation::Class> and utilizing the initialize_validator method.
+
+=head2 Discussion
+
+L<Validation::Class> will atuomatically inject a method name
+`initialize_validator` if a pre-existing `new` method is dicovered which allows
+you to execute certain validation class normalization routines. When, the
+initialize_validator method is called is not important, it is only important
+that it is called before your object is used as a validation class object.
+
+A validation class using Moose as an object system could be configured as follows:
+
+    package MyApp::Person;
+
+    use Moose;
+    use Validation::Class qw(fld mxn);
+
+    # the order in which these frameworks are used is important
+    # loading Moose first ensures that the Moose::Object constructor
+    # has precendence
+
+    sub BUILD {
+
+        my ($self, $params) = @_;
+
+        $self->initialize_validator($params);
+
+    }
+
+    mxn 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+
+    fld 'login'  => {
+        mixin => 'basic',
+        label => 'user login',
+        error => 'login invalid'
+    };
+
+    fld 'password'  => {
+        mixin => 'basic',
+        label => 'user password',
+        error => 'password invalid'
+    };
+
+    has 'profile' => (
+        is  => 'rw',
+        isa => 'MyApp::Person::Profile'
+    );
+
+    1;
 
 =head1 FILTERING DATA
 

@@ -1825,6 +1825,8 @@ sub register_settings {
 
     my $name = $self->package;
 
+    # grab configuration settings, not instance settings
+
     my $settings = $self->configuration->settings;
 
     # attach classes
@@ -1835,7 +1837,7 @@ sub register_settings {
 
         my @parents;
 
-        if (!ref $alias && $alias eq 1) {
+        if ($alias eq 1 && !ref $alias) {
 
             push @parents, $name;
 
@@ -1866,6 +1868,24 @@ sub register_settings {
 
     }
 
+    # attach requirements
+
+    if (my $alias = firstval { exists $data->{$_} } qw(required requirements)) {
+
+        $alias = $data->{$alias};
+
+        my @requirements;
+
+        push @requirements, isa_arrayref($alias) ? @{$alias} : $alias;
+
+        foreach my $requirement (@requirements) {
+
+            $settings->{requirements}->{$requirement} = 1;
+
+        }
+
+    }
+
     # attach roles
 
     if (my $alias = firstval { exists $data->{$_} } qw(base role roles bases)) {
@@ -1888,6 +1908,46 @@ sub register_settings {
 
                 eval { use_module $role };
 
+                # is the role a validation class?
+
+                unless ($self->registry->has($role)) {
+                    confess sprintf "Can't apply the role %s to the " .
+                        "class %s unless the role subclasses " .
+                        "Validation::Class",
+                            $role,
+                            $self->package
+                    ;
+                }
+
+                my $role_proto = $self->registry->get($role);;
+
+                # check requirements
+
+                my $requirements =
+                    $role_proto->configuration->settings->{requirements};
+                ;
+
+                if (defined $requirements) {
+
+                    my @failures;
+
+                    foreach my $requirement (keys %{$requirements}) {
+                        unless ($self->package->can($requirement)) {
+                            push @failures, $requirement;
+                        }
+                    }
+
+                    if (@failures) {
+                        confess sprintf "Can't use the class %s as a role for ".
+                            "use with the class %s while missing method(s): %s",
+                                $role,
+                                $self->package,
+                                join ', ', @failures
+                        ;
+                    }
+
+                }
+
                 push @{$settings->{roles}}, $role;
 
                 my @routines =
@@ -1907,32 +1967,30 @@ sub register_settings {
 
                     }
 
-                    my $role_proto = $self->registry->get($role);
-
                     # merge configurations
 
-                    my $spro = $self->configuration->profile;
-                    my $rpro = $role_proto->configuration->profile;
+                    my $self_profile = $self->configuration->profile;
+                    my $role_profile = $role_proto->configuration->profile;
 
                     # manually merge configuration profiles
-                    foreach my $attr ($spro->keys) {
+                    foreach my $attr ($self_profile->keys) {
 
                         my $lst = 'Validation::Class::Listing';
                         my $map = 'Validation::Class::Mapping';
 
-                        my $sproo = $spro->{$attr};
-                        my $rproo = $rpro->{$attr};
+                        my $sp_attr = $self_profile->{$attr};
+                        my $rp_attr = $role_profile->{$attr};
 
-                        if (ref($rproo) and $rproo->isa($map)) {
-                            $sproo->add($rproo->hash);
+                        if (ref($rp_attr) and $rp_attr->isa($map)) {
+                            $sp_attr->add($rp_attr->hash);
                         }
 
-                        elsif (ref($rproo) and $rproo->isa($lst)) {
-                            $sproo->add($rproo->list);
+                        elsif (ref($rp_attr) and $rp_attr->isa($lst)) {
+                            $sp_attr->add($rp_attr->list);
                         }
 
                         else {
-                            $sproo->merge({$attr => $rproo});
+                            $sp_attr->merge({$attr => $rp_attr});
                         }
 
                     }

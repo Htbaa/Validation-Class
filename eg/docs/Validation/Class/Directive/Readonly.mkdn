@@ -4,7 +4,7 @@ Validation::Class::Directive::Readonly - Readonly Directive for Validation Class
 
 # VERSION
 
-version 7.900021
+version 7.900022
 
 # SYNOPSIS
 
