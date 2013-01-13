@@ -485,9 +485,22 @@ underscore.
         length   => 1
     };
 
-Protip: Field directives are used to validate scalar and array data. Don't use
-fields to store and validate objects. Please see the *has* keyword instead or
-use an object system with type constraints like L<Moose>.
+
+Please note that prefixing field names with a double plus-symbol instructs the
+register to merge your declaration with any pre-existing declarations within the
+same scope (e.g. fields imported via loading roles), whereas prefixing field
+names with a single plus-symbol instructs the register to overwrite any
+pre-existing declarations.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    set role => 'MyApp::User';
+
+    mixin '++email_address' => {
+        required => 1
+    };
 
 =cut
 
@@ -588,7 +601,7 @@ application. This option accepts an arrayref or single argument.
 
     use Validation::Class;
 
-    load classes => 1;
+    load classes => ['MyApp::Domain1', 'MyApp::Domain2'];
 
     package main;
 
@@ -604,7 +617,7 @@ application. This option accepts an arrayref or single argument.
 
     use Validate::Class;
 
-    load required => 'activate';
+    load requirements => 'activate';
 
     package MyApp::Person;
 
@@ -624,7 +637,7 @@ option accepts an arrayref or single argument.
 
     use Validate::Class;
 
-    load required => ['activate', 'deactivate'];
+    load requirements => ['activate', 'deactivate'];
 
     1;
 
@@ -893,8 +906,8 @@ directives created by the mixin directive.
         required => 0
     };
 
-Since version 7.900015, all classes are automatically configured with the following
-default mixins for the sake of convenience:
+Since version 7.900015, all classes are automatically configured with the
+following default mixins for the sake of convenience:
 
     mixin ':flg' => {
         required   => 1,
@@ -913,6 +926,23 @@ default mixins for the sake of convenience:
         required   => 1,
         min_length => 1,
         filters    => [qw/trim strip/]
+    };
+
+Please note that the aforementioned mixin names are prexed with a semi-colon but
+are treated as an exception to the rule. Prefixing mixin names with a double
+plus-symbol instructs the register to merge your declaration with any pre-existing
+declarations within the same scope (e.g. mixins imported via loading roles),
+whereas prefixing mixin names with a single plus-symbol instructs the register
+to overwrite any pre-existing declarations.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    set role => 'MyApp::User';
+
+    mixin '++boilerplate' => {
+        filters => ['autocase']
     };
 
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values

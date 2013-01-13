@@ -4,7 +4,7 @@ Validation::Class::Directive::MaxSymbols - MaxSymbols Directive for Validation C
 
 # VERSION
 
-version 7.900022
+version 7.900023
 
 # SYNOPSIS
 

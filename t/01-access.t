@@ -5,6 +5,8 @@ use utf8;
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 {
 
     package TestClass::CheckParameters;
@@ -126,6 +128,35 @@ use warnings;
     ok $accessors[2] eq 'name_phone_0', "$class has the name_phone_0 accessor";
     ok $accessors[3] eq 'name_phone_1', "$class has the name_phone_1 accessor";
     ok $accessors[4] eq 'name_phone_2', "$class has the name_phone_2 accessor";
+
+}
+
+{
+
+    package TestClass::FieldAppend::Role;
+    use Validation::Class;
+
+    fld 'title'   => {length => 1};
+    fld 'surname' => {min_length => 1};
+
+    package TestClass::FieldAppend;
+    use Validation::Class;
+    set role => 'TestClass::FieldAppend::Role';
+
+    fld '+title'    => {required => 0, min_length => 1};
+    fld '++surname' => {max_length => 1};
+
+    package main;
+
+    my $class   = "TestClass::FieldAppend";
+    my $self    = $class->new;
+    my $title   = $self->fields->get('title');
+    my $surname = $self->fields->get('surname');
+
+    ok $class eq ref $self, "$class instantiated";
+
+    ok(((!defined $title->{length} && defined $title->{required} && defined $title->{min_length}) and ($title->{required} == 0 && $title->{min_length} == 1)), "$class title field was overriden");
+    ok(((defined $surname->{min_length} && defined $surname->{max_length}) and ($surname->{min_length} == 1 && $surname->{max_length} == 1)), "$class surname field was appended");
 
 }
 
