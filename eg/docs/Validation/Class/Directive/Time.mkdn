@@ -4,7 +4,7 @@ Validation::Class::Directive::Time - Time Directive for Validation Class Field D
 
 # VERSION
 
-version 7.900023
+version 7.900024
 
 # SYNOPSIS
 

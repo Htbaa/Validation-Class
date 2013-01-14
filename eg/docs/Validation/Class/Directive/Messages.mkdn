@@ -4,7 +4,7 @@ Validation::Class::Directive::Messages - Messages Directive for Validation Class
 
 # VERSION
 
-version 7.900023
+version 7.900024
 
 # SYNOPSIS
 

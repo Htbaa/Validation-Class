@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900023
+version 7.900024
 
 # DESCRIPTION
 

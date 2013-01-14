@@ -4,7 +4,7 @@ Validation::Class::Directive::MinSum - MinSum Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900023
+version 7.900024
 
 # SYNOPSIS
 
