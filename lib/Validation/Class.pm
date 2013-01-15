@@ -948,12 +948,12 @@ to overwrite any pre-existing declarations.
 
     set role => 'MyApp::Person';
 
-    # overwrite and append existing field
+    # overwrite and append existing mixin
     mixin '++boilerplate' => {
         min_symbols => 1
     };
 
-    # redefine existing field
+    # redefine existing mixin
     mixin '+username' => {
         required => 1
     };

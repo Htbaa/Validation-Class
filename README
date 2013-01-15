@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900024
+    version 7.900025
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -503,12 +503,12 @@ KEYWORDS
 
         set role => 'MyApp::Person';
 
-        # overwrite and append existing field
+        # overwrite and append existing mixin
         mixin '++boilerplate' => {
             min_symbols => 1
         };
 
-        # redefine existing field
+        # redefine existing mixin
         mixin '+username' => {
             required => 1
         };
