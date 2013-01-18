@@ -306,6 +306,7 @@ sub merge {
 
     # eval bug in Hash::Merge (v0.12 line 100) will likely never be fixed
     # https://rt.cpan.org/Public/Bug/Display.html?id=55978
+    # something is hijacking $SIG{__DIE__}
     eval { $self->add($merger->merge($arguments, $self->hash)) };
 
     return $self;
@@ -367,7 +368,10 @@ sub rmerge {
 
     my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
 
-    $self->add($merger->merge($arguments, $self->hash));
+    # eval bug in Hash::Merge (v0.12 line 100) will likely never be fixed
+    # https://rt.cpan.org/Public/Bug/Display.html?id=55978
+    # something is hijacking $SIG{__DIE__}
+    eval { $self->add($merger->merge($arguments, $self->hash)) };
 
     return $self;
 

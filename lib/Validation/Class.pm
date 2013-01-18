@@ -388,41 +388,33 @@ per instance. See the list of core directives, L<Validation::Class::Directives>,
 or review L<Validation::Class::Directive> for insight into creating your own
 CPAN installable directives.
 
-    package MyApp::Directives;
-
-    use Validation::Class 'directive';
-
-    use Data::Validate::Email;
-
-    directive 'isa_email_address' => sub {
-
-        my ($self, $field, $param) = @_;
-
-        my $validator = Data::Validate::Email->new;
-
-        unless ($validator->is_email($param)) {
-
-            my $handle = $field->label || $field->name;
-
-            $field->errors->add("$handle must be a valid email address");
-
-            return 0;
-
-        }
-
-        return 1;
-
-    };
-
     package MyApp::Person;
 
     use Validate::Class;
 
-    use MyApp::Directives;
+    # define a custom class-level directive
+    directive 'blacklisted' => sub {
+        my ($self, $field, $param) = @_;
+
+        if (defined $field->{blacklisted} && defined $param) {
+            if ($field->{required} || $param) {
+                if (exists_in_blacklist($field->{blacklisted}, $param)) {
+                    my $handle = $field->label || $field->name;
+                    $field->errors->add("$handle has been blacklisted");
+                    return 0;
+                }
+            }
+        }
+
+        return 1;
+    };
 
     field 'email_address' => {
-        isa_email_address => 1
+        email => 1,
+        blacklisted => '/path/to/blacklsit'
     };
+
+
 
     1;
 
