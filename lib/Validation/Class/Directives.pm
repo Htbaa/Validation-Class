@@ -15,7 +15,13 @@ use Carp 'confess';
 
 use List::MoreUtils;
 
-our $_registry = {map{$_=>$_->new}(usesub 'Validation::Class::Directive')};
+our $_registry = {};
+
+foreach my $module (usesub 'Validation::Class::Directive') {
+    $_registry->{$module} = $module->new
+        if $module->isa('Validation::Class::Directive')
+    ;
+}
 
 # VERSION
 

@@ -8,8 +8,6 @@ use warnings;
 use Module::Find;
 
 use Validation::Class::Util '!has';
-use Module::Runtime 'use_module';
-use Hash::Merge 'merge';
 use Clone 'clone';
 use Exporter ();
 
@@ -212,14 +210,17 @@ sub initialize_validator {
     my $input = Validation::Class::Simple::Streamer->new($parameters);
 
     # data validation rules for the username parameter
+
     $input->check('username')->required->between('5-255');
     $input->filters([qw/trim strip/]);
 
     # data validation rule for the password parameter
+
     $input->check('password')->required->between('5-255')->min_symbols(1);
     $input->filters([qw/trim strip/]);
 
     # perform validation
+
     unless ($input) {
         # handle the failures
     }
@@ -227,16 +228,14 @@ sub initialize_validator {
 =head1 DESCRIPTION
 
 Validation::Class is a scalable data validation library with interfaces for
-applications of all sizes. L<Validation::Class::Simple::Streamer> is a great way
-to leverage this library for ad-hoc use-cases, L<Validation::Class::Simple>
-is very well suited for applications of moderate sophistication where it makes
-sense to pre-declared validation rules, and Validation::Class is designed to
-transform class namespaces into data validation domains where consistency and
-reuse are primary concerns.
+applications of all sizes.
 
+The most common usage of Validation::Class is to transform class namespaces into
+data validation domains where consistency and reuse are primary concerns.
 Validation::Class provides an extensible framework for defining reusable data
 validation rules. It ships with a complete set of pre-defined validations and
 filters referred to as L<"directives"|Validation::Class::Directives/DIRECTIVES>.
+
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
 inheritance, automatic array handling, and extensibility (e.g. overriding
@@ -284,7 +283,7 @@ a more traditional usage of Validation::Class:
 
 If you are looking for a simple in-line data validation module built using the
 same tenets and principles as Validation::Class, please review
-L<Validation::Class::Simple>.
+L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>.
 
 =head1 RATIONALE
 
@@ -397,7 +396,7 @@ CPAN installable directives.
 
     directive 'isa_email_address' => sub {
 
-        my ($self, $proto, $field, $param) = @_;
+        my ($self, $field, $param) = @_;
 
         my $validator = Data::Validate::Email->new;
 

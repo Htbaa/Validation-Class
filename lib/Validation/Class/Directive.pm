@@ -93,7 +93,7 @@ has 'name'          => sub {
 
     my $regexp = qr/Validation::Class::Directive::(.*)$/;
 
-    ($name) = $name =~ $regexp;
+    $name = $1 if $name =~ $regexp;
 
     $name =~ s/([a-z])([A-Z])/$1_$2/g;
     $name =~ s/\W/_/g;
