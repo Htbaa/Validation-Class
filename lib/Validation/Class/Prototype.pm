@@ -774,6 +774,35 @@ sub clone_field {
 
 }
 
+=method does
+
+The does method is used to determine whether the current prototype is composed
+using the role specified. Return true if so, false if not.
+
+    package Class;
+
+    use Validation::Class;
+
+    set role => 'Class::Root';
+
+    package main;
+
+    my $self = Class->new(params => $params);
+
+    return 1 if $self->proto->does('Class::Root');
+
+=cut
+
+sub does {
+
+    my ($self, $role) = @_;
+
+    my $roles = $self->settings->get('roles');
+
+    return $roles ? (firstval { $_ eq $role } @{$roles}) ? 1 : 0 : 0;
+
+}
+
 =method error_count
 
 The error_count method returns the total number of errors set at both the class

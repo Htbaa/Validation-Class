@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900027
+    version 7.900028
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -147,13 +147,21 @@ KEYWORDS
             my ($self, $field, $param) = @_;
 
             if (defined $field->{blacklisted} && defined $param) {
+
                 if ($field->{required} || $param) {
+
                     if (exists_in_blacklist($field->{blacklisted}, $param)) {
+
                         my $handle = $field->label || $field->name;
+
                         $field->errors->add("$handle has been blacklisted");
+
                         return 0;
+
                     }
+
                 }
+
             }
 
             return 1;

@@ -46,4 +46,26 @@ use warnings;
 
 }
 
+{
+
+    package TestClass::Test3::Define;
+    use Validation::Class;
+
+    package TestClass::Test3::Consume;
+    use Validation::Class;
+
+    set role => 'TestClass::Test3::Define';
+
+    package main;
+
+    my $class = "TestClass::Test3::Consume";
+    my $self  = $class->new;
+
+    ok $class eq ref $self, "$class instantiated";
+    ok $self->proto->can('does'), "$class prototype has does method";
+    ok $self->proto->does('TestClass::Test3::Define'), "$class prototype has role TestClass::Test3::Define";
+    ok !$self->proto->does('TestClass::Test3::Gumby'), "$class prototype does not have role TestClass::Test3::Gumby";
+
+}
+
 done_testing;

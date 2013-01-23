@@ -397,13 +397,21 @@ CPAN installable directives.
         my ($self, $field, $param) = @_;
 
         if (defined $field->{blacklisted} && defined $param) {
+
             if ($field->{required} || $param) {
+
                 if (exists_in_blacklist($field->{blacklisted}, $param)) {
+
                     my $handle = $field->label || $field->name;
+
                     $field->errors->add("$handle has been blacklisted");
+
                     return 0;
+
                 }
+
             }
+
         }
 
         return 1;
@@ -507,6 +515,8 @@ sub fld { goto &field } sub field {
     my $package = shift if @_ == 3;
 
     my ($name, $data) = @_;
+
+    $data ||= {};
 
     return unless ($name && $data);
 
@@ -959,6 +969,8 @@ sub mxn { goto &mixin } sub mixin {
     my $package = shift if @_ == 3;
 
     my ($name, $data) = @_;
+
+    $data ||= {};
 
     return unless ($name && $data);
 
