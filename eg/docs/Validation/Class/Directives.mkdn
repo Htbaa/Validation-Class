@@ -4,7 +4,7 @@ Validation::Class::Directives - Validation::Class Core Directives Registry
 
 # VERSION
 
-version 7.900024
+version 7.900029
 
 # DESCRIPTION
 

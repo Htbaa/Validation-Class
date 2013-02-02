@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900024
+version 7.900029
 
 # DESCRIPTION
 
@@ -267,6 +267,23 @@ validated that can share existing validation rules.
     $self->validate(qw/phone phone2 phone3 phone4/);
 
     1;
+
+## does
+
+The does method is used to determine whether the current prototype is composed
+using the role specified. Return true if so, false if not.
+
+    package Class;
+
+    use Validation::Class;
+
+    set role => 'Class::Root';
+
+    package main;
+
+    my $self = Class->new(params => $params);
+
+    return 1 if $self->proto->does('Class::Root');
 
 ## error\_count
 
@@ -605,8 +622,8 @@ The validate\_method method (or method\_validates) is used to determine whether 
 self-validating method will be successful. It does so by validating the methods
 input specification. This is useful in circumstances where it is advantageous to
 know in-advance whether a self-validating method will pass or fail. It
-effectively allows you to use the methods input specification as a validation
-profile.
+effectively allows you to use the methods input specification as a
+validation profile.
 
     if ($self->validate_method('password_change')) {
 

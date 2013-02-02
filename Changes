@@ -1,5 +1,11 @@
 Revision history for the Perl library Validation::Class
 
+7.900029  2013-02-02
+
+  - Now exporting the prototype is_valid method into the calling class
+
+  - Minor POD update about alternate self-validating-method usage and syntax
+
 7.900028  2013-01-23
 
   - Minor POD updates

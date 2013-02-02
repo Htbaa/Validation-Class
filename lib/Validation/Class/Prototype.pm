@@ -1501,6 +1501,7 @@ sub proxy_methods {
         filtering
         ignore_failure
         ignore_unknown
+        is_valid
         param
         params
         plugin
@@ -1748,7 +1749,10 @@ sub register_method {
 
         my $input  = $data->{'input'};
         my $output = $data->{'output'};
-        my $using  = $data->{'using'} || $self->can("_$name");
+        my $using  = $data->{'using'};
+
+           $using ||= $self->can("_$name");
+           $using ||= $self->can("_process_$name");
 
         if ($input) {
 
@@ -2675,8 +2679,8 @@ The validate_method method (or method_validates) is used to determine whether a
 self-validating method will be successful. It does so by validating the methods
 input specification. This is useful in circumstances where it is advantageous to
 know in-advance whether a self-validating method will pass or fail. It
-effectively allows you to use the methods input specification as a validation
-profile.
+effectively allows you to use the methods input specification as a
+validation profile.
 
     if ($self->validate_method('password_change')) {
 

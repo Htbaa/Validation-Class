@@ -4,7 +4,7 @@ Validation::Class::Directive::Name - Name Directive for Validation Class Field D
 
 # VERSION
 
-version 7.900024
+version 7.900029
 
 # DESCRIPTION
 
