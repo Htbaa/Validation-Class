@@ -1,5 +1,13 @@
 Revision history for the Perl library Validation::Class
 
+7.900030  2013-02-09
+
+  - Fixed a bug in the error_fields method
+
+  - Fixed a bug in the role inheritance functionality
+
+  - Minor POD update
+
 7.900029  2013-02-02
 
   - Now exporting the prototype is_valid method into the calling class

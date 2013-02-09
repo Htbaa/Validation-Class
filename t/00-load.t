@@ -266,6 +266,7 @@ use warnings;
     sub filtering        {'noop'}
     sub ignore_failure   {'noop'}
     sub ignore_unknown   {'noop'}
+    sub is_valid         {'noop'}
     sub param            {'noop'}
     sub params           {'noop'}
     sub queue            {'noop'}

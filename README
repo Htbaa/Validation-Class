@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900029
+    version 7.900030
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -705,6 +705,11 @@ PROXY METHODS
 
     See "ignore_unknown" in Validation::Class::Prototype for full
     documentation.
+
+  is_valid
+        $self->is_valid;
+
+    See "is_valid" in Validation::Class::Prototype for full documentation.
 
   param
         $self->param;

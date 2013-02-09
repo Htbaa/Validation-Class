@@ -1178,8 +1178,7 @@ head2 errors_to_string
 
     $self->errors_to_string;
 
-See L<Validation::Class::Prototype/errors_to_string> for full
-documentation.
+See L<Validation::Class::Prototype/errors_to_string> for full documentation.
 
 =proxy_method get_errors
 
@@ -1227,15 +1226,19 @@ See L<Validation::Class::Prototype/filtering> for full documentation.
 
     $self->ignore_failure;
 
-See L<Validation::Class::Prototype/ignore_failure> for full
-documentation.
+See L<Validation::Class::Prototype/ignore_failure> for full documentation.
 
 =proxy_method ignore_unknown
 
     $self->ignore_unknown;
 
-See L<Validation::Class::Prototype/ignore_unknown> for full
-documentation.
+See L<Validation::Class::Prototype/ignore_unknown> for full documentation.
+
+=proxy_method is_valid
+
+    $self->is_valid;
+
+See L<Validation::Class::Prototype/is_valid> for full documentation.
 
 =proxy_method param
 

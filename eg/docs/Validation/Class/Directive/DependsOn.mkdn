@@ -4,7 +4,7 @@ Validation::Class::Directive::DependsOn - DependsOn Directive for Validation Cla
 
 # VERSION
 
-version 7.900029
+version 7.900030
 
 # SYNOPSIS
 

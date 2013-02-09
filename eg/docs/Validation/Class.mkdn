@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900029
+version 7.900030
 
 # SYNOPSIS
 
@@ -672,8 +672,7 @@ head2 errors\_to\_string
 
     $self->errors_to_string;
 
-See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full
-documentation.
+See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
 
 ## get\_errors
 
@@ -721,15 +720,19 @@ See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc
 
     $self->ignore_failure;
 
-See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full
-documentation.
+See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full documentation.
 
 ## ignore\_unknown
 
     $self->ignore_unknown;
 
-See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full
-documentation.
+See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full documentation.
+
+## is\_valid
+
+    $self->is_valid;
+
+See ["is\_valid" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#is\_valid) for full documentation.
 
 ## param
 
