@@ -1,5 +1,11 @@
 Revision history for the Perl library Validation::Class
 
+7.900031  2013-02-24
+
+  - Fixed a bug in the auto-validating method execution
+
+  - Added new tests for auto-validating methods and dot-notation-style fields
+
 7.900030  2013-02-09
 
   - Fixed a bug in the error_fields method

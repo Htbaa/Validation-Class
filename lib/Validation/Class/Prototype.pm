@@ -1744,7 +1744,11 @@ sub register_method {
 
     confess
         "Error creating method $name, requires 'input' and 'using' options"
-        unless $data->{input} && ($data->{using} || $package->can("_$name"))
+        unless $data->{input} && (
+            $data->{using} ||
+            $package->can("_$name") ||
+            $package->can("_process_$name")
+        )
     ;
 
     $self->configuration->methods->add($name, $data);
