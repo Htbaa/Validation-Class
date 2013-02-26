@@ -1710,7 +1710,7 @@ sub register_filter {
 
     my ($self, $name, $code) = @_;
 
-    $self->configuration->filter->add($name, $code);
+    $self->configuration->filters->add($name, $code);
 
     return $self;
 

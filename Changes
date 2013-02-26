@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900032  2013-02-26
+
+  - Fixed a bug declaring filters, updated POD and added test case
+
 7.900031  2013-02-24
 
   - Fixed a bug in the auto-validating method execution
