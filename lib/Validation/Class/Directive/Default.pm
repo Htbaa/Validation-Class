@@ -17,8 +17,8 @@ use Validation::Class::Util;
 
     my $rules = Validation::Class::Simple->new(
         fields => {
-            user_role  => {
-                default => 'client'
+            access_code  => {
+                default => 'demo123'
             }
         }
     );
@@ -36,6 +36,23 @@ use Validation::Class::Util;
 Validation::Class::Directive::Default is a core validation class field
 directive that holds the value which should be used if no parameter is
 supplied.
+
+=over 8
+
+=item * alternative argument: a-coderef-returns-default-value
+
+This directive can be passed a single value or a coderef which should return
+the value to be used as the default value:
+
+    fields => {
+        access_code => {
+            default => sub {
+                return join '::', lc __PACKAGE__, time();
+            }
+        }
+    }
+
+=back
 
 =cut
 
@@ -55,9 +72,15 @@ sub after_validation {
 
     if (defined $field->{default} && ! defined $param) {
 
-        my $name = $field->name;
+        my $context = $proto->stash->{'validation.context'};
 
-        $proto->params->add($name, $field->{default});
+        my $name  = $field->name;
+        my $value = isa_coderef($field->{default}) ?
+            $field->{default}->($context, $proto) :
+            $field->{default}
+        ;
+
+        $proto->params->add($name, $value);
 
     }
 
@@ -73,9 +96,15 @@ sub before_validation {
 
     if (defined $field->{default} && ! defined $param) {
 
-        my $name = $field->name;
+        my $context = $proto->stash->{'validation.context'};
 
-        $proto->params->add($name, $field->{default});
+        my $name  = $field->name;
+        my $value = isa_coderef($field->{default}) ?
+            $field->{default}->($context, $proto) :
+            $field->{default}
+        ;
+
+        $proto->params->add($name, $value);
 
     }
 
@@ -91,9 +120,15 @@ sub normalize {
 
     if (defined $field->{default} && ! defined $param) {
 
-        my $name = $field->name;
+        my $context = $proto->stash->{'validation.context'};
 
-        $proto->params->add($name, $field->{default});
+        my $name  = $field->name;
+        my $value = isa_coderef($field->{default}) ?
+            $field->{default}->($context, $proto) :
+            $field->{default}
+        ;
+
+        $proto->params->add($name, $value);
 
     }
 
