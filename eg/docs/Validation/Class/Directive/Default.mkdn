@@ -4,7 +4,7 @@ Validation::Class::Directive::Default - Default Directive for Validation Class F
 
 # VERSION
 
-version 7.900032
+version 7.900033
 
 # SYNOPSIS
 
@@ -12,8 +12,8 @@ version 7.900032
 
     my $rules = Validation::Class::Simple->new(
         fields => {
-            user_role  => {
-                default => 'client'
+            access_code  => {
+                default => 'demo123'
             }
         }
     );
@@ -31,6 +31,20 @@ version 7.900032
 Validation::Class::Directive::Default is a core validation class field
 directive that holds the value which should be used if no parameter is
 supplied.
+
+- alternative argument: a-coderef-returning-a-default-value
+
+    This directive can be passed a single value or a coderef which should return
+    the value to be used as the default value:
+
+        fields => {
+            access_code => {
+                default => sub {
+                    my $self = shift; # this coderef will receive a context object
+                    return join '::', lc __PACKAGE__, time();
+                }
+            }
+        }
 
 # AUTHOR
 
