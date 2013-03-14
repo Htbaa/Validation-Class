@@ -195,7 +195,7 @@ sub initialize_validator {
 
     # initialize prototype
 
-    $proto->normalize;
+    $proto->normalize($self);
 
     # ready-set-go !!!
 

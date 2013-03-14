@@ -106,7 +106,7 @@ sub check {
 
         $validator->queue($self->{target} = $target);
 
-        $validator->proto->normalize;
+        $validator->proto->normalize($validator);
 
     }
 

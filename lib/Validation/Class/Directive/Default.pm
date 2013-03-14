@@ -39,7 +39,7 @@ supplied.
 
 =over 8
 
-=item * alternative argument: a-coderef-returns-default-value
+=item * alternative argument: a-coderef-returning-a-default-value
 
 This directive can be passed a single value or a coderef which should return
 the value to be used as the default value:
@@ -47,6 +47,7 @@ the value to be used as the default value:
     fields => {
         access_code => {
             default => sub {
+                my $self = shift; # this coderef will receive a context object
                 return join '::', lc __PACKAGE__, time();
             }
         }
@@ -120,7 +121,7 @@ sub normalize {
 
     if (defined $field->{default} && ! defined $param) {
 
-        my $context = $proto->stash->{'validation.context'};
+        my $context = $proto->stash->{'normalization.context'};
 
         my $name  = $field->name;
         my $value = isa_coderef($field->{default}) ?

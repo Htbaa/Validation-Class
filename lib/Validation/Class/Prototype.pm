@@ -1285,7 +1285,19 @@ and again just before each validation event.
 
 sub normalize {
 
-    my $self = shift;
+    my ($self, $context) = @_;
+
+    # we need context
+
+    confess
+
+        "Context object ($self->{package} class instance) required ".
+        "to perform validation" unless $self->{package} eq ref $context
+
+    ;
+
+    # stash the current context object
+    $self->stash->{'normalization.context'} = $context;
 
     # resets
 
@@ -1389,6 +1401,9 @@ sub normalize {
         $self->check_field($key);
 
     }
+
+    # delete the stashed context object
+    delete $self->stash->{'normalization.context'};
 
     return $self;
 
@@ -2575,7 +2590,7 @@ sub has_valid { goto &validate } sub validates { goto &validate } sub validate {
 
     # normalize/sanitize
 
-    $self->normalize();
+    $self->normalize($context);
 
     # create alias map manually if requested
     # ... extremely-deprecated but it remains for back-compat and nostalgia !!!
@@ -2746,7 +2761,7 @@ sub method_validates { goto &validate_method } sub validate_method {
 
     return 0 unless $name;
 
-    $self->normalize();
+    $self->normalize($context);
     $self->apply_filters('pre');
 
     my $methspec = $self->methods->{$name};
@@ -2804,7 +2819,7 @@ sub profile_validates { goto &validate_profile } sub validate_profile {
 
     return 0 unless $name;
 
-    $self->normalize();
+    $self->normalize($context);
     $self->apply_filters('pre');
 
     if (isa_coderef($self->profiles->{$name})) {
