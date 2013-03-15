@@ -4,7 +4,7 @@ Validation::Class::Cookbook - Recipes for Validation::Class
 
 # VERSION
 
-version 7.900033
+version 7.900034
 
 # BUILDING CLASSES
 

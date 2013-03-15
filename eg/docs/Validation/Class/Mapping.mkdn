@@ -4,7 +4,7 @@ Validation::Class::Mapping - Generic Container Class for a Hash Reference
 
 # VERSION
 
-version 7.900033
+version 7.900034
 
 # SYNOPSIS
 

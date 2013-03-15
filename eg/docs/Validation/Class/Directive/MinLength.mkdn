@@ -4,7 +4,7 @@ Validation::Class::Directive::MinLength - MinLength Directive for Validation Cla
 
 # VERSION
 
-version 7.900033
+version 7.900034
 
 # SYNOPSIS
 
