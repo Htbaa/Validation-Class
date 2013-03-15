@@ -1,12 +1,25 @@
 use Test::More;
 
-package MyVal;
+package MyVal::A;
 
 use Validation::Class;
 
+package MyVal::B;
+
+use Validation::Class;
+
+mixin ':unique' => {
+    pattern    => qr/^\d+$/,
+    required   => 1,
+    min_length => 1,
+    max_length => 255,
+    filters    => ['trim', 'strip', 'numeric'],
+    default    => sub { time() }
+};
+
 package main;
 
-my $v = MyVal->new(
+my $a = MyVal::A->new(
     fields => {
         access_key  => {
             default  => 12345,
@@ -25,16 +38,33 @@ my $v = MyVal->new(
     }
 );
 
-ok $v, 'class initialized';
+ok $a, 'class initialized';
 
-ok 'abcde' eq $v->params->get('access_key'), 'access_key has explicit value';
-ok 'abcdefghi' eq $v->params->get('access_code'), 'access_code has explicit value';
+ok 'abcde' eq $a->params->get('access_key'), 'access_key has explicit value';
+ok 'abcdefghi' eq $a->params->get('access_code'), 'access_code has explicit value';
 
-$v->params->clear;
+$a->params->clear;
 
-ok $v->validate('access_code', 'access_key'), 'params validated via default values';
+ok $a->validate('access_code', 'access_key'), 'params validated via default values';
 
-ok 12345 eq $v->params->get('access_key'), 'access_key has default value';
-ok 'MyVal' eq $v->params->get('access_code'), 'access_code has default value w/context';
+ok 12345 eq $a->params->get('access_key'), 'access_key has default value';
+ok 'MyVal::A' eq $a->params->get('access_code'), 'access_code has default value w/context';
+
+my $b = MyVal::B->new(
+    fields => {
+        access_code => {
+            mixin   => ':unique',
+            multiples => 1,
+            default => sub { time() },
+            required => 1
+        },
+    },
+    params => {
+    }
+);
+
+ok $b->validate('access_code'), 'access_code passed validation';
+
+#require Data::Dumper; die Data::Dumper::Dumper($b->proto->fields, $b->proto->params);
 
 done_testing;

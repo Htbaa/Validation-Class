@@ -100,7 +100,15 @@ sub after_validation_delete_clones {
 
     my $name = $field->name;
 
-    my ($key, $index) = $name =~ /.\:(\d+)$/;
+    # this will add additional processing overhead which we hate, but is how we
+    # will currently prevent the reaping of strangely named fields that appear
+    # to be clones/clonable but are not in-fact ... so we'll check if the field
+    # is in the clones array
+    return unless grep { defined $_ and $name eq $_ }
+        @{$proto->stash->{'directive.validation.clones'}}
+    ;
+
+    my ($key, $index) = $name =~ /^(.*)\:(\d+)$/;
 
     if ($key && defined $index) {
 
@@ -110,7 +118,21 @@ sub after_validation_delete_clones {
 
         $proto->params->{$key}->[$index] = $value;
 
-        $proto->fields->delete($name); # you are a clone, delete yourself
+        # inherit errors from clone
+
+        if ($proto->fields->has($key) && $proto->fields->has($name)) {
+
+            $proto->fields->get($key)->errors->add(
+
+                $proto->fields->get($name)->errors->list
+
+            );
+
+        }
+
+        # remove clone permenantly
+
+        $proto->fields->delete($name);
 
         delete $proto->stash->{'directive.validation.clones'}->[$index];
 

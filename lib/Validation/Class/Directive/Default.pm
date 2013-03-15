@@ -61,57 +61,10 @@ has 'mixin'        => 1;
 has 'field'        => 1;
 has 'multi'        => 1;
 has 'dependencies' => sub {{
-    normalization => ['filters'],
-    validation    => ['value']
+    normalization  => ['filters', 'readonly'],
+    # note: default-values are only handled during normalization now
+    # validation   => ['multiples', 'value']
 }};
-
-sub after_validation {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    # override parameter value if default exists
-
-    if (defined $field->{default} && ! defined $param) {
-
-        my $context = $proto->stash->{'validation.context'};
-
-        my $name  = $field->name;
-        my $value = isa_coderef($field->{default}) ?
-            $field->{default}->($context, $proto) :
-            $field->{default}
-        ;
-
-        $proto->params->add($name, $value);
-
-    }
-
-    return $self;
-
-}
-
-sub before_validation {
-
-    my ($self, $proto, $field, $param) = @_;
-
-    # override parameter value if default exists
-
-    if (defined $field->{default} && ! defined $param) {
-
-        my $context = $proto->stash->{'validation.context'};
-
-        my $name  = $field->name;
-        my $value = isa_coderef($field->{default}) ?
-            $field->{default}->($context, $proto) :
-            $field->{default}
-        ;
-
-        $proto->params->add($name, $value);
-
-    }
-
-    return $self;
-
-}
 
 sub normalize {
 
@@ -121,15 +74,18 @@ sub normalize {
 
     if (defined $field->{default} && ! defined $param) {
 
-        my $context = $proto->stash->{'normalization.context'};
-
-        my $name  = $field->name;
-        my $value = isa_coderef($field->{default}) ?
-            $field->{default}->($context, $proto) :
-            $field->{default}
+        my @defaults = isa_arrayref($field->{default}) ?
+            @{$field->{default}} : ($field->{default})
         ;
 
-        $proto->params->add($name, $value);
+        my $context = $proto->stash->{'normalization.context'};
+        my $name    = $field->name;
+
+        foreach my $default (@defaults) {
+            $default = $default->($context, $proto) if isa_coderef($default);
+        }
+
+        $proto->params->add($name, @defaults == 1 ? $defaults[0] : [@defaults]);
 
     }
 
