@@ -207,23 +207,18 @@ sub initialize_validator {
 
     use Validation::Class::Simple::Streamer;
 
-    my $input = Validation::Class::Simple::Streamer->new($parameters);
+    my  $input = Validation::Class::Simple::Streamer->new($parameters);
 
-    # data validation rules for the username parameter
+        # check username parameter
+        $input->check('username')->required->between('5-255');
+        $input->filters([qw/trim strip/]);
 
-    $input->check('username')->required->between('5-255');
-    $input->filters([qw/trim strip/]);
+        # check password parameter
+        $input->check('password')->required->between('5-255')->min_symbols(1);
+        $input->filters([qw/trim strip/]);
 
-    # data validation rule for the password parameter
-
-    $input->check('password')->required->between('5-255')->min_symbols(1);
-    $input->filters([qw/trim strip/]);
-
-    # perform validation
-
-    unless ($input) {
-        # handle the failures
-    }
+        # run validations
+        print $input->errors_to_string unless $input;
 
 =head1 DESCRIPTION
 
@@ -591,7 +586,7 @@ The process of applying roles, requirement, and other settings to the current
 class mainly involves introspecting the namespace's methods and merging relevant
 parts of the prototype configuration.
 
-=keyword load:classes
+=keyword load-classes
 
 The `classes` (or class) option uses L<Module::Find> to load all child classes
 (in-all-subdirectories) for convenient access through the
@@ -612,7 +607,7 @@ application. This option accepts an arrayref or single argument.
 
     1;
 
-=keyword load:requirements
+=keyword load-requirements
 
     package MyApp::User;
 
@@ -642,7 +637,7 @@ option accepts an arrayref or single argument.
 
     1;
 
-=keyword load:roles
+=keyword load-roles
 
     package MyApp::Person;
 
@@ -1168,7 +1163,7 @@ See L<Validation::Class::Prototype/error_fields> for full documentation.
 
 See L<Validation::Class::Prototype/errors> for full documentation.
 
-head2 errors_to_string
+=head2 errors_to_string
 
     $self->errors_to_string;
 

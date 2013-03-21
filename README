@@ -2,28 +2,23 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900034
+    version 7.900035
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
 
-        my $input = Validation::Class::Simple::Streamer->new($parameters);
+        my  $input = Validation::Class::Simple::Streamer->new($parameters);
 
-        # data validation rules for the username parameter
+            # check username parameter
+            $input->check('username')->required->between('5-255');
+            $input->filters([qw/trim strip/]);
 
-        $input->check('username')->required->between('5-255');
-        $input->filters([qw/trim strip/]);
+            # check password parameter
+            $input->check('password')->required->between('5-255')->min_symbols(1);
+            $input->filters([qw/trim strip/]);
 
-        # data validation rule for the password parameter
-
-        $input->check('password')->required->between('5-255')->min_symbols(1);
-        $input->filters([qw/trim strip/]);
-
-        # perform validation
-
-        unless ($input) {
-            # handle the failures
-        }
+            # run validations
+            print $input->errors_to_string unless $input;
 
 DESCRIPTION
     Validation::Class is a scalable data validation library with interfaces
@@ -270,7 +265,7 @@ KEYWORDS
     current class mainly involves introspecting the namespace's methods and
     merging relevant parts of the prototype configuration.
 
-  load:classes
+  load-classes
     The `classes` (or class) option uses Module::Find to load all child
     classes (in-all-subdirectories) for convenient access through the
     "class" in Validation::Class::Prototype method, and when introspecting a
@@ -290,7 +285,7 @@ KEYWORDS
 
         1;
 
-  load:requirements
+  load-requirements
         package MyApp::User;
 
         use Validate::Class;
@@ -319,7 +314,7 @@ KEYWORDS
 
         1;
 
-  load:roles
+  load-roles
         package MyApp::Person;
 
         use Validation::Class;
@@ -646,13 +641,6 @@ PROXY METHODS
 
     See "errors" in Validation::Class::Prototype for full documentation.
 
-    head2 errors_to_string
-
-        $self->errors_to_string;
-
-    See "errors_to_string" in Validation::Class::Prototype for full
-    documentation.
-
   get_errors
         $self->get_errors;
 
@@ -790,6 +778,12 @@ PROXY METHODS
         $self->validate_profile;
 
     See "validate_profile" in Validation::Class::Prototype for full
+    documentation.
+
+  errors_to_string
+        $self->errors_to_string;
+
+    See "errors_to_string" in Validation::Class::Prototype for full
     documentation.
 
 EXTENSIBILITY

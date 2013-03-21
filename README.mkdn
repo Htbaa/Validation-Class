@@ -4,29 +4,24 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900034
+version 7.900035
 
 # SYNOPSIS
 
     use Validation::Class::Simple::Streamer;
 
-    my $input = Validation::Class::Simple::Streamer->new($parameters);
+    my  $input = Validation::Class::Simple::Streamer->new($parameters);
 
-    # data validation rules for the username parameter
+        # check username parameter
+        $input->check('username')->required->between('5-255');
+        $input->filters([qw/trim strip/]);
 
-    $input->check('username')->required->between('5-255');
-    $input->filters([qw/trim strip/]);
+        # check password parameter
+        $input->check('password')->required->between('5-255')->min_symbols(1);
+        $input->filters([qw/trim strip/]);
 
-    # data validation rule for the password parameter
-
-    $input->check('password')->required->between('5-255')->min_symbols(1);
-    $input->filters([qw/trim strip/]);
-
-    # perform validation
-
-    unless ($input) {
-        # handle the failures
-    }
+        # run validations
+        print $input->errors_to_string unless $input;
 
 # DESCRIPTION
 
@@ -281,7 +276,7 @@ The process of applying roles, requirement, and other settings to the current
 class mainly involves introspecting the namespace's methods and merging relevant
 parts of the prototype configuration.
 
-## load:classes
+## load-classes
 
 The \`classes\` (or class) option uses [Module::Find](http://search.cpan.org/perldoc?Module::Find) to load all child classes
 (in-all-subdirectories) for convenient access through the
@@ -302,7 +297,7 @@ application. This option accepts an arrayref or single argument.
 
     1;
 
-## load:requirements
+## load-requirements
 
     package MyApp::User;
 
@@ -332,7 +327,7 @@ option accepts an arrayref or single argument.
 
     1;
 
-## load:roles
+## load-roles
 
     package MyApp::Person;
 
@@ -662,12 +657,6 @@ See ["error\_fields" in Validation::Class::Prototype](http://search.cpan.org/per
 
 See ["errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors) for full documentation.
 
-head2 errors\_to\_string
-
-    $self->errors_to_string;
-
-See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
-
 ## get\_errors
 
     $self->get_errors;
@@ -824,6 +813,12 @@ See ["validate\_method" in Validation::Class::Prototype](http://search.cpan.org/
     $self->validate_profile;
 
 See ["validate\_profile" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_profile) for full documentation.
+
+## errors\_to\_string
+
+    $self->errors_to_string;
+
+See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
 
 # EXTENSIBILITY
 
