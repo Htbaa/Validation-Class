@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900035
+    version 7.900036
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -77,7 +77,10 @@ DESCRIPTION
 QUICKSTART
     If you are looking for a simple in-line data validation module built
     using the same tenets and principles as Validation::Class, please review
-    Validation::Class::Simple or Validation::Class::Simple::Streamer.
+    Validation::Class::Simple or Validation::Class::Simple::Streamer. If
+    you're interested in an experimental yet highly promising approach
+    toward validating hierachical data, please take a moment to review
+    Validation::Class::Domain.
 
 RATIONALE
     If you are new to Validation::Class, or would like more information on
@@ -641,6 +644,12 @@ PROXY METHODS
 
     See "errors" in Validation::Class::Prototype for full documentation.
 
+  errors_to_string
+        $self->errors_to_string;
+
+    See "errors_to_string" in Validation::Class::Prototype for full
+    documentation.
+
   get_errors
         $self->get_errors;
 
@@ -778,12 +787,6 @@ PROXY METHODS
         $self->validate_profile;
 
     See "validate_profile" in Validation::Class::Prototype for full
-    documentation.
-
-  errors_to_string
-        $self->errors_to_string;
-
-    See "errors_to_string" in Validation::Class::Prototype for full
     documentation.
 
 EXTENSIBILITY

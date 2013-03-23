@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900035
+version 7.900036
 
 # SYNOPSIS
 
@@ -81,7 +81,10 @@ a more traditional usage of Validation::Class:
 
 If you are looking for a simple in-line data validation module built using the
 same tenets and principles as Validation::Class, please review
-[Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) or [Validation::Class::Simple::Streamer](http://search.cpan.org/perldoc?Validation::Class::Simple::Streamer).
+[Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) or [Validation::Class::Simple::Streamer](http://search.cpan.org/perldoc?Validation::Class::Simple::Streamer). If
+you're interested in an experimental yet highly promising approach toward
+validating hierachical data, please take a moment to review
+[Validation::Class::Domain](http://search.cpan.org/perldoc?Validation::Class::Domain).
 
 # RATIONALE
 
@@ -657,6 +660,12 @@ See ["error\_fields" in Validation::Class::Prototype](http://search.cpan.org/per
 
 See ["errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors) for full documentation.
 
+## errors\_to\_string
+
+    $self->errors_to_string;
+
+See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
+
 ## get\_errors
 
     $self->get_errors;
@@ -813,12 +822,6 @@ See ["validate\_method" in Validation::Class::Prototype](http://search.cpan.org/
     $self->validate_profile;
 
 See ["validate\_profile" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_profile) for full documentation.
-
-## errors\_to\_string
-
-    $self->errors_to_string;
-
-See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
 
 # EXTENSIBILITY
 

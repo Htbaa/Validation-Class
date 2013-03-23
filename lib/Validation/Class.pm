@@ -278,7 +278,10 @@ a more traditional usage of Validation::Class:
 
 If you are looking for a simple in-line data validation module built using the
 same tenets and principles as Validation::Class, please review
-L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>.
+L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>. If
+you're interested in an experimental yet highly promising approach toward
+validating hierachical data, please take a moment to review
+L<Validation::Class::Domain>.
 
 =head1 RATIONALE
 
@@ -1163,7 +1166,7 @@ See L<Validation::Class::Prototype/error_fields> for full documentation.
 
 See L<Validation::Class::Prototype/errors> for full documentation.
 
-=head2 errors_to_string
+=proxy_method errors_to_string
 
     $self->errors_to_string;
 
