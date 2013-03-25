@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900038
+    version 7.900039
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -80,7 +80,7 @@ QUICKSTART
     Validation::Class::Simple or Validation::Class::Simple::Streamer. If
     you're interested in an experimental yet highly promising approach
     toward validating hierachical data, please take a moment to review
-    Validation::Class::Deep.
+    Validation::Class::Document.
 
 RATIONALE
     If you are new to Validation::Class, or would like more information on

@@ -276,12 +276,12 @@ a more traditional usage of Validation::Class:
 
 =head1 QUICKSTART
 
-If you are looking for a simple in-line data validation module built using the
-same tenets and principles as Validation::Class, please review
+If you are looking for a simple in-line data validation module built
+using the same tenets and principles as Validation::Class, please review
 L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>. If
 you're interested in an experimental yet highly promising approach toward
 validating hierachical data, please take a moment to review
-L<Validation::Class::Deep>.
+L<Validation::Class::Document>.
 
 =head1 RATIONALE
 

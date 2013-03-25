@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900038
+version 7.900039
 
 # SYNOPSIS
 
@@ -79,12 +79,12 @@ a more traditional usage of Validation::Class:
 
 # QUICKSTART
 
-If you are looking for a simple in-line data validation module built using the
-same tenets and principles as Validation::Class, please review
+If you are looking for a simple in-line data validation module built
+using the same tenets and principles as Validation::Class, please review
 [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) or [Validation::Class::Simple::Streamer](http://search.cpan.org/perldoc?Validation::Class::Simple::Streamer). If
 you're interested in an experimental yet highly promising approach toward
 validating hierachical data, please take a moment to review
-[Validation::Class::Deep](http://search.cpan.org/perldoc?Validation::Class::Deep).
+[Validation::Class::Document](http://search.cpan.org/perldoc?Validation::Class::Document).
 
 # RATIONALE
 
