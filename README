@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900037
+    version 7.900038
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -28,7 +28,7 @@ DESCRIPTION
     namespaces into data validation domains where consistency and reuse are
     primary concerns. Validation::Class provides an extensible framework for
     defining reusable data validation rules. It ships with a complete set of
-    pre-defined validations and filters referred to as directives.
+    pre-defined validations and filters referred to as "directives".
 
     The core feature-set consist of self-validating methods, validation
     profiles, reusable validation rules and templates, pre and post input
@@ -102,6 +102,7 @@ KEYWORDS
 
         has 'first_name' => 'Peter';
         has 'last_name'  => 'Venkman';
+
         has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
 
         has 'email_address';
@@ -121,7 +122,7 @@ KEYWORDS
 
             my ($self, $args) = @_;
 
-            # run after instantiation in the order declared
+            # run after instantiation in the order defined
 
         };
 
@@ -209,7 +210,7 @@ KEYWORDS
 
         # accessor will be created as send_reminders
         field 'send-reminders' => {
-            length   => 1
+            length => 1
         };
 
     Please note that prefixing field names with a double plus-symbol
@@ -224,7 +225,7 @@ KEYWORDS
 
         set role => 'MyApp::User';
 
-        # overwrite and append existing field
+        # append existing field and overwrite directives
         field '++email_address' => {
             required => 1
         };

@@ -4,7 +4,7 @@ Validation::Class::Simple::Streamer - Simple Streaming Data Validation
 
 # VERSION
 
-version 7.900037
+version 7.900038
 
 # SYNOPSIS
 
