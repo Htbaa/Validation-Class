@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900036
+    version 7.900037
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -28,7 +28,7 @@ DESCRIPTION
     namespaces into data validation domains where consistency and reuse are
     primary concerns. Validation::Class provides an extensible framework for
     defining reusable data validation rules. It ships with a complete set of
-    pre-defined validations and filters referred to as "directives".
+    pre-defined validations and filters referred to as directives.
 
     The core feature-set consist of self-validating methods, validation
     profiles, reusable validation rules and templates, pre and post input
@@ -80,7 +80,7 @@ QUICKSTART
     Validation::Class::Simple or Validation::Class::Simple::Streamer. If
     you're interested in an experimental yet highly promising approach
     toward validating hierachical data, please take a moment to review
-    Validation::Class::Domain.
+    Validation::Class::Deep.
 
 RATIONALE
     If you are new to Validation::Class, or would like more information on
