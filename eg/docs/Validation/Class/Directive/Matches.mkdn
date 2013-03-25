@@ -4,7 +4,7 @@ Validation::Class::Directive::Matches - Matches Directive for Validation Class F
 
 # VERSION
 
-version 7.900034
+version 7.900037
 
 # SYNOPSIS
 
