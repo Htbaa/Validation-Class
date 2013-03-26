@@ -17,16 +17,25 @@ use Validation::Class::Util;
 
     use Validation::Class::Simple::Streamer;
 
+    my $parameters = {
+        credit_card   => '0000000000000000',
+        email_address => 'root@localhost',
+
+    };
+
     my $rules = Validation::Class::Simple::Streamer->new($parameters);
 
     # the point here is expressiveness
+    # directive methods auto-validate in boolean context !!!
 
-    unless ($rules->check('user_cc')->creditcard(['visa', 'mastercard'])) {
-        # credit card is a valid visa/mastercard
+    if (not $rules->check('credit_card')->creditcard(['visa', 'mastercard'])) {
+        # credit card is invalid visa/mastercard
+        warn $rules->messages;
     }
 
-    unless ($rules->check('email_address')->min_length(3)->email) {
-        # email address is valid
+    if (not $rules->check('email_address')->min_length(3)->email) {
+        # email address is invalid
+        warn $rules->messages;
     }
 
     # prepare password for validation
@@ -36,15 +45,15 @@ use Validation::Class::Util;
         unless $rules->min_symbols(1) && $rules->matches('password2');
 
     # are you of legal age?
-    if ($rules->check('user_age')->between('18-75')) {
+    if ($rules->check('member_years_of_age')->between('18-75')) {
         # access to explicit content approved
     }
 
     # get all fields with errors
     my $fields = $rules->validator->error_fields;
 
-    # print errors if any
-    print $rules->messages unless $params->validate;
+    # warn with errors if any
+    warn $rules->messages unless $rules->is_valid;
 
     # validate like a boss
     # THE END
@@ -52,14 +61,25 @@ use Validation::Class::Util;
 =head1 DESCRIPTION
 
 Validation::Class::Simple::Streamer is a simple streaming validation module
-that makes data validation fun. It is built around the powerful
-L<Validation::Class> data validation framework via L<Validation::Class::Simple>.
+that makes data validation fun. Target parameters and attach matching fields
+and directives to them by chaining together methods which represent
+Validation::Class L<directives|Validation::Class::Directives/DIRECTIVES>. This
+module is built around the powerful L<Validation::Class> data validation
+framework via L<Validation::Class::Simple>. This module was inspired by the
+simplicity and expressiveness of the Node.js validator library, but built on
+top of the ever-awesome Validation::Class framework, which is designed to be
+modular and extensible, i.e. whatever custom directives you create and install
+will become methods on this class which you can then use to enforce policies.
 
-This module is/was inspired by the simplicity and expressiveness of the Node.js
-validator library, L<https://github.com/chriso/node-validator>, but built on top
-of the ever-awesome Validation::Class framework, which is designed to be modular
-and extensible, i.e. whatever custom directives you create and install will
-become methods on this class which you can then use to enforce policies.
+=cut
+
+=head1 RATIONALE
+
+If you are new to Validation::Class, or would like more information on
+the underpinnings of this library and how it views and approaches
+data validation, please review L<Validation::Class::Whitepaper>.
+Please review the L<Validation::Class::Simple/GUIDED-TOUR> for a detailed
+step-by-step look into how Validation::Class works.
 
 =cut
 
@@ -86,10 +106,14 @@ sub new {
 
 =method check
 
-The check method specifies the parameter to be used in the following series of
-commands.
+The check method specifies the parameter to be affected by directive methods
+if/when called.
 
-    $self = $self->check('email_address');
+    $self = $self->check('email_address'); # focus on email_address
+
+    $self->required;        # apply the Required directive to email_address
+    $self->min_symbols(1);  # apply the MinSymbols directive to email_address
+    $self->min_length(5);   # apply the MinLength directive to email_address
 
 =cut
 

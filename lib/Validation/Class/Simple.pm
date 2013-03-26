@@ -16,6 +16,13 @@ use Validation::Class::Util ('prototype_registry');
 
     use Validation::Class::Simple;
 
+    my $parameters = {
+        name  => 'Root',
+        email => 'root@localhost',
+        pass  => 's3cret',
+        pass2 => 's2cret'
+    };
+
     # define object specific rules
     my $rules = Validation::Class::Simple->new(
         # define fields on-the-fly
@@ -33,12 +40,13 @@ use Validation::Class::Util ('prototype_registry');
     # validate
     unless ($rules->validate) {
         # handle the failures
+        warn $rules->errors_to_string;
     }
 
 =head1 DESCRIPTION
 
-Validation::Class::Simple is a simple validation module built around the powerful
-L<Validation::Class> data validation framework.
+Validation::Class::Simple is a simple validation module built around the
+powerful L<Validation::Class> data validation framework.
 
 This module is merely a blank canvas, a clean validation class derived from
 L<Validation::Class> which has not been pre-configured (e.g. configured via
@@ -50,9 +58,9 @@ engine in an ad-hoc fashion.
 
 =head1 QUICKSTART
 
-If you are looking for a data validation module with an even lower learning curve
-built using the same tenets and principles as Validation::Class which is as
-simple and even lazier than this module, please review the tested but
+If you are looking for a data validation module with an even lower learning
+curve built using the same tenets and principles as Validation::Class which is
+as simple and even lazier than this module, please review the tested but
 experimental L<Validation::Class::Simple::Streamer>.
 
 =head1 RATIONALE
