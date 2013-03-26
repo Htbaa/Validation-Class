@@ -4,7 +4,7 @@ Validation::Class::Directive::Value - Value Directive for Validation Class Field
 
 # VERSION
 
-version 7.900039
+version 7.900040
 
 # DESCRIPTION
 

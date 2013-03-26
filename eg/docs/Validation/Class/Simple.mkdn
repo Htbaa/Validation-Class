@@ -4,11 +4,18 @@ Validation::Class::Simple - Simple Ad-Hoc Data Validation
 
 # VERSION
 
-version 7.900039
+version 7.900040
 
 # SYNOPSIS
 
     use Validation::Class::Simple;
+
+    my $parameters = {
+        name  => 'Root',
+        email => 'root@localhost',
+        pass  => 's3cret',
+        pass2 => 's2cret'
+    };
 
     # define object specific rules
     my $rules = Validation::Class::Simple->new(
@@ -27,12 +34,13 @@ version 7.900039
     # validate
     unless ($rules->validate) {
         # handle the failures
+        warn $rules->errors_to_string;
     }
 
 # DESCRIPTION
 
-Validation::Class::Simple is a simple validation module built around the powerful
-[Validation::Class](http://search.cpan.org/perldoc?Validation::Class) data validation framework.
+Validation::Class::Simple is a simple validation module built around the
+powerful [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) data validation framework.
 
 This module is merely a blank canvas, a clean validation class derived from
 [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) which has not been pre-configured (e.g. configured via
@@ -44,9 +52,9 @@ engine in an ad-hoc fashion.
 
 # QUICKSTART
 
-If you are looking for a data validation module with an even lower learning curve
-built using the same tenets and principles as Validation::Class which is as
-simple and even lazier than this module, please review the tested but
+If you are looking for a data validation module with an even lower learning
+curve built using the same tenets and principles as Validation::Class which is
+as simple and even lazier than this module, please review the tested but
 experimental [Validation::Class::Simple::Streamer](http://search.cpan.org/perldoc?Validation::Class::Simple::Streamer).
 
 # RATIONALE

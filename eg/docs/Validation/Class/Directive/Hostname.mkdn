@@ -4,7 +4,7 @@ Validation::Class::Directive::Hostname - Hostname Directive for Validation Class
 
 # VERSION
 
-version 7.900039
+version 7.900040
 
 # SYNOPSIS
 
