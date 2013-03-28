@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900040
+version 7.900041
 
 # SYNOPSIS
 

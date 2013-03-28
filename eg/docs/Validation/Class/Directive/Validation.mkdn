@@ -4,7 +4,7 @@ Validation::Class::Directive::Validation - Validation Directive for Validation C
 
 # VERSION
 
-version 7.900040
+version 7.900041
 
 # SYNOPSIS
 
