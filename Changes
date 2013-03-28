@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900042  2013-03-28
+
+  - Field errors to output messages using the field label where applicable
+
 7.900041  2013-03-28
 
   - Better V::C prototype configuration merging (important for roles usage)

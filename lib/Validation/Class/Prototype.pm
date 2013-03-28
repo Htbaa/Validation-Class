@@ -1397,6 +1397,7 @@ sub normalize {
     foreach my $name (@fields) {
 
         my $field = $self->fields->get($name);
+        my $label = $field->{label} ? $field->{label} : "The field $name";
 
         if (defined $field->{alias}) {
 
@@ -1407,9 +1408,17 @@ sub normalize {
 
                 if ($mapper->{$alias}) {
 
+                    my $alt_field =
+                        $self->fields->get($mapper->{$alias})
+                    ;
+
+                    my $alt_label = $alt_field->{label} ?
+                        $alt_field->{label} : "the field $mapper->{$alias}"
+                    ;
+
                     my $error =
-                        qq(The field $name contains the alias $alias which is
-                        also an alias on the field $mapper->{$alias})
+                        qq($label contains the alias $alias which is
+                        also an alias on $alt_label)
                     ;
 
                     $self->throw_error($error);
@@ -1419,7 +1428,7 @@ sub normalize {
                 if ($self->fields->has($alias)) {
 
                     my $error =
-                        qq(The field $name contains the alias $alias which is
+                        qq($label contains the alias $alias which is
                         the name of an existing field)
                     ;
 
