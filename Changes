@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900041  2013-03-28
+
+  - Better V::C prototype configuration merging (important for roles usage)
+
 7.900036  2013-03-23
 
   - POD Updates

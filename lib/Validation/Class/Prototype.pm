@@ -266,6 +266,47 @@ has 'validated' => 0;
 
 has 'stashed' => sub { Validation::Class::Mapping->new };
 
+Hash::Merge::specify_behavior(
+    {
+        'SCALAR' => {
+            'SCALAR'  => sub {
+                $_[1]
+            },
+            'ARRAY'   => sub {
+                [$_[0], @{$_[1]}]
+            },
+            'HASH'    => sub {
+                $_[1]
+            },
+        },
+        'ARRAY' => {
+            'SCALAR'  => sub {
+                [@{$_[0]}, $_[1]]
+            },
+            'ARRAY'   => sub {
+                [@{$_[0]}, @{$_[1]}]
+            },
+            'HASH'    => sub {
+                [@{$_[0]}, $_[1]]
+            },
+        },
+        'HASH' => {
+            'SCALAR'  => sub {
+                $_[1]
+            },
+            'ARRAY'   => sub {
+                $_[1]
+            },
+            'HASH'    => sub {
+                Hash::Merge::_merge_hashes($_[0], $_[1])
+            },
+        },
+    },
+    # based on RIGHT_PRECEDENT, STORAGE_PRECEDENT and RETAINMENT_PRECEDENT
+    # ... this is intended to DWIM in the context of role-settings-merging
+    'ROLE_PRECEDENT'
+);
+
 sub new {
 
     my $class = shift;
@@ -2074,7 +2115,8 @@ sub register_settings {
                     my $self_profile = $self->configuration->profile;
                     my $role_profile = $role_proto->configuration->profile;
 
-                    # manually merge configuration profiles
+                    # manually merge profiles with list/map containers
+
                     foreach my $attr ($self_profile->keys) {
 
                         my $lst = 'Validation::Class::Listing';
@@ -2085,30 +2127,6 @@ sub register_settings {
 
                         if (ref($rp_attr) and $rp_attr->isa($map)) {
                             $sp_attr->merge($rp_attr->hash);
-                            # thank god for unit tests which makes releasing
-                            # this necessary change easier although I'm still
-                            # not sure I am making the right decision ...
-
-                            # I realized while working on an app in production
-                            # that V::C doesn't handle role inheritance properly
-                            # which lead to an investigation which turned into a
-                            # witch-hunt ...
-
-                            # short-story-long, this code -> $sp_attr->add($rp_attr->hash);
-                            # was overwriting the $self prototype profile SETTINGS hash
-                            # with the $role prototype SETTINGS hash which meant that
-                            # at runtime, not all roles were stored, also causing the
-                            # does() method to break which leads me to my next fail ...
-
-                            # the does() method in VC, unlike the isa() method in UNIVERSAL,
-                            # does not traverse the inheritance-tree because all roles are
-                            # bubbled-up into calling class when the SETTINGS hash is copied
-                            # ... and thats the thing I'm not sure about, but for now, this
-                            # code work and doesn't break anything else (i think)
-
-                            # alternatively I could not merge the SETTINGS hash at-all
-                            # and refactor the does() method to traverse ...
-                            # e.g. $sp_attr->add($rp_attr->hash) unless $attr eq 'SETTINGS';
                         }
 
                         elsif (ref($rp_attr) and $rp_attr->isa($lst)) {
@@ -2116,7 +2134,15 @@ sub register_settings {
                         }
 
                         else {
-                            $sp_attr->merge({$attr => $rp_attr});
+
+                            # merge via spec-based merging for standard types
+
+                            Hash::Merge::set_behavior('ROLE_PRECEDENT');
+
+                            $sp_attr = merge $sp_attr => $rp_attr;
+
+                            Hash::Merge::set_behavior('LEFT_PRECEDENT');
+
                         }
 
                     }
