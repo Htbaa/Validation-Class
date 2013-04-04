@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900041
+    version 7.900042
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -20,7 +20,9 @@ SYNOPSIS
             $input->filters([qw/trim strip/]);
 
             # run validations
-            print $input->messages unless $input;
+            unless ($input) {
+                print $input->messages("\n");
+            }
 
 DESCRIPTION
     Validation::Class is a scalable data validation library with interfaces
@@ -718,6 +720,11 @@ PROXY METHODS
         $self->params;
 
     See "params" in Validation::Class::Prototype for full documentation.
+
+  plugin
+        $self->plugin;
+
+    See "plugin" in Validation::Class::Prototype for full documentation.
 
   queue
         $self->queue;

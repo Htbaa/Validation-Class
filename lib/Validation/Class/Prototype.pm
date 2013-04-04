@@ -769,7 +769,9 @@ sub clear_queue {
 
 The clone_field method is used to create new fields (rules) from existing fields
 on-the-fly. This is useful when you have a variable number of parameters being
-validated that can share existing validation rules.
+validated that can share existing validation rules. Please note that cloning a
+field does not include copying and/or processing of any mixins on the original
+field to the cloned field, if desired, this must be done manually.
 
     package Class;
 

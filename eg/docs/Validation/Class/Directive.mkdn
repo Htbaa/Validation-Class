@@ -4,7 +4,7 @@ Validation::Class::Directive - Base Class for Validation Class Directives
 
 # VERSION
 
-version 7.900041
+version 7.900042
 
 # SYNOPSIS
 

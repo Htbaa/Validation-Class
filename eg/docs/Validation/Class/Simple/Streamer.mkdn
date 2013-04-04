@@ -4,7 +4,7 @@ Validation::Class::Simple::Streamer - Simple Streaming Data Validation
 
 # VERSION
 
-version 7.900041
+version 7.900042
 
 # SYNOPSIS
 
@@ -91,6 +91,14 @@ The clear method resets the validation queue and declared fields but leaves the
 declared parameters in-tact, almost like the object state post-instantiation.
 
     $self->clear;
+
+## is\_valid
+
+The is\_valid method returns a boolean value which is true if the last validation
+attempt was successful, and false if it was not (which is determined by looking
+for errors at the class and field levels).
+
+    $self->is_valid;
 
 ## messages
 

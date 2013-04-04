@@ -2,6 +2,7 @@
 
 package Validation::Class::Simple::Streamer;
 
+use 5.10.0;
 use strict;
 use warnings;
 use overload bool => \&validate, '""' => \&messages, fallback => 1;
@@ -205,6 +206,24 @@ sub declare {
     exit carp sprintf q(Can't locate object method "%s" via package "%s"),
         $action, ((ref $_[0] || $_[0]) || 'main')
     ;
+
+}
+
+=method is_valid
+
+The is_valid method returns a boolean value which is true if the last validation
+attempt was successful, and false if it was not (which is determined by looking
+for errors at the class and field levels).
+
+    $self->is_valid;
+
+=cut
+
+sub is_valid {
+
+    my ($self) = @_;
+
+    return $self->{validator}->error_count ? 0 : 1;
 
 }
 

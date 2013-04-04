@@ -1,5 +1,15 @@
 Revision history for the Perl library Validation::Class
 
+7.900043  2013-04-04
+
+  - V::C, V::C::S, and V::C::S::S now requires Perl 5.10.0
+
+  - Added better numeric filtering, supports negative numbers
+
+  - Updated decimal filter and added currency filter
+
+  - Updated POD, added plugin documentation reference, added note to clone_field
+
 7.900042  2013-03-28
 
   - Field errors to output messages using the field label where applicable

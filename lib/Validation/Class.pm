@@ -2,6 +2,7 @@
 
 package Validation::Class;
 
+use 5.10.0;
 use strict;
 use warnings;
 
@@ -220,7 +221,9 @@ sub initialize_validator {
         $input->filters([qw/trim strip/]);
 
         # run validations
-        print $input->messages unless $input;
+        unless ($input) {
+            print $input->messages("\n");
+        }
 
 =head1 DESCRIPTION
 
@@ -1250,6 +1253,12 @@ See L<Validation::Class::Prototype/param> for full documentation.
     $self->params;
 
 See L<Validation::Class::Prototype/params> for full documentation.
+
+=proxy_method plugin
+
+    $self->plugin;
+
+See L<Validation::Class::Prototype/plugin> for full documentation.
 
 =proxy_method queue
 

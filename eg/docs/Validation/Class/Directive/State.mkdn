@@ -4,7 +4,7 @@ Validation::Class::Directive::State - State Directive for Validation Class Field
 
 # VERSION
 
-version 7.900041
+version 7.900042
 
 # SYNOPSIS
 

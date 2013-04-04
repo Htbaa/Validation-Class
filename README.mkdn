@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900041
+version 7.900042
 
 # SYNOPSIS
 
@@ -23,7 +23,9 @@ version 7.900041
         $input->filters([qw/trim strip/]);
 
         # run validations
-        print $input->messages unless $input;
+        unless ($input) {
+            print $input->messages("\n");
+        }
 
 # DESCRIPTION
 
@@ -744,6 +746,12 @@ See ["param" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Val
     $self->params;
 
 See ["params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#params) for full documentation.
+
+## plugin
+
+    $self->plugin;
+
+See ["plugin" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#plugin) for full documentation.
 
 ## queue
 
