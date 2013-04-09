@@ -47,7 +47,7 @@ of input (e.g. a hospital API may require a more sophisticated SSN validation
 than that of a department of education API; likewise; an email service API may
 require a more sophisticated email validation than that of a file sharing API).
 Validation::Class does not attempt to provide validators for all levels of
-strictness and the core directives exist to support simple typical use-case with
+strictness and the core directives exist to support typical use-cases with
 a minimal level of strictness.
 
 =head2 alias
