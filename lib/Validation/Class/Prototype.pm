@@ -2696,7 +2696,7 @@ sub has_valid { goto &validate } sub validates { goto &validate } sub validate {
         # were explicitly requested to be validated, e.g. not explicitly
         # defining fields to be validated effectively allows the parameters
         # submitted to dictate what gets validated (may not be dangerous)
-        @fields = (map { $self->fields->has($_) ? $_ : () } $self->params->keys);
+        @fields = ($self->params->keys);
     }
 
     elsif (@fields && !$self->params->count) {

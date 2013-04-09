@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900044  2013-04-09
+
+  - Error reporting unknown params when no fields specified
+
 7.900043  2013-04-04
 
   - V::C, V::C::S, and V::C::S::S now requires Perl 5.10.0
