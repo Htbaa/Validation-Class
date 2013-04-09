@@ -4,7 +4,7 @@ Validation::Class::Directive::Telephone - Telephone Directive for Validation Cla
 
 # VERSION
 
-version 7.900043
+version 7.900044
 
 # SYNOPSIS
 

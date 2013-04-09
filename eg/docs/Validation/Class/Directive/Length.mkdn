@@ -4,7 +4,7 @@ Validation::Class::Directive::Length - Length Directive for Validation Class Fie
 
 # VERSION
 
-version 7.900043
+version 7.900044
 
 # SYNOPSIS
 
