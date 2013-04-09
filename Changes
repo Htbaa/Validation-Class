@@ -4,6 +4,10 @@ Revision history for the Perl library Validation::Class
 
   - Error reporting unknown params when no fields specified
 
+  - Update POD to denote the source of the email validator's regex
+
+  - Update POD to encourage the use of CPAN modules for more sophisticated data validation
+
 7.900043  2013-04-04
 
   - V::C, V::C::S, and V::C::S::S now requires Perl 5.10.0

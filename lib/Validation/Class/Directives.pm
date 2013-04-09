@@ -36,9 +36,10 @@ L<Validation::Class::Mapping>.
 The following is a list of core directives that get installed automatically with
 Validation::Class.
 
-Please note that the purpose of the core directives is merely to provide a
+B<Please Note!> The purpose of the core directives is merely to provide a
 reasonable layer of protection against bad/malformed data, the validators are
-not very sophisticated (e.g. the email directive does not perform a host lookup).
+not very sophisticated (e.g. the email directive does not perform a host lookup
+nor does it conform to the RFC specification).
 
 Please look at L<Validation::Class::Directive> for information of developing
 your own directives.
@@ -88,7 +89,9 @@ and validates the existence of dependent parameters.
 =head2 email
 
 The email directive is provided by L<Validation::Class::Directive::Email>
-and checks the validity of email address specified by the associated parameters.
+and checks the validity of email address specified by the associated parameters
+within reason. Please note, the email directive does not perform a host lookup
+nor does it conform to the RFC specification.
 
 =head2 error
 

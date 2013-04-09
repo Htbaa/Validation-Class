@@ -35,7 +35,9 @@ use Validation::Class::Util;
 
 Validation::Class::Directive::Email is a core validation class field directive
 that checks the validity of email addresses specified by the associated
-parameters.
+parameters. Please note, the email directive does not perform a host lookup
+nor does it conform to the RFC specification. For more sophisticated email
+validation, please use custom validation with L<Email::Valid> or similar.
 
 =cut
 
