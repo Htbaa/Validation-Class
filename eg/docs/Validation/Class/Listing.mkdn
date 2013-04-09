@@ -4,7 +4,7 @@ Validation::Class::Listing - Generic Container Class for an Array Reference
 
 # VERSION
 
-version 7.900044
+version 7.900045
 
 # SYNOPSIS
 
