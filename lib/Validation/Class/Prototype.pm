@@ -2718,10 +2718,20 @@ sub has_valid { goto &validate } sub validates { goto &validate } sub validate {
     # stash the current context object
     $self->stash->{'validation.context'} = $context;
 
-    # report fields requested that do not exist
-    $self->pitch_error("Data validation field $_ does not exist")
-        for grep {!$self->fields->has($_)} uniq @fields
-    ;
+    # report fields requested that do not exist and are not aliases
+    for my $f (grep {!$self->fields->has($_)} uniq @fields) {
+        next if grep {
+                if ($_->has('alias')) {
+                    my @aliases = isa_arrayref($_->get('alias')) ?
+                        @{$_->get('alias')} : ($_->get('alias'))
+                    ;
+                    grep { $f eq $_ } @aliases;
+                }
+            }
+            $self->fields->values
+        ;
+        $self->pitch_error("Data validation field $f does not exist");
+    }
 
     # stash fields targeted for validation
     $self->stash->{'validation.fields'} =

@@ -1,12 +1,16 @@
 Revision history for the Perl library Validation::Class
 
+7.900045  2013-04-09
+
+  - Fixed problem validating aliases with ignore_unknown and report_unknown enabled
+
 7.900044  2013-04-09
 
   - Error reporting unknown params when no fields specified
 
-  - Update POD to denote the source of the email validator's regex
+  - Update the V::C::Direcitves POD with the rationale behind the implementation of core directives
 
-  - Update POD to encourage the use of CPAN modules for more sophisticated data validation
+  - Update the V::C::D::Email POD to encourage the use of CPAN modules for more sophisticated data validationalternative
 
 7.900043  2013-04-04
 
