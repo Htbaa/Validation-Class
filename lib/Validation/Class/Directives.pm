@@ -29,20 +29,26 @@ foreach my $module (usesub 'Validation::Class::Directive') {
 
 Validation::Class::Directives provides a collection of installed
 Validation::Class directives. This class inherits from
-L<Validation::Class::Mapping>.
+L<Validation::Class::Mapping>. Please look at L<Validation::Class::Directive>
+for information of developing your own directives.
 
-=head1 DIRECTIVES
+=head1 RATIONALE
 
 The following is a list of core directives that get installed automatically with
-Validation::Class.
-
+Validation::Class and can be used to jump-start your data validation initiative.
 B<Please Note!> The purpose of the core directives is merely to provide a
 reasonable layer of protection against bad/malformed data, the validators are
-not very sophisticated (e.g. the email directive does not perform a host lookup
-nor does it conform to the RFC specification).
+not very sophisticated and were created using a minimal level of strictness
+(e.g. the email and hostname directives do not perform a hostname lookup nor
+does the email directive conform to the RFC specification).
 
-Please look at L<Validation::Class::Directive> for information of developing
-your own directives.
+Various applications have varied levels of strictness regarding various types
+of input (e.g. a hospital API may require a more sophisticated SSN validation
+than that of a department of education API; likewise; an email service API may
+require a more sophisticated email validation than that of a file sharing API).
+Validation::Class does not attempt to provide validators for all levels of
+strictness and the core directives exist to support simple typical use-case with
+a minimal level of strictness.
 
 =head2 alias
 
