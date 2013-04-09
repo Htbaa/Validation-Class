@@ -4,13 +4,16 @@ Validation::Class::Directive - Base Class for Validation Class Directives
 
 # VERSION
 
-version 7.900042
+version 7.900043
 
 # SYNOPSIS
 
-    package Validation::Class::Plugin::CheckBlacklist;
+    package Validation::Class::Directive::CheckBlacklist;
 
     use base 'Validation::Class::Directive';
+
+    use strict;
+    use warnings;
     use Validation::Class::Util;
     use File::Slurp;
 
