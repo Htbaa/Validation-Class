@@ -13,9 +13,12 @@ use Carp 'confess';
 
 =head1 SYNOPSIS
 
-    package Validation::Class::Plugin::CheckBlacklist;
+    package Validation::Class::Directive::CheckBlacklist;
 
     use base 'Validation::Class::Directive';
+
+    use strict;
+    use warnings;
     use Validation::Class::Util;
     use File::Slurp;
 
