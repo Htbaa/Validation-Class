@@ -55,7 +55,7 @@ sub normalize {
     # by default fields should have a filtering directive
     # unless already specified
 
-    $field->{filtering} = $proto->filtering || 'pre' if ! defined $field->{filtering};
+    $field->{filtering} = $proto->filtering unless defined $field->{filtering};
 
     return $self;
 

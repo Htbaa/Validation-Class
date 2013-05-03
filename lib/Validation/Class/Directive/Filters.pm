@@ -245,41 +245,48 @@ sub execute_filtering {
 
     my ($self, $proto, $field, $param, $state) = @_;
 
-    return unless $state;
+    return unless $state &&
+        ($proto->filtering eq 'pre' || $proto->filtering eq 'post') &&
+        defined $field->{filters} &&
+        defined $field->{filtering} &&
+        defined $param
+    ;
 
-    if (defined $field->{filters} && defined $field->{filtering} && defined $param) {
+    my $filtering = $field->{filtering};
 
-            if ($field->{filtering} eq $state && $state ne 'off') {
+    $field->{filtering} = $proto->filtering unless defined $field->{filtering};
 
-            my @filters = isa_arrayref($field->{filters}) ?
-                    @{$field->{filters}} : ($field->{filters});
+    if ($field->{filtering} eq $state && $state ne 'off') {
 
-            my $values = $param;
+        my @filters = isa_arrayref($field->{filters}) ?
+                @{$field->{filters}} : ($field->{filters});
 
-            foreach my $value (isa_arrayref($param) ? @{$param} : ($param)) {
+        my $values = $param;
 
-                next if ! $value;
+        foreach my $value (isa_arrayref($param) ? @{$param} : ($param)) {
 
-                foreach my $filter (@filters) {
+            next if ! $value;
 
-                    $filter = $proto->filters->get($filter)
-                        unless isa_coderef($filter);
+            foreach my $filter (@filters) {
 
-                    next if ! $filter;
+                $filter = $proto->filters->get($filter)
+                    unless isa_coderef($filter);
 
-                    $value  = $filter->($value);
+                next if ! $filter;
 
-                }
+                $value  = $filter->($value);
 
             }
 
-            my $name = $field->name;
-
-            $proto->params->add($name, $param);
-
         }
 
+        my $name = $field->name;
+
+        $proto->params->add($name, $param);
+
     }
+
+    $field->{filtering} = $filtering;
 
     return $self;
 

@@ -1,5 +1,9 @@
 Revision history for the Perl library Validation::Class
 
+7.900048  2013-05-03
+
+  - Fixed filtering to respect filtering attribute
+
 7.900045  2013-04-09
 
   - Fixed problem validating aliases with ignore_unknown and report_unknown enabled
