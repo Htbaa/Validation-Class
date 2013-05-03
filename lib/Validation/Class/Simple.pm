@@ -82,17 +82,17 @@ There are three ways to declare parameters you wish to have validated. The first
 and most common approach is to supply the target parameters to the validation
 class constructor:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new(params => $parameters);
+    my $rules = Validation::Class::Simple->new(params => $parameters);
 
 All input parameters are wrapped by the L<Validation::Class::Params> container
 which provides generic functionality for managing hashes. Additionally you can
 declare parameters by using the params object directly:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     $rules->params->clear;
 
@@ -130,9 +130,9 @@ keys are called directives which correspond with the names of classes in the
 directives namespace, and whose values are arguments which control how
 directives carry-out their operations.
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     $rules->fields->clear;
 
@@ -156,9 +156,9 @@ also allows you to set fields that must be validated regardless of what has been
 passed to the validate method. Additionally it allows you to conditionally
 specify constraints:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     $rules->queue('name'); # always validate the name parameter
 
@@ -177,9 +177,9 @@ out of the box in order to design constraints that fit your particular use-case.
 The stash method allows you to share arbitrary objects with routines used by
 validation classes.
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     $rules->fields->add(
         email => {
@@ -204,9 +204,9 @@ messages. Errors can exist at the field-level and class-level (errors not
 specific to a particular field). All errors are wrapped in a
 L<Validation::Class::Errors> container.
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     # print a comma separated list of class and field errors
     print $rules->errors_to_string unless $rules->validate;
@@ -240,9 +240,9 @@ Filtering is the process of applying transformations to the incoming data. The
 problem with filtering is that it permanently alters the data input and in the
 event of a failure could report inconsistent error messages:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new;
+    my $rules = Validation::Class::Simple->new;
 
     $rules->fields->add(
         # even if the input is submitted as lowercase it will fail
@@ -296,9 +296,9 @@ rules which remain mutable. L<Validation::Class> provides attributes for
 determining how the validation engine reacts to exceptions and validation
 failures:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new(
+    my $rules = Validation::Class::Simple->new(
         ignore_failure => 1, # do not throw errors if validation fails
         ignore_unknown => 0, # throw errors if unknown directives are found
         report_failure => 0, # register errors if "method validations" fail
@@ -335,9 +335,9 @@ not-required for a specific validation operation. This requirement is referred
 to as the toggle function. The toggle function is enacted by prefixing a field
 name with a plus or minus sign (+|-) when passed to the validate method:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new(fields => {...});
+    my $rules = Validation::Class::Simple->new(fields => {...});
 
     # meaning, email is always required to have a value
     # however password and password2 can be submitted as empty strings
@@ -346,9 +346,9 @@ name with a plus or minus sign (+|-) when passed to the validate method:
 
 Here are a few examples and explanations of using the validate method:
 
-    use Validation::Simple;
+    use Validation::Class::Simple;
 
-    my $rules = Validation::Simple->new(fields => {...});
+    my $rules = Validation::Class::Simple->new(fields => {...});
 
     unless ($rules->validate) {
         # validate all fields with matching parameters
