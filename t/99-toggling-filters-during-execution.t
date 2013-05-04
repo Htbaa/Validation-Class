@@ -35,8 +35,6 @@ my $vsimple = "Validation::Class::Simple"->new(
 my $should_pass = { name =>  "foo"  };
 my $should_fail = { name => " foo " };
 
-diag "hackish method...";
-
 ok(
     validate_ignoring_filters_1($vsimple, $should_pass),
     'validate_ignoring_filters_1($vsimple, $should_pass)',
@@ -46,8 +44,6 @@ ok(
     !validate_ignoring_filters_1($vsimple, $should_fail),
     '!validate_ignoring_filters_1($vsimple, $should_fail)',
 );
-
-diag "official method...";
 
 ok(
     validate_ignoring_filters_2($vsimple, $should_pass),
