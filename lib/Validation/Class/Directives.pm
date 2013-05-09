@@ -306,7 +306,6 @@ sub new {
 
 }
 
-
 sub add {
 
     my $self = shift;
