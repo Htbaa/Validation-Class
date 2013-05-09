@@ -24,6 +24,8 @@ our @EXPORT = qw(
     build
     dir
     directive
+    doc
+    document
     fld
     field
     flt
@@ -463,6 +465,28 @@ sub dir { goto &directive } sub directive {
     };
 
 }
+
+sub doc { goto &document } sub document {
+
+    my $package = shift if @_ == 3;
+
+    my ($name, $data) = @_;
+
+    $data ||= {};
+
+    return unless ($name && $data);
+
+    return configure_class_proto $package => sub {
+
+        my ($proto) = @_;
+
+        $proto->register_document($name, $data);
+
+        return $proto;
+
+    };
+
+};
 
 =keyword field
 

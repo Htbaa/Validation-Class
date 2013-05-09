@@ -23,6 +23,7 @@ use List::MoreUtils 'uniq', 'firstval';
 use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
+use Clone 'clone';
 
 =head1 DESCRIPTION
 
@@ -66,21 +67,31 @@ overridden.
 
 hold 'configuration' => sub { Validation::Class::Configuration->new };
 
-=attribute errors
-
-The errors attribute provides access to class-level error messages.
-This attribute is a L<Validation::Class::Errors> object, may contain
-error messages and CANNOT be overridden.
-
-=cut
-
-hold 'directives' => sub { Validation::Class::Mapping->new };
-
 =attribute directives
 
 The directives attribute provides access to defined directive objects.
 This attribute is a L<Validation::Class::Mapping> object containing
 hashrefs and CANNOT be overridden.
+
+=cut
+
+hold 'directives' => sub { Validation::Class::Mapping->new };
+
+=attribute documents
+
+The documents attribute provides access to defined document models.
+This attribute is a L<Validation::Class::Mapping> object and CANNOT be
+overridden.
+
+=cut
+
+hold 'documents' => sub { Validation::Class::Mapping->new };
+
+=attribute errors
+
+The errors attribute provides access to class-level error messages.
+This attribute is a L<Validation::Class::Errors> object, may contain
+error messages and CANNOT be overridden.
 
 =cut
 
@@ -1593,6 +1604,8 @@ sub proxy_methods_wrapped {
 
         validate
         validates
+        validate_document
+        document_validates
         validate_method
         method_validates
         validate_profile
@@ -1705,6 +1718,16 @@ sub register_directive {
     );
 
     $self->configuration->directives->add($name, $directive);
+
+    return $self;
+
+}
+
+sub register_document {
+
+    my ($self, $name, $data) = @_;
+
+    $self->configuration->documents->add($name, $data);
 
     return $self;
 
@@ -2406,6 +2429,7 @@ sub snapshot {
         my @clonable_configuration_settings = qw(
             attributes
             directives
+            documents
             events
             fields
             filters
@@ -2774,6 +2798,213 @@ sub has_valid { goto &validate } sub validates { goto &validate } sub validate {
     }
 
     return $self->validated == 2 ? 1 : 0;
+
+}
+
+=method validate_document
+=cut
+
+sub document_validates { goto &validate_document } sub validate_document {
+
+    my ($self, $context, $ref, $data, $options) = @_;
+
+    my $name;
+
+    my $documents = clone $self->documents->hash;
+
+    my $_fmap     = {}; # ad-hoc fields
+
+    if ("HASH" eq ref $ref) {
+
+        $ref  = clone $ref;
+
+        $name = "DOC" . time() . ($self->documents->count + 1);
+
+        # build document on-the-fly from a hashref
+        foreach my $rules (values %{$ref}) {
+
+            next unless "HASH" eq ref $rules;
+
+            my  $id = uc "$rules";
+                $id =~ s/\W/_/g;
+                $id =~ s/_$//;
+
+            $self->fields->add($id => $rules);
+            $rules = $id;
+            $_fmap->{$id} = 1;
+
+        }
+
+        $documents->{$name} = $ref;
+
+    }
+
+    else {
+
+        $name = $ref;
+
+    }
+
+    my $fields    = { map {$_ => 1} ($self->fields->keys) };
+
+    confess "Please supply a registered document name to validate against"
+        unless $name
+    ;
+
+    confess "The ($name) document is not registered and cannot be validated against"
+        unless $name && exists $documents->{$name}
+    ;
+
+    my $document = $documents->{$name};
+
+    confess "The ($name) document does not contain any mappings and cannot ".
+          "be validated against" unless keys %{$documents}
+    ;
+
+    $options ||= {};
+
+    for my  $key (keys %{$document}) {
+
+        $document->{$key} = $documents->{$document->{$key}} if
+            $document->{$key} && exists $documents->{$document->{$key}} &&
+            ! $self->fields->has($document->{$key})
+        ;
+
+    }
+
+    $document = flatten $document;
+
+    for my  $key (keys %{$document}) {
+
+        my  $value = delete $document->{$key};
+
+        my  $token;
+        my  $regex;
+
+            $token  = '\.\@';
+            $regex  = ':\d+';
+            $key    =~ s/$token/$regex/g;
+
+            $token  = '\*';
+            $regex  = '[^\.]+';
+            $key    =~ s/$token/$regex/g;
+
+        $document->{$key} = $value;
+
+    }
+
+    my $_dmap = {};
+    my $_pmap = {};
+    my $_xmap = {};
+
+    my $_data = flatten $data;
+
+    for my $key (keys %{$_data}) {
+
+        my  $point = $key;
+            $point =~ s/\W/_/g;
+        my  $label = $key;
+            $label =~ s/\:/./g;
+
+        my  $match = 0;
+
+        for my $regex (keys %{$document}) {
+
+            if ($_data->{$key}) {
+
+                my  $field = $document->{$regex};
+
+                if ($key =~ /^$regex$/) {
+
+                    my $config = {label => $label};
+
+                    $config->{mixin} = $self->fields->get($field)->mixin
+                        if $self->fields->get($field)->can('mixin')
+                    ;
+
+                    $self->clone_field($field, $point => $config);
+
+                    $self->apply_mixin($point => $config->{mixin})
+                        if $config->{mixin}
+                    ;
+
+                    $_dmap->{$key}   = 1;
+                    $_pmap->{$point} = $key;
+
+                    $match = 1;
+
+                }
+
+            }
+
+        }
+
+        $_xmap->{$point} = $key;
+
+        # register node as a parameter
+
+        $self->params->add($point => $_data->{$key})
+            unless $options->{prune} && ! $match
+        ;
+
+        # queue and force requirement
+
+        $self->queue("+$point")
+            unless $options->{prune} && ! $match
+        ;
+
+        # prune unnecessary nodes
+
+        if ($options->{prune} && ! $match) {
+
+            delete $_data->{$key};
+
+        }
+
+    }
+
+    $self->validate($context);
+
+    $self->clear_queue;
+
+    my @errors = $self->get_errors;
+
+    for (sort @errors) {
+
+        my ($message) = $_ =~ /field (\w+) does not exist/;
+
+        next unless $message;
+
+        $message = $_xmap->{$message};
+
+        next unless $message;
+
+        $message  =~ s/\W/./g;
+
+        # re-format unknown parameter errors
+        $_ = "The parameter $message was not expected and could not be validated";
+
+    }
+
+    $_dmap = unflatten $_dmap;
+
+    while (my($point, $key) = each(%{$_pmap})) {
+
+        $_data->{$key} = $self->params->get($point); # prepare data
+
+        $self->fields->delete($point) unless $fields->{$point}; # reap clones
+
+    }
+
+    $self->fields->delete($_) for keys %{$_fmap}; # reap ad-hoc fields
+
+    $self->reset_fields;
+
+    $self->set_errors(@errors) if @errors; # report errors
+
+    $_[3] = unflatten $_data if defined $_[2]; # restore data
+
+    return $self->is_valid;
 
 }
 
