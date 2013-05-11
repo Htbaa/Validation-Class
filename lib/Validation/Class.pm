@@ -220,10 +220,8 @@ sub initialize_validator {
         $input->check('password')->required->between('5-255')->min_symbols(1);
         $input->filters([qw/trim strip/]);
 
-        # run validations
-        unless ($input) {
-            print $input->messages("\n");
-        }
+        # run validate
+        die $input->messages unless $input->validate;
 
 =head1 DESCRIPTION
 
@@ -285,18 +283,12 @@ a more traditional usage of Validation::Class:
 
 If you are looking for a simple in-line data validation module built
 using the same tenets and principles as Validation::Class, please review
-L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>. If
-you're interested in an experimental yet highly promising approach toward
-validating hierarchical data, please take a moment to review
-L<Validation::Class::Document>.
-
-=head1 RATIONALE
-
-If you are new to Validation::Class, or would like more information on
-the underpinnings of this library and how it views and approaches
-data validation, please review L<Validation::Class::Whitepaper>.
-Please review the L<Validation::Class::Simple/GUIDED-TOUR> for a detailed
-step-by-step look into how Validation::Class works.
+L<Validation::Class::Simple> or L<Validation::Class::Simple::Streamer>. If you
+are new to Validation::Class, or would like more information on the
+underpinnings of this library and how it views and approaches data validation,
+please review L<Validation::Class::Whitepaper>. Please review the
+L<Validation::Class::Simple/GUIDED-TOUR> for a detailed step-by-step look into
+how Validation::Class works.
 
 =cut
 
