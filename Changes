@@ -1,497 +1,2188 @@
-Revision history for the Perl library Validation::Class
+==================================================
+Changes from 2012-05-11 00:00:00 +0000 to present.
+==================================================
 
-7.900048  2013-05-03
+---------------------------------------------
+version 7.900049 at 2013-05-11 08:15:01 +0000
+---------------------------------------------
 
-  - Fixed filtering to respect filtering attribute
+  Change: 2d32f75ed775d0be809d1350e78893a135568a99
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-09 10:44:43 +0000
 
-7.900045  2013-04-09
+    trivial update, removed extra newline 
 
-  - Fixed problem validating aliases with ignore_unknown and report_unknown enabled
+  Change: a6f65ca655f7b2aea644a9c4ec47146ad089a3ba
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-04 11:14:48 +0000
 
-7.900044  2013-04-09
+    removed diag from t/99-toggling-filters-during-execution.t 
 
-  - Error reporting unknown params when no fields specified
+---------------------------------------------
+version 7.900048 at 2013-05-03 22:49:06 +0000
+---------------------------------------------
 
-  - Update the V::C::Direcitves POD with the rationale behind the implementation of core directives
+  Change: 091a24144288583062ae6b286f34a58ccca3decc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-03 18:49:06 +0000
 
-  - Update the V::C::D::Email POD to encourage the use of CPAN modules for more sophisticated data validationalternative
+    fixed filtering to respect filtering attribute 
 
-7.900043  2013-04-04
+  Change: 0c725ba9967909e7280700e4b6ffb903891edf8d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-03 13:11:43 +0000
 
-  - V::C, V::C::S, and V::C::S::S now requires Perl 5.10.0
+    fixed namespace typo in the documentation 
 
-  - Added better numeric filtering, supports negative numbers
+---------------------------------------------
+version 7.900047 at 2013-05-03 02:45:26 +0000
+---------------------------------------------
 
-  - Updated decimal filter and added currency filter
+  Change: 7aa395eae3c4c69ee3d557a1f6b6e7a1fd49fb53
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-02 22:45:26 +0000
 
-  - Updated POD, added plugin documentation reference, added note to clone_field
+    fixed bug in the filtering directive filtering positive and negative
+    numbers
 
-7.900042  2013-03-28
+    fixed bug in the filtering directive filtering positive and negative
+    numbers 
 
-  - Field errors to output messages using the field label where applicable
+---------------------------------------------
+version 7.900046 at 2013-04-10 01:57:42 +0000
+---------------------------------------------
 
-7.900041  2013-03-28
+  Change: 916f98426a18e7e7f974848904a7563549ba930e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 21:57:42 +0000
 
-  - Better V::C prototype configuration merging (important for roles usage)
+    releasing 7.900046 
 
-7.900036  2013-03-23
+  Change: 813906f4378409b622ff384d5a09d1b5244ec2b6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 21:52:56 +0000
 
-  - POD Updates
+    alias resolution handled during the normalization process 
 
-7.900032  2013-02-26
+---------------------------------------------
+version 7.900045 at 2013-04-09 20:32:43 +0000
+---------------------------------------------
 
-  - Fixed a bug declaring filters, updated POD and added test case
+  Change: 14c68fa1ab5a3f398e0a5de89020599b45ff6713
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 16:32:43 +0000
 
-7.900031  2013-02-24
+    releasing 7.900045 
 
-  - Fixed a bug in the auto-validating method execution
+  Change: 7e6a3b7690beb7c0e077afba4b3c5939c9bf1eb6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 16:30:01 +0000
 
-  - Added new tests for auto-validating methods and dot-notation-style fields
+    fixed problem validating aliases with ignore_unknown and report_unknown
+    enabled 
 
-7.900030  2013-02-09
+  Change: 9174c9498fdf168efbbd6551dd5864de2ff3184b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 10:51:58 +0000
 
-  - Fixed a bug in the error_fields method
+    fixed typo in V::C::Directives 
 
-  - Fixed a bug in the role inheritance functionality
+---------------------------------------------
+version 7.900044 at 2013-04-09 14:36:43 +0000
+---------------------------------------------
 
-  - Minor POD update
+  Change: 547847b001a6e80e2cdbda778bc78c3c36c04424
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 10:36:43 +0000
 
-7.900029  2013-02-02
+    releasing 7.900044 
 
-  - Now exporting the prototype is_valid method into the calling class
+  Change: d499534737b0b9e0870504a8e014e4f9d4a157a7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 10:29:07 +0000
 
-  - Minor POD update about alternate self-validating-method usage and syntax
+    added the rationale to V::C::Directives 
 
-7.900028  2013-01-23
+---------------------------------------------
+version 7.900043 at 2013-04-09 09:15:19 +0000
+---------------------------------------------
 
-  - Minor POD updates
+  Change: d98cb6137c405eed12964c58c21a402689cf22c7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 05:15:19 +0000
 
-  - Allowing field and mixin keywords to register empty definitions
+    releasing 7.900043 
 
-  - Added the does method to the prototype to verify attached roles
+  Change: 0dbc7b57778c466ce715ec9385383b05c2ffd3a1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 05:13:11 +0000
 
-7.900026  2013-01-17
+    fixed typo in V::C::Directive 
 
-  - Various POD updates
+  Change: 1c95ef9bd2f43ec8e020eee12fdbbdaa00a4530b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 05:03:26 +0000
 
-  - Preparing to support of foreign directives
+    added notice to POD that the email directive does not confirm to the RFC
+    spec 
 
-  - Patched merge in Validation/Class/Mapping.pm to address a bug in Hash::Merge
+  Change: e95974d3e4552d517a5bf2c55954489936db95b1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-09 03:34:58 +0000
 
-  - Updated register_settings in Validation/Class/Prototype.pm
+    error reporting unknown params when no fields specified 
 
-7.900023  2013-01-13
+---------------------------------------------
+version 7.900042 at 2013-04-04 16:31:56 +0000
+---------------------------------------------
 
-  - Added the ability to append and overwrite imported fields and mixins
+  Change: 7330f969d53f672c27c6e22eee2763cae8f741b5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-04-04 12:31:56 +0000
 
-7.900022  2013-01-11
+    releasing 7.900043 
 
-  - Added/Update POD in the main module and cookbook
+  Change: afab9c43f8fc970c992d2d017a66a61e8e8989ac
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-28 18:53:32 +0000
 
-  - Added role-requirements (methods required by subclass) settings fom the load keyword
+    field errors to output messages using the field label where applicable 
 
-7.900021  2013-01-10
+---------------------------------------------
+version 7.900041 at 2013-03-28 08:57:40 +0000
+---------------------------------------------
 
-  - Miscellaneous POD changes, fixed typos, re-worded method descriptions
+  Change: e205af56c0ef03d66abaa2a3b45e44d8e3c7ed61
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-28 04:57:40 +0000
 
-  - Removed phased-out plugin code
+    releasing 7.900041 
 
-  - Refactored settings loading functionality
+  Change: cb5ca0db0bbac66b9b985003c02254f5b6a8037f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-28 04:57:10 +0000
 
-7.900020  2013-01-09
+    Better V::C prototype configuration merging (important for roles usage) 
 
-  - Fixed major logic flaw in register_settings method, role merging not handling blessed objects properly
+---------------------------------------------
+version 7.900040 at 2013-03-26 02:24:46 +0000
+---------------------------------------------
 
-7.900018  2013-01-07
+  Change: 190b8e4b7a53708566137e08f054fe4e391e6cfc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-25 22:24:46 +0000
 
-  - Fixed major logic flaw, attribute accessor now setting param and field value
+    POD Updates 
 
-  - Added new (autocase) filter to filters directives
+  Change: 0ddb8c8ee9b293546b7ec0cb1b0282391f7fc3cc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-25 20:16:40 +0000
 
-7.900017  2013-01-06
+    POD Updates 
 
-  - Fixed oversight in get_hash method during release 7.900016
+---------------------------------------------
+version 7.900039 at 2013-03-25 02:58:10 +0000
+---------------------------------------------
 
-7.900016  2013-01-06
+  Change: 75cb6913b192df36670cd233fb837edb62563598
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-24 22:58:10 +0000
 
-  - Fixed strange bug where attributes weren't being included in the snapshot process
+    POD Updates 
 
-  - Added the get_values method to the list of auto-exported proxy methods
+---------------------------------------------
+version 7.900038 at 2013-03-25 02:24:55 +0000
+---------------------------------------------
 
-  - Added the get_hash method to the auto-exported list which returns k/v pairs for all fields
+  Change: a1bf9d32f5be2c9b5aeafa2fa6740f1729f257e7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-24 22:24:55 +0000
 
-7.900015  2013-01-04
+    POD Updates 
 
-  - Added default mixins (:str, :num, and :flg)
+---------------------------------------------
+version 7.900037 at 2013-03-25 00:05:14 +0000
+---------------------------------------------
 
-  - Updated the POD in the Cookbook and Prototype
+  Change: 1122be1525a0b94871265e5bf64a7186e0d9a105
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-24 20:05:14 +0000
 
-  - Added a has_valid method in prototype as an alias to validate
+    POD updates 
 
-7.900013  2013-01-01
+  Change: f92e93c79efa8224e1a8d6ce45c5bf9e92f7660d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-24 20:03:51 +0000
 
-  - Added untested but fully-functional form-fields plugin
+    POD updates 
 
-  - Miscellaneous POD changes, especially around the set/load keywords
+---------------------------------------------
+version 7.900036 at 2013-03-23 15:53:20 +0000
+---------------------------------------------
 
-  - Pruned some POD and updated the class method to only work with validation classes
+  Change: 25a72deb75cb3a6ae4384785a81cf054a4b1f908
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-23 11:53:20 +0000
 
-  - Modified the Options directive to support keyed-options
+    pod updates, releasing 7.900036 
 
-  - Added new help directive to associate help statements with fields
+---------------------------------------------
+version 7.900035 at 2013-03-21 15:10:50 +0000
+---------------------------------------------
 
-7.900012  2012-12-31
+  Change: 5954c9e6da010c19e6f18b7e470c5a69c37ec725
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-21 11:10:50 +0000
 
-  - Fixed major logic flaw in dependency verification logic
+    releasing 7.900035 
 
-  - Fixed major logic flaw in alias checking during normalization
+---------------------------------------------
+version 7.900034 at 2013-03-15 06:42:57 +0000
+---------------------------------------------
 
-  - Addressed test failure under Perl 5.8.1
+  Change: 2ae72e94643fc086c20f4f0ab174bb099d375935
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-15 02:42:57 +0000
 
-7.900011  2012-12-23
+    releasing 7.900034 
 
-  - Fixed major logic flaw in newer directives dealing with null parameters
+  Change: a309ffe4e545c4c35d0f8aade4b5fc9a1b188452
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-15 02:42:37 +0000
 
-7.900010  2012-12-20
+    releasing 7.900034 
 
-  - Fix 03-streaming.t for Perl v5.8.9 *
+  Change: 47bbe90224b059dfb84a0d62b72ceb5042180050
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-15 02:35:29 +0000
 
-  - V::C::Fields now uses AUTOLOAD to access fields without using get()
+    default-values handled during normalization only, better clone reaping 
 
-7.900009  2012-12-16
+---------------------------------------------
+version 7.900033 at 2013-03-14 21:15:08 +0000
+---------------------------------------------
 
-  - Fixed setting param as undefined via the acccessor
+  Change: d091a586b4060c8049459617be928a89d14ddf16
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-14 17:15:08 +0000
 
-  - Method input/output specification accepts other method names also
+    releasing 7.900033 
 
-  - Method `using` specification will fallback to _method_name if missing
+  Change: d560d248b8ef92a01e95d491daaf80adb1ea540f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-14 17:08:52 +0000
 
-7.900006  2012-12-16
+    normalization has a context, default-directive accepts a coderef 
 
-  - Fixed missing version numbers
+  Change: 07df6e75184d4dad34b933128c0229954ad09994
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-03-14 16:47:56 +0000
 
-  - Updated main module POD (more directional)
+    default-directive value can be an anonymous sub-routine 
 
-  - Incoming parameters (via params argument) are always cloned
+---------------------------------------------
+version 7.900032 at 2013-02-26 22:39:57 +0000
+---------------------------------------------
 
-  - Added prototype utility functions for un/flattening parameters
+  Change: c2227ffd1303a59d5ae90da0cb1e497b0ef68e8b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-26 22:39:57 +0000
 
-  - Removed unnecessary flattening function from V::C::Fields
+    releasing version 7.900032 
 
-  - Fixed 03-streaming test (me thinks)
+  Change: 40db0a2a73fc05b4299ad8e08e18c3f3b962dd98
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-26 22:37:21 +0000
 
-7.900005  2012-12-10
+    fixed a bug declaring filters, updated POD and added test case 
 
-  - Fixed quirk with keys/values functions in V::C::Mapping breaking tests
+---------------------------------------------
+version 7.900031 at 2013-02-24 22:11:06 +0000
+---------------------------------------------
 
-7.900004  2012-12-09
+  Change: 2b64a5555c5f51819312f501506e08fc320949fe
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-24 22:11:06 +0000
 
-  - Minor maintenance and POD updates
+    releasing version 7.900031 
 
-7.900003  2012-12-05
+  Change: db9647f6664dd918a6c701307bf93ccb3ef8d55e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-24 22:09:40 +0000
 
-  - Introduced Validation::Class::Simple::Streamer
+    fixed a bug in the auto-validating method execution, added new tests for
+    auto-validating methods and dot-notation-style fields 
 
-7.900000  2012-11-18
+---------------------------------------------
+version 7.900030 at 2013-02-09 21:25:58 +0000
+---------------------------------------------
 
-  - Added more documentation
+  Change: de2020c9ad8f4ac1a51e70ebc91ff2e3a28846ea
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-09 21:25:58 +0000
 
-  - Added the ability to override messages at the field and class-level
+    releasing 7.900030, fixed a bug in the error_fields method, fixed a bug in
+    the role inheritance functionality, minor pod update 
 
-  - Created Validation::Class::Directive::Messages
+---------------------------------------------
+version 7.900029 at 2013-02-02 09:01:00 +0000
+---------------------------------------------
 
-  - Created Validation::Class::Directive::City
+  Change: f97c686f601bd3b1e583072cc803e4984a51af70
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-02-02 09:01:00 +0000
 
-  - Created Validation::Class::Directive::State
+    releasing 7.900029, now exporting the prototype is_valid method into the
+    calling class, minor pod update about alternate self-validating-method
+    usage and syntax 
 
-  - Created Validation::Class::Directive::Zipcode
+---------------------------------------------
+version 7.900028 at 2013-01-23 05:02:35 +0000
+---------------------------------------------
 
-  - Created Validation::Class::Directive::Creditcard
+  Change: 952c28c2846206ad6de3c4ad2de75de2c339bdca
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-23 05:02:35 +0000
 
-  - Created Validation::Class::Directive::Date
+    releasing 7.900028, minor pod updates, allowing field and mixin keywords
+    to register empty definitions, added the does method to the prototype to
+    verify attached roles 
 
-  - Created Validation::Class::Directive::Time
+---------------------------------------------
+version 7.900027 at 2013-01-18 04:15:48 +0000
+---------------------------------------------
 
-  - Created Validation::Class::Directive::Decimal
+  Change: e4fe5d49250ef7ca04d1fa970f5d3ca16ab54a89
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-18 04:15:48 +0000
 
-  - Created Validation::Class::Directive::Email
+    re-releasing as 7.900027 
 
-  - Created Validation::Class::Directive::Hostname
+---------------------------------------------
+version 7.900026 at 2013-01-18 03:56:12 +0000
+---------------------------------------------
 
-  - Created Validation::Class::Directive::SSN
+  Change: 933beb3e0b89bbcbfa2416f380621ded5714f7c4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-18 03:56:12 +0000
 
-  - Created Validation::Class::Directive::Telephone
+    releasing 7.900026, various pod updates, preparing to support of foreign
+    directives, patched merge in Validation/Class/Mapping.pm to address a bug
+    in Hash::Merge, updated register_settings in Validation/Class/Prototype.pm 
 
-  - Created Validation::Class::Directive::UUID
+---------------------------------------------
+version 7.900025 at 2013-01-15 07:22:09 +0000
+---------------------------------------------
 
-  - Created Validation::Class::Whitepaper
+  Change: 1fc4ce15a5f35214c88af504ea9ac8c2c7a866f7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-15 07:22:09 +0000
 
-  - Changed the version number scheme (again) to slow down incrementing of the major number
+    minor update 
 
-  - Created Validation::Class::Simple for ad-hoc validation needs
+---------------------------------------------
+version 7.900024 at 2013-01-14 11:42:11 +0000
+---------------------------------------------
 
-  - Created various container classes, .e.g. Fields, Params, Directives, etc
+  Change: b76a155b2add89b39bbed51e404d441bb9c333cd
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-14 11:42:11 +0000
 
-  - Created various base classes, .e.g. Core, Mapping, Listing, etc
+    releasing 7.900024, minor update 
 
-  - Rewrite of all documentation iteratively, under the Validation::Class::Manual namespace
+---------------------------------------------
+version 7.900023 at 2013-01-13 06:50:21 +0000
+---------------------------------------------
 
-  - Rewrite of Validation::Class, main module provides sugar for configuration only
+  Change: e709678d5461e7ba6590a16051aa207656cc4357
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-13 06:50:21 +0000
 
-  - Rewrite of Validation::Class::Prototype, now is configurable using OO
+    releasing 7.900023, added the ability to append and overwrite imported
+    fields and mixins 
 
-  - Added the Multiples directive which better enforces array handling
+---------------------------------------------
+version 7.900022 at 2013-01-12 01:17:55 +0000
+---------------------------------------------
 
-  - Renamed the clone method to clone_field
+  Change: 36c3a484f09f4e5834242103ffd59d8e17c00940
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-12 01:17:55 +0000
 
-  - Removed inheritence support via 'base' as it existed in 7.85
+    preparing release 7.900022, added/update pod in the main module and
+    cookbook, added role-requirements (methods required by subclass) settings
+    fom the load keyword 
 
-  - Removed the object keyword and support as it existed in 7.85
+  Change: 02f63e9ff11d110258faa60f41dfafcba9d4da00
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-11 21:17:40 +0000
 
-7.85  2012-09-21
+    fixed POD for load keyword 
 
-  - The load/set and object/obj keywords documentation has been moved into the intro document under hidden features
+  Change: 02e083582d36e0c1088311996e9d6592ad9acb42
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-11 21:08:57 +0000
 
-  - Fixed Class::Forward version dependency which cause test failures in previous versions
+    tweaked POD for method new 
 
-7.84  2012-09-20
+---------------------------------------------
+version 7.900021 at 2013-01-11 04:06:52 +0000
+---------------------------------------------
 
-  - The import method has been modified to copy/merge meta-class configs based on inheritance
+  Change: 807fb6e214e5f679a1149e5a202e88d8a672c6c9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-11 04:06:52 +0000
 
-7.82  2012-08-13
+    releasing 7.900021, miscellaneous pod changes, fixed typos, re-worded
+    method descriptions, removed phased-out plugin code, refactored settings
+    loading functionality 
 
-  - The class method/functionality has been refactored and is now using Class::Forward
+---------------------------------------------
+version 7.900020 at 2013-01-09 09:08:51 +0000
+---------------------------------------------
 
-  - New invalid parameter error triggered when arrayrefs are discovered with nested structures (non-scalars)
+  Change: 9e685b5d5e07c12fccff7e8faca60fb54f8d2dff
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-09 09:08:51 +0000
 
-7.81  2012-08-11
+    releasing 7.900020, fixed major logic flaw in register_settings method,
+    role merging not handling blessed objects properly 
 
-  - fixed array/filtering issue (rare bug)
+---------------------------------------------
+version 7.900019 at 2013-01-08 06:46:31 +0000
+---------------------------------------------
 
-7.80  2012-07-31
+  Change: 8d45217f128766bc28d79287205ead6e3a8f2910
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-08 06:46:31 +0000
 
-  - fixed typo in custom validation
+    releasing 7.900019 hotfix 
 
-7.79  2012-07-28
+  Change: 5cae5bc913e7e5bb475489c430c31bfb5a8e6444
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-08 06:15:05 +0000
 
-  - updated the object keyword and functionality (untested)
+    minor update to the get_values prototype method 
 
-7.78  2012-07-28
+---------------------------------------------
+version 7.900018 at 2013-01-08 03:48:38 +0000
+---------------------------------------------
 
-  - changed flatten/unflatten functionality, now only happens during validation
+  Change: d5c7c365b4840aa9d2afcdc3bfbbaca3378ddeea
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-08 03:48:38 +0000
 
-  - fixed unneccessary serialization, field and values are always as expected
+    releasing 7.900018, fixed major logic flaw, attribute accessor now setting
+    param and field value, added new (autocase) filter to filters directives 
 
-  - better parameter handling (backwards-compatibility: some earlier functionality issues may occur)
+---------------------------------------------
+version 7.900017 at 2013-01-06 19:48:06 +0000
+---------------------------------------------
 
-7.77  2012-07-27
+  Change: 570f75d4c79677b9c0c56fd5cb142fd6caf609ca
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-06 19:48:06 +0000
 
-  - better handling of custom validation (and registering resulting errors)
+    releasing 7.900017 
 
-7.75  2012-07-15
+  Change: 7c2e5a492df8d2bd9dc71ee0e8509f356787e69c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-06 19:45:49 +0000
 
-  - added the validate_profile method (untested atm)
+    fixed oversight in get_hash method during release 7.900016 
 
-7.74  2012-07-03
+---------------------------------------------
+version 7.900016 at 2013-01-06 16:24:51 +0000
+---------------------------------------------
 
-  - allow class to cooperate with non-validation classes
+  Change: 4b1fd6d5d8091fc81dec5b2fe5120ab8778dbff4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-06 16:24:51 +0000
 
-7.72  2012-07-02
+    releasing 7.900016, fixed strange bug where attributes were not being
+    included in the snapshot process, added the get_values method to the list
+    of auto-exported proxy methods, added the get_hash method to the
+    auto-exported list which returns k/v pairs for all fields 
 
-  - main module POD changes
+---------------------------------------------
+version 7.900015 at 2013-01-05 03:36:17 +0000
+---------------------------------------------
 
-  - renamed constructor replacement to initialize_validator
+  Change: d61274ba9263f3a72ecca71b22b94759932cbc49
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-05 03:36:17 +0000
 
-  - restrict the class method from passing parameters that don't exist
+    releasing 7.900015 w/updated documentation 
 
-7.70  2012-06-28
+  Change: 461709578d6fffd9fde71bcb98a61979edbbd7a1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-05 03:35:20 +0000
 
-  - on initialization, only set registered accessors
+    releasing 7.900015, added default mixins (:str, :num, and :flg), updated
+    the pod in the cookbook and prototype, added a has_valid method in
+    prototype as an alias to validate 
 
-  - major bug fix   validation routine now reaps auto-cloned fields
+---------------------------------------------
+version 7.900014 at 2013-01-02 09:47:16 +0000
+---------------------------------------------
 
-  - custom validation firing default failure message even if custom message is used
+  Change: e5e68783469da295c9a3a8e2075fea3c62cce193
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-02 09:47:16 +0000
 
-7.69  2012-06-24
+    removed form-fields plugin documentation 
 
-  - added more tests
+  Change: 81dff68e2bacfac18c2642ace827bc1da8005e7d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-02 09:46:33 +0000
 
-7.68  2012-06-20
+    removed explicit prereqs that exist in core since 5.8.9, removed
+    form-fields plugin, shipping plugins separately 
 
-  - updated some tests
+---------------------------------------------
+version 7.900013 at 2013-01-02 07:28:53 +0000
+---------------------------------------------
 
-  - fixed plugin function and POD -  works better (with discovery)
+  Change: db6d7bd509e68d63340147a89207cae76b1e9c9b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-02 07:28:53 +0000
 
-7.67  2012-06-20
+    removed plugin tests which are no longer relevant 
 
-  - misc POD changes
+  Change: 43a765322ad311338dc46f2b30d6732a4bbb492e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 17:09:04 +0000
 
-7.66  2012-06-19
+    preparing release 7.900013 
 
-  - misc changes (experimental configs) -  should not impede normal usage
+  Change: 81fce6ea9f3a9b831f35c57d9f93c9a40e2cb479
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 16:59:58 +0000
 
-7.65  2012-06-17
+    added untested but fully-functional form-fields plugin 
 
-  - allow keywords to be called/used in OO fashion
+  Change: 57ce928afe7a06b0a21e661cd3838e4db1e07e4e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 15:14:24 +0000
 
-  - fixed V::C::Exporter which broke due to recent updates (needs tests)
+    miscellaneous POD changes around the set/load keywords 
 
-7.59  2012-06-16
+  Change: da7dd861270d704cfb3a33f223db331970041f72
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 15:13:12 +0000
 
-  - builders are also passed all arguments given to the constructor
+    miscellaneous POD changes 
 
-  - fixed breakage in V::C::Exporter
+  Change: baf9c63a332d94c0071f8ba97bfb1ffe112a3abb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 15:12:36 +0000
 
-7.58  2012-06-16
+    pruned some POD and updated the class method to only work with validation
+    classes 
 
-  - changed structure for defining and using plugins
+  Change: dc18d0cfb6cabc3789fa000f8059b4667c92ff3e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 15:11:11 +0000
 
-  - allow the retrieval of instantiated plugin objects
+    modified the options directive to support keyed-options 
 
-7.55  2012-06-14
+  Change: 326f42f9ff3f0e89afff7e0e4b10ecb0fa80bf73
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-01-01 15:09:52 +0000
 
-  - fixed major bug cause by 7.50 (alternate syntax for the set/load keyword)
+    added new help directive to associate help statements with fields 
 
-7.50  2012-06-13
+  Change: 4e7387d098a7ce1d3eec09b1da0fe9021398015d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-31 20:26:19 +0000
 
-  - wrote tests to test the Validation::Class::Field object accessors
+    Merge branch 'master' into feature/formfields-plugin 
 
-  - changed module::find usage   no longer loads unless used
+  Change: 56c52d55568ce4de153b7bbb8f31fc8ee4a55b34
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-31 20:13:31 +0000
 
-  - added get method to Validation::Class::Collection
+    updated POD, changed main module synopsis 
 
-  - various POD changes
+  Change: fd875df9a710823909b22025ea5de212ea9ffdb7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-31 07:11:17 +0000
 
-  - refactored class method in V::C::P now accepts an alternate syntax
+    Merge branch 'master' into feature/formfields-plugin 
 
-  - V::C::P class method load unloaded modules as they're called
+  Change: 95bab6fe7e5106657dfce31eed919ddd7a2defa3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-29 14:07:21 +0000
 
-  - add alternate syntax to the V::C load/set method
+    added notes to help guide implementation 
 
-7.40  2012-06-06
+  Change: 08147567273414c00f1df26df5419a0ebef051e4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-29 01:49:28 +0000
 
-  - fixed bug in validation toggling feature   github-issue-16
+    started flushing out ideas for the formfields plugin 
 
-7.39  2012-06-03
+---------------------------------------------
+version 7.900012 at 2012-12-31 19:53:36 +0000
+---------------------------------------------
 
-  - fixed major bug in custom validation evaluation
+  Change: fd518170a9d2ff2b2e6beafc84882448e8852b10
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-31 19:53:36 +0000
 
-7.38  2012-05-31
+    fixed major logic flaw in dependency verification logic, fixed major logic
+    flaw in alias checking during normalization, addressed test failure under
+    Perl 5.8.1 
 
-  - more POD changes
+---------------------------------------------
+version 7.900011 at 2012-12-23 22:58:24 +0000
+---------------------------------------------
 
-7.35  2012-05-25
+  Change: 394ef886e9193269e15e8ff62a694f1968c3712a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-23 22:58:24 +0000
 
-  - POD changes
+    preparing release 7.900011, fixed logical errors in new directives 
 
-7.25  2012-05-18
+  Change: f750a1832c8ac231ecceec17aa2112077dcf9968
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-23 22:46:41 +0000
 
-  - misc changes
+    fixed major logic flaw in some of the newer directives 
 
-  - changed error message for options validator
+---------------------------------------------
+version 7.900010 at 2012-12-21 00:26:34 +0000
+---------------------------------------------
 
-  - fixed major overlooked bug in the processing of core validators
+  Change: eff877cf8cec602539e2f03cb0be43e3a8b79ea1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-21 00:26:34 +0000
 
-7.21  2012-05-12
+    releasing 7.900010, fixed V::C::Streamer, updated main module POD,
+    extended V::C::Fields 
 
-  - fixed bad conditional in t/09-modifiers.t and t/02-keyword-object.t
+  Change: 195fdcda6f45c861a6663268f6af61b8122a4c97
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-17 00:36:51 +0000
 
-7.20  2012-05-10
+    preparing release 7.900010, misc POD changes 
 
-  - fixed mistype in t/09-modifiers.t causing test failures
+  Change: 1da72611c8212ece5a22421c655b9211ca164360
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-17 00:28:51 +0000
 
-  - add the obj/object keyword (which defines class object builders)
+    updated the main module synopsis 
 
-  - add test for the object keyword
+  Change: c89c385e7b67193718149d7fbd5a86348dc126a2
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 20:36:45 +0000
 
-7.16  2012-05-03
+    updated synopsis 
 
-  - added V::C::Relatives collection class
+---------------------------------------------
+version 7.900009 at 2012-12-16 20:02:11 +0000
+---------------------------------------------
 
-  - fixed slight oversight in V::C
+  Change: a3ab36f312ce4e1e0612bb951f288ab385cfad8b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 20:02:11 +0000
 
-  - added test for method modifiers
+    updating documentation for release 7.900009 
 
-  - extended V::C::Intro POD
+  Change: eb7e3482b67eda7cd6e35abf0436e3348ca20a07
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 20:01:01 +0000
 
-7.15  2012-05-03
+    preparing release 7.900009, POD changes, extended auto-validating method
+    functionality 
 
-  - added all *_errors, *_fields, and *_params methods to
+---------------------------------------------
+version 7.900008 at 2012-12-16 17:10:07 +0000
+---------------------------------------------
 
-  - the proxy methods list
+  Change: dccbee83c1e38f913fd63c33e07a8c76e8864386
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 17:10:07 +0000
 
-  - update various POD bits
+    releasing version 7.900008, minor update, POD changes 
 
-7.12  2012-05-02
+---------------------------------------------
+version 7.900007 at 2012-12-16 16:18:01 +0000
+---------------------------------------------
 
-  - better synopsis
+  Change: 5ebec337d8c70762b7ed56dc5d6dfcffbbf0fede
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 16:18:01 +0000
 
-  - update various POD bits
+    releasing version 7.900007, minor update, POD changes 
 
-7.11  2012-04-27
+---------------------------------------------
+version 7.900006 at 2012-12-16 16:00:33 +0000
+---------------------------------------------
 
-  - enforcing field naming convention to reduce margin for error
+  Change: dfd2b2bd12c98135005abc2dffa698a4cda42b9a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 16:00:33 +0000
 
-  - refactored and decoupled main validation routine
+    releasing 7.900006, fixed 03-streaming.t test, updated main module POD 
 
-  - added has() method to V::C::Collection
+  Change: 99aacc29739310e9db4ff08ef8c0d2c0ae43a01a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-16 15:19:24 +0000
 
-  - various POD updates
+    preparing release 7.900006, fixed 03-streaming.t test, updated main module
+    POD 
 
-  - major engine refactoring
+---------------------------------------------
+version 7.900005 at 2012-12-11 03:05:50 +0000
+---------------------------------------------
 
-  - renamed set_field_value to set_fields
+  Change: 9d5cedd2ee5718c146e3e0694b354d26fd8807f3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-11 03:05:50 +0000
 
-  - renamed default_field_value to get_value
+    releasing version 7.900005, with POD/README/Makefile updates 
 
-  - changed set_params
+  Change: 2aff62631fe398ea82f3764fbdf1e17ecda2cd6a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-11 03:03:14 +0000
 
-  - remembered (+documented) why we dont reap cloned fields
+    releasing version 7.900005, fixed quirk with keys/values functions in
+    V::C::Mapping breaking tests 
 
-7.04  2012-04-24
+---------------------------------------------
+version 7.900004 at 2012-12-09 17:53:27 +0000
+---------------------------------------------
 
-  - using the 5.14 open pragma for one test cause failures on cpants
+  Change: 679645c1cd7964422c4b2d704e5afab923e775a7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-09 17:53:27 +0000
 
-7.03  2012-04-24
+    releasing version 7.900004, minor update, POD changes 
 
-  - fixed minor object-based parameter handling issue
+---------------------------------------------
+version 7.900003 at 2012-12-05 22:46:21 +0000
+---------------------------------------------
 
-  - get_hash_params method renamed unflatten_params
+  Change: fbc7defa84dce2db74aa6b4669728496fa12e6f7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 22:46:21 +0000
 
-  - set_hash_params method renamed flatten_params
+    releasing version 7.900003 
 
-  - changed how field accessors are created and called
+  Change: 4081684e336f20d513b94daf75c27cb59aa3a351
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 22:44:59 +0000
 
-7.02  2012-04-23
+    releasing version 7.900003 
 
-  - moved archived tests undef regression folder
+  Change: 530740a71c61cc4fe007b7c64d46ae19a1802837
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 22:43:24 +0000
 
-  - tested accessors and parameter handling of structures (ARRAYS)
+    re-generated the docs for ver. 7.900002 
 
-7.01  2012-04-23
+  Change: 7006c0d8d7c995b77269e859f1f2d94487828a3c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 22:42:11 +0000
 
-  - release new public version
+    updated the synopsis for simple-streamer 
 
-  - complete rewrite
+---------------------------------------------
+version 7.900002 at 2012-12-05 22:11:18 +0000
+---------------------------------------------
 
-  - major implementation overhaul
+  Change: c257a97d6ad4b15e1a420abe3616237921865b1a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 22:11:18 +0000
 
-  - prevent namespace pollution by employing a prototype class
+    releasing 7.900002, optimized simple streamer, added some lite
+    documentation 
 
-  - added proto/prototype method to access prototype class
+  Change: 471f6b0bea2d6c094f3b795a94f6b4d38691f4a4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 01:53:44 +0000
 
-  - removed load_classes and load_plugins
+    added missing documentation for simple-streamer 
 
-  - changed options accepted by the load/set method
+  Change: 76d07412d4bfb81377d4eaba50227d7bb4e88b48
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 01:49:00 +0000
 
-  - no longer registering quickname for relatives
+    updated documentation and added feature simple-streamer 
 
-  - deprecated load_plugins and load_classes methods
+  Change: 68ce2b51e07515567789b86979663ce68da059a4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 01:44:42 +0000
 
-  - removed Array::Unique finally
+    fixed bug discovered by integrity script 
 
-  - cleanup error handling (needs its own class)
+  Change: 5aa83644000e094dc11655106ef2049367ef88dd
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-05 01:37:03 +0000
 
-  - merge half-ass cookbook into intro POD
+    implemented the simple-streamer 
 
-  - started rewriting existing tests (and new ones)
+  Change: 488ec5e4c8e99b18f7cc5b520de662779b401ba3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-04 13:05:15 +0000
+
+    fixed typo in the documentation 
+
+---------------------------------------------
+version 7.900001 at 2012-12-02 16:46:17 +0000
+---------------------------------------------
+
+  Change: b967d0effde92aa56b9eabaa746f7613d3181055
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 16:46:17 +0000
+
+    releasing 7.900001 with missing documentation 
+
+---------------------------------------------
+version 7.900000 at 2012-12-02 15:39:12 +0000
+---------------------------------------------
+
+  Change: 28d17469e90d30af41d01ebbb6b227a96fd313a8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 15:39:12 +0000
+
+    fixed integrity bugs found during release 
+
+  Change: a8bb27f1b33f34d46c52554bd91b4c189ae8d719
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 14:53:08 +0000
+
+    rearranged load order in vcs (simple), misc changes to city and creditcard
+    tests 
+
+  Change: 82c316d798edb0990f4ee43c6c07e7d66f6c2799
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 14:32:03 +0000
+
+    fixed simple pattern compilation in the pattern directive 
+
+  Change: 69b5cf956d027a212c46bc4bd9847894037eba08
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 14:25:08 +0000
+
+    fixed typo in the directives class documentation 
+
+  Change: 2995272558b638f7b47a5d977af3863017009a47
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 14:06:52 +0000
+
+    updated documentation for all directives (again) 
+
+  Change: ce9b36a07bc13cbcc431d8035eb13d001c9b68cb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-02 13:52:26 +0000
+
+    updated documentation for all directives 
+
+  Change: a9e25883285ff61b700557ce73ab843f99ea9a27
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-01 23:26:58 +0000
+
+    updated the documentation on all directives 
+
+  Change: 9227964a44f2462e52535da628bb2c72f7e32496
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-01 23:26:04 +0000
+
+    updated the documentation on specific directives 
+
+  Change: 12dfe0ade68055ca5ea5d4ced70f3d570c440fdb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-01 23:11:23 +0000
+
+    update the documentation for directives, renamed the core module to util
+    which is more apropo 
+
+  Change: 6c7ffb6276085ec959876bafff64848db036fca7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-01 20:56:29 +0000
+
+    made misc pod changes, added new validation methods validates,
+    profile_validates, and method_validates 
+
+  Change: 02119ae3fe3ef61531eaf34927fcf185aac90b0e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-12-01 18:28:51 +0000
+
+    modified misc documents (documentation), finished tests for new directives 
+
+  Change: a3746749609aa2eb4b23da4674531fe6b973985c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-29 14:09:01 +0000
+
+    started tests for the creditcard and date directives 
+
+  Change: 501543f2fef8a16569ad226c2c3e38f650b51587
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-29 01:48:27 +0000
+
+    updated the way plugins are loaded in the prototype 
+
+  Change: ad5f5de0f919f6a0f84f2df2e88319f38134675f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-28 09:06:39 +0000
+
+    added the error message overriding code and started its documentation 
+
+  Change: 2ec7633b0c389858da17b090929cb8fca1a41f32
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-27 06:19:17 +0000
+
+    started testing the city and telephone directives 
+
+  Change: 96a8db5112a00d50f564a47edc65da080b302a7d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-26 08:16:25 +0000
+
+    updated dist.ini and Changes file 
+
+  Change: 5d3c7392b60123048b06f097ecb3c8b21409a410
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-26 08:11:28 +0000
+
+    added new untested directives for city, state, zipcode, etc 
+
+  Change: e5e52baeb3bf9c900fdcffcdc76b44095d6c3a43
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-26 01:14:55 +0000
+
+    updated the whitepaper 
+
+  Change: d99a9ed7aabe0c23a73b5e986b9cfcb806cee5d5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-26 01:08:20 +0000
+
+    made slight changes to documentation 
+
+  Change: 7430be6256aa3dfab7ea213093b24fbfad70f94c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-26 01:05:56 +0000
+
+    made minor updates, 99% done with the whitepaper, more tests in the
+    examples folder 
+
+  Change: c1c0a6b35841512e3c1c4c044ba394b9fab57f98
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-25 06:44:03 +0000
+
+    updated the whitepaper and made content corrections 
+
+  Change: ae73931a2434610ea038b3079582b23b825f5a48
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-25 06:33:20 +0000
+
+    fixed misspelling in whitepaper 
+
+  Change: 29aaaddedd6c7d0e9e80fb76cbd2e9367cfbe603
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-25 06:31:22 +0000
+
+    re-generated documentation, updated the whitepaper which is now 98%
+    complete 
+
+  Change: ea769f6c982ffdc6a00aae38627b4f3841a48ae4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-25 01:06:05 +0000
+
+    updated the codename in dist.ini 
+
+  Change: c7015573fbd940dbe901c2d3e02205bd00f8a9e1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 21:45:57 +0000
+
+    added the cookbook and whitepaper updates 
+
+  Change: b735a2b578a43396824ec9641fa15eb24716ccc4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 21:41:39 +0000
+
+    started the Validation::Class whitepaper, cleaned-up POD in various
+    classes 
+
+  Change: 268e99a8db5d1eff16bb00fdb41df07e8435e771
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 20:22:43 +0000
+
+    update POD for Validation::Class 
+
+  Change: cc7401197d2c543cd3be4768a82cdca13f276c26
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 20:18:38 +0000
+
+    fixed various spelling errors in POD 
+
+  Change: ada57d64d05816c4a81ab168227db62ad3df2105
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 19:48:57 +0000
+
+    updated POD for Validation::Class and added documentation to the repo-only 
+
+  Change: 477381d97bf5a00273d10bf5be54937aa4718aae
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 19:12:57 +0000
+
+    updated the README 
+
+  Change: a4b111b04c6f9fd4e9d8a7d79a2764f6b1edd755
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 19:11:23 +0000
+
+    cleanup the codebase - prepared documentation for prototype and modified a
+    few methods slightly 
+
+  Change: 5009f24845a48a226b6d9f7a21d364900182abe5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-24 17:17:30 +0000
+
+    cleanup the codebase - prepared most documentation for release except for
+    prototype 
+
+  Change: d06c5f7bd3b2f17e0c90ef5639ec8d6bf5cd9e13
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-23 07:03:38 +0000
+
+    cleanup the codebase - fixed unforeseen issues with V::C::Simple and
+    started the documentation 
+
+  Change: a9005a28e12d45e881ce1f17fe38329119ffe472
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 05:37:10 +0000
+
+    cleanup the codebase - tweaked Validation::Class pod 
+
+  Change: d63eab72112de31b990083d861ada90b18374750
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 05:33:19 +0000
+
+    cleanup the codebase - tweaked the Validation::Class pod 
+
+  Change: 021094b03bfe37ad3c2f945029d132b9680e75a7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 05:21:23 +0000
+
+    cleanup the codebase - rewrote Validation::Class pod 
+
+  Change: f04d609389f026c91ef888b7d0cec1b10b798749
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 02:01:15 +0000
+
+    cleanup the codebase - added 02-integrity.t to run perltidy on the
+    codebase as a standard test 
+
+  Change: 4006c5433a569c5d41d67172432a10094db4be28
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 00:44:05 +0000
+
+    cleanup the distzilla environment - re-configured tidy script 
+
+  Change: fdf67cd9f4acc930bdf0d2a2ae4a32cf04580a18
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 00:28:45 +0000
+
+    cleanup the distzilla environment 
+
+  Change: cab69a3a4acdb1e5cb3549bd017768876c073077
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 00:26:16 +0000
+
+    renamed the integrity script as tidy (which is now only responsible for
+    cleaning test files) 
+
+  Change: 9780e75b5180d4706d0796043b4cfbe33398967b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-21 00:16:32 +0000
+
+    code-blast update, rewrite 99% complete, re-organizing tests and distzilla
+    config 
+
+  Change: 4ff199a0931930d94d038e5fb546a886ab0a3c93
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-18 07:58:23 +0000
+
+    code-blast update, rewrite 99% complete, all tests pass todo: cleanup and
+    documentation 
+
+  Change: 333b8698746b79895fe08cd15338137b025e17bb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-17 05:33:52 +0000
+
+    Merge branch 'rewrite' of github.com:alnewkirk/Validation-Class into
+    rewrite 
+
+  Change: 920c267745e2593be1067bed66d651133e54d7fa
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-17 05:31:04 +0000
+
+    code-blast update, rewrite 98% complete, todo: fix regression testing,
+    cleanup and documentation 
+
+  Change: 799cdc4700911e2732e2f55d160577d22e96c2dc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-17 05:30:28 +0000
+
+    code-blast update, added the multiples directive 
+
+  Change: 20a729772e51f4595fb802cdaef2bd826bc7a524
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-17 01:39:38 +0000
+
+    code-blast update, rewrite 98% complete, added the multiples directive,
+    todo: fix regression testing, cleanup and documentation 
+
+  Change: 32f00364766ace7714ba9f0761f684f4ff434921
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-16 07:36:58 +0000
+
+    code-blast update, rewrite 95% complete, todo: fix regression testing,
+    cleanup and documentation 
+
+  Change: f348a9a760b91d2c5feb858f82024c93c399883a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-15 05:00:16 +0000
+
+    code-blast update, rewrite 90% complete, todo: testing, cleanup and
+    documentation 
+
+  Change: 01d964322f23d96d6b969c3ce36b02ca3450bf46
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-14 05:38:13 +0000
+
+    code-blast update, rewrite 85% complete, todo: testing and cleanup 
+
+  Change: ebdcf5f60ac2c51e1e51ef85e5d3c39568595e11
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-11 10:03:49 +0000
+
+    code-blast update, rewrite 65% complete, todo: filtering 
+
+  Change: 367b95fc82554ffb3a2d37f2733eda3d0c52d03e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-11-09 07:21:18 +0000
+
+    code-blast update, rewrite 45% complete, todo: filtering and validation 
+
+  Change: 5c03e2c13dceda39edcbbd13da192dc127ce9be0
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-10-28 09:50:25 +0000
+
+    initial commit for pod/code rewrite 
+
+  Change: 81756d18cdb78e444da4f498203c08c6855bf59c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-25 03:58:44 +0000
+
+    updated V::C::Exporter, readme and makefile, released new version 7.86 
+
+  Change: 3f2d4b7be5d3fdbc5760ad32c532451380264a16
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-25 03:52:08 +0000
+
+    incremented the dist.ini version 
+
+  Change: 221d763a4e1f51da90187620e020f191dfa6babf
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-25 03:50:44 +0000
+
+    fixed variable scoping issue in Validation::Class 
+
+  Change: 36b7d7c39141bd3e7bbb08d301b37a2d1d61fadb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-22 00:50:28 +0000
+
+    new release, ver 7.85 with Class::Forward version dependency fix 
+
+  Change: 8b9fcdc1bbe08be74b0064e61af5f01d5bec981b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-21 19:37:19 +0000
+
+    the load/set and object/obj keywords documentation has been moved into the
+    intro pod under hidden features 
+
+  Change: 395fe2facf2a11f8cc7f4c9724ef56b5191734f3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-21 19:18:54 +0000
+
+    resolved merge conflict from github repo 
+
+  Change: 504ff5134ddc337ae5190807cf07679116f6d865
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-20 19:51:28 +0000
+
+    new release, ver 7.84 with inheritance support 
+
+  Change: dcf4225f0056ce3be71791859658c88173206a89
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-09-04 02:26:28 +0000
+
+    removed Class-Forward-0.04 dependency 
+
+  Change: b23a35e46057f15f440183ff7a126222be7d5b01
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-08-21 06:05:42 +0000
+
+    updated class method (ignoring relatives), added missing files to the repo 
+
+  Change: ef5867f6860c34643f90a4d39ca95108df8fb6d9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-08-14 16:54:17 +0000
+
+    The class method/functionality has been refactored (now using
+    Class::Forward), and New invalid parameter structure error triggered when
+    arrayrefs are discovered with nested structures 
+
+  Change: 306f40bb94ec903218d9cffabfbf09be6b20532e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-08-11 03:13:28 +0000
+
+    fixed array/filtering issue (rare bug) 
+
+  Change: edde419f9625190205f46e9be0a289f0c9dc8394
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-08-01 00:04:21 +0000
+
+    fixed typo in custom validation 
+
+  Change: d4c8caef9480052b65230f233947bff15447e84c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-28 14:24:02 +0000
+
+    updated the object keyword and functionality 
+
+  Change: d98cf8aaf9796883680421b9e3656083a607fb94
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-28 13:54:45 +0000
+
+    changed flatten/unflatten functionality, now only happens during
+    validation 
+
+  Change: ab20786f8608ca7daccb03a6ae0ce76e281a372b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-27 02:53:07 +0000
+
+    release 7.77: better handling of custom validation (and registering
+    resulting errors) 
+
+  Change: ef1308254e8d6346c1fbd5bdf92cb14a8f64080b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-16 12:18:23 +0000
+
+    fixed validate_profile method 
+
+  Change: 2d64cd8ba94b3434ccbb10786633395c476720e9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-15 23:53:44 +0000
+
+    added the validate_profile method (untested atm) 
+
+  Change: b4159cc1e0a7956c128978fbf57f75a45e0419f4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-03 09:53:40 +0000
+
+    new release 7.74, allow class to cooperate with non-validation classes 
+
+  Change: f7b0815967ee5027e1b7e4a66bbd297af1e2cca3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-02 20:09:00 +0000
+
+    POD updates 
+
+  Change: a26a5d00e8bd34a78271deadc2315d9c23d5f240
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-07-02 16:51:33 +0000
+
+    released 7.72, changes: main module POD changes, renamed constructor
+    replacement to initialize_validator, restrict the class method from
+    passing parameters that dont exist 
+
+  Change: 6708006fd83c05bb1fd13610cb35928301787fe8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-28 02:57:37 +0000
+
+    released version 7.70, on initialization only set registered accessors,
+    major bug fix - validation routine now reaps auto-cloned fields, custom
+    validation firing default failure message even if custom message is used 
+
+  Change: b4b3737211db79c956657fce762c528ded2ccb7d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-24 19:07:38 +0000
+
+    added more tests 
+
+  Change: fcb69bc968d6959d6f48097d8de1320468b792eb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-20 01:16:40 +0000
+
+    released version 7.67 
+
+  Change: b344d90f61afb6f7bfa09acb63f0d52d5777cded
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-19 16:11:35 +0000
+
+    prepared version 7.66 (pre-release) 
+
+  Change: 1ea51b4fddc45c18abedf0fa89a4f88f566e4847
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-19 12:51:55 +0000
+
+    misc POD change 
+
+  Change: b53a218536fe7798e81c61ab1ac6b4adfc46e779
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-18 12:32:22 +0000
+
+    added attr checking POD example 
+
+  Change: 4673e778d77e03d7e918dbe437849ed1d4f68b94
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-17 10:05:05 +0000
+
+    released version 7.65 
+
+  Change: 951959f9254a150583e4312fca320bd72f199492
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-16 15:22:14 +0000
+
+    released version 7.58 
+
+  Change: 224ccc2da5b8d48e5bb72f003bf44652b00af684
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-14 14:30:26 +0000
+
+    released version 7.55 
+
+  Change: ac5f1651733ffc2ff01631cd2eb44fa42c9b8bdd
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-14 02:14:44 +0000
+
+    released version 7.51 
+
+  Change: a47a238c11253bef43a993037ea8ecbfe1a07757
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-14 01:59:14 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+
+  Change: 48913438cdb0747b23a013188900fcb886ebe1e3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-14 01:58:47 +0000
+
+    released version 7.50 
+
+  Change: b77b825716aa4c24b881826e079e8be53946a3ec
+  Author: ANAIO <we@ana.im>
+  Date : 2012-06-12 07:10:10 +0000
+
+    Merge pull request #17 from oalders/master
+
+    s/depreciated/deprecated/g 
+
+  Change: 77ac5af50d00f776cd0cd2316e6ac021df04adea
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2012-06-07 15:24:26 +0000
+
+    s/depreciated/deprecated/g 
+
+  Change: bff9f9bc633628cea98e241a06666548fe97ba80
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-06 22:11:23 +0000
+
+    fixed bug in validation toggling feature - github-issue-16 
+
+  Change: 3f421be1486ee4687144179303be0a4460734235
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-06-03 00:26:53 +0000
+
+    fixed major bug in custom validation evaluation 
+
+  Change: 14d09c098c2ec84ed476f8a4d8ca251b0aff5d67
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-31 12:06:53 +0000
+
+    more POD changes, updated the synopsis 
+
+  Change: 76cd21cca255de8cf15b2722434041cfab50380a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-31 12:02:47 +0000
+
+    POD changes, Sharper synopsis verbiage 
+
+  Change: 8f3e2d93326a9213edb0a4f25239bb98a24df491
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-26 09:51:55 +0000
+
+    POD changes 
+
+  Change: 7db1929014b20e2ec8c871f49783ad7126acb0ee
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-26 00:41:32 +0000
+
+    POD updates 
+
+  Change: 8f2b1b19dcb59416d4e0ffaeed8c83759171e3fd
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-25 22:52:04 +0000
+
+    POD changes 
+
+  Change: bf004b9fbd54dc41e35fa0419a1aa76b5d28de80
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-18 04:09:58 +0000
+
+    * misc changes * changed error message for options validator * fixed major
+    overlooked bug in the processing of core validators 
+
+  Change: bc71047d567ba994c54beb3874359a76544b10a0
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-12 13:38:47 +0000
+
+    * fixed bad conditional in t/09-modifiers.t and t/02-keyword-object.t 
+
+  Change: f7635e46c6080bb0f3e9de053687b3f2061b8d46
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-11 23:22:38 +0000
+
+    * fixed mistype in t/09-modifiers.t causing test failures * add the
+    obj/object keyword (which defines class object builders) * add test for
+    the object keyword 
+
+  Change: dd1af942a4fa7bfebef7b0037604cc861327baed
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-09 14:40:41 +0000
+
+    released new version 7.17 (POD changes) 
+
+  Change: 0f6c8c2394f4e12fc73d05b4df60610fd192fec8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-09 13:24:48 +0000
+
+    * added V::C::Relatives collection class * fixed slight oversight in V::C
+    * added test for method modifiers * extended V::C::Intro POD 
+
+  Change: 3e0b67fdded03de0556bbcbb2ce5834df38e1419
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-03 16:58:01 +0000
+
+    * added all *_errors, *_fields, and *_params methods to
+
+    the proxy methods list * update various POD bits 
+
+  Change: e1c17d49139769f07851837d3a3ff341018fca6b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-02 04:12:11 +0000
+
+    released new version 7.13 (POD changes) 
+
+  Change: fc6dd579326c3b61295e948899236e1990b4324b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-05-02 03:54:52 +0000
+
+    released new version 7.12 
+
+  Change: 84e4f0840b318d7cf23968edb043b3bffbf45e26
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-28 22:17:13 +0000
+
+    released new version 7.11 
+
+  Change: ec1b3340f882026f4717a45d48a5e0009ec371b1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-28 22:14:34 +0000
+
+    preparing for official 7.11 release 
+
+  Change: e53235d44f7a393ff8da51f1ec072498b2f28dca
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-27 23:38:29 +0000
+
+    releasing v7.10_01 dev version 
+
+  Change: 1aa9274166a727da6d3ad8b2c7544338c809c643
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-27 23:34:40 +0000
+
+    * enforcing field naming convention to reduce margin for error *
+    refactored and decoupled main validation routine * added has() method to
+    V::C::Collection * various POD updates * major engine refactoring *
+    renamed set_field_value to set_fields * renamed default_field_value to
+    get_value * changed set_params * remembered (+documented) why we dont reap
+    cloned fields 
+
+  Change: 20981831883331628f3c509d70a59892c61c45bd
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-26 07:10:26 +0000
+
+    update CHANGES 
+
+  Change: 0b33e169d374073cf25add24978efe69d6ee5d0b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-24 17:52:36 +0000
+
+    * using the 5.14 open pragma for one test cause failures on cpants * fixed
+    minor object-based parameter handling issue * get_hash_params method
+    renamed unflatten_params * set_hash_params method renamed flatten_params *
+    changed how field accessors are created and called 
+
+  Change: eee4ad72671ffca1c176a5548bd444dd26f4bf9b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-24 17:51:20 +0000
+
+    * using the 5.14 open pragma for one test cause failures on cpants * fixed
+    minor object-based parameter handling issue * get_hash_params method
+    renamed unflatten_params * set_hash_params method renamed flatten_params *
+    changed how field accessors are created and called 
+
+  Change: 87897d19bbba08fe20718f92f56875257ec5869f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-24 15:38:26 +0000
+
+    * fixed minor object-based parameter handling issue * get_hash_params
+    method renamed unflatten_params * set_hash_params method renamed
+    flatten_params * changed how field accessors are created and called 
+
+  Change: 9cfea4bd3e425d065c8501ce8d4ef3851bc2f449
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-23 19:57:18 +0000
+
+    * moved archived tests undef regression folder * tested accessors and
+    parameter handling of structures (ARRAYS) 
+
+  Change: 7dd1b5b0a16fbc5bddba7599075829d38b20f5d7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-23 06:15:31 +0000
+
+    * release new public version * complete rewrite * major implementation
+    overhaul * prevent namespace pollution by employing a prototype class *
+    added proto/prototype method to access prototype class * removed
+    load_classes and load_plugins * changed options accepted by the load/set
+    method * no longer registering quickname for relatives * depreciated
+    load_plugins and load_classes methods * removed Array::Unique finally *
+    cleanup error handling (needs its own class) * merge half-ass cookbook
+    into intro POD * started rewriting existing tests (and new ones) 
+
+  Change: 6909999e4dec154f68def621133737073131ae9e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-22 11:26:04 +0000
+
+    Updated POD, changed method names on V::C::Errors, enabled utf8 output in
+    params test 
+
+  Change: 526f5eceb47f29a5269da3ab84eb268248ed94a4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-22 01:45:47 +0000
+
+    new README 
+
+  Change: 727eed28843553bceed2ba2d01570ee85c4cdde3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-22 01:44:56 +0000
+
+    releasing dev version of rewrite 
+
+  Change: b2ad5752e931a0f9c502b5acdaf5a16857ae9b8e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-22 01:36:54 +0000
+
+    100% rewrite 
+
+  Change: 0c018ddf3c9d2b63d0a1f3ccab9ece0b76ea6815
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-20 17:29:11 +0000
+
+    %85 complete rewrite 
+
+  Change: 8552b984f051595ae92b16f5a386691e99c19d55
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-20 03:31:56 +0000
+
+    %70 complete rewrite 
+
+  Change: 2c76e924d9476452da6ac8f75a0085eb3878fe86
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-19 02:00:20 +0000
+
+    * major implementation overhaul * prevent namespace pollution by employing
+    a prototype class * added proto/prototype method to access prototype class
+    * removed load_classes and load_plugins * changed options accepted by the
+    load/set method * no longer registering quickname for relatives *
+    depreciated load_plugins and load_classes methods * removed Array::Unique
+    finally 
+
+  Change: 7328a954f107499e39e8de75dae7232bcfe47e8b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-18 23:59:27 +0000
+
+    brain-dump checkpoint 2 
+
+  Change: 97f9838e483c0f7f16b279906cf5d4948686f273
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-18 15:17:57 +0000
+
+    brain-dump checkpoint 
+
+  Change: 7b2e56b9e34e008667e3e4ce3aff7fe5b11e40ff
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-13 16:55:41 +0000
+
+    * fixed major bug for V::C field accessors when setting values 
+
+  Change: 946c539efda1e50f6186a105c1f1b383496fc3fc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-12 13:05:23 +0000
+
+    * added POD for the lowercase filter * relocated pre-filtering to include
+    exploded fields * field accessors always grab the collapsed value *
+    improved overall parameter handling with array parameter support 
+
+  Change: 4c56e628806f52ee05baae407f0eb059ef0c7e27
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-12 10:36:54 +0000
+
+    * added get_fields to V::C::Engine * validate in V::C::Engine restores
+    exploded params 
+
+  Change: 5a9728015ad901460adcc0f8e961bc82bd161f67
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-11 20:45:00 +0000
+
+    * misc cleanup, version bump 
+
+  Change: 590cc7483e76c9e3ed79d20bfa26200180421393
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-11 20:38:49 +0000
+
+    * trialing new style of testing using BDD (no-commitment) * fixed
+    V::C::Exporter passing V::C keywords * V::C POD update 
+
+  Change: 3657892600d1825722e786a722f4575a636b661a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-11 20:38:03 +0000
+
+    * trialing new style of testing using BDD (no-commitment) * fixed
+    V::C::Exporter passing V::C keywords * V::C POD update 
+
+  Change: 87495a131275a02f2a1c6e27bcc44ce30d3229f5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-05 21:39:04 +0000
+
+    * allow all array-like directives (e.g. "options") to take an arrayref *
+    decouple validator from validating-directives * fixed unreported bug in
+    the apply_filters method setting default value * allow default to execute
+    a coderef 
+
+  Change: 68165511d6fc7d257c46b221ea78effc59ad9c55
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-04-05 03:58:41 +0000
+
+    * added Validation::Class::Exporter 
+
+  Change: 33cd0464891d272778f599f05527388774e8303e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-24 10:48:53 +0000
+
+    * creates keyword config defaults on access 
+
+  Change: cd620f63ed1085d1e38700d7f3c1d21b1c9972d6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-22 01:53:28 +0000
+
+    * bug fix: minor but major typo in Engine.pm template method broken build
+    keyword functionality 
+
+  Change: 707ff68189fe8f61fc249756f77c06b4b282f153
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-21 01:01:35 +0000
+
+    * bug fix: Class.pm gotcha in attribute keyword, (used once typo error) 
+
+  Change: 7a03ad2e129cedbc6a573ceb9e5cb40c61e646bb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-21 00:26:56 +0000
+
+    * bug fix: config merging while using class as class and role in parrallel
+    * added copy_errors method 
+
+  Change: 1bf8ca95a5deba74464fb9d9161037e379407c1f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-18 19:49:25 +0000
+
+    * add before, after and around method modifiers * set/load -> base to be
+    renamed config * accessors created at compile-time instead of run-time *
+    POD changes * added readonly directive * added default_value method *
+    added get_classes method 
+
+  Change: 5d45cc886b937debec7eb36f11e3583753b15b4a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-17 12:35:40 +0000
+
+    * version bump - 5.68 
+
+  Change: df5abb20958fb515cf8e84431975b1efdb5e2ac1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-17 12:33:49 +0000
+
+    * load/set keyword gets slight syntax change * fixed load/set
+    backwards-compatibility bug 
+
+  Change: 9ae4e2352871a0d09a886cc71e503cf8c9e009f6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-17 12:03:36 +0000
+
+    * POD changes, more tests * fixed self-validiting method arg handling in
+    Class.pm * renamed utility functions and update the class method in
+    Engine.pm 
+
+  Change: d69fce5abebf3ab8d28714a1021551bdd9e260c6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-15 01:57:55 +0000
+
+    removed deleted files 
+
+  Change: b4c58335b81049f8f44544ce97972ef24bd5ccff
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-15 01:55:28 +0000
+
+    fixed attribute method not being exported, miscellaneous tweaks, some new
+    tests 
+
+  Change: a6784b5c2495b75a2f19ae9c33175b8b1191f729
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-14 08:22:09 +0000
+
+    set/load -> base copies routines from the specified class if not exist,
+    attributes get registered in the config hash, slight POD changes 
+
+  Change: 893015fa6114740235277aa725c787f19e263827
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-12 10:50:17 +0000
+
+    various POD changes, vesion bump 
+
+  Change: 9e158c1944c027eebf5601df855c7c76a645e369
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-10 19:23:17 +0000
+
+    POD changes 
+
+  Change: f658bf6578fa8d35876b2380d925c27687e78713
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-10 18:57:26 +0000
+
+    relocated tests making way for test suite rewrite 
+
+  Change: 3f2242b151d7efa1a1b63d9d0009e0c6f580411c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-10 18:56:16 +0000
+
+    Complete POD rewrite, Rename Plugins.pod to Cookbook.pod, Methods have
+    output validation 
+
+  Change: de29f7b120eceb5cc28347694383fa257e31313a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-10 11:13:54 +0000
+
+    started POD rewrite and code tweaking towards v6 
+
+  Change: df805a8af87f1b5c2c122be122280f521ce532fe
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-08 21:34:03 +0000
+
+    new version, add build/bld keywords to register methods to be executed on
+    instantiation 
+
+  Change: eb27b11d13fc54dd85e84c2c7ffa64cb78bb4972
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-08 20:36:49 +0000
+
+    new version 5.50 
+
+  Change: 89533039dccb0922c6d609e2f11ba6879000f7da
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-03-08 20:33:59 +0000
+
+    automatic creation of class attributes based on param values, added method
+    and mth keywords in preparation for the new OO system in v6, added
+    ignore_failure flag (set true) to prevent methods from croaking on error,
+    added report_failure flag (set false) registering an error on method
+    failure 
+
+  Change: 088000d25278cff8687ee3fc1947eb8ac07a2b6e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-28 04:15:26 +0000
+
+    positioning load_plugins and load_classes methods for depreciation 
+
+  Change: 5d0bf8690ab61d43b0711b3d3d4c95f96bc44fdc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-19 14:21:37 +0000
+
+    v5.20 
+
+  Change: d8ae0cb1df14788175206108c8a94ab8007485de
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-19 14:19:46 +0000
+
+    added the set_method method, tests, updated some POD, update load method
+    to inherit configuration data from other classes 
+
+  Change: eaed357b1f061450bc4ddb577032fbe8b640f6dc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-19 00:30:06 +0000
+
+    cleaned up various error handling approaches, editorialized some POD also 
+
+  Change: 222a2d2ed6437278bde1787dbc987c3acb856a75
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-17 22:17:06 +0000
+
+    flip-flopped again with regards to the version number style, class()
+    returns undefined instead of dying with AWEFUL(tm) error per mst 
+
+  Change: 15f8cb022231313f5958e0de21f0e145f019adad
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-13 23:36:15 +0000
+
+    Version Bump 
+
+  Change: 2325ecdd60398b38e4099cf772e1590843814cdf
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-13 23:33:59 +0000
+
+    Fixed tests breaking installation (V::C::Moose related) 
+
+  Change: 1b4b9fa43776047fae8eff6f7e6cf02062d775f6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-13 17:16:19 +0000
+
+    Public version bump (tested) 
+
+  Change: 8ced15bfc962fec7803c44fb095e614e09b48a91
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-12 18:19:38 +0000
+
+    added updated dist.ini file and Engine.pm 
+
+  Change: 5dcf7f53d254597d3073a468ee4808af3de6d5a5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-12 18:17:42 +0000
+
+    v5.0.0_02
+
+    * Fixed error in the has() attribute maker 
+
+  Change: 96587254efaea9c8a1504fe0ea3ffe638f839e45
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-11 17:08:05 +0000
+
+    return of the perlcritic.pl 
+
+  Change: f633d31b58f74ee29c72615c46c13f2174f4d0d8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-11 17:01:36 +0000
+
+    remove deleted files 
+
+  Change: 7e890340f030f5732b96a173c0217e9aba388ca0
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-11 17:00:52 +0000
+
+    version snapshot 
+
+  Change: cbf6918d4f163e49272d2b6e44bba014a0a95d49
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-11 16:56:09 +0000
+
+    forgot .gitignore file 
+
+  Change: aa9947195ef8ddc1109d746a6faede9ffbf054b9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2012-02-11 16:51:48 +0000
+
+    version snapshot 
+
+  Change: 9f9f86d748171865d4c6738c41fbc4db82573b04
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-10-13 21:50:52 +0000
+
+    now supports hash serialization/deserialization 
+
+  Change: 78bcef6d044f94ee170c828f66a84ce909f074fe
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-18 14:53:09 +0000
+
+    removed cruft 
+
+  Change: 69afb6b0132deb01256745dbcf283a10bc62c74c
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-10 08:46:00 +0000
+
+    update to include name directive generation 
+
+  Change: 6108be543df79a1ab41fbbc0a788f704a6934e87
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-10 00:54:56 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+
+  Change: 5846365128aca9b890b082bb8b95cf0789db8ee2
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-10 00:54:45 +0000
+
+    name directive gets auto-generated at instantiation 
+
+  Change: b7e0a64b63a78e5af51118fee16a4e97b9b6980b
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-09 21:15:58 +0000
+
+    removed extra files 
+
+  Change: 7a2d0677bc0cb8a5a8771abaa4ff9d0f7b7a9884
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-09 21:14:26 +0000
+
+    Merge branch 'master' of git://github.com/alnewkirk/Validation-Class 
+
+  Change: 53c574e58c5b1d83185a59e27ef76d7be134db49
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-09 21:13:54 +0000
+
+    fixed die statments which ignored the ignore_unknown flag 
+
+  Change: 84f5f9e67b94c46bc2e67db686c614bc7e493c7b
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-06 00:03:31 +0000
+
+    added a few random un-documented shortcuts 
+
+  Change: cbe3ff0d33ccb3bb301cab613dfdfd308037e842
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-09-04 02:11:17 +0000
+
+    added group parameter validation and extraction routines 
+
+  Change: 93fc5331ff26b5dcaa17b6435c980ea4536f42e6
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-25 15:12:13 +0000
+
+    fixed persistent values between instances 
+
+  Change: 7dc075b97c99e871ac97939c435af217093655f3
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-14 10:25:04 +0000
+
+    fatal typo causes - name directive is not supported 
+
+  Change: 47d68ad04e5719ad1f5eceb67b743a9ecc48d25a
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-14 10:16:31 +0000
+
+    fixed param created field anomaly 
+
+  Change: 8cd8958da2c485e020da74c4380bb8632d904887
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-14 08:36:20 +0000
+
+    added test for unknown field anomaly, fixed default variable localization
+    issue 
+
+  Change: ce09ab8e9a747230f4677a90b749dcada3f7a4ee
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-13 03:54:28 +0000
+
+    version bump 
+
+  Change: 1595d1a974867e4b88f8eb2049fa0375a4b9f8ea
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-13 03:53:09 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+
+  Change: aada659909d885afab4f411f1355fa7f1f3da431
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-13 03:53:00 +0000
+
+    added the options validator directive and tests 
+
+  Change: 236940482e702ae5f6f214648cd11b69ba6104b1
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-13 06:46:23 +0000
+
+    new version 
+
+  Change: c8f26416322bba178115340da798e4248a5f6abc
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-11 16:19:44 +0000
+
+    fixed importer functionality and POD example 
+
+  Change: 6db6c0dac230987ecfcadbf70196ddd70c9e19ae
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-11 14:43:23 +0000
+
+    added match validator directive with tests 
+
+  Change: 0f1bbba3dfacbdfbba746447798919eeb9443f26
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-11 14:38:28 +0000
+
+    added length validator directive 
+
+  Change: 2122249ba99c510e84e40ef8309d42befec2b0d5
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-11 13:42:13 +0000
+
+    added length validator directive 
+
+  Change: 784e9b94b8146bc8efa40f5d73e8ffaeb0d723bd
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-11 01:07:08 +0000
+
+    removed whitespace filter test 
+
+  Change: caa1a61af6ee7cd01d9d776f2bb422bab4dfc503
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-10 20:58:54 +0000
+
+    added mixin test 
+
+  Change: d72abd3a82d4f21e34ce3860cf0faa59d4c0dde9
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 23:20:38 +0000
+
+    added more tests 
+
+  Change: f6c853357b77a33a511f12d7898aa6d34949234f
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 21:01:33 +0000
+
+    added filter tests 
+
+  Change: 2bf4b7d808077f0d502ee3a54a339d50b9be7a68
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 23:41:29 +0000
+
+    updated the POD 
+
+  Change: d592d5c25b59dc49fece4f77ec497be6e7f6398f
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 16:01:56 +0000
+
+    updated POD 
+
+  Change: 23061b8a6fda46554c46bb526d8e6ac0c0cad5f4
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 01:07:02 +0000
+
+    fixed conflict 
+
+  Change: 8690c16901f7aa239e1d66e85c7c3aee7f9e6e48
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 01:02:41 +0000
+
+    new version with updated POD 
+
+  Change: 95cef0cd9ff9f150ba6c29808e7797f9184cd92f
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-09 01:00:18 +0000
+
+    refactored merging, directives and validation 
+
+  Change: ded76d4801fa6f64ebaee0fc49569595c157a288
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-06 23:14:02 +0000
+
+    fixed camelcase and titlecase filters 
+
+  Change: 35f0213a2a4c7d0060363d7ae216b6e5b93e7ebe
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-07-06 10:40:18 +0000
+
+    added param handling section to pod and get_params method 
+
+  Change: 89334fd68493afa203c240e2510a0b59a7e35a21
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-04 04:55:38 +0000
+
+    fixed filtering issue 
+
+  Change: e022b4c0e0e4e6f59d38a64c6310221c82731bf8
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-03 20:43:58 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+
+  Change: 2626c1e689a48f14ef3932541c762ae5156ba99f
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-03 20:42:33 +0000
+
+    added aliases - automapping feature 
+
+  Change: 1765cb87ae63b8a9a5d7452c6ecde0db82731807
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-01 18:05:58 +0000
+
+    fixed .gitignore 
+
+  Change: 6695b375de5a90f91f9e7b676ce4243511513bbe
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-07-01 18:04:13 +0000
+
+    refactored filter function 
+
+  Change: f8b450ce4669f76d2c1c646bfbd026cabac35d57
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-06-21 02:11:51 +0000
+
+    fixed docs, minor patches 
+
+  Change: bb254b2b33d5030da634e2af41f1112f404cf29f
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-06-19 19:19:43 +0000
+
+    complete re-factored using Moose, better documentation 
+
+  Change: 3e38c3c39ea2e829cd0c1b777cbc9b580a5da6f7
+  Author: Al Newkirk & Associates <github@alnewkirk.com>
+  Date : 2011-01-28 13:02:53 +0000
+
+    added error_fields and params functions 
+
+  Change: 2b069648a5274c7124fc13b02b1c0996ce69eab2
+  Author: Mario Domgoergen <mdom@taz.de>
+  Date : 2011-01-25 16:15:41 +0000
+
+    error_fields returns a hashref with all erroneous fields and their error
+    messages 
+
+  Change: 31d1ab9f31dfa40906b2a21e2bb98b43ea5d1d16
+  Author: Al Newkirk <github@alnewkirk.com>
+  Date : 2011-01-14 07:40:26 +0000
+
+    Updated README 
+
+  Change: 51d6d82fae1f4cddcea29c3c365b1c8907a7c60f
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-01-11 16:13:14 +0000
+
+    upgraded POD 
+
+  Change: 36712bbec404f14a39dfa495b3f6b65c6a476e14
+  Author: Al Newkirk <we@ana.im>
+  Date : 2011-01-10 23:56:12 +0000
+
+    first stable release 
+
+  Change: 39c6fc3d4431fd86f265d147f2e72ee581572288
+  Author: root <root@megatron.(none)>
+  Date : 2011-01-10 21:44:56 +0000
+
+    first commit 
+
+================
+End of releases.
+================

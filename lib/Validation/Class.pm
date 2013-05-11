@@ -19,6 +19,8 @@ use Validation::Class::Prototype;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
 
+    adopt
+    adt
     attribute
     bld
     build
@@ -300,6 +302,63 @@ step-by-step look into how Validation::Class works.
 
 =cut
 
+=keyword adopt
+
+The adopt keyword (or adt) copies copies configuration and functionality from
+other Validation::Class classes. The adopt keyword takes three arguments, the
+name of the class to be introspected, and the configuration type and name to be
+recreated. Basically, anything you can configure using a Validation::Class
+keyword can be adopted into other classes using this keyword with the exception
+of coderefs registered using the build keyword. Please note! If you are adopting
+a field declaration which has an associated mixin directive defined on the
+target class, you must adopt the mixin explicitly if you wish it's values to be
+interpolated.
+
+    package MyApp::Exployee;
+
+    use Validate::Class;
+    use MyApp::Person;
+
+    adopt MyApp::Person, mixin   => 'basic';
+    adopt MyApp::Person, field   => 'first_name';
+    adopt MyApp::Person, field   => 'last_name';
+    adopt MyApp::Person, profile => 'has_fullname';
+
+    1;
+
+=cut
+
+sub adt { goto &adopt } sub adopt {
+
+    my $package = shift if @_ == 4;
+
+    my ($class, $type, $name) = @_;
+
+    my $aliases = {
+        has => 'attribute',
+        dir => 'directive',
+        fld => 'field',
+        flt => 'filter',
+        msg => 'message',
+        mth => 'method',
+        mxn => 'mixin',
+        pro => 'profile'
+    };
+
+    my $keywords = { map { $_ => $_ } values %{$aliases} };
+
+    $type = $keywords->{$type} || $aliases->{$type};
+
+    return unless $class && $name && $type;
+
+    my $store  = "${type}s";
+    my $config = prototype_registry->get($class)->configuration;
+    my $data   = clone $config->$store->get($name);
+
+    @_ = ($name => $data) and goto &$type;
+
+}
+
 =keyword attribute
 
 The attribute keyword (or has) registers a class attribute, i.e. it creates an
@@ -314,7 +373,6 @@ be used as it's default value.
 
     has 'first_name' => 'Peter';
     has 'last_name'  => 'Venkman';
-
     has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
 
     has 'email_address';
