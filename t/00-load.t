@@ -47,6 +47,8 @@ use warnings;
     ok !$class->can('build'), "TestClass::Alt wo/ build keyword";
     ok !$class->can('dir'), "TestClass::Alt wo/ dir keyword";
     ok !$class->can('directive'), "TestClass::Alt wo/ directive keyword";
+    ok !$class->can('doc'), "TestClass::Alt wo/ doc keyword";
+    ok !$class->can('document'), "TestClass::Alt wo/ document keyword";
     ok !$class->can('fld'), "TestClass::Alt wo/ fld keyword";
     ok !$class->can('field'), "TestClass::Alt wo/ field keyword";
     ok !$class->can('flt'), "TestClass::Alt wo/ flt keyword";
@@ -232,6 +234,8 @@ use warnings;
     sub build     {'noop'}
     sub dir       {'noop'}
     sub directive {'noop'}
+    sub doc       {'noop'}
+    sub document  {'noop'}
     sub fld       {'noop'}
     sub field     {'noop'}
     sub flt       {'noop'}

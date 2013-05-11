@@ -24,6 +24,8 @@ our @EXPORT = qw(
     build
     dir
     directive
+    doc
+    document
     fld
     field
     flt
@@ -306,7 +308,6 @@ be used as it's default value.
 
     has 'first_name' => 'Peter';
     has 'last_name'  => 'Venkman';
-
     has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
 
     has 'email_address';
@@ -397,21 +398,13 @@ CPAN installable directives.
         my ($self, $field, $param) = @_;
 
         if (defined $field->{blacklisted} && defined $param) {
-
             if ($field->{required} || $param) {
-
                 if (exists_in_blacklist($field->{blacklisted}, $param)) {
-
                     my $handle = $field->label || $field->name;
-
                     $field->errors->add("$handle has been blacklisted");
-
                     return 0;
-
                 }
-
             }
-
         }
 
         return 1;
@@ -455,6 +448,187 @@ sub dir { goto &directive } sub directive {
     };
 
 }
+
+=keyword document
+
+The document keyword (or doc) registers a data matching profile which can be
+used to validate heiarchal data. It will store a hashref with pre-define path
+matching rules for the data structures you wish to validate. The "path matching
+rules", which use a specialized object notation, referred to as the document
+notation, can be thought of as a kind-of simplified regular expression which is
+executed against the flattened data structure. The following are a few general
+use-cases:
+
+    # given this JSON data structure
+    {
+        "id": "1234-A",
+        "name": {
+            "first_name" : "Bob",
+            "last_name"  : "Smith",
+         },
+        "title": "CIO",
+        "friends" : [],
+    }
+
+    # select id to validate against the string rules
+    document 'foobar'  =>
+        { 'id' => 'string' };
+
+    # select name -> first_name/last_name to validate against the string rules
+    document 'foobar'  =>
+        {'name.first_name' => 'string', 'name.last_name' => 'string'};
+
+    # or
+    document 'foobar'  =>
+        {'name.*_name' => 'string'};
+
+    # select each element in friends to validate against the string rules
+    document 'foobar'  =>
+        { 'friends.@'  => 'string' };
+
+    # or select an element of a hashref in each element in friends to validate
+    document 'foobar'  =>
+        { 'friends.@.name' => 'string' };
+
+The document declaration's keys should follow the aforementioned document
+notation schema and it's values should be strings which correspond to the names
+of fields (or other document declarations) that will be used to preform the
+data validation. It is possible to combine document declarations to validate
+hierarchical data that contains data structures matching one or more document
+patterns. The following is an example of what that might look like.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # data validation rule
+    field  'name' => {
+        mixin      => [':str'],
+        pattern    => qr/^[A-Za-z ]+$/,
+        max_length => 20,
+    };
+
+    # data validation map / document notation schema
+    document 'friend' => {
+        'name' => 'name'
+    };
+
+    # data validation map / document notation schema
+    document 'person' => {
+        'name' => 'name',
+        'friends.@' => 'friend'
+    };
+
+    package main;
+
+    my $data = {
+        "name"   => "Anita Campbell-Green",
+        "friends" => [
+            { "name" => "Horace" },
+            { "name" => "Skinner" },
+            { "name" => "Alonzo" },
+            { "name" => "Frederick" },
+        ],
+    };
+
+    my $person = MyApp::Person->new;
+
+    unless ($person->validate_document(person => $data)) {
+        warn $person->errors_to_string if $person->error_count;
+    }
+
+Alternatively, the following is a more verbose data validation class using
+traditional styling and configuration.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field  'id' => {
+        mixin      => [':str'],
+        filters    => ['numeric'],
+        max_length => 2,
+    };
+
+    field  'name' => {
+        mixin      => [':str'],
+        pattern    => qr/^[A-Za-z ]+$/,
+        max_length => 20,
+    };
+
+    field  'rating' => {
+        mixin      => [':str'],
+        pattern    => qr/^\-?\d+$/,
+    };
+
+    field  'tag' => {
+        mixin      => [':str'],
+        pattern    => qr/^(?!evil)\w+/,
+        max_length => 20,
+    };
+
+    document 'person' => {
+        'id'                             => 'id',
+        'name'                           => 'name',
+        'company.name'                   => 'name',
+        'company.supervisor.name'        => 'name',
+        'company.supervisor.rating.@.*'  => 'rating',
+        'company.tags.@'                 => 'name'
+    };
+
+    package main;
+
+    my $data = {
+        "id"      => "1234-ABC",
+        "name"    => "Anita Campbell-Green",
+        "title"   => "Designer",
+        "company" => {
+            "name"       => "House of de Vil",
+            "supervisor" => {
+                "name"   => "Cruella de Vil",
+                "rating" => [
+                    {   "support"  => -9,
+                        "guidance" => -9
+                    }
+                ]
+            },
+            "tags" => [
+                "evil",
+                "cruelty",
+                "dogs"
+            ]
+        },
+    };
+
+    my $person = MyApp::Person->new;
+
+    unless ($person->validate_document(person => $data)) {
+        warn $person->errors_to_string if $person->error_count;
+    }
+
+=cut
+
+sub doc { goto &document } sub document {
+
+    my $package = shift if @_ == 3;
+
+    my ($name, $data) = @_;
+
+    $data ||= {};
+
+    return unless ($name && $data);
+
+    return configure_class_proto $package => sub {
+
+        my ($proto) = @_;
+
+        $proto->register_document($name, $data);
+
+        return $proto;
+
+    };
+
+};
 
 =keyword field
 
@@ -1373,9 +1547,12 @@ B<If you have simple data validation needs, please review:>
 
 =back
 
-Validation::Class validates strings, not structures. If you need a means for
-validating object types you should be using a modern object system like L<Mo>,
-L<Moo>, L<Mouse>, or L<Moose>. Alternatively you could use L<Params::Validate>.
+Validation::Class primarily validates strings, not blessed objects. If you need
+a means for validating object types you should be using a modern object system
+like L<Mo>, L<Moo>, L<Mouse>, or L<Moose>. Alternatively, you could use a
+decoupled object validators like L<Type::Tiny>, L<Params::Validate> or
+L<Specio>. If you are looking for the best-of-both-worlds, you might want to
+look at L<MooX::Validate>.
 
 In the event that you would like to look elsewhere for your data validation
 needs, the following is a list of other validation libraries/frameworks you
