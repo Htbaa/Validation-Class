@@ -331,6 +331,7 @@ sub adt { goto &adopt } sub adopt {
     my $aliases = {
         has => 'attribute',
         dir => 'directive',
+        doc => 'document',
         fld => 'field',
         flt => 'filter',
         msg => 'message',
