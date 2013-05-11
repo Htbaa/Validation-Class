@@ -2802,6 +2802,26 @@ sub has_valid { goto &validate } sub validates { goto &validate } sub validate {
 }
 
 =method validate_document
+
+The validate_document method (or document_validates) is used to validate the
+specified hierarchical data against the specified document declaration. This is
+extremely valuable for validating serialized messages passed between machines.
+This method requires two arguments, the name of the document declaration to be
+used, and the data to be validated which should be submitted in the form of a
+hashref. The following is an example of this technique:
+
+    my $boolean = $self->validate_document(foobar => $data);
+
+Additionally, you may submit options in the form of a hashref to further control
+the validation process. The following is an example of this technique:
+
+    # the prune option removes non-matching parameters (nodes)
+    my $boolean = $self->validate_document(foobar => $data, { prune => 1 });
+
+Additionally, to support the validation of ad-hoc specifications, you may pass
+this method two hashrefs, the first being the document notation schema, and the
+second being the hierarchical data you wish to validate.
+
 =cut
 
 sub document_validates { goto &validate_document } sub validate_document {
