@@ -3,14 +3,57 @@ Changes from 2012-05-11 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900049 at 2013-05-11 08:15:01 +0000
+version 7.900049 at 2013-05-11 14:49:51 +0000
 ---------------------------------------------
+
+  Change: 6cba0369b439cef1db62c23423d657b4c2c86eaf
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 10:49:28 +0000
+
+    allow class to adopt document configurations from other classes 
+
+  Change: b5b4b6011d648a6f0c5bfa8b7e0880a031c8f830
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 10:46:38 +0000
+
+    Merge branch 'class-configuration-adoption' 
+
+  Change: aa443f967ef1f6b5179a7217ad031f08d83958aa
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 10:46:11 +0000
+
+    Merge branch 'integrate-document-validation' 
+
+  Change: 61d42f3a7b64f2558aeb8f7fc7654851d285d8f4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 05:25:02 +0000
+
+    updated documentation in the main module, removed the rationale section 
+
+  Change: b34df39312034b7207cfe85c83eb3012baf57a53
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 04:58:05 +0000
+
+    updated documentation for the validate_document functionality 
+
+  Change: e4b6f2f86f93dfb487a16196bfd94ae6d801beea
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 04:18:39 +0000
+
+    added adopt keyword to allow copying of configuration objects to and from
+    classes 
 
   Change: 2d32f75ed775d0be809d1350e78893a135568a99
   Author: Al Newkirk <anewkirk@ana.io>
   Date : 2013-05-09 10:44:43 +0000
 
     trivial update, removed extra newline 
+
+  Change: 47e80e2f2ec8925d939da5774a76e6431cc6ba0d
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-09 02:32:18 +0000
+
+    integrated heirarchal data processing (ported V::C::Document) 
 
   Change: a6f65ca655f7b2aea644a9c4ec47146ad089a3ba
   Author: Al Newkirk <anewkirk@ana.io>
