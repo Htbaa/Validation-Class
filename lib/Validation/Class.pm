@@ -298,7 +298,7 @@ how Validation::Class works.
 
 =keyword adopt
 
-The adopt keyword (or adt) copies copies configuration and functionality from
+The adopt keyword (or adt) copies configuration and functionality from
 other Validation::Class classes. The adopt keyword takes three arguments, the
 name of the class to be introspected, and the configuration type and name to be
 recreated. Basically, anything you can configure using a Validation::Class
@@ -366,11 +366,13 @@ be used as it's default value.
 
     use Validate::Class;
 
-    has 'first_name' => 'Peter';
-    has 'last_name'  => 'Venkman';
-    has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
+    attribute 'first_name' => 'Peter';
+    attribute 'last_name'  => 'Venkman';
+    attribute 'full_name'  => sub {
+        join ', ', $_[0]->last_name, $_[0]->first_name
+    };
 
-    has 'email_address';
+    attribute 'email_address';
 
     1;
 
@@ -414,6 +416,8 @@ in the same way the common BUILD routine is used in modern OO frameworks.
         # run after instantiation in the order defined
 
     };
+
+    1;
 
 The build keyword takes one argument, a coderef which is passed the instantiated
 class object.
@@ -476,8 +480,6 @@ CPAN installable directives.
         email => 1,
     };
 
-
-
     1;
 
 The directive keyword takes two arguments, the name of the directive and a
@@ -519,6 +521,14 @@ notation, can be thought of as a kind-of simplified regular expression which is
 executed against the flattened data structure. The following are a few general
 use-cases:
 
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field  'string' => {
+        mixin => [':str']
+    };
+
     # given this JSON data structure
     {
         "id": "1234-A",
@@ -530,11 +540,11 @@ use-cases:
         "friends" : [],
     }
 
-    # select id to validate against the string rules
+    # select id to validate against the string rule
     document 'foobar'  =>
         { 'id' => 'string' };
 
-    # select name -> first_name/last_name to validate against the string rules
+    # select name -> first_name/last_name to validate against the string rule
     document 'foobar'  =>
         {'name.first_name' => 'string', 'name.last_name' => 'string'};
 
@@ -542,11 +552,12 @@ use-cases:
     document 'foobar'  =>
         {'name.*_name' => 'string'};
 
-    # select each element in friends to validate against the string rules
+    # select each element in friends to validate against the string rule
     document 'foobar'  =>
         { 'friends.@'  => 'string' };
 
     # or select an element of a hashref in each element in friends to validate
+    # against the string rule
     document 'foobar'  =>
         { 'friends.@.name' => 'string' };
 
@@ -596,6 +607,8 @@ patterns. The following is an example of what that might look like.
     unless ($person->validate_document(person => $data)) {
         warn $person->errors_to_string if $person->error_count;
     }
+
+    1;
 
 Alternatively, the following is a more verbose data validation class using
 traditional styling and configuration.
@@ -665,6 +678,8 @@ traditional styling and configuration.
     unless ($person->validate_document(person => $data)) {
         warn $person->errors_to_string if $person->error_count;
     }
+
+    1;
 
 =cut
 
@@ -742,6 +757,8 @@ pre-existing declarations.
     field '+login' => {
         required => 1
     };
+
+    1;
 
 =cut
 
@@ -1052,7 +1069,6 @@ for execution.
             my ($self, @args) = @_;
 
             # do something registrationy
-
             $self->id(...); # set the ID field for output validation
 
             return $self;
@@ -1199,6 +1215,8 @@ to overwrite any pre-existing declarations.
         required => 1
     };
 
+    1;
+
 The mixin keyword takes two arguments, the mixin name and a hashref of key/values
 pairs known as directives.
 
@@ -1258,6 +1276,8 @@ code (magic) necessary to normalize your environment.
 
     }
 
+    1;
+
 =cut
 
 sub new {
@@ -1308,6 +1328,8 @@ validates data relevant to a specific action.
         # handle failures
     }
 
+    1;
+
 The profile keyword takes two arguments, a profile name and coderef which will
 be used to execute a sequence of actions for validation purposes.
 
@@ -1349,6 +1371,8 @@ this method directly, see L<Validation::Class::Prototype>.
     my $person = MyApp::Person->new;
 
     my $prototype = $person->prototype;
+
+    1;
 
 =cut
 
