@@ -6,10 +6,11 @@ use 5.10.0;
 use strict;
 use warnings;
 
-use Validation::Class ();
 use Validation::Class::Prototype;
 
+use Scalar::Util ('refaddr');
 use Validation::Class::Util ('prototype_registry');
+use Validation::Class ();
 
 # VERSION
 
@@ -17,7 +18,7 @@ use Validation::Class::Util ('prototype_registry');
 
     use Validation::Class::Simple;
 
-    my $parameters = {
+    my $params = {
         name  => 'Root',
         email => 'root@localhost',
         pass  => 's3cret',
@@ -36,7 +37,7 @@ use Validation::Class::Util ('prototype_registry');
     );
 
     # set parameters to be validated
-    $rules->params->add($parameters);
+    $rules->params->add($params);
 
     # validate
     unless ($rules->validate) {
@@ -84,7 +85,7 @@ class constructor:
 
     use Validation::Class::Simple;
 
-    my $rules = Validation::Class::Simple->new(params => $parameters);
+    my $rules = Validation::Class::Simple->new(params => $params);
 
 All input parameters are wrapped by the L<Validation::Class::Params> container
 which provides generic functionality for managing hashes. Additionally you can
@@ -382,9 +383,10 @@ sub new {
     $class = ref $class || $class;
 
     my $self = bless {}, $class;
+    my $addr = refaddr $self;
 
     prototype_registry->add(
-        "$self" => Validation::Class::Prototype->new(
+        $addr => Validation::Class::Prototype->new(
             package => $class # inside-out prototype
         )
     );
@@ -436,15 +438,19 @@ sub new {
 
 sub proto { goto &prototype } sub prototype {
 
-    return prototype_registry->get(shift);
+    my $self = shift;
+    my $addr = refaddr $self;
+
+    return prototype_registry->get($addr);
 
 }
 
 sub DESTROY {
 
-    my ($self) = @_;
+    my $self = shift;
+    my $addr = refaddr $self;
 
-    prototype_registry->delete($self) if $self && prototype_registry;
+    prototype_registry->delete($addr) if $self && prototype_registry;
 
     return;
 

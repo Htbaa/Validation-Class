@@ -229,6 +229,8 @@ use warnings;
 
     no warnings 'redefine';
 
+    sub adt       {'noop'}
+    sub adopt     {'noop'}
     sub attribute {'noop'}
     sub bld       {'noop'}
     sub build     {'noop'}

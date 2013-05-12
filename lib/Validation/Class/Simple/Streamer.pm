@@ -5,12 +5,13 @@ package Validation::Class::Simple::Streamer;
 use 5.10.0;
 use strict;
 use warnings;
-use overload bool => \&validate, '""' => \&messages, fallback => 1;
+
+use base 'Validation::Class::Simple';
 
 use Carp;
-
-use Validation::Class::Simple;
 use Validation::Class::Util;
+
+use overload bool => \&validate, '""' => \&messages, fallback => 1;
 
 # VERSION
 
@@ -18,25 +19,25 @@ use Validation::Class::Util;
 
     use Validation::Class::Simple::Streamer;
 
-    my $parameters = {
+    my $params = {
         credit_card   => '0000000000000000',
         email_address => 'root@localhost',
 
     };
 
-    my $rules = Validation::Class::Simple::Streamer->new($parameters);
+    my $rules = Validation::Class::Simple::Streamer->new(params => $params);
 
     # the point here is expressiveness
     # directive methods auto-validate in boolean context !!!
 
     if (not $rules->check('credit_card')->creditcard(['visa', 'mastercard'])) {
         # credit card is invalid visa/mastercard
-        warn $rules->messages;
+        warn $rules->errors_to_string;
     }
 
     if (not $rules->check('email_address')->min_length(3)->email) {
         # email address is invalid
-        warn $rules->messages;
+        warn $rules->errors_to_string;
     }
 
     # prepare password for validation
@@ -51,13 +52,10 @@ use Validation::Class::Util;
     }
 
     # get all fields with errors
-    my $fields = $rules->validator->error_fields;
+    my $fields = $rules->error_fields;
 
     # warn with errors if any
-    warn $rules->messages unless $rules->is_valid;
-
-    # validate like a boss
-    # THE END
+    warn $rules->errors_to_string unless $rules->validate;
 
 =head1 DESCRIPTION
 
@@ -66,11 +64,8 @@ that makes data validation fun. Target parameters and attach matching fields
 and directives to them by chaining together methods which represent
 Validation::Class L<directives|Validation::Class::Directives/DIRECTIVES>. This
 module is built around the powerful L<Validation::Class> data validation
-framework via L<Validation::Class::Simple>. This module was inspired by the
-simplicity and expressiveness of the Node.js validator library, but built on
-top of the ever-awesome Validation::Class framework, which is designed to be
-modular and extensible, i.e. whatever custom directives you create and install
-will become methods on this class which you can then use to enforce policies.
+framework via L<Validation::Class::Simple>. This module is a sub-class of and
+derived from the L<Validation::Class::Simple> class.
 
 =cut
 
@@ -87,21 +82,13 @@ step-by-step look into how Validation::Class works.
 sub new {
 
     my $class  = shift;
-    my $params = $class->build_args(@_) || {};
-    my $fields = { map { $_ => { name => $_ } } keys %{$params} };
+       $class  = ref $class || $class;
+    my $self   = $class->SUPER::new(@_);
 
-    $class = ref $class || $class;
+    $self->{action} = '';
+    $self->{target} = '';
 
-    my $self = {
-        action => '',
-        target => '',
-        validator  => Validation::Class::Simple->new(
-            params => $params,
-            fields => $fields
-        )
-    };
-
-    return bless $self, $class;
+    return $self;
 
 }
 
@@ -124,14 +111,13 @@ sub check {
 
     if ($target) {
 
-        my $validator = $self->{validator};
+        return $self if $target eq $self->{target};
 
-        $validator->fields->add($target => {name => $target})
-            unless $validator->fields->has($target);
+        $self->prototype->fields->add($target => {name => $target})
+            unless $self->prototype->fields->has($target);
 
-        $validator->queue($self->{target} = $target);
-
-        $validator->proto->normalize($validator);
+        $self->prototype->queue($self->{target} = $target);
+        $self->prototype->normalize($self);
 
     }
 
@@ -152,9 +138,9 @@ sub clear {
 
     my ($self) = @_;
 
-    $self->{validator}->proto->queued->clear;
+    $self->prototype->queued->clear;
 
-    $self->{validator}->proto->reset_fields;
+    $self->prototype->reset_fields;
 
     return $self;
 
@@ -166,11 +152,11 @@ sub declare {
 
     my $arguments = pop(@config);
     my $action    = shift(@config) || $self->{action};
-
     my $target    = $self->{target};
-    my $validator = $self->{validator};
 
     return $self unless $target;
+
+    $self->prototype->queue($target); # if clear() was called or check() wasn't
 
     unless ($arguments) {
         $arguments = 1 if $action eq 'city';
@@ -189,9 +175,9 @@ sub declare {
         $arguments = 1 if $action eq 'zipcode';
     }
 
-    if ($validator->fields->has($target)) {
+    if ($self->prototype->fields->has($target)) {
 
-        my $field = $validator->fields->get($target);
+        my $field = $self->prototype->fields->get($target);
 
         if ($field->can($action)) {
 
@@ -209,31 +195,13 @@ sub declare {
 
 }
 
-=method is_valid
-
-The is_valid method returns a boolean value which is true if the last validation
-attempt was successful, and false if it was not (which is determined by looking
-for errors at the class and field levels).
-
-    $self->is_valid;
-
-=cut
-
-sub is_valid {
-
-    my ($self) = @_;
-
-    return $self->{validator}->error_count ? 0 : 1;
-
-}
-
 =method messages
 
 The messages method returns any registered errors as a concatenated string using
 the L<Validation::Class::Prototype/errors_to_string> method and accepts the same
 parameters.
 
-    print $self->messages("\n");
+    print $self->messages;
 
 =cut
 
@@ -241,26 +209,7 @@ sub messages {
 
     my ($self, @arguments) = @_;
 
-    return $self->{validator}->errors_to_string(@arguments);
-
-}
-
-=method params
-
-The params method gives you access to the validator's params list which is a
-L<Validation::Class::Mapping> object.
-
-    $params = $self->params($parameters);
-
-=cut
-
-sub params {
-
-    my ($self, @arguments) = @_;
-
-    $self->{validator}->params->add(@arguments);
-
-    return $self->{validator}->params;
+    return $self->prototype->errors_to_string(@arguments);
 
 }
 
@@ -278,28 +227,11 @@ sub validate {
 
     my ($self) = @_;
 
-    my $true = $self->{validator}->validate;
+    my $true = $self->prototype->validate($self);
 
-    $self->{validator}->clear_queue if $true; # reduces validation overhead
+    $self->prototype->clear_queue if $true; # reduces validation overhead
 
     return $true;
-
-}
-
-=method validator
-
-The validator method gives you access to the object's validation class which is
-a L<Validation::Class::Simple> object by default.
-
-    $validator = $self->validator;
-
-=cut
-
-sub validator {
-
-    my ($self) = @_;
-
-    return $self->{validator};
 
 }
 

@@ -212,9 +212,9 @@ sub initialize_validator {
 
     use Validation::Class::Simple::Streamer;
 
-    my  $parameters = {username => 'admin', password => 's3cret'};
+    my  $params = {username => 'admin', password => 's3cret'};
 
-    my  $input = Validation::Class::Simple::Streamer->new($parameters);
+    my  $input = Validation::Class::Simple::Streamer->new(params => $params);
 
         # check username parameter
         $input->check('username')->required->between('5-255');
@@ -225,7 +225,7 @@ sub initialize_validator {
         $input->filters([qw/trim strip/]);
 
         # run validate
-        die $input->messages unless $input->validate;
+        die $input->errors_to_string unless $input->validate;
 
 =head1 DESCRIPTION
 
