@@ -4,7 +4,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 # VERSION
 
-version 7.900045
+version 7.900049
 
 # DESCRIPTION
 
@@ -34,17 +34,23 @@ The configuration attribute provides the default configuration profile.
 This attribute is a [Validation::Class::Configuration](http://search.cpan.org/perldoc?Validation::Class::Configuration) object and CANNOT be
 overridden.
 
-## errors
-
-The errors attribute provides access to class-level error messages.
-This attribute is a [Validation::Class::Errors](http://search.cpan.org/perldoc?Validation::Class::Errors) object, may contain
-error messages and CANNOT be overridden.
-
 ## directives
 
 The directives attribute provides access to defined directive objects.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
 hashrefs and CANNOT be overridden.
+
+## documents
+
+The documents attribute provides access to defined document models.
+This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and CANNOT be
+overridden.
+
+## errors
+
+The errors attribute provides access to class-level error messages.
+This attribute is a [Validation::Class::Errors](http://search.cpan.org/perldoc?Validation::Class::Errors) object, may contain
+error messages and CANNOT be overridden.
 
 ## events
 
@@ -617,6 +623,27 @@ minus respectively as follows:
     unless ($input->validate(@spec)){
         return $input->errors_to_string;
     }
+
+## validate\_document
+
+The validate\_document method (or document\_validates) is used to validate the
+specified hierarchical data against the specified document declaration. This is
+extremely valuable for validating serialized messages passed between machines.
+This method requires two arguments, the name of the document declaration to be
+used, and the data to be validated which should be submitted in the form of a
+hashref. The following is an example of this technique:
+
+    my $boolean = $self->validate_document(foobar => $data);
+
+Additionally, you may submit options in the form of a hashref to further control
+the validation process. The following is an example of this technique:
+
+    # the prune option removes non-matching parameters (nodes)
+    my $boolean = $self->validate_document(foobar => $data, { prune => 1 });
+
+Additionally, to support the validation of ad-hoc specifications, you may pass
+this method two hashrefs, the first being the document notation schema, and the
+second being the hierarchical data you wish to validate.
 
 ## validate\_method
 

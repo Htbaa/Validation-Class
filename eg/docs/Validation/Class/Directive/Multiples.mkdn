@@ -4,7 +4,7 @@ Validation::Class::Directive::Multiples - Multiples Directive for Validation Cla
 
 # VERSION
 
-version 7.900045
+version 7.900049
 
 # SYNOPSIS
 

@@ -25,7 +25,8 @@ my %WriteMakefileArgs = (
     "Hash::Merge" => 0,
     "List::MoreUtils" => 0,
     "Module::Find" => 0,
-    "Module::Runtime" => 0
+    "Module::Runtime" => 0,
+    "Scalar::Util" => 0
   },
   "TEST_REQUIRES" => {},
   "VERSION" => "7.900049",

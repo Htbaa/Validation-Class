@@ -4,31 +4,31 @@ Validation::Class::Simple::Streamer - Simple Streaming Data Validation
 
 # VERSION
 
-version 7.900045
+version 7.900049
 
 # SYNOPSIS
 
     use Validation::Class::Simple::Streamer;
 
-    my $parameters = {
+    my $params = {
         credit_card   => '0000000000000000',
         email_address => 'root@localhost',
 
     };
 
-    my $rules = Validation::Class::Simple::Streamer->new($parameters);
+    my $rules = Validation::Class::Simple::Streamer->new(params => $params);
 
     # the point here is expressiveness
     # directive methods auto-validate in boolean context !!!
 
     if (not $rules->check('credit_card')->creditcard(['visa', 'mastercard'])) {
         # credit card is invalid visa/mastercard
-        warn $rules->messages;
+        warn $rules->errors_to_string;
     }
 
     if (not $rules->check('email_address')->min_length(3)->email) {
         # email address is invalid
-        warn $rules->messages;
+        warn $rules->errors_to_string;
     }
 
     # prepare password for validation
@@ -43,13 +43,10 @@ version 7.900045
     }
 
     # get all fields with errors
-    my $fields = $rules->validator->error_fields;
+    my $fields = $rules->error_fields;
 
     # warn with errors if any
-    warn $rules->messages unless $rules->is_valid;
-
-    # validate like a boss
-    # THE END
+    warn $rules->errors_to_string unless $rules->validate;
 
 # DESCRIPTION
 
@@ -58,11 +55,8 @@ that makes data validation fun. Target parameters and attach matching fields
 and directives to them by chaining together methods which represent
 Validation::Class [directives](http://search.cpan.org/perldoc?Validation::Class::Directives#DIRECTIVES). This
 module is built around the powerful [Validation::Class](http://search.cpan.org/perldoc?Validation::Class) data validation
-framework via [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple). This module was inspired by the
-simplicity and expressiveness of the Node.js validator library, but built on
-top of the ever-awesome Validation::Class framework, which is designed to be
-modular and extensible, i.e. whatever custom directives you create and install
-will become methods on this class which you can then use to enforce policies.
+framework via [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple). This module is a sub-class of and
+derived from the [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) class.
 
 # RATIONALE
 
@@ -92,28 +86,13 @@ declared parameters in-tact, almost like the object state post-instantiation.
 
     $self->clear;
 
-## is\_valid
-
-The is\_valid method returns a boolean value which is true if the last validation
-attempt was successful, and false if it was not (which is determined by looking
-for errors at the class and field levels).
-
-    $self->is_valid;
-
 ## messages
 
 The messages method returns any registered errors as a concatenated string using
 the ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) method and accepts the same
 parameters.
 
-    print $self->messages("\n");
-
-## params
-
-The params method gives you access to the validator's params list which is a
-[Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object.
-
-    $params = $self->params($parameters);
+    print $self->messages;
 
 ## validate
 
@@ -122,13 +101,6 @@ the series and sequence of commands issued previously. This method is called
 implicitly whenever the object is used in boolean context, e.g. in a conditional.
 
     $true = $self->validate;
-
-## validator
-
-The validator method gives you access to the object's validation class which is
-a [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) object by default.
-
-    $validator = $self->validator;
 
 # AUTHOR
 

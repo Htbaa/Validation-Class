@@ -4,6 +4,7 @@ requires "Hash::Merge" => "0";
 requires "List::MoreUtils" => "0";
 requires "Module::Find" => "0";
 requires "Module::Runtime" => "0";
+requires "Scalar::Util" => "0";
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "6.30";

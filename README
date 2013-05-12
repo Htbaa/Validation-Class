@@ -7,9 +7,9 @@ VERSION
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
 
-        my  $parameters = {username => 'admin', password => 's3cret'};
+        my  $params = {username => 'admin', password => 's3cret'};
 
-        my  $input = Validation::Class::Simple::Streamer->new($parameters);
+        my  $input = Validation::Class::Simple::Streamer->new(params => $params);
 
             # check username parameter
             $input->check('username')->required->between('5-255');
@@ -20,7 +20,7 @@ SYNOPSIS
             $input->filters([qw/trim strip/]);
 
             # run validate
-            die $input->messages unless $input->validate;
+            die $input->errors_to_string unless $input->validate;
 
 DESCRIPTION
     Validation::Class is a scalable data validation library with interfaces
@@ -90,8 +90,8 @@ QUICKSTART
 
 KEYWORDS
   adopt
-    The adopt keyword (or adt) copies copies configuration and functionality
-    from other Validation::Class classes. The adopt keyword takes three
+    The adopt keyword (or adt) copies configuration and functionality from
+    other Validation::Class classes. The adopt keyword takes three
     arguments, the name of the class to be introspected, and the
     configuration type and name to be recreated. Basically, anything you can
     configure using a Validation::Class keyword can be adopted into other
@@ -125,11 +125,13 @@ KEYWORDS
 
         use Validate::Class;
 
-        has 'first_name' => 'Peter';
-        has 'last_name'  => 'Venkman';
-        has 'full_name'  => sub { join ', ', $_[0]->last_name, $_[0]->first_name };
+        attribute 'first_name' => 'Peter';
+        attribute 'last_name'  => 'Venkman';
+        attribute 'full_name'  => sub {
+            join ', ', $_[0]->last_name, $_[0]->first_name
+        };
 
-        has 'email_address';
+        attribute 'email_address';
 
         1;
 
@@ -149,6 +151,8 @@ KEYWORDS
             # run after instantiation in the order defined
 
         };
+
+        1;
 
     The build keyword takes one argument, a coderef which is passed the
     instantiated class object.
@@ -188,8 +192,6 @@ KEYWORDS
             email => 1,
         };
 
-
-
         1;
 
     The directive keyword takes two arguments, the name of the directive and
@@ -208,6 +210,14 @@ KEYWORDS
     kind-of simplified regular expression which is executed against the
     flattened data structure. The following are a few general use-cases:
 
+        package MyApp::Person;
+
+        use Validation::Class;
+
+        field  'string' => {
+            mixin => [':str']
+        };
+
         # given this JSON data structure
         {
             "id": "1234-A",
@@ -219,11 +229,11 @@ KEYWORDS
             "friends" : [],
         }
 
-        # select id to validate against the string rules
+        # select id to validate against the string rule
         document 'foobar'  =>
             { 'id' => 'string' };
 
-        # select name -> first_name/last_name to validate against the string rules
+        # select name -> first_name/last_name to validate against the string rule
         document 'foobar'  =>
             {'name.first_name' => 'string', 'name.last_name' => 'string'};
 
@@ -231,11 +241,12 @@ KEYWORDS
         document 'foobar'  =>
             {'name.*_name' => 'string'};
 
-        # select each element in friends to validate against the string rules
+        # select each element in friends to validate against the string rule
         document 'foobar'  =>
             { 'friends.@'  => 'string' };
 
         # or select an element of a hashref in each element in friends to validate
+        # against the string rule
         document 'foobar'  =>
             { 'friends.@.name' => 'string' };
 
@@ -286,6 +297,8 @@ KEYWORDS
         unless ($person->validate_document(person => $data)) {
             warn $person->errors_to_string if $person->error_count;
         }
+
+        1;
 
     Alternatively, the following is a more verbose data validation class
     using traditional styling and configuration.
@@ -356,6 +369,8 @@ KEYWORDS
             warn $person->errors_to_string if $person->error_count;
         }
 
+        1;
+
   field
     The field keyword (or fld) registers a data validation rule for reuse
     and validation in code. The field name should correspond with the
@@ -407,6 +422,8 @@ KEYWORDS
         field '+login' => {
             required => 1
         };
+
+        1;
 
   filter
     The filter keyword (or flt) registers custom filters to be used in your
@@ -563,7 +580,6 @@ KEYWORDS
                 my ($self, @args) = @_;
 
                 # do something registrationy
-
                 $self->id(...); # set the ID field for output validation
 
                 return $self;
@@ -691,6 +707,8 @@ KEYWORDS
             required => 1
         };
 
+        1;
+
     The mixin keyword takes two arguments, the mixin name and a hashref of
     key/values pairs known as directives.
 
@@ -724,6 +742,8 @@ KEYWORDS
         unless ($user->validate_profile('check_email')) {
             # handle failures
         }
+
+        1;
 
     The profile keyword takes two arguments, a profile name and coderef
     which will be used to execute a sequence of actions for validation
@@ -761,6 +781,8 @@ METHODS
 
         }
 
+        1;
+
   prototype
     The prototype method (or proto) returns an instance of the associated
     class prototype. The class prototype is responsible for manipulating and
@@ -776,6 +798,8 @@ METHODS
         my $person = MyApp::Person->new;
 
         my $prototype = $person->prototype;
+
+        1;
 
 PROXY METHODS
     Validation::Class mostly provides sugar functions for modeling your data

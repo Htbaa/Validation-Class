@@ -1,10 +1,29 @@
 ==================================================
-Changes from 2012-05-11 00:00:00 +0000 to present.
+Changes from 2012-05-12 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900049 at 2013-05-11 14:49:51 +0000
+version 7.900049 at 2013-05-12 03:49:57 +0000
 ---------------------------------------------
+
+  Change: 2d786b5bfddb4f03971d7df08a49ef3768909cce
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 23:44:03 +0000
+
+    refactored V::C::S::Streamer, updated relevant POD, modified relevant
+    tests 
+
+  Change: 8d9e6b487c119b949053a83a02ab4504a0b0da6f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 11:20:45 +0000
+
+    updated main module documentation 
+
+  Change: 921b76449b4ad6ad94d25a223143580bb921c588
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-05-11 10:50:29 +0000
+
+    updated changes and readme files 
 
   Change: 6cba0369b439cef1db62c23423d657b4c2c86eaf
   Author: Al Newkirk <anewkirk@ana.io>

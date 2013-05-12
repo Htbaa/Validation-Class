@@ -4,7 +4,7 @@ Validation::Class::Directive::Mixin - Mixin Directive for Validation Class Field
 
 # VERSION
 
-version 7.900045
+version 7.900049
 
 # SYNOPSIS
 
