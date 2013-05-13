@@ -1387,7 +1387,7 @@ sub proto { goto &prototype } sub prototype {
 =head1 PROXY METHODS
 
 Validation::Class mostly provides sugar functions for modeling your data
-validation requirements. Each class you create is associated with a *prototype*
+validation requirements. Each class you create is associated with a prototype
 class which provides the data validation engine and keeps your class namespace
 free from pollution, please see L<Validation::Class::Prototype> for more
 information on specific methods and attributes.

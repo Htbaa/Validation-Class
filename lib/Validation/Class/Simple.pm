@@ -458,15 +458,15 @@ sub DESTROY {
 
 =head1 PROXY METHODS
 
-Each instance of Validation::Class::Simple is associated with a *prototype*
-class which provides the data validation engine and keeps the class namespace
-free from pollution and collisions, please see L<Validation::Class::Prototype>
-for more information on specific methods and attributes.
+Each instance of Validation::Class::Simple is associated with a prototype class
+which provides the data validation engine and keeps the class namespace free
+from pollution and collisions, please see L<Validation::Class::Prototype> for
+more information on specific methods and attributes.
 
 Validation::Class::Simple is injected with a few proxy methods which are
-basically aliases to the corresponding prototype (engine) class methods, however
-it is possible to access the prototype directly using the proto/prototype
-methods.
+basically aliases to the corresponding prototype (engine) class methods,
+however it is possible to access the prototype directly using the
+proto/prototype methods.
 
 =proxy_method class
 
@@ -498,12 +498,11 @@ See L<Validation::Class::Prototype/error_fields> for full documentation.
 
 See L<Validation::Class::Prototype/errors> for full documentation.
 
-head2 errors_to_string
+=proxy_method errors_to_string
 
     $self->errors_to_string;
 
-See L<Validation::Class::Prototype/errors_to_string> for full
-documentation.
+See L<Validation::Class::Prototype/errors_to_string> for full documentation.
 
 =proxy_method get_errors
 
@@ -517,11 +516,23 @@ See L<Validation::Class::Prototype/get_errors> for full documentation.
 
 See L<Validation::Class::Prototype/get_fields> for full documentation.
 
+=proxy_method get_hash
+
+    $self->get_hash;
+
+See L<Validation::Class::Prototype/get_hash> for full documentation.
+
 =proxy_method get_params
 
     $self->get_params;
 
 See L<Validation::Class::Prototype/get_params> for full documentation.
+
+=proxy_method get_values
+
+    $self->get_values;
+
+See L<Validation::Class::Prototype/get_values> for full documentation.
 
 =proxy_method fields
 
@@ -539,15 +550,19 @@ See L<Validation::Class::Prototype/filtering> for full documentation.
 
     $self->ignore_failure;
 
-See L<Validation::Class::Prototype/ignore_failure> for full
-documentation.
+See L<Validation::Class::Prototype/ignore_failure> for full documentation.
 
 =proxy_method ignore_unknown
 
     $self->ignore_unknown;
 
-See L<Validation::Class::Prototype/ignore_unknown> for full
-documentation.
+See L<Validation::Class::Prototype/ignore_unknown> for full documentation.
+
+=proxy_method is_valid
+
+    $self->is_valid;
+
+See L<Validation::Class::Prototype/is_valid> for full documentation.
 
 =proxy_method param
 
@@ -560,6 +575,12 @@ See L<Validation::Class::Prototype/param> for full documentation.
     $self->params;
 
 See L<Validation::Class::Prototype/params> for full documentation.
+
+=proxy_method plugin
+
+    $self->plugin;
+
+See L<Validation::Class::Prototype/plugin> for full documentation.
 
 =proxy_method queue
 
