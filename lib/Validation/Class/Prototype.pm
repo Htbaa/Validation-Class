@@ -197,7 +197,7 @@ using this module.
 
 =cut
 
-hold 'package' => sub{ undef };
+hold 'package' => sub { undef };
 
 =attribute params
 
@@ -2420,6 +2420,10 @@ sub set_values {
 sub snapshot {
 
     my ($self) = @_;
+
+    # reset the stash
+
+    $self->stashed->clear;
 
     # clone configuration settings and merge into the prototype
     # ... which makes the prototype kind've a snapshot of the configuration

@@ -352,6 +352,8 @@ sub adt { goto &adopt } sub adopt {
 
     @_ = ($name => $data) and goto &$type;
 
+    return;
+
 }
 
 =keyword attribute
