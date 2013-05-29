@@ -4,7 +4,7 @@ Validation::Class::Directive::Creditcard - Creditcard Directive for Validation C
 
 # VERSION
 
-version 7.900049
+version 7.900050
 
 # SYNOPSIS
 

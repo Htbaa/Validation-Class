@@ -4,7 +4,7 @@ Validation::Class::Simple - Simple Ad-Hoc Data Validation
 
 # VERSION
 
-version 7.900049
+version 7.900050
 
 # SYNOPSIS
 
@@ -65,15 +65,15 @@ please review [Validation::Class::Whitepaper](http://search.cpan.org/perldoc?Val
 
 # PROXY METHODS
 
-Each instance of Validation::Class::Simple is associated with a \*prototype\*
-class which provides the data validation engine and keeps the class namespace
-free from pollution and collisions, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype)
-for more information on specific methods and attributes.
+Each instance of Validation::Class::Simple is associated with a prototype class
+which provides the data validation engine and keeps the class namespace free
+from pollution and collisions, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype) for
+more information on specific methods and attributes.
 
 Validation::Class::Simple is injected with a few proxy methods which are
-basically aliases to the corresponding prototype (engine) class methods, however
-it is possible to access the prototype directly using the proto/prototype
-methods.
+basically aliases to the corresponding prototype (engine) class methods,
+however it is possible to access the prototype directly using the
+proto/prototype methods.
 
 ## class
 
@@ -105,12 +105,11 @@ See ["error\_fields" in Validation::Class::Prototype](http://search.cpan.org/per
 
 See ["errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors) for full documentation.
 
-head2 errors\_to\_string
+## errors\_to\_string
 
     $self->errors_to_string;
 
-See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full
-documentation.
+See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
 
 ## get\_errors
 
@@ -124,11 +123,23 @@ See ["get\_errors" in Validation::Class::Prototype](http://search.cpan.org/perld
 
 See ["get\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_fields) for full documentation.
 
+## get\_hash
+
+    $self->get_hash;
+
+See ["get\_hash" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_hash) for full documentation.
+
 ## get\_params
 
     $self->get_params;
 
 See ["get\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_params) for full documentation.
+
+## get\_values
+
+    $self->get_values;
+
+See ["get\_values" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_values) for full documentation.
 
 ## fields
 
@@ -146,15 +157,19 @@ See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc
 
     $self->ignore_failure;
 
-See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full
-documentation.
+See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full documentation.
 
 ## ignore\_unknown
 
     $self->ignore_unknown;
 
-See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full
-documentation.
+See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full documentation.
+
+## is\_valid
+
+    $self->is_valid;
+
+See ["is\_valid" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#is\_valid) for full documentation.
 
 ## param
 
@@ -167,6 +182,12 @@ See ["param" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Val
     $self->params;
 
 See ["params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#params) for full documentation.
+
+## plugin
+
+    $self->plugin;
+
+See ["plugin" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#plugin) for full documentation.
 
 ## queue
 

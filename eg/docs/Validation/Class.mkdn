@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900049
+version 7.900050
 
 # SYNOPSIS
 
@@ -816,7 +816,7 @@ this method directly, see [Validation::Class::Prototype](http://search.cpan.org/
 # PROXY METHODS
 
 Validation::Class mostly provides sugar functions for modeling your data
-validation requirements. Each class you create is associated with a \*prototype\*
+validation requirements. Each class you create is associated with a prototype
 class which provides the data validation engine and keeps your class namespace
 free from pollution, please see [Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype) for more
 information on specific methods and attributes.
