@@ -449,8 +449,9 @@ sub bld { goto &build } sub build {
 =keyword directive
 
 The directive keyword (or dir) registers custom validator directives to be used
-in your field definitions. This is a means of extending the list of directives
-per instance. See the list of core directives, L<Validation::Class::Directives>,
+in your field definitions. Please note that custom directives can only be used 
+with field definitions. This is a means of extending the list of directives per 
+instance. See the list of core directives, L<Validation::Class::Directives>,
 or review L<Validation::Class::Directive> for insight into creating your own
 CPAN installable directives.
 
