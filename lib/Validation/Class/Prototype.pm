@@ -1822,15 +1822,21 @@ sub register_method {
 
     my $package = $self->package;
 
-    confess
-        "Error creating method $name on $package: collides with attribute $name"
-        if $self->attributes->has($name)
-    ;
+    unless ($data->{install}) {
 
-    confess
-        "Error creating method $name on $package: collides with method $name"
-        if $package->can($name)
-    ;
+        confess
+            "Error creating method $name on $package: ".
+            "collides with attribute $name"
+            if $self->attributes->has($name)
+        ;
+
+        confess
+            "Error creating method $name on $package: ".
+            "collides with method $name"
+            if $package->can($name)
+        ;
+
+    }
 
     confess
         "Error creating method $name, requires 'input' and 'using' options"

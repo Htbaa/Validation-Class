@@ -238,6 +238,8 @@ use warnings;
     sub directive {'noop'}
     sub doc       {'noop'}
     sub document  {'noop'}
+    sub ens       {'noop'}
+    sub ensure    {'noop'}
     sub fld       {'noop'}
     sub field     {'noop'}
     sub flt       {'noop'}

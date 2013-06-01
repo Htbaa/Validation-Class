@@ -6,6 +6,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
+#use Class::Method::Modifiers 'before', 'after', 'around';
 use Module::Find;
 
 use Validation::Class::Util '!has';
@@ -28,6 +29,8 @@ our @EXPORT = qw(
     directive
     doc
     document
+    ens
+    ensure
     fld
     field
     flt
@@ -707,6 +710,78 @@ sub doc { goto &document } sub document {
     };
 
 };
+
+=keyword ensure
+
+The ensure keyword (or ens) is used to convert a pre-existing method 
+into an auto-validating method. The auto-validating method will be 
+registered and function as if it was created using the method keyword. 
+The original pre-existing method will be overridden with a modifed version
+which performs the pre and/or post validation routines.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    sub register {
+        # ...
+    }
+
+    ensure register => {
+        input  => ['name', '+email', 'username', '+password', '+password2'],
+        output => ['+id'], # optional output validation, dies on failure
+    };
+
+    package main;
+
+    my $person = MyApp::Person->new(params => $params);
+
+    if ($person->register) {
+
+        # handle the successful registration
+
+    }
+
+    1;
+
+The ensure keyword takes two arguments, the name of the method to be 
+overridden and a hashref of required key/value pairs. The hashref must 
+have an `input` key whose value is either an arrayref of fields to be 
+validated, or a scalar value which matches (a validation profile or 
+auto-validating method name). Whether and what the method returns is 
+yours to decide. The method will return 0 if validation fails. The 
+keyword functions much in the same way as the method keyword.
+
+=cut
+
+
+sub ens { goto &ensure } sub ensure {
+
+    my $package = shift if @_ == 3;
+
+    my ($name, $data) = @_;
+
+    $data ||= {};
+
+    return unless ($name && $data);
+
+    return configure_class_proto $package => sub {
+
+        my ($proto) = @_;
+
+        my $package = $proto->{package};
+        my $code    = $package->can($name);
+
+        $data->{using}   = $code;
+        $data->{install} = 1;
+
+        $proto->register_method($name, $data);
+
+        return $proto;
+
+    };
+
+}
 
 =keyword field
 
