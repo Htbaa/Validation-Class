@@ -1586,6 +1586,12 @@ See L<Validation::Class::Prototype/stash> for full documentation.
 
 See L<Validation::Class::Prototype/validate> for full documentation.
 
+=proxy_method validate_document
+
+    $self->validate_document;
+
+See L<Validation::Class::Prototype/validate_document> for full documentation.
+
 =proxy_method validate_method
 
     $self->validate_method;
@@ -1636,10 +1642,10 @@ B<If you have simple data validation needs, please review:>
 
 Validation::Class primarily validates strings, not blessed objects. If you need
 a means for validating object types you should be using a modern object system
-like L<Mo>, L<Moo>, L<Mouse>, or L<Moose>. Alternatively, you could use a
+like L<Mo>, L<Moo>, L<Mouse>, or L<Moose>. Alternatively, you could use
 decoupled object validators like L<Type::Tiny>, L<Params::Validate> or
-L<Specio>. If you are looking for the best-of-both-worlds, you might want to
-look at L<MooX::Validate>.
+L<Specio>. If you are looking to integrate data validation with a 
+light-weight object system, you might want to look at L<MooX::Validate>.
 
 In the event that you would like to look elsewhere for your data validation
 needs, the following is a list of other validation libraries/frameworks you

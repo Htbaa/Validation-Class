@@ -655,6 +655,13 @@ See L<Validation::Class::Prototype/stash> for full documentation.
 
 See L<Validation::Class::Prototype/validate> for full documentation.
 
+
+=proxy_method validate_document
+
+    $self->validate_document;
+
+See L<Validation::Class::Prototype/validate_document> for full documentation.
+
 =proxy_method validate_method
 
     $self->validate_method;
