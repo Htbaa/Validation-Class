@@ -6,7 +6,6 @@ use 5.10.0;
 use strict;
 use warnings;
 
-#use Class::Method::Modifiers 'before', 'after', 'around';
 use Module::Find;
 
 use Validation::Class::Util '!has';
@@ -769,13 +768,7 @@ sub ens { goto &ensure } sub ensure {
 
         my ($proto) = @_;
 
-        my $package = $proto->{package};
-        my $code    = $package->can($name);
-
-        $data->{using}   = $code;
-        $data->{install} = 1;
-
-        $proto->register_method($name, $data);
+        $proto->register_ensure($name, $data);
 
         return $proto;
 
@@ -1130,9 +1123,9 @@ sub msg { goto &message } sub message {
 =keyword method
 
 The method keyword (or mth) is used to register an auto-validating method.
-Similar to method signatures, an auto-validating method can leverage pre-existing
-validation rules and profiles to ensure a method has the required data necessary
-for execution.
+Similar to method signatures, an auto-validating method can leverage 
+pre-existing validation rules and profiles to ensure a method has the required 
+data necessary for execution.
 
     package MyApp::Person;
 
@@ -1175,7 +1168,8 @@ hashref must also have a `using` key whose value is a coderef which will be
 executed upon successfully validating the input. The `using` key/coderef can be
 omitted when a sub-routine of the same name prefixed with an underscore
 (or underscore + process + underscore) is present. Whether and what the method
-returns is yours to decide. The method will return 0 if validation fails.
+returns is yours to decide. The method will return undefined if validation 
+fails.
 
     # alternate usage
 

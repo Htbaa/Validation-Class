@@ -27,8 +27,37 @@ use warnings;
 
     $self->constraint('h@ck');
 
-    ok 'check_a OK' eq $self->check_a, "$class check_a method spec'd and validated";
-    ok 'check_a OK' eq $self->a_check, "$class a_check method spec'd and validated";
+    ok 'check_a OK' eq $self->check_a,
+      "$class check_a method spec'd and validated";
+
+    for (1..5) {
+        ok 'check_a OK' eq $self->a_check,
+          "$_: $class a_check method spec'd and validated";
+        ok 1 == $self->validate_method('a_check'),
+          "$_: $class a_check method validated but NOT executed";
+        ok 'check_a OK' eq $self->a_check,
+          "$_: $class a_check method spec'd and validated (again)";
+    }
+
+    $self->constraint(undef);
+
+    ok !defined  $self->a_check,
+      "$class a_check method failed to validate";
+    
+    $self->constraint('stuff');
+
+    ok 'check_a OK' eq $self->a_check,
+        "$class a_check method spec'd and validated";
+
+    $self->constraint(undef);
+
+    ok 0 == $self->validate_method('a_check'),
+      "$class a_check method does NOT validate and is NOT executed";
+
+    $self->constraint('stuff');
+
+    ok 'check_a OK' eq $self->a_check,
+      "$class a_check method spec'd and validated (again)";
 
 }
 
