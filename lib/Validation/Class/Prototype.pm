@@ -1847,7 +1847,7 @@ sub register_method {
     my $package = $self->package;
 
     unless ($data->{overwrite}) {
-    
+
         confess
             "Error creating method $name on $package: ".
             "collides with attribute $name"
@@ -1858,13 +1858,13 @@ sub register_method {
             "collides with method $name"
                 if $package->can($name)
         ;
-    
+
     }
 
     my @output_keys = my @input_keys = qw(
         input input_document input_profile input_method
-    );  
-    
+    );
+
     s/input/output/ for @output_keys;
 
     confess
@@ -1900,11 +1900,11 @@ sub register_method {
 
         my $input_type  = firstval { defined $data->{$_} } @input_keys;
         my $output_type = firstval { defined $data->{$_} } @output_keys;
-        my $input  = $input_type  ? $data->{$input_type}  : ''; 
+        my $input  = $input_type  ? $data->{$input_type}  : '';
         my $output = $output_type ? $data->{$output_type} : '';
         my $using  = $data->{'using'};
         my $return = undef;
-       
+
         if ($input and $input_type eq 'input') {
 
             if (isa_arrayref($input)) {
@@ -1929,7 +1929,7 @@ sub register_method {
 
             my $type           = $input_type;
                $type           =~ s/input_//;
-            
+
             my $type_list      = "${type}s";
             my $type_validator = "validate_${type}";
 
@@ -1967,7 +1967,7 @@ sub register_method {
 
             my $type           = $output_type;
                $type           =~ s/output_//;
-            
+
             my $type_list      = "${type}s";
             my $type_validator = "validate_${type}";
 
@@ -2945,7 +2945,7 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     }
 
-    my $fields    = { map {$_ => 1} ($self->fields->keys) };
+    my $fields = { map { $_ => 1 } ($self->fields->keys) };
 
     confess "Please supply a registered document name to validate against"
         unless $name
@@ -2963,7 +2963,9 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     $options ||= {};
 
-    for my  $key (keys %{$document}) {
+    # handle sub-document references
+
+    for my $key (keys %{$document}) {
 
         $document->{$key} = $documents->{$document->{$key}} if
             $document->{$key} && exists $documents->{$document->{$key}} &&
@@ -2974,7 +2976,23 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     $document = flatten $document;
 
-    for my  $key (keys %{$document}) {
+    my $overlay = clone $document;
+
+    # create overlay with undef values to merge with data
+
+    for my $key (keys %{$overlay}) {
+
+        (my $new = $key) =~ s/\\//g;
+
+        $overlay->{$new} = undef;
+
+        delete $overlay->{$key};
+
+    }
+
+    # handle regex expansions
+
+    for my $key (keys %{$document}) {
 
         my  $value = delete $document->{$key};
 
@@ -2995,9 +3013,10 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     my $_dmap = {};
     my $_pmap = {};
+
     my $_xmap = {};
 
-    my $_data = flatten $data;
+    my $_data = merge $overlay, flatten $data;
 
     for my $key (keys %{$_data}) {
 
@@ -3008,13 +3027,17 @@ sub document_validates { goto &validate_document } sub validate_document {
 
         my  $match = 0;
 
+        my  $switch;
+
         for my $regex (keys %{$document}) {
 
-            if ($_data->{$key}) {
+            if (exists $_data->{$key}) {
 
-                my  $field = $document->{$regex};
+                my  $field  = $document->{$regex};
 
                 if ($key =~ /^$regex$/) {
+
+                    $switch = $1 if $field =~ s/^([+-])//;
 
                     my $config = {label => $label};
 
@@ -3047,9 +3070,9 @@ sub document_validates { goto &validate_document } sub validate_document {
             unless $options->{prune} && ! $match
         ;
 
-        # queue and force requirement
+        # queue nodes
 
-        $self->queue("+$point")
+        $self->queue($switch ? "$switch$point" : "$point")
             unless $options->{prune} && ! $match
         ;
 
@@ -3154,7 +3177,7 @@ sub method_validates { goto &validate_method } sub validate_method {
 
         $method_spec->{using}  = sub { 1 };
         $method_spec->{output} = undef;
-        
+
         $context->$name(@args);
 
         $method_spec->{using}  = $code;

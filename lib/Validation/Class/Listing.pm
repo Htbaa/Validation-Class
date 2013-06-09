@@ -19,7 +19,7 @@ use List::MoreUtils 'uniq';
     $foos->add('foo');
     $foos->add('bar', 'baz');
 
-    print $foos->count; # 2 objects
+    print $foos->count; # 3 objects
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    use FindBin;
+    use lib $FindBin::Bin . "/../lib";
+
+}
+
+package Input;
+
+use Validation::Class;
+
+field name => {
+    required => 1,
+};
+
+my $input = __PACKAGE__->new(@ARGV);
+
+print $input->validate('name')
+    ? "parameters are valid\n"
+    : "parameters are invalid\n" . $input->errors_to_string . "\n";
+
+1;
+
+__END__
+
+# psuedo-code for ...
+field name => { required => 1 };
+
+if (%$requested && $requested->{name}) {
+    if (exists $params->{name}) {
+        if (defined $params->{name}) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    else {
+        return 1;
+    }
+}
+elsif (!%$requested) {
+    if (%$fields and $fields->{name}) {
+        if ($field->{name}->{required}) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
+    else {
+        return 1;
+    }
+}
