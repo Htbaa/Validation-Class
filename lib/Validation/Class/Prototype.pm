@@ -2976,19 +2976,26 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     $document = flatten $document;
 
-    my $overlay = clone $document;
+    my $signature = clone $document;
 
-    # create overlay with undef values to merge with data
+    # create document signature
 
-    for my $key (keys %{$overlay}) {
+    for my $key (keys %{$signature}) {
 
         (my $new = $key) =~ s/\\//g;
 
-        $overlay->{$new} = undef;
+        $new =~ s/\*/???/g;
+        $new =~ s/\.@/:0/g;
 
-        delete $overlay->{$key};
+        $signature->{$new} = '???';
+
+        delete $signature->{$key} unless $new eq $key;
 
     }
+
+    my $overlay = clone $signature;
+
+    $_ = undef for values %{$overlay};
 
     # handle regex expansions
 
@@ -3013,10 +3020,27 @@ sub document_validates { goto &validate_document } sub validate_document {
 
     my $_dmap = {};
     my $_pmap = {};
-
     my $_xmap = {};
 
-    my $_data = merge $overlay, flatten $data;
+    my $_zata = flatten $data;
+    my $_data = merge $overlay, $_zata;
+
+    # remove overlaid patterns if matching nodes exist
+
+    for my $key (keys %{$_data}) {
+
+        if ($key =~ /\?{3}/) {
+
+            (my $regex = $key) =~ s/\?{3}/\\w+/g;
+
+            delete $_data->{$key}
+                if grep { $_ =~ /$regex/ && $_ ne $key } keys %{$_data};
+
+        }
+
+    }
+
+    # generate validation rules
 
     for my $key (keys %{$_data}) {
 
@@ -3065,26 +3089,17 @@ sub document_validates { goto &validate_document } sub validate_document {
         $_xmap->{$point} = $key;
 
         # register node as a parameter
+        $self->params->add($point => $_data->{$key}) unless ! $match;
 
-        $self->params->add($point => $_data->{$key})
-            unless $options->{prune} && ! $match
-        ;
-
-        # queue nodes
-
-        $self->queue($switch ? "$switch$point" : "$point")
-            unless $options->{prune} && ! $match
-        ;
+        # queue node and requirement
+        $self->queue($switch ? "$switch$point" : "$point") unless ! $match;
 
         # prune unnecessary nodes
-
-        if ($options->{prune} && ! $match) {
-
-            delete $_data->{$key};
-
-        }
+        delete $_data->{$key} if $options->{prune} && ! $match;
 
     }
+
+    # validate
 
     $self->validate($context);
 

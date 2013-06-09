@@ -9,9 +9,20 @@ use Test::More;
 
     use Validation::Class;
 
-    field    name     => { min_length => 2, max_length => 100 };
-    document user     => { 'name.first' => 'name', 'name.last' => 'name' };
-    method   set_user => { input_document => 'user', using => sub { $_[1] } };
+    field name => {
+        min_length => 2,
+        max_length => 100
+    };
+
+    document user => {
+        'name.first' => 'name',
+        'name.last'  => 'name'
+    };
+
+    method set_user => {
+        input_document => 'user',
+        using          => sub { $_[1] }
+    };
 
     package main;
 
@@ -32,10 +43,9 @@ use Test::More;
       "T document (user) is NOT valid; name.first required";
 
     $user->{'name.first'}   = 'name';
+
     $data->{name}->{first}  = 'friendly';
     $data->{name}->{middle} = 'guy';
-
-    $class->ignore_unknown(1);
 
     is_deeply
         { name => { first => 'friendly', middle => 'guy', last => undef } },

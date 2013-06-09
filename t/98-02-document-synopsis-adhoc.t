@@ -32,13 +32,13 @@ my $data = {
 };
 
 my $schema = {
-    'id'                        => {mixin => [':num'], max_length => 4},
-    'name'                      => {mixin => [':str'], min_length => 2},
-    'title'                     => {mixin => [':str'], min_length => 5},
-    'company.name'              => {mixin => [':str'], min_length => 2},
-    'company.tags.@'            => {mixin => [':str'], min_length => 2},
-    'company.super*.name'       => {mixin => [':str'], min_length => 2},
-    'company.super*.rating.@.*' => {mixin => [':str'], },
+    'id'                        => { mixin => [':num'], max_length => 4 },
+    'name'                      => { mixin => [':str'], min_length => 2 },
+    'title'                     => { mixin => [':str'], min_length => 5 },
+    'company.name'              => { mixin => [':str'], min_length => 2 },
+    'company.tags.@'            => { mixin => [':str'], min_length => 2 },
+    'company.super*.name'       => { mixin => [':str'], min_length => 2 },
+    'company.super*.rating.@.*' => { mixin => [':str'], },
 };
 
 my $class;
