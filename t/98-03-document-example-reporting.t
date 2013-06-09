@@ -5,6 +5,34 @@ use Test::More;
 
 {
 
+    package T0;
+
+    use Validation::Class;
+
+    field 'string' => {
+        mixin => ':str'
+    };
+
+    document 'user' => {
+        'name'  => 'string',
+        'email' => 'string',
+    };
+
+    package main;
+
+    my $class = eval { T0->new };
+
+    ok "T0" eq ref $class, "T0 instantiated";
+
+    my $data = {};
+
+    ok ! $class->validate_document(user => $data), "T0 document (user) not valid";
+    ok 2 == $class->error_count, "T0 document failed with 2 errors";
+
+}
+
+{
+
     package T1;
 
     use Validation::Class;
@@ -22,18 +50,7 @@ use Test::More;
 
     package main;
 
-    my $class;
-
-    eval {
-
-        $class = T1->new(
-            ignore_failure => 1,
-            ignore_unknown => 1,
-            report_failure => 1,
-            report_unknown => 1
-        );
-
-    };
+    my $class = eval { T1->new };
 
     ok "T1" eq ref $class, "T1 instantiated";
 
@@ -71,9 +88,8 @@ use Test::More;
         ]
     };
 
-    ok ! $class->validate_document(user => $data), "T1 document (user) not valid";
-    ok 11 == $class->error_count, "T1 document failed with 11 errors";
-    ok $class->errors_to_string =~ /office_locations\.0\.id was not expected/, "T1 document errors look okay";
+    ok $class->validate_document(user => $data), "T1 document (user) valid";
+    ok 0 == $class->error_count, "T1 document passed with no errors";
 
 }
 
@@ -96,18 +112,7 @@ use Test::More;
 
     package main;
 
-    my $class;
-
-    eval {
-
-        $class = T2->new(
-            ignore_failure => 1,
-            ignore_unknown => 1,
-            report_failure => 0,
-            report_unknown => 0
-        );
-
-    };
+    my $class = eval { T2->new };
 
     ok "T2" eq ref $class, "T2 instantiated";
 
