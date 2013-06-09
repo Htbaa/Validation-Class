@@ -62,9 +62,9 @@ derived from the [Validation::Class::Simple](http://search.cpan.org/perldoc?Vali
 
 If you are new to Validation::Class, or would like more information on
 the underpinnings of this library and how it views and approaches
-data validation, please review [Validation::Class::Whitepaper](http://search.cpan.org/perldoc?Validation::Class::Whitepaper).
-Please review the ["GUIDED-TOUR" in Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple#GUIDED-TOUR) for a detailed
-step-by-step look into how Validation::Class works.
+data validation, please review [Validation::Class::Whitepaper](http://search.cpan.org/perldoc?Validation::Class::Whitepaper). Please review
+the ["GUIDED-TOUR" in Validation::Class::Cookbook](http://search.cpan.org/perldoc?Validation::Class::Cookbook#GUIDED-TOUR) for a detailed step-by-step look
+into how Validation::Class works.
 
 # METHODS
 

@@ -3,8 +3,14 @@ Changes from 2012-06-09 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900051 at 2013-06-09 16:17:47 +0000
+version 7.900051 at 2013-06-09 16:33:57 +0000
 ---------------------------------------------
+
+  Change: c5affe48bf8737c2b34c1341b9898a99e966282f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-06-09 12:33:53 +0000
+
+    moved the guided-tour documentation from V::C::S into the cookbook 
 
   Change: bc092c679d7585177379d324f718c2ea26cc6eb4
   Author: Al Newkirk <anewkirk@ana.io>

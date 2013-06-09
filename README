@@ -85,7 +85,7 @@ QUICKSTART
     are new to Validation::Class, or would like more information on the
     underpinnings of this library and how it views and approaches data
     validation, please review Validation::Class::Whitepaper. Please review
-    the "GUIDED-TOUR" in Validation::Class::Simple for a detailed
+    the "GUIDED-TOUR" in Validation::Class::Cookbook for a detailed
     step-by-step look into how Validation::Class works.
 
 KEYWORDS
