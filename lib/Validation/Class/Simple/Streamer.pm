@@ -73,9 +73,9 @@ derived from the L<Validation::Class::Simple> class.
 
 If you are new to Validation::Class, or would like more information on
 the underpinnings of this library and how it views and approaches
-data validation, please review L<Validation::Class::Whitepaper>.
-Please review the L<Validation::Class::Simple/GUIDED-TOUR> for a detailed
-step-by-step look into how Validation::Class works.
+data validation, please review L<Validation::Class::Whitepaper>. Please review
+the L<Validation::Class::Cookbook/GUIDED-TOUR> for a detailed step-by-step look
+into how Validation::Class works.
 
 =cut
 
