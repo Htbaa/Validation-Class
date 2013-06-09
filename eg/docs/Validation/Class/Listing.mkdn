@@ -4,7 +4,7 @@ Validation::Class::Listing - Generic Container Class for an Array Reference
 
 # VERSION
 
-version 7.900050
+version 7.900051
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ version 7.900050
     $foos->add('foo');
     $foos->add('bar', 'baz');
 
-    print $foos->count; # 2 objects
+    print $foos->count; # 3 objects
 
 # DESCRIPTION
 
