@@ -3,8 +3,14 @@ Changes from 2012-06-09 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900051 at 2013-06-09 16:33:57 +0000
+version 7.900051 at 2013-06-09 16:35:54 +0000
 ---------------------------------------------
+
+  Change: e87d51c24f0f67e3ea42b6f460dc3694c2c19aaa
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-06-09 12:35:44 +0000
+
+    hotfix for release 7.900051 
 
   Change: c5affe48bf8737c2b34c1341b9898a99e966282f
   Author: Al Newkirk <anewkirk@ana.io>
