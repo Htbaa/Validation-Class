@@ -2,7 +2,7 @@ NAME
     Validation::Class - Powerful Data Validation Framework
 
 VERSION
-    version 7.900051
+    version 7.900052
 
 SYNOPSIS
         use Validation::Class::Simple::Streamer;
@@ -367,6 +367,54 @@ KEYWORDS
         my $person = MyApp::Person->new;
 
         unless ($person->validate_document(person => $data)) {
+            warn $person->errors_to_string if $person->error_count;
+        }
+
+        1;
+
+    Additionally, the following is yet another way to validate a document by
+    passing the document specification directly instead of by name.
+
+        package MyApp::Person;
+
+        use Validation::Class;
+
+        package main;
+
+        my $data = {
+            "id"      => "1234-ABC",
+            "name"    => "Anita Campbell-Green",
+            "title"   => "Designer",
+            "company" => {
+                "name"       => "House of de Vil",
+                "supervisor" => {
+                    "name"   => "Cruella de Vil",
+                    "rating" => [
+                        {   "support"  => -9,
+                            "guidance" => -9
+                        }
+                    ]
+                },
+                "tags" => [
+                    "evil",
+                    "cruelty",
+                    "dogs"
+                ]
+            },
+        };
+
+        my $spec = {
+            'id'                            => { max_length => 2 },
+            'name'                          => { mixin      => ':str' },
+            'company.name'                  => { mixin      => ':str' },
+            'company.supervisor.name'       => { mixin      => ':str' },
+            'company.supervisor.rating.@.*' => { pattern    => qr/^(?!evil)\w+/ },
+            'company.tags.@'                => { max_length => 20 },
+        };
+
+        my $person = MyApp::Person->new;
+
+        unless ($person->validate_document($spec => $data)) {
             warn $person->errors_to_string if $person->error_count;
         }
 

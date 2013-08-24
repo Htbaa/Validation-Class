@@ -44,7 +44,7 @@ has 'mixin' => 1;
 has 'field' => 1;
 has 'multi' => 0;
 has 'dependencies' => sub {{
-    normalization => [],
+    normalization => ['alias'],
     validation    => []
 }};
 

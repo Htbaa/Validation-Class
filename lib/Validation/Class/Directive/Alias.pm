@@ -57,15 +57,37 @@ has 'mixin'        => 0;
 has 'field'        => 1;
 has 'multi'        => 0;
 has 'dependencies' => sub {{
-    normalization => [],
+    normalization => ['name'],
     validation    => ['name']
 }};
+
+sub normalize {
+
+    my ($self, $proto, $field, $param) = @_;
+
+    # create a map from aliases if applicable
+
+    $self->execute_alias_mapping($proto, $field, $param);
+
+    return $self;
+
+}
 
 sub before_validation {
 
     my ($self, $proto, $field, $param) = @_;
 
     # create a map from aliases if applicable
+
+    $self->execute_alias_mapping($proto, $field, $param);
+
+    return $self;
+
+}
+
+sub execute_alias_mapping {
+
+    my ($self, $proto, $field, $param) = @_;
 
     if (defined $field->{alias}) {
 

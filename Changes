@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2012-06-09 00:00:00 +0000 to present.
+Changes from 2012-08-24 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900051 at 2013-06-09 16:35:54 +0000
+version 7.900052 at 2013-08-24 15:40:56 +0000
 ---------------------------------------------
+
+  Change: 1aaef5c8780ab5f9b37b9f22a16d5d39597bf1c5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-08-24 11:39:36 +0000
+
+    added the alias directive processing to the on_normalize event 
+
+---------------------------------------------
+version 7.900051 at 2013-06-09 16:36:35 +0000
+---------------------------------------------
+
+  Change: 4d34f0444ccf663efbed99392ace7fec40783205
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-06-09 12:36:35 +0000
+
+    v7.900051 
 
   Change: e87d51c24f0f67e3ea42b6f460dc3694c2c19aaa
   Author: Al Newkirk <anewkirk@ana.io>
