@@ -1768,8 +1768,7 @@ sub register_field {
     $merge   = 1 if $name =~ s/^\+{1}//;
 
     confess "Error creating field $name, name is not properly formatted"
-        unless $name =~ /^[a-zA-Z_](([\w\.]+)?\w)$/
-        xor    $name =~ /^[a-zA-Z_](([\w\.]+)?\w)\:\d+$/;
+        unless $name =~ /^(?:[a-zA-Z_](?:[\w\.]*\w|\w*)(?:\:\d+)?)$/;
 
     if ($merge) {
         if ($self->configuration->fields->has($name) && $merge == 2) {
