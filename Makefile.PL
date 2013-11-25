@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0
   },
   "TEST_REQUIRES" => {},
-  "VERSION" => "7.900053",
+  "VERSION" => "7.900054",
   "test" => {
     "TESTS" => "t/*.t t/legacy/*.t t/legacy/regression/*.t t/legacy/regression/filters/*.t t/legacy/regression/validators/*.t"
   }

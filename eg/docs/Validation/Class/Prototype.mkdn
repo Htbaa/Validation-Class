@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Prototype - Data Validation Engine for Validation::Class Classes
-
-# VERSION
-
-version 7.900051
-
 # DESCRIPTION
 
 Validation::Class::Prototype is the validation engine used by proxy via
@@ -13,58 +5,38 @@ Validation::Class::Prototype is the validation engine used by proxy via
 Please see [Validation::Class::Simple](http://search.cpan.org/perldoc?Validation::Class::Simple) for a quick introduction on how to get
 started.
 
-# ATTRIBUTES
-
-## attributes
-
 The attributes attribute provides access to simple attributes registered on the
 the calling class. This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object
 containing hashref objects and CANNOT be overridden.
-
-## builders
 
 The builders attribute provides access to coderefs registered to hook into the
 instantiation process of the calling class. This attribute is a
 [Validation::Class::Listing](http://search.cpan.org/perldoc?Validation::Class::Listing) object containing coderef objects and CANNOT be
 overridden.
 
-## configuration
-
 The configuration attribute provides the default configuration profile.
 This attribute is a [Validation::Class::Configuration](http://search.cpan.org/perldoc?Validation::Class::Configuration) object and CANNOT be
 overridden.
-
-## directives
 
 The directives attribute provides access to defined directive objects.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
 hashrefs and CANNOT be overridden.
 
-## documents
-
 The documents attribute provides access to defined document models.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and CANNOT be
 overridden.
-
-## errors
 
 The errors attribute provides access to class-level error messages.
 This attribute is a [Validation::Class::Errors](http://search.cpan.org/perldoc?Validation::Class::Errors) object, may contain
 error messages and CANNOT be overridden.
 
-## events
-
 The events attribute provides access to validation events and the directives
 that subscribe to them. This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object
 and CANNOT be overridden.
 
-## fields
-
 The fields attribute provides access to defined fields objects.
 This attribute is a [Validation::Class::Fields](http://search.cpan.org/perldoc?Validation::Class::Fields) object containing
 [Validation::Class::Field](http://search.cpan.org/perldoc?Validation::Class::Field) objects and CANNOT be overridden.
-
-## filtering
 
 The filtering attribute (by default set to 'pre') controls when incoming data
 is filtered. Setting this attribute to 'post' will defer filtering until after
@@ -72,13 +44,9 @@ validation occurs which allows any errors messages to report errors based on the
 unaltered data. Alternatively, setting the filtering attribute to 'off' will
 bypass all filtering unless explicitly defined at the field-level.
 
-## filters
-
 The filters attribute provides access to defined filters objects.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
 code references and CANNOT be overridden.
-
-## ignore\_failure
 
 The ignore\_failure boolean determines whether your application will live or die
 upon failing to validate a self-validating method defined using the method
@@ -86,25 +54,17 @@ keyword. This is on (1) by default, method validation failures will set errors
 and can be determined by checking the error stack using one of the error message
 methods. If turned off, the application will die and confess on failure.
 
-## ignore\_unknown
-
 The ignore\_unknown boolean determines whether your application will live or
 die upon encountering unregistered field directives during validation. This is
 off (0) by default, attempts to validate unknown fields WILL cause the program
 to die.
 
-## messages
-
 The messages attribute provides access to class-level error message overrides.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing scalar values.
-
-## methods
 
 The methods attribute provides access to self-validating code references.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
 code references.
-
-## mixins
 
 The mixins attribute provides access to field templates. This attribute is
 a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and CANNOT be overridden.
@@ -112,57 +72,39 @@ a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class:
 The package attribute contains the namespace of the instance object currently
 using this module.
 
-## params
-
 The params attribute provides access to input parameters.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and CANNOT be
 overridden.
 
-## profiles
-
 The profiles attribute provides access to validation profile.
 This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object containing
 hash references and CANNOT be overridden.
-
-## queued
 
 The queued attribute returns an arrayref of field names for validation and
 CANNOT be overridden. It represents a list of field names stored to be used in
 validation later. If the queued attribute contains a list, you can omit
 arguments to the validate method.
 
-## report\_failure
-
 The report\_failure boolean determines whether your application will report
 self-validating method failures as class-level errors. This is off (0) by default,
 if turned on, an error messages will be generated and set at the class-level
 specifying the method which failed in addition to the existing messages.
-
-## report\_unknown
 
 The report\_unknown boolean determines whether your application will report
 unregistered fields as class-level errors upon encountering unregistered field
 directives during validation. This is off (0) by default, attempts to validate
 unknown fields will NOT be registered as class-level variables.
 
-## settings
-
 The settings attribute provides access to settings specific to the associated
 class, not to be confused with settings which exist in the prototype's
 configuration. This attribute is a [Validation::Class::Mapping](http://search.cpan.org/perldoc?Validation::Class::Mapping) object and
 CANNOT be overridden.
-
-## validated
 
 The validated attribute simply denotes whether the validation routine has been
 executed since the last normalization process (which occurs at instantiation
 and before validation). It's values will either be 0 (not validated),
 1 (validated with errors), or 2 (validated without errors). You can simply check
 this attribute for truth when you need to know if validation has occurred.
-
-# METHODS
-
-## apply\_filters
 
 The apply\_filters method can be used to run the currently defined parameters
 through the filters defined in their matching fields.
@@ -171,8 +113,6 @@ through the filters defined in their matching fields.
 
     # apply filters to fields where filtering is set to 'post' filtering
     $self = $self->apply_filters('post');
-
-## class
 
 The class method accepts any arguments which can be passed to the foward method
 of a [Class::Forward](http://search.cpan.org/perldoc?Class::Forward) object which should return a valid class namespace.
@@ -222,8 +162,6 @@ aliases on the matching rules (if any) to allow validation to occur seamlessly.
 
     1;
 
-## clear\_queue
-
 The clear\_queue method resets the queue container, see the queue method for more
 information on queuing fields to be validated. The clear\_queue method has yet
 another useful behavior in that it can assign the values of the queued
@@ -245,8 +183,6 @@ order queued.
         print "Name is $name and email is $email";
 
     }
-
-## clone\_field
 
 The clone\_field method is used to create new fields (rules) from existing fields
 on-the-fly. This is useful when you have a variable number of parameters being
@@ -276,8 +212,6 @@ field to the cloned field, if desired, this must be done manually.
 
     1;
 
-## does
-
 The does method is used to determine whether the current prototype is composed
 using the role specified. Return true if so, false if not.
 
@@ -293,14 +227,10 @@ using the role specified. Return true if so, false if not.
 
     return 1 if $self->proto->does('Class::Root');
 
-## error\_count
-
 The error\_count method returns the total number of errors set at both the class
 and field level.
 
     my $count = $self->error_count;
-
-## error\_fields
 
 The error\_fields method returns a hashref containing the names of fields which
 failed validation and an arrayref of error messages.
@@ -312,8 +242,6 @@ failed validation and an arrayref of error messages.
     }
 
     my $suspects = $self->error_fields('field2', 'field3');
-
-## errors\_to\_string
 
 The errors\_to\_string method stringifies the all error objects on both the class
 and fields using the specified delimiter (defaulting to comma-space (", ")).
@@ -327,8 +255,6 @@ and fields using the specified delimiter (defaulting to comma-space (", ")).
 
     }
 
-## get\_errors
-
 The get\_errors method returns a list of combined class-and-field-level errors.
 
     # returns all errors
@@ -340,23 +266,17 @@ The get\_errors method returns a list of combined class-and-field-level errors.
     # return errors for field_a and field_b specifically
     my @specific_field_errors = $self->get_errors('field_a', 'field_b');
 
-## get\_fields
-
 The get\_fields method returns the list of [Validation::Class::Field](http://search.cpan.org/perldoc?Validation::Class::Field) objects
 for specific fields and returns an empty list if no arguments are passed. If a
 field does not match the name specified it will return undefined.
 
     my ($a, $b) = $self->get_fields('field_a', 'field_b');
 
-## get\_hash
-
 The get\_hash method returns a hashref consisting of all fields with their
 absolute values (i.e. default value or matching parameter value). If a
 field does not have an absolute value its value will be undefined.
 
     my $hash = $self->get_hash;
-
-## get\_params
 
 The get\_params method returns the values of the parameters specified (as a list,
 in the order specified). This method will return a list of key/value pairs if
@@ -393,8 +313,6 @@ no parameter names are passed.
 
     print $params->{name};
 
-## get\_values
-
 The get\_values method returns the absolute value for a given field. This method
 executes specific logic which returns the value a field has based on a set of
 internal conditions. This method always returns a list, field names that do not
@@ -415,15 +333,11 @@ exist are returned as undefined.
         $value = $field->{value} || $param;
     }
 
-## is\_valid
-
 The is\_valid method returns a boolean value which is true if the last validation
 attempt was successful, and false if it was not (which is determined by looking
 for errors at the class and field levels).
 
     return "OK" if $self->is_valid;
-
-## normalize
 
 The normalize method executes a set of routines that conditions the environment
 filtering any parameters present whose matching field has its filtering
@@ -432,16 +346,12 @@ and again just before each validation event.
 
     $self->normalize;
 
-## param
-
 The param method gets/sets a single parameter by name. This method returns the
 value assigned or undefined if the parameter does not exist.
 
     my $value = $self->param('name');
 
     $self->param($name => $value);
-
-## plugin
 
 The plugin method returns an instantiated plugin object which is passed the
 current prototype object. Note: This functionality is somewhat experimental.
@@ -457,8 +367,6 @@ current prototype object. Note: This functionality is somewhat experimental.
     my $formatter = $input->plugin('telephone_format');
     # ... returns a Validation::Class::Plugin::TelephoneFormat object
 
-## queue
-
 The queue method is a convenience method used specifically to append the
 queued attribute allowing you to \*queue\* fields to be validated. This method
 also allows you to set fields that must always be validated.
@@ -467,14 +375,10 @@ also allows you to set fields that must always be validated.
     $self->queue(qw/email email2/) if $input->param('change_email');
     $self->queue(qw/login login2/) if $input->param('change_login');
 
-## reset
-
 The reset method clears all errors, fields and queued field names, both at the
 class and individual field levels.
 
     $self->reset();
-
-## reset\_errors
 
 The reset\_errors method clears all errors, both at the class and individual
 field levels. This method is called automatically every time the validate()
@@ -482,15 +386,11 @@ method is triggered.
 
     $self->reset_errors();
 
-## reset\_fields
-
 The reset\_fields method set special default directives and clears all errors and
 field values, both at the class and individual field levels. This method is
 executed automatically at instantiation.
 
     $self->reset_fields();
-
-## reset\_params
 
 The reset\_params method is responsible for completely removing any existing
 parameters and adding those specified. This method returns the class object.
@@ -498,14 +398,10 @@ This method takes a list of key/value pairs or a single hashref.
 
     $self->reset_params($new_params);
 
-## set\_errors
-
 The set\_errors method pushes its arguments (error messages) onto the class-level
 error stack and returns a count of class-level errors.
 
     my $count = $self->set_errors('...', '...');
-
-## set\_fields
 
 The set\_fields method is responsible setting/overriding registered fields.
 This method returns the class object. This method takes a list of key/value
@@ -514,8 +410,6 @@ value should be a hashref that is a valid field configuration object.
 
     $self->set_fields($name => $config); # accepts hashref also
 
-## set\_params
-
 The set\_params method is responsible for setting/replacing parameters. This
 method returns the class object. This method takes a list of key/value pairs or
 a single hashref whose keys should match field names and whose value should
@@ -523,14 +417,10 @@ be a scalar or arrayref of scalars.
 
     $self->set_params($name => $value); # accepts a hashref also
 
-## set\_value
-
 The set\_value method assigns a value to the specified field's parameter
 unless the field is readonly. This method returns the class object.
 
     $self->set_values($name => $value);
-
-## stash
 
 The stash method provides a container for context/instance specific information.
 The stash is particularly useful when custom validation routines require insight
@@ -559,8 +449,6 @@ into context/instance specific operations.
 
     #  store the database object for use in email validation
     $self->stash(database => $database_object);
-
-## validate
 
 The validate method (or has\_valid, or validates) returns true/false depending on
 whether all specified fields passed validation checks.
@@ -624,8 +512,6 @@ minus respectively as follows:
         return $input->errors_to_string;
     }
 
-## validate\_document
-
 The validate\_document method (or document\_validates) is used to validate the
 specified hierarchical data against the specified document declaration. This is
 extremely valuable for validating serialized messages passed between machines.
@@ -645,8 +531,6 @@ Additionally, to support the validation of ad-hoc specifications, you may pass
 this method two hashrefs, the first being the document notation schema, and the
 second being the hierarchical data you wish to validate.
 
-## validate\_method
-
 The validate\_method method (or method\_validates) is used to determine whether a
 self-validating method will be successful. It does so by validating the methods
 input specification. This is useful in circumstances where it is advantageous to
@@ -664,8 +548,6 @@ validation profile.
 
     }
 
-## validate\_profile
-
 The validate\_profile method (or profile\_validates) executes a stored validation
 profile, it requires a profile name and can be passed additional parameters
 which get forwarded into the profile routine in the order received.
@@ -681,14 +563,3 @@ which get forwarded into the profile routine in the order received.
         print $self->errors_to_string;
 
     }
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

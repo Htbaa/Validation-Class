@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Simple - Simple Ad-Hoc Data Validation
-
-# VERSION
-
-version 7.900051
-
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -77,206 +69,140 @@ basically aliases to the corresponding prototype (engine) class methods,
 however it is possible to access the prototype directly using the
 proto/prototype methods.
 
-## class
-
     $self->class;
 
 See ["class" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#class) for full documentation.
-
-## clear\_queue
 
     $self->clear_queue;
 
 See ["clear\_queue" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#clear\_queue) for full documentation.
 
-## error\_count
-
     $self->error_count;
 
 See ["error\_count" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#error\_count) for full documentation.
-
-## error\_fields
 
     $self->error_fields;
 
 See ["error\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#error\_fields) for full documentation.
 
-## errors
-
     $self->errors;
 
 See ["errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors) for full documentation.
-
-## errors\_to\_string
 
     $self->errors_to_string;
 
 See ["errors\_to\_string" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#errors\_to\_string) for full documentation.
 
-## get\_errors
-
     $self->get_errors;
 
 See ["get\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_errors) for full documentation.
-
-## get\_fields
 
     $self->get_fields;
 
 See ["get\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_fields) for full documentation.
 
-## get\_hash
-
     $self->get_hash;
 
 See ["get\_hash" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_hash) for full documentation.
-
-## get\_params
 
     $self->get_params;
 
 See ["get\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_params) for full documentation.
 
-## get\_values
-
     $self->get_values;
 
 See ["get\_values" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#get\_values) for full documentation.
-
-## fields
 
     $self->fields;
 
 See ["fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#fields) for full documentation.
 
-## filtering
-
     $self->filtering;
 
 See ["filtering" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#filtering) for full documentation.
-
-## ignore\_failure
 
     $self->ignore_failure;
 
 See ["ignore\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_failure) for full documentation.
 
-## ignore\_unknown
-
     $self->ignore_unknown;
 
 See ["ignore\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#ignore\_unknown) for full documentation.
-
-## is\_valid
 
     $self->is_valid;
 
 See ["is\_valid" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#is\_valid) for full documentation.
 
-## param
-
     $self->param;
 
 See ["param" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#param) for full documentation.
-
-## params
 
     $self->params;
 
 See ["params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#params) for full documentation.
 
-## plugin
-
     $self->plugin;
 
 See ["plugin" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#plugin) for full documentation.
 
-## queue
-
     $self->queue;
 
 See ["queue" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#queue) for full documentation.
-
-## report\_failure
 
     $self->report_failure;
 
 See ["report\_failure" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report\_failure) for full
 documentation.
 
-## report\_unknown
-
     $self->report_unknown;
 
 See ["report\_unknown" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#report\_unknown) for full documentation.
-
-## reset\_errors
 
     $self->reset_errors;
 
 See ["reset\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_errors) for full documentation.
 
-## reset\_fields
-
     $self->reset_fields;
 
 See ["reset\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_fields) for full documentation.
-
-## reset\_params
 
     $self->reset_params;
 
 See ["reset\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#reset\_params) for full documentation.
 
-## set\_errors
-
     $self->set_errors;
 
 See ["set\_errors" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_errors) for full documentation.
-
-## set\_fields
 
     $self->set_fields;
 
 See ["set\_fields" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_fields) for full documentation.
 
-## set\_params
-
     $self->set_params;
 
 See ["set\_params" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_params) for full documentation.
-
-## set\_method
 
     $self->set_method;
 
 See ["set\_method" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#set\_method) for full documentation.
 
-## stash
-
     $self->stash;
 
 See ["stash" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#stash) for full documentation.
-
-## validate
 
     $self->validate;
 
 See ["validate" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate) for full documentation.
 
-## validate\_document
+
 
     $self->validate_document;
 
 See ["validate\_document" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_document) for full documentation.
 
-## validate\_method
-
     $self->validate_method;
 
 See ["validate\_method" in Validation::Class::Prototype](http://search.cpan.org/perldoc?Validation::Class::Prototype#validate\_method) for full documentation.
-
-## validate\_profile
 
     $self->validate_profile;
 
@@ -307,14 +233,3 @@ documentation.
 
 See ["after method(s) => sub { ... }" in Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers#after method(s) => sub { ... }) for full
 documentation.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

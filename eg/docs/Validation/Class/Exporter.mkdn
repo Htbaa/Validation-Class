@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Exporter - Simple Exporter for Validation::Class Classes
-
-# VERSION
-
-version 7.900051
-
 # SYNOPSIS
 
     package MyApp::Validator;
@@ -62,10 +54,6 @@ To simplify writing exporter modules, `Validation::Class::Exporter` also
 imports `strict` and `warnings` into your exporter module, as well as into
 modules that use it.
 
-# METHODS
-
-## apply\_spec
-
 When you call this method, `Validation::Class::Exporter` builds a custom
 `import` method on the calling class. The `import` method will export the
 functions you specify, and can also automatically export `Validation::Class`
@@ -87,14 +75,3 @@ This method accepts the following parameters:
     This approach affords you some trickery in that you can utilize the load method
     to apply the current class' configuration to the calling class' configuration,
     etc.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

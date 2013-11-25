@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Directive - Base Class for Validation Class Directives
-
-# VERSION
-
-version 7.900051
-
 # SYNOPSIS
 
     package Validation::Class::Directive::CheckBlacklist;
@@ -72,14 +64,3 @@ You can extend Validation::Class by creating your own validation rules
 (directives). Validation::Class::Directive provides a base-class for you to use
 when creating new directive classes. Please see [Validation::Class::Directives](http://search.cpan.org/perldoc?Validation::Class::Directives)
 for a complete list of core directives.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

@@ -1,24 +1,5 @@
-# NAME
-
-Validation::Class::Directive::Toggle - Toggle Directive for Validation Class Field Definitions
-
-# VERSION
-
-version 7.900051
-
 # DESCRIPTION
 
 Validation::Class::Directive::Toggle is a core validation class field directive
 that is used internally to handle validation of per-validation-event
 requirements.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.

@@ -1,11 +1,3 @@
-# NAME
-
-Validation::Class::Directive::Email - Email Directive for Validation Class Field Definitions
-
-# VERSION
-
-version 7.900051
-
 # SYNOPSIS
 
     use Validation::Class::Simple;
@@ -33,14 +25,3 @@ that checks the validity of email addresses specified by the associated
 parameters. Please note, the email directive does not perform a host lookup
 nor does it conform to the RFC specification. For more sophisticated email
 validation, please use custom validation with [Email::Valid](http://search.cpan.org/perldoc?Email::Valid) or similar.
-
-# AUTHOR
-
-Al Newkirk <anewkirk@ana.io>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
