@@ -232,7 +232,10 @@ sub initialize_validator {
 =head1 DESCRIPTION
 
 Validation::Class is a scalable data validation library with interfaces for
-applications of all sizes.
+applications of all sizes. B<Note: Validation::Class is entering into
+maintenance-only mode, i.e. Validation::Class will only be updated with minor
+enhancements and bug fixes, the lessons learned will be part of a complete
+rewrite uploaded under the namespace> L<Validation::Interface>.
 
 The most common usage of Validation::Class is to transform class namespaces into
 data validation domains where consistency and reuse are primary concerns.

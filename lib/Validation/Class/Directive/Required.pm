@@ -56,7 +56,8 @@ sub before_validation {
         if ($field->{required} && (! defined $param || $param eq '')) {
 
             $self->error($proto, $field);
-            $proto->stash->{'validation.bypass_event'}++;
+            $proto->stash->{'validation.bypass_event'}++
+                unless $proto->ignore_intervention;
 
         }
 

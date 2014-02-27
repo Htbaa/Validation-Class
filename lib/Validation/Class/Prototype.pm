@@ -153,6 +153,20 @@ methods. If turned off, the application will die and confess on failure.
 
 has 'ignore_failure' => '1';
 
+=attribute ignore_intervention
+
+The ignore_intervention boolean determines whether validation will short-circuit
+if required fields are not present. This is off (0) by default; The logic behind
+this decision is that, for example, in the case of a required field, if the
+field was not submitted but was required, there is no need to perform additional
+validation. This is a type-of short-circuiting which reduces validation
+overhead. If you would like to emit all applicable validation errors you can
+enable this option.
+
+=cut
+
+has 'ignore_intervention' => '0';
+
 =attribute ignore_unknown
 
 The ignore_unknown boolean determines whether your application will live or
@@ -670,6 +684,7 @@ sub class {
     my @attrs = qw(
 
         ignore_failure
+        ignore_intervention
         ignore_unknown
         report_failure
         report_unknown
@@ -1580,6 +1595,7 @@ sub proxy_methods {
         fields
         filtering
         ignore_failure
+        ignore_intervention
         ignore_unknown
         is_valid
         param

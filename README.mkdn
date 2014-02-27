@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900054
+version 7.900055
 
 # SYNOPSIS
 
@@ -28,7 +28,10 @@ version 7.900054
 # DESCRIPTION
 
 Validation::Class is a scalable data validation library with interfaces for
-applications of all sizes.
+applications of all sizes. __Note: Validation::Class is entering into
+maintenance-only mode, i.e. Validation::Class will only be updated with minor
+enhancements and bug fixes, the lessons learned will be part of a complete
+rewrite uploaded under the namespace__ [Validation::Interface](http://search.cpan.org/perldoc?Validation::Interface).
 
 The most common usage of Validation::Class is to transform class namespaces into
 data validation domains where consistency and reuse are primary concerns.
