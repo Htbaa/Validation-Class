@@ -3,12 +3,12 @@ Changes from 2013-05-29 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900056 at 2014-05-29 14:01:37 +0000
+version 7.900056 at 2014-05-29 14:08:09 +0000
 ---------------------------------------------
 
-  Change: 8a23c11cb84e765559f6267676fba3b37740c9f5
+  Change: 9d62ad2d16230d1742c015e06883fbcc6a1a8fa9
   Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2014-05-29 09:56:42 +0000
+  Date : 2014-05-29 10:04:37 +0000
 
     removed maintenance notice and updated the documentation 
 
