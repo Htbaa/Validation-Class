@@ -54,6 +54,14 @@ keyword. This is on (1) by default, method validation failures will set errors
 and can be determined by checking the error stack using one of the error message
 methods. If turned off, the application will die and confess on failure.
 
+The ignore\_intervention boolean determines whether validation will short-circuit
+if required fields are not present. This is off (0) by default; The logic behind
+this decision is that, for example, in the case of a required field, if the
+field was not submitted but was required, there is no need to perform additional
+validation. This is a type-of short-circuiting which reduces validation
+overhead. If you would like to emit all applicable validation errors you can
+enable this option.
+
 The ignore\_unknown boolean determines whether your application will live or
 die upon encountering unregistered field directives during validation. This is
 off (0) by default, attempts to validate unknown fields WILL cause the program
@@ -451,7 +459,10 @@ into context/instance specific operations.
     $self->stash(database => $database_object);
 
 The validate method (or has\_valid, or validates) returns true/false depending on
-whether all specified fields passed validation checks.
+whether all specified fields passed validation checks. Please consider, if this
+method is called without any parameters, the list of fields to be validated
+will be assumed/deduced, making the execution strategy conditional, which may
+not be what you want.
 
     use MyApp::Person;
 

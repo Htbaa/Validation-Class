@@ -2670,7 +2670,10 @@ sub unflatten_params {
 =method validate
 
 The validate method (or has_valid, or validates) returns true/false depending on
-whether all specified fields passed validation checks.
+whether all specified fields passed validation checks. Please consider, if this
+method is called without any parameters, the list of fields to be validated
+will be assumed/deduced, making the execution strategy conditional, which may
+not be what you want.
 
     use MyApp::Person;
 

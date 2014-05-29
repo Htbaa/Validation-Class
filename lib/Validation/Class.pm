@@ -215,33 +215,28 @@ sub initialize_validator {
     use Validation::Class::Simple::Streamer;
 
     my  $params = {username => 'admin', password => 's3cret'};
+    my  $input  = Validation::Class::Simple::Streamer->new(params => $params);
 
-    my  $input = Validation::Class::Simple::Streamer->new(params => $params);
+    # check username parameter
+    $input->check('username')->required->between('5-255');
+    $input->filters([qw/trim strip/]);
 
-        # check username parameter
-        $input->check('username')->required->between('5-255');
-        $input->filters([qw/trim strip/]);
+    # check password parameter
+    $input->check('password')->required->between('5-255')->min_symbols(1);
+    $input->filters([qw/trim strip/]);
 
-        # check password parameter
-        $input->check('password')->required->between('5-255')->min_symbols(1);
-        $input->filters([qw/trim strip/]);
-
-        # run validate
-        die $input->errors_to_string unless $input->validate;
+    # run validate
+    $input->validate or die $input->errors_to_string;
 
 =head1 DESCRIPTION
 
 Validation::Class is a scalable data validation library with interfaces for
-applications of all sizes. B<Note: Validation::Class is entering into
-maintenance-only mode, i.e. Validation::Class will only be updated with minor
-enhancements and bug fixes, the lessons learned will be part of a complete
-rewrite uploaded under the namespace> L<Validation::Interface>.
-
-The most common usage of Validation::Class is to transform class namespaces into
-data validation domains where consistency and reuse are primary concerns.
-Validation::Class provides an extensible framework for defining reusable data
-validation rules. It ships with a complete set of pre-defined validations and
-filters referred to as L<"directives"|Validation::Class::Directives/DIRECTIVES>.
+applications of all sizes. The most common usage of Validation::Class is to
+transform class namespaces into data validation domains where consistency and
+reuse are primary concerns. Validation::Class provides an extensible framework
+for defining reusable data validation rules. It ships with a complete set of
+pre-defined validations and filters referred to as
+L<"directives"|Validation::Class::Directives/DIRECTIVES>.
 
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
@@ -250,7 +245,8 @@ default error messages, creating custom validators, creating custom input
 filters and much more). Validation::Class promotes DRY (don't repeat yourself)
 code. The main benefit in using Validation::Class is that the architecture is
 designed to increase the consistency of data input handling. The following is
-a more traditional usage of Validation::Class:
+a more traditional usage of Validation::Class, using the DSL to construct a
+validator class:
 
     package MyApp::Person;
 
@@ -298,6 +294,18 @@ underpinnings of this library and how it views and approaches data validation,
 please review L<Validation::Class::Whitepaper>. Please review the
 L<Validation::Class::Cookbook/GUIDED-TOUR> for a detailed step-by-step look into
 how Validation::Class works.
+
+=cut
+
+=head1 UPGRADE
+
+Validation::Class is stable, its feature-set is complete, and is currently in
+maintenance-only mode, i.e. Validation::Class will only be updated with minor
+enhancements and bug fixes. However, the lessons learned will be incorporated
+into a compelete rewrite uploaded under the namespace L<Validation::Interface>.
+The Validation::Interface fork is designed to have a much simpler API with less
+options and better execution, focused on validating hierarchical data as its
+primarily objective.
 
 =cut
 
@@ -1535,11 +1543,10 @@ Validation::Class mostly provides sugar functions for modeling your data
 validation requirements. Each class you create is associated with a prototype
 class which provides the data validation engine and keeps your class namespace
 free from pollution, please see L<Validation::Class::Prototype> for more
-information on specific methods and attributes.
-
-Validation::Class injects a few proxy methods into your class which are
-basically aliases to the corresponding prototype class methods, however it is
-possible to access the prototype directly using the proto/prototype methods.
+information on specific methods and attributes. Validation::Class injects a few
+proxy methods into your class which are basically aliases to the corresponding
+prototype class methods, however it is possible to access the prototype directly
+using the proto/prototype methods.
 
 =proxy_method class
 
@@ -1624,6 +1631,12 @@ See L<Validation::Class::Prototype/filtering> for full documentation.
     $self->ignore_failure;
 
 See L<Validation::Class::Prototype/ignore_failure> for full documentation.
+
+=proxy_method ignore_intervention
+
+    $self->ignore_intervention;
+
+See L<Validation::Class::Prototype/ignore_intervention> for full documentation.
 
 =proxy_method ignore_unknown
 
@@ -1774,48 +1787,10 @@ documentation.
 
 =head1 SEE ALSO
 
-B<If you have simple data validation needs, please review:>
-
-=over
-
-=item L<Validation::Class::Simple>
-
-=back
-
-Validation::Class primarily validates strings, not blessed objects. If you need
-a means for validating object types you should be using a modern object system
-like L<Mo>, L<Moo>, L<Mouse>, or L<Moose>. Alternatively, you could use
-decoupled object validators like L<Type::Tiny>, L<Params::Validate> or
-L<Specio>. If you are looking to integrate data validation with a
-light-weight object system, you might want to look at L<MooX::Validate>.
-
-In the event that you would like to look elsewhere for your data validation
-needs, the following is a list of other validation libraries/frameworks you
-might be interested in. If I've missed a really cool new validation library
-please let me know.
-
-=over
-
-=item L<HTML::FormHandler>
-
-This library seems to be the defacto standard for designing Moose classes with
-HTML-centric data validation rules.
-
-=item L<Data::Verifier>
-
-This library is a great approach towards adding robust validation logic to
-your existing Moose-based codebase.
-
-=item L<Validate::Tiny>
-
-This library is nice for simple use-cases, it has virtually no dependencies
-and solid test coverage.
-
-=item L<Data::Domain>
-
-This library is has a unique yet modular API for building data valdation rules,
-although the design is simple, it appears to also support the validating of
-hierarchical data and objects.
+Validation::Class does not validate blessed objects. If you need a means for
+validating object types you should use a modern object system like L<Moo>,
+L<Mouse>, or L<Moose>. Alternatively, you could use decoupled object
+validators like L<Type::Tiny>, L<Params::Validate> or L<Specio>.
 
 =back
 
