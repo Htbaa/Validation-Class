@@ -26,6 +26,7 @@ use warnings;
         if ($p1->max_length(50)) {
             $p1->filters(['alpha', 'trim', 'strip']);
             ok $p1, "p1 validated";
+            ok $p1, "p1 still validated";
         }
     }
 
