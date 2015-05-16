@@ -230,8 +230,6 @@ sub validate {
 
     my $true = $self->prototype->validate($self);
 
-    $self->prototype->clear_queue if $true; # reduces validation overhead
-
     return $true;
 
 }
