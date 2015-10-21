@@ -1,194 +1,55 @@
 ==================================================
-Changes from 2013-05-29 00:00:00 +0000 to present.
+Changes from 2014-10-21 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900056 at 2014-05-29 14:08:09 +0000
+version 7.900057 at 2015-10-21 13:39:03 +0000
 ---------------------------------------------
 
-  Change: 9d62ad2d16230d1742c015e06883fbcc6a1a8fa9
+  Change: 48df1c550f42c45ce91ec54f823d8bf371ee0ed8
   Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2014-05-29 10:04:37 +0000
+  Date : 2015-10-21 13:35:14 +0000
 
-    removed maintenance notice and updated the documentation 
+    added object param sharing test 
 
----------------------------------------------
-version 7.900055 at 2014-02-27 04:20:32 +0000
----------------------------------------------
-
-  Change: cc35d465e97a4f4ad3f3a9444aceb42e85e159a6
+  Change: cb38e53433a09309f6d4c638ff83c621243ece29
   Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2014-02-26 23:20:32 +0000
+  Date : 2015-10-21 13:35:06 +0000
 
-    v7.900055 
+    removed Class::Forward dependency 
 
-  Change: 0fb1f7b9c1939e65565fa8225e9e5038e679f2be
+  Change: 0e4c25dabe100c8c12efcaa3b38c83145c736a24
   Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2014-02-26 23:18:25 +0000
+  Date : 2015-05-22 00:54:48 +0000
 
-    added ignore_intervention option 
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
 
----------------------------------------------
-version 7.900054 at 2013-11-25 05:30:30 +0000
----------------------------------------------
+  Change: 513e06cc4a53ef53e570305efa1c789860d6a286
+  Author: Yanick Champoux <yanick@babyl.dyndns.org>
+  Date : 2015-05-16 23:01:08 +0000
 
-  Change: b235843cba9727757359af50b19bd66ad4fe4a8a
+    Makes 'evaluate' idempotent.
+
+    Deals with #37. The optimization was making it such that calling
+    `validate` a second time would cause a stack trace. 
+
+  Change: 2487096d709955875dc85dc48b738c766e10c13f
   Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-11-25 00:30:30 +0000
+  Date : 2015-05-16 19:00:43 +0000
 
-    v7.900054 
+    Merge pull request #39 from yanick/validate-idempotent
 
-  Change: 56053aefb08885a9384cebc9c32edc4fcb455059
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-11-25 00:29:31 +0000
+    Makes 'evaluate' idempotent. 
 
-    hard perl 5.10 requirement 
+  Change: e368e5bb42a09dd8a7984da5fe49a30053f55847
+  Author: Yanick Champoux <yanick@babyl.dyndns.org>
+  Date : 2015-04-25 12:49:20 +0000
 
----------------------------------------------
-version 7.900053 at 2013-11-25 05:11:15 +0000
----------------------------------------------
+    makes 'evaluate' idempotent
 
-  Change: 4fca23e7de0199f598ca3c4165e25b3af7c483df
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-11-25 00:11:15 +0000
-
-    v7.900053 
-
-  Change: 77f6401df65d0e393be442b48bec3434feede4b4
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-11-25 00:10:15 +0000
-
-    fixed error in field name format validation 
-
----------------------------------------------
-version 7.900052 at 2013-08-24 15:45:20 +0000
----------------------------------------------
-
-  Change: f4659d6f05c7e9b82cd7da968108d845120a9cd2
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-08-24 11:45:20 +0000
-
-    v7.900052 
-
-  Change: 892eceab1c4b770b871575b55b6d2bb013ed3527
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-08-24 11:41:54 +0000
-
-    added the alias directive processing to the on_normalize event 
-
----------------------------------------------
-version 7.900051 at 2013-06-09 16:36:35 +0000
----------------------------------------------
-
-  Change: 4d34f0444ccf663efbed99392ace7fec40783205
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 12:36:35 +0000
-
-    v7.900051 
-
-  Change: e87d51c24f0f67e3ea42b6f460dc3694c2c19aaa
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 12:35:44 +0000
-
-    hotfix for release 7.900051 
-
-  Change: c5affe48bf8737c2b34c1341b9898a99e966282f
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 12:33:53 +0000
-
-    moved the guided-tour documentation from V::C::S into the cookbook 
-
-  Change: bc092c679d7585177379d324f718c2ea26cc6eb4
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 12:06:10 +0000
-
-    releasing 7.900051 
-
-  Change: 995e82f225e855f64a1d5b348ff09220d64156fc
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 06:02:57 +0000
-
-    fixed test t/98-03-document-example-reporting.t for use with changes to
-    the validate_document method 
-
-  Change: 14643ca99db96c40d2903aeadff2851a07916edc
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-09 05:49:40 +0000
-
-    updated the validate_document method to validate unmatched patterns for
-    complete data structure coverage 
-
-  Change: 31ab8507f3a76106e92ec66c2735fb6f23b98d1d
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-08 23:41:16 +0000
-
-    modified the documentation for the method keyword 
-
-  Change: f54d11cdf21d288d48d3a6f819cf68b072032eee
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-08 21:19:28 +0000
-
-    fixed miscellaneous issues with the validate_document method including
-    proper field requirement usage 
-
-  Change: 1153d28e3ded6b66bea261e53822892a09d8f1bb
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-06 20:38:27 +0000
-
-    redesigned the ensure and method keywords and registers and usages 
-
-  Change: 4c562871c9402aa99111117c81516560a7a09aab
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-01 00:13:23 +0000
-
-    Merge branch 'feature-ensure-function' 
-
-  Change: 6702e856fe1898c0216ca81e246c67942f46e261
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-01 00:12:24 +0000
-
-    updated and reorganized documentation 
-
-  Change: 47523753dd3ef967e3a87046c76951f5498ff32a
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-06-01 00:02:05 +0000
-
-    added keyword ensure to wrap existing methods with pre/post conditions 
-
-  Change: 825ac499acb24b64b930c174fbedcea1d008f695
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-05-31 14:23:40 +0000
-
-    updated documentation for the directive function 
-
----------------------------------------------
-version 7.900050 at 2013-05-29 18:54:57 +0000
----------------------------------------------
-
-  Change: d7b4de09bece3ba58671fbf974f722256a6f7661
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-05-29 14:54:57 +0000
-
-    v7.900050 
-
-  Change: 8c4f705fd73e2955f3ffc40f7cdc693982308921
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-05-29 14:53:57 +0000
-
-    releasing 7.900050 
-
-  Change: bc1ddc5fa8765c9dcb44ed5873351ea2f6cffa9e
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-05-29 14:51:49 +0000
-
-    fixed cached stash bug, stashes are now instance specific 
-
-  Change: be788c0c8f6035f4a68bc6cbc5c7793bb3bdf4c4
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2013-05-13 06:39:02 +0000
-
-    updated proxy method POD 
+    Deals with #37. The optimization was making it such that calling
+    `validate` a second time would cause a stack trace. 
 
 =================================================
-Plus 50 releases after 2013-05-29 00:00:00 +0000.
+Plus 57 releases after 2014-10-21 00:00:00 +0000.
 =================================================

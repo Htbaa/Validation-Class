@@ -1,4 +1,3 @@
-requires "Class::Forward" => "0";
 requires "Hash::Flatten" => "0";
 requires "Hash::Merge" => "0";
 requires "List::MoreUtils" => "0";
@@ -12,5 +11,5 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "ExtUtils::MakeMaker" => "6.30";
+  requires "ExtUtils::MakeMaker" => "0";
 };
