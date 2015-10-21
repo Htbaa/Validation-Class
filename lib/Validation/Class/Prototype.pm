@@ -22,7 +22,6 @@ use Hash::Flatten 'flatten', 'unflatten';
 use Module::Runtime 'use_module';
 use Module::Find 'findallmod';
 use Scalar::Util 'weaken';
-use Class::Forward 'clsf';
 use Hash::Merge 'merge';
 use Carp 'confess';
 use Clone 'clone';
@@ -619,9 +618,6 @@ sub check_mixin {
 
 =method class
 
-The class method accepts any arguments which can be passed to the foward method
-of a L<Class::Forward> object which should return a valid class namespace.
-
 This method instantiated and returns the validation class specified , existing
 parameters and configuration options are passed to the constructor of the
 validation class (including the stash object). You can prevent/override
@@ -647,8 +643,6 @@ aliases on the matching rules (if any) to allow validation to occur seamlessly.
 
     my $child3  = $input->class('child');      # loads Class::Child;
     my $child4  = $input->class('step_child'); # loads Class::StepChild;
-
-    # please see Class::Forward for namespace shortname conventions
 
     # intelligently detecting and mapping parameters to child class
 
@@ -677,7 +671,13 @@ sub class {
 
     return unless $name;
 
-    my $class=Class::Forward->new(namespace=>$self->{package})->forward($name);
+    my @strings;
+
+    @strings = split /\//, $name;
+    @strings = map { s/[^a-zA-Z0-9]+([a-zA-Z0-9])/\U$1/g; $_ } @strings;
+    @strings = map { /\w/ ? ucfirst $_ : () } @strings;
+
+    my $class = join '::', $self->{package}, @strings;
 
     return unless $class;
 
@@ -1564,11 +1564,13 @@ sub plugin {
 
     # transform what looks like a shortname
 
-    my $lookup = Class::Forward->new;
+    my @strings;
 
-    $lookup->namespace('Validation::Class::Plugin');
+    @strings = split /\//, $name;
+    @strings = map { s/[^a-zA-Z0-9]+([a-zA-Z0-9])/\U$1/g; $_ } @strings;
+    @strings = map { /\w/ ? ucfirst $_ : () } @strings;
 
-    my $class = $lookup->forward($name);
+    my $class = join '::', 'Validation::Class::Plugin', @strings;
 
     eval { use_module $class };
 
