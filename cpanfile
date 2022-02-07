@@ -1,3 +1,4 @@
+requires "Clone" => "0";
 requires "Hash::Flatten" => "0";
 requires "Hash::Merge" => "0";
 requires "List::MoreUtils" => "0";
