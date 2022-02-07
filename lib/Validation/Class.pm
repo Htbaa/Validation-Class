@@ -774,7 +774,7 @@ sub doc { goto &document } sub document {
 The ensure keyword (or ens) is used to convert a pre-existing method
 into an auto-validating method. The auto-validating method will be
 registered and function as if it was created using the method keyword.
-The original pre-existing method will be overridden with a modifed version
+The original pre-existing method will be overridden with a modified version
 which performs the pre and/or post validation routines.
 
     package MyApp::Person;
