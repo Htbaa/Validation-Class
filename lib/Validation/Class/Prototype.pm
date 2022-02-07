@@ -2240,7 +2240,7 @@ sub register_settings {
                     # merge configurations
 
                     my $self_profile = $self->configuration->profile;
-                    my $role_profile = $role_proto->configuration->profile;
+                    my $role_profile = clone($role_proto->configuration->profile);
 
                     # manually merge profiles with list/map containers
 
