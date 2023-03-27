@@ -1792,8 +1792,6 @@ validating object types you should use a modern object system like L<Moo>,
 L<Mouse>, or L<Moose>. Alternatively, you could use decoupled object
 validators like L<Type::Tiny>, L<Params::Validate> or L<Specio>.
 
-=back
-
 =cut
 
 1;
